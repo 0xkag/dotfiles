@@ -79,5 +79,5 @@ export PATH=$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/b
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-. $HOME/.dotfiles/shellrc
+source $HOME/.dotfiles/shellrc
 
