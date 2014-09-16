@@ -1,3 +1,5 @@
+;; vim: et sw=4 ts=4:
+
 ;; packages
 
 (require 'package)
@@ -6,23 +8,24 @@
 ;; ... package archives
 
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
-(add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/") t)
+;(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+;(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
+;(add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/") t)
 
 ;; ... packages to install
 
 (defvar kyle/packages '(ace-jump-mode
                         ack
-                        anaconda-mode
+                        ;anaconda-mode
                         ;ag
                         auto-complete
+                        better-defaults
                         color
-			color-theme
-			company
-			company-anaconda
+                        color-theme
+                        company
+                        ;company-anaconda
                         ;diminish
-                        ;elpy
+                        elpy
                         evil
                         ;evil-indent-textobject
                         ;evil-leader
@@ -54,8 +57,9 @@
                         python-environment
                         ;rainbow-delimiters
                         ;smart-mode-line
-                        ;smex
+                        smex
                         ;surround
+                        sublime-themes
                         undo-tree
                         ;vimrc-mode
                         ;yasnippet
@@ -78,27 +82,27 @@
 
 (global-font-lock-mode 1)
 (global-linum-mode 1)
+
 (column-number-mode 1)
 (line-number-mode 1)
 (show-paren-mode 1)
-(setq show-paren-style 'expression)
 
-;(global-company-mode 1)
-;(company-mode 1)
-;(add-to-list 'company-backends 'company-anaconda)
+(setq show-paren-style 'expression)
 
 ;;
 ;; ace-jump
 ;;
 
+(require 'ace-jump-mode)
 (eval-after-load "ace-jump-mode" '(ace-jump-mode-enable-mark-sync))
 
 ;;
 ;; ack
 ;;
 
-(defvar ack-history nil
-  "History for the `ack' command.")
+(require 'ack)
+
+(defvar ack-history nil "History for the `ack' command.")
 
 (defun ack (command-args)
   (interactive
@@ -114,13 +118,17 @@
 ;; company
 ;;
 
-(add-hook 'python-mode-hook
-  (lambda ()
-    (set (make-local-variable 'company-backends) '(company-anaconda))))
+;;(global-company-mode 1)
+;;(company-mode 1)
+;;(add-to-list 'company-backends 'company-anaconda)
 
-(global-company-mode 1)
+;(add-hook 'python-mode-hook
+;  (lambda ()
+;    (set (make-local-variable 'company-backends) '(company-anaconda))))
 
-(require 'color)
+;(global-company-mode 1)
+
+;;(require 'color)
 
 ;(let ((bg (face-attribute 'default :background)))
 ;  (custom-set-faces
@@ -143,13 +151,29 @@
 ;; elpy
 ;;
 
-;(setq elpy-rpc-backend "jedi")
+(setq elpy-rpc-backend "jedi")
+
+(add-hook 'python-mode-hook
+  (lambda ()
+    (elpy-mode 1)))
 
 ;;
 ;; evil
 ;;
 
 (evil-mode 1)
+
+;;
+;; ido
+;;
+
+(ido-mode 1)
+
+;;
+;; smex
+;;
+
+(smex-initialize)
 
 ;;
 ;; key bindings
@@ -159,6 +183,64 @@
 (define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
 (define-key evil-normal-state-map (kbd "SPC") 'ace-jump-mode)
 
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+
 ;(add-hook 'python-mode-hook 'jedi:setup)
 ;(setq jedi:complete-on-dot t)
 
+;;(custom-set-variables
+;; ;; custom-set-variables was added by Custom.
+;; ;; If you edit it by hand, you could mess it up, so be careful.
+;; ;; Your init file should contain only one such instance.
+;; ;; If there is more than one, they won't work right.
+;; ;;'(ansi-color-names-vector ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
+;; '(company-auto-complete t)
+;; '(company-auto-complete-chars (quote (32 95 40 41 46)))
+;; '(company-show-numbers t)
+;; '(custom-enabled-themes (quote (zenburn)))
+;; '(custom-safe-themes (quote ("3b819bba57a676edf6e4881bd38c777f96d1aa3b3b5bc21d8266fa5b0d0f1ebf" default))))
+;;(custom-set-faces
+;; ;; custom-set-faces was added by Custom.
+;; ;; If you edit it by hand, you could mess it up, so be careful.
+;; ;; Your init file should contain only one such instance.
+;; ;; If there is more than one, they won't work right.
+;; '(company-tooltip ((t (:inherit default :background))))
+;; '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
+;; '(company-tooltip-selection ((t (:inherit font-lock-function-name-face)))))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
+ '(custom-enabled-themes (quote (manoj-dark)))
+ '(custom-safe-themes (quote ("1989847d22966b1403bab8c674354b4a2adf6e03e0ffebe097a6bd8a32be1e19" default))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:background nil))))
+ '(company-tooltip ((t (:inherit default :background))) t)
+ '(company-tooltip-common ((t (:inherit font-lock-constant-face))) t)
+ '(company-tooltip-selection ((t (:inherit font-lock-function-name-face))) t))
+
+;;
+;; theme
+;;
+
+(require 'color-theme)
+(color-theme-initialize)
+
+(if window-system
+    (color-theme-subtle-hacker)
+    (color-theme-hober))
+
+;(load-theme 'tty-dark t)
+;(load-theme 'junio t)
+;(load-theme 'renegade t)
+
+;(color-theme-tty-dark)
+;(color-theme-renegade)
