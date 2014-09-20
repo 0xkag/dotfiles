@@ -52,7 +52,7 @@ source $ZSH/oh-my-zsh.sh
 # User configuration
 
 export OLDPATH=$PATH
-export PATH=$HOME/bin:$HOME/.dotfiles/bin
+export PATH=$HOME/bin:$HOME/.dotfiles/bin:$HOME/.local/bin
 test -n "$OLDPATH" && export PATH=$PATH:$OLDPATH
 export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # export MANPATH="/usr/local/man:$MANPATH"
