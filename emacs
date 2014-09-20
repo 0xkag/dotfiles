@@ -14,7 +14,8 @@
 
 ;; ... packages to install
 
-(defvar kyle/packages '(ace-jump-mode
+(defvar kyle/packages '(ace-jump-buffer
+                        ace-jump-mode
                         ack
                         ;anaconda-mode
                         ;ag
@@ -34,9 +35,10 @@
                         ;evil-paredit
                         ;evil-visualstar
                         ;exec-path-from-shell
-                        ;fill-column-indicator
+                        fill-column-indicator
                         ;flx-ido
                         ;flycheck
+                        flymake-cursor
                         ;git-gutter+
                         ;git-gutter-fringe+
                         ;guide-key
@@ -81,19 +83,45 @@
 ;;
 
 (global-font-lock-mode 1)
-(global-linum-mode 1)
-
+;(global-linum-mode 1)
 (column-number-mode 1)
 (line-number-mode 1)
 (show-paren-mode 1)
 
 (setq show-paren-style 'expression)
 
+;; ===
+
+;;
+;; elpy
+;;
+
+(require 'elpy)
+
+(setq elpy-rpc-backend "jedi")
+
+(add-hook 'python-mode-hook
+  (lambda ()
+    (setq fill-column 78)
+    (elpy-mode 1)
+    (fci-mode 1)))
+
+;;
+;; evil
+;;
+
+;(require 'evil)
+
+;(evil-mode 1)
+
+;; ====
+
 ;;
 ;; ace-jump
 ;;
 
 (require 'ace-jump-mode)
+
 (eval-after-load "ace-jump-mode" '(ace-jump-mode-enable-mark-sync))
 
 ;;
@@ -102,7 +130,8 @@
 
 (require 'ack)
 
-(defvar ack-history nil "History for the `ack' command.")
+(defvar ack-history nil
+  "History for the `ack' command.")
 
 (defun ack (command-args)
   (interactive
@@ -146,22 +175,6 @@
     ;`(company-scrollbar-fg ((t (:background ,(color-lighten-name bg 5)))))
     `(company-tooltip-selection ((t (:inherit font-lock-function-name-face))))
     `(company-tooltip-common ((t (:inherit font-lock-constant-face))))))
-
-;;
-;; elpy
-;;
-
-(setq elpy-rpc-backend "jedi")
-
-(add-hook 'python-mode-hook
-  (lambda ()
-    (elpy-mode 1)))
-
-;;
-;; evil
-;;
-
-(evil-mode 1)
 
 ;;
 ;; ido
@@ -209,23 +222,23 @@
 ;; '(company-tooltip ((t (:inherit default :background))))
 ;; '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
 ;; '(company-tooltip-selection ((t (:inherit font-lock-function-name-face)))))
-(custom-set-variables
+;(custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
- '(custom-enabled-themes (quote (manoj-dark)))
- '(custom-safe-themes (quote ("1989847d22966b1403bab8c674354b4a2adf6e03e0ffebe097a6bd8a32be1e19" default))))
-(custom-set-faces
+; '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
+; '(custom-enabled-themes (quote (manoj-dark)))
+; '(custom-safe-themes (quote ("1989847d22966b1403bab8c674354b4a2adf6e03e0ffebe097a6bd8a32be1e19" default))))
+;(custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:background nil))))
- '(company-tooltip ((t (:inherit default :background))) t)
- '(company-tooltip-common ((t (:inherit font-lock-constant-face))) t)
- '(company-tooltip-selection ((t (:inherit font-lock-function-name-face))) t))
+; '(default ((t (:background nil))))
+; '(company-tooltip ((t (:inherit default :background))) t)
+; '(company-tooltip-common ((t (:inherit font-lock-constant-face))) t)
+; '(company-tooltip-selection ((t (:inherit font-lock-function-name-face))) t))
 
 ;;
 ;; theme
