@@ -1,3 +1,6 @@
 [submodule "lib/oh-my-zsh"]
 	path = lib/oh-my-zsh
 	url = git://github.com/robbyrussell/oh-my-zsh.git
+[submodule "sshrc"]
+	path = lib/sshrc
+	url = https://github.com/Russell91/sshrc
