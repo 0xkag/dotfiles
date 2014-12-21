@@ -104,15 +104,19 @@
   (lambda ()
     (setq fill-column 78)
     (elpy-mode 1)
-    (fci-mode 1)))
+    (fci-mode 1)
+    (setq indent-tabs-mode t)
+    (setq python-indent 4)
+    (setq tab-width 4)
+    (tabify (point-min) (point-max))))
 
 ;;
 ;; evil
 ;;
 
-;(require 'evil)
+(require 'evil)
 
-;(evil-mode 1)
+(evil-mode 1)
 
 ;; ====
 
@@ -244,12 +248,12 @@
 ;; theme
 ;;
 
-(require 'color-theme)
-(color-theme-initialize)
+;(require 'color-theme)
+;(color-theme-initialize)
 
-(if window-system
-    (color-theme-subtle-hacker)
-    (color-theme-hober))
+;(if window-system
+;    (color-theme-subtle-hacker)
+;    (color-theme-hober))
 
 ;(load-theme 'tty-dark t)
 ;(load-theme 'junio t)
@@ -257,3 +261,18 @@
 
 ;(color-theme-tty-dark)
 ;(color-theme-renegade)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(eldoc-idle-delay 0.25))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:background nil))))
+ '(company-tooltip ((t (:inherit default :background))))
+ '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
+ '(company-tooltip-selection ((t (:inherit font-lock-function-name-face)))))
