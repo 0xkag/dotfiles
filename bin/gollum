@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -u
+
+GOLLUM_DIR=${GOLLUM_DIR:?}
+
+~/.dotfiles/lib/gollum/bin/gollum \
+  --page-file-dir gollum ${GOLLUM_DIR} \
+  --host 127.0.0.1
+
