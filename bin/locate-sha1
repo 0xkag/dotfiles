@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+locate "$1" | xargs -I {} sha1 -r {} 
