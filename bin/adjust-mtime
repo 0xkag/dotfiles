@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+
+from datetime import datetime
+import os
+import os.path
+import sys
+
+os.stat_float_times(True)
+
+for line in sys.stdin:
+    line = line.strip()
+    atime = os.path.getatime(line)
+    mtime = os.path.getmtime(line)
+    mtime_modified = mtime - (60 * 60)
+    print line, atime, datetime.fromtimestamp(atime), mtime, \
+        datetime.fromtimestamp(mtime), mtime_modified, \
+        datetime.fromtimestamp(mtime_modified)
+    #os.utime(line, (atime, mtime_modified))
+
