@@ -4,3 +4,6 @@
 [submodule "sshrc"]
 	path = lib/sshrc
 	url = https://github.com/Russell91/sshrc
+[submodule "lib/cask"]
+	path = lib/cask
+	url = https://github.com/cask/cask.git
