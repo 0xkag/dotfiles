@@ -1,5 +1,9 @@
 ;; vim: et sw=4 ts=4:
 
+;; basic
+
+(require 'cl)
+
 ;; packages
 
 (require 'package)
@@ -7,10 +11,10 @@
 
 ;; ... package archives
 
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+(add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/") t)
+;(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
 ;(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-;(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
-;(add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/") t)
 
 ;; ... packages to install
 
@@ -19,11 +23,11 @@
                         ack
                         ;anaconda-mode
                         ;ag
-                        auto-complete
-                        better-defaults
-                        color
-                        color-theme
-                        company
+                        ;auto-complete
+                        ;better-defaults
+                        ;color
+                        ;color-theme
+                        ;company
                         ;company-anaconda
                         ;diminish
                         elpy
@@ -38,7 +42,7 @@
                         fill-column-indicator
                         ;flx-ido
                         ;flycheck
-                        flymake-cursor
+                        ;flymake-cursor
                         ;git-gutter+
                         ;git-gutter-fringe+
                         ;guide-key
@@ -50,6 +54,8 @@
                         ;markdown-mode
                         ;molokai-theme
                         ;multiple-cursors
+                        org
+                        ;org-trello
                         ;paredit
                         ;popwin
                         ;pretty-mode
@@ -61,7 +67,7 @@
                         ;smart-mode-line
                         smex
                         ;surround
-                        sublime-themes
+                        ;sublime-themes
                         undo-tree
                         ;vimrc-mode
                         ;yasnippet
@@ -74,9 +80,28 @@
 
 ;; ... install missing packages
 
-(dolist (package kyle/packages)
-  (unless (package-installed-p package)
-    (package-install package)))
+
+(dolist (pkg kyle/packages)
+  (when (and (not (package-installed-p pkg))
+             (assoc pkg package-archive-contents))
+    (package-install pkg)))
+
+;(dolist (package kyle/packages)
+;  (unless (package-installed-p package)
+;    (package-install package)))
+
+;; ... from http://stackoverflow.com/a/14838150/812472
+
+(defun package-list-unaccounted-packages ()
+  "Like `package-list-packages', but shows only the packages that
+  are installed and are not in `jpk-packages'.  Useful for
+  cleaning out unwanted packages."
+  (interactive)
+  (package-show-package-list
+    (remove-if-not (lambda (x) (and (not (memq x kyle/packages))
+                                    (not (package-built-in-p x))
+                                    (package-installed-p x)))
+                   (mapcar 'car package-archive-contents))))
 
 ;;
 ;; global editor options
@@ -89,8 +114,6 @@
 (show-paren-mode 1)
 
 (setq show-paren-style 'expression)
-
-;; ===
 
 ;;
 ;; elpy
@@ -118,8 +141,6 @@
 
 (evil-mode 1)
 
-;; ====
-
 ;;
 ;; ace-jump
 ;;
@@ -128,6 +149,7 @@
 
 (eval-after-load "ace-jump-mode" '(ace-jump-mode-enable-mark-sync))
 
+#||
 ;;
 ;; ack
 ;;
@@ -185,6 +207,13 @@
 ;;
 
 (ido-mode 1)
+
+;;
+;; org
+;;
+
+(setq org-todo-keywords
+  '((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
 
 ;;
 ;; smex
@@ -266,7 +295,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(eldoc-idle-delay 0.25))
+ '(eldoc-idle-delay 0.25)
+ '(org-agenda-files (quote ("~/wc/org/todo.org"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -276,3 +306,6 @@
  '(company-tooltip ((t (:inherit default :background))))
  '(company-tooltip-common ((t (:inherit font-lock-constant-face))))
  '(company-tooltip-selection ((t (:inherit font-lock-function-name-face)))))
+
+||#
+
