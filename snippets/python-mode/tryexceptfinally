@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: tryexceptfinally
+# key: try
+# --
+try:
+    $1
+except $2:
+    $3
+finally:
+    $0
