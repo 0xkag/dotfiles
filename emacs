@@ -1,9 +1,112 @@
 ;; vim: et sw=4 ts=4:
 
-;; basic
+;; basic and packages
 
 (require 'cl)
+(require 'cask "~/.dotfiles/lib/cask/cask.el")
+(cask-initialize)
+(require 'pallet)
+(pallet-mode t)
 
+;; global editor options
+
+(global-font-lock-mode 1)
+;(global-linum-mode 1)
+(column-number-mode 1)
+(line-number-mode 1)
+(show-paren-mode 1)
+(setq show-paren-style 'expression)
+
+;; package: ace-jump
+
+(require 'ace-jump-mode)
+(eval-after-load "ace-jump-mode" '(ace-jump-mode-enable-mark-sync))
+
+;; package: ack
+
+(require 'ack)
+(defvar ack-history nil
+  "History for the `ack' command.")
+(defun ack (command-args)
+  (interactive
+    (let ((ack-command "ack --nogroup --with-filename --all "))
+      (list (read-shell-command "Run ack (like this): "
+                                ack-command
+                                'ack-history))))
+  (let ((compilation-disable-input t))
+    (compilation-start (concat command-args " < " null-device)
+                       'grep-mode)))
+
+;; package: bind-key
+
+(require 'bind-key)
+
+;; package: drag-stuff
+
+(require 'drag-stuff)
+(drag-stuff-mode t)
+
+;; package: evil
+
+(require 'evil)
+(evil-mode 1)
+
+;; package: expand-region
+
+(require 'expand-region)
+(bind-key "C-@" 'er/expand-region)
+
+;; package: idle-highlight
+
+(require 'idle-highlight-mode)
+
+;; package: ido, flx-ido
+
+(require 'ido)
+(require 'flx-ido)
+(ido-mode t)
+(ido-everywhere 1)
+(flx-ido-mode 1)
+;; disable ido faces to see flx highlights.
+(setq ido-enable-flex-matching t)
+(setq ido-use-faces nil)
+
+;; package: org
+
+(require 'org)
+(setq org-todo-keywords
+  '((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
+
+;; package: popwin
+
+(require 'popwin)
+(popwin-mode 1)
+;(global-set-key (kbd "C-z") popwin:keymap)
+
+;; package: projectile
+
+(projectile-global-mode)
+
+;; package: smartparens
+
+(require 'smartparens-config)
+
+;; package: smex
+
+(require 'smex)
+(smex-initialize)
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command) ;; old M-x
+
+;; package: yasnippet
+
+(require 'yasnippet)
+(add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
+(add-to-list 'yas-snippet-dirs "~/.dotfiles/snippets")
+(yas-global-mode 1)
+
+#|
 ;; packages
 
 (require 'package)
@@ -102,19 +205,9 @@
                                     (not (package-built-in-p x))
                                     (package-installed-p x)))
                    (mapcar 'car package-archive-contents))))
+|#
 
-;;
-;; global editor options
-;;
-
-(global-font-lock-mode 1)
-;(global-linum-mode 1)
-(column-number-mode 1)
-(line-number-mode 1)
-(show-paren-mode 1)
-
-(setq show-paren-style 'expression)
-
+#|
 ;;
 ;; elpy
 ;;
@@ -133,42 +226,9 @@
     (setq tab-width 4)
     (tabify (point-min) (point-max))))
 
-;;
-;; evil
-;;
-
-(require 'evil)
-
-(evil-mode 1)
-
-;;
-;; ace-jump
-;;
-
-(require 'ace-jump-mode)
-
-(eval-after-load "ace-jump-mode" '(ace-jump-mode-enable-mark-sync))
+|#
 
 #||
-;;
-;; ack
-;;
-
-(require 'ack)
-
-(defvar ack-history nil
-  "History for the `ack' command.")
-
-(defun ack (command-args)
-  (interactive
-   (let ((ack-command "ack --nogroup --with-filename --all "))
-     (list (read-shell-command "Run ack (like this): "
-                               ack-command
-                               'ack-history))))
-  (let ((compilation-disable-input t))
-    (compilation-start (concat command-args " < " null-device)
-                       'grep-mode)))
-
 ;;
 ;; company
 ;;
@@ -207,19 +267,6 @@
 ;;
 
 (ido-mode 1)
-
-;;
-;; org
-;;
-
-(setq org-todo-keywords
-  '((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
-
-;;
-;; smex
-;;
-
-(smex-initialize)
 
 ;;
 ;; key bindings
