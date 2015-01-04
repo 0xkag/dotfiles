@@ -1,0 +1,26 @@
+# vim: noet sw=4 ts=4:
+
+function join { local IFS="$1"; shift; echo "$*"; }
+
+path=(
+	$HOME/bin
+	$HOME/.dotfiles/bin
+	$HOME/root/bin
+	/usr/local/bin
+	/usr/local/sbin
+	/usr/bin
+	/usr/sbin
+	/bin
+	/sbin
+)
+
+export PATH=$(join : ${path[@]})
+
+manpath=(
+	/usr/local/man
+	/usr/local/share/man
+	/usr/share/man
+)
+
+export MANPATH=$(join : ${manpath[@]})
+

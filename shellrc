@@ -14,6 +14,7 @@ alias l="ls -CF $COLOR"
 alias ls="ls -CF $COLOR"
 alias ll='ls -l'
 alias la='ls -lA'
+[ ! command -v sha1sum &> /dev/null ] && alias sha1sum='sha1 -r'
 
 #alias l='ls -CF'
 #alias ll='ls -alF'
