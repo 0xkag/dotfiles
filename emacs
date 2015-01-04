@@ -54,7 +54,6 @@
 ;; package: expand-region
 
 (require 'expand-region)
-(bind-key "C-@" 'er/expand-region)
 
 ;; package: idle-highlight
 
@@ -81,7 +80,6 @@
 
 (require 'popwin)
 (popwin-mode 1)
-;(global-set-key (kbd "C-z") popwin:keymap)
 
 ;; package: projectile
 
@@ -95,9 +93,6 @@
 
 (require 'smex)
 (smex-initialize)
-(global-set-key (kbd "M-x") 'smex)
-(global-set-key (kbd "M-X") 'smex-major-mode-commands)
-(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command) ;; old M-x
 
 ;; package: yasnippet
 
@@ -105,6 +100,16 @@
 (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
 (add-to-list 'yas-snippet-dirs "~/.dotfiles/snippets")
 (yas-global-mode 1)
+;; keybindings
+
+(bind-key "C-@" 'er/expand-region)
+(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+(define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command) ;; old M-x
+;(global-set-key (kbd "C-z") popwin:keymap)
+(define-key evil-normal-state-map (kbd "SPC") 'ace-jump-mode)
 ;(define-key yas-minor-mode-map (kbd "<tab>") nil)
 ;(define-key yas-minor-mode-map (kbd "TAB") nil)
 ;(define-key yas-minor-mode-map (kbd "<backtab>") 'yas-expand)
@@ -186,7 +191,6 @@
 
 ;; ... install missing packages
 
-
 (dolist (pkg kyle/packages)
   (when (and (not (package-installed-p pkg))
              (assoc pkg package-archive-contents))
@@ -264,24 +268,6 @@
     ;`(company-scrollbar-fg ((t (:background ,(color-lighten-name bg 5)))))
     `(company-tooltip-selection ((t (:inherit font-lock-function-name-face))))
     `(company-tooltip-common ((t (:inherit font-lock-constant-face))))))
-
-;;
-;; ido
-;;
-
-(ido-mode 1)
-
-;;
-;; key bindings
-;;
-
-(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
-(define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
-(define-key evil-normal-state-map (kbd "SPC") 'ace-jump-mode)
-
-(global-set-key (kbd "M-x") 'smex)
-(global-set-key (kbd "M-X") 'smex-major-mode-commands)
-(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
 ;(add-hook 'python-mode-hook 'jedi:setup)
 ;(setq jedi:complete-on-dot t)
