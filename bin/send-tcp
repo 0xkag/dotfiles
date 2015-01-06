@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# put packet contents on stdin
+
+nc -4 -w1 $1 $2
+
