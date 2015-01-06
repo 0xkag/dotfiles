@@ -46,6 +46,10 @@
 (require 'drag-stuff)
 (drag-stuff-mode t)
 
+;; package: diminish
+
+(require 'diminish)
+
 ;; package: evil
 
 (require 'evil)
@@ -55,16 +59,32 @@
 
 (require 'expand-region)
 
+;; package: guide-key
+
+(require 'guide-key)
+(setq guide-key/idle-delay 0.5)
+;(setq guide-key/guide-key-sequence '("C-c" "C-x r" "C-x 4"))
+(setq guide-key/guide-key-sequence t)
+(setq guide-key/recursive-key-sequence-flag t)
+(setq guide-key/highlight-command-regexp
+      '("rectangle"
+        ("register" . font-lock-type-face)
+        ("bookmark" . "hot pink")
+        ("org-" . "orange")))
+(guide-key-mode 1)
+
 ;; package: idle-highlight
 
 (require 'idle-highlight-mode)
 
-;; package: ido, flx-ido
+;; package: ido, ido-ubiquitous, flx-ido
 
 (require 'ido)
+(require 'ido-ubiquitous)
 (require 'flx-ido)
 (ido-mode t)
 (ido-everywhere 1)
+(ido-ubiquitous-mode 1)
 (flx-ido-mode 1)
 ;; disable ido faces to see flx highlights.
 (setq ido-enable-flex-matching t)
@@ -73,8 +93,8 @@
 ;; package: org
 
 (require 'org)
-(setq org-todo-keywords
-  '((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
+(setq org-todo-keywords '((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
+(setq org-list-allow-alphabetical 1)
 
 ;; package: popwin
 
@@ -100,16 +120,34 @@
 (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
 (add-to-list 'yas-snippet-dirs "~/.dotfiles/snippets")
 (yas-global-mode 1)
-;; keybindings
+
+;; keybindings: global
 
 (bind-key "C-@" 'er/expand-region)
-(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
-(define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
-(global-set-key (kbd "M-x") 'smex)
-(global-set-key (kbd "M-X") 'smex-major-mode-commands)
-(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command) ;; old M-x
-;(global-set-key (kbd "C-z") popwin:keymap)
-(define-key evil-normal-state-map (kbd "SPC") 'ace-jump-mode)
+(define-key global-map (kbd "C-c a")       'org-agenda)
+(define-key global-map (kbd "C-c b")       'org-iswitchb)
+(define-key global-map (kbd "C-c c")       'org-capture)
+(define-key global-map (kbd "C-c l")       'org-store-link)
+(define-key global-map (kbd "C-c SPC")     'ace-jump-mode)
+(define-key global-map (kbd "C-x SPC")     'ace-jump-mode-pop-mark)
+(define-key global-map (kbd "M-x")         'smex)
+(define-key global-map (kbd "M-X")         'smex-major-mode-commands)
+(define-key global-map (kbd "C-c C-c M-x") 'execute-extended-command) ;; old M-x
+;(define-key global-map (kbd "C-z")         popwin:keymap)
+
+;; keybindings: evil
+
+(bind-key "SPC" 'ace-jump-mode evil-normal-state-map)
+
+;; keybindings: ido
+
+;; adapted from http://whattheemacsd.com/setup-ido.el-02.html
+(bind-key "~" (lambda () (interactive) (if (looking-back "/") (insert "~/") (call-interactively 'self-insert-command))) ido-file-completion-map)
+
+;; keybindings: org
+
+(setq org-agenda-custom-commands '(("f" occur-tree "FIXME"))) ;; C-c a f
+
 ;(define-key yas-minor-mode-map (kbd "<tab>") nil)
 ;(define-key yas-minor-mode-map (kbd "TAB") nil)
 ;(define-key yas-minor-mode-map (kbd "<backtab>") 'yas-expand)
