@@ -1,2 +1,5 @@
 #!/usr/bin/env bash
-locate -0 "$1" | xargs -0 -I {} bash -c "[ -f \"{}\" ] || exit 0; sha1 -r {} | awk '{ printf \"%s \", \$1 }'; find {} -ls" | sort
+# set: noet sw=4 ts=4:
+
+locate -0 "$1" | xargs -0 -R 32 -S 32768 -I {} bash -c "[[ -r '{}' ]] || { echo \"! cannot read '{}'\"; exit 1; } && { sha1 -r '{}' | awk '{ printf \"%s\t\", \$1 }'; gfind '{}' -printf '%t\t%s\t%p\n'; }" | gsort -t $'\t' -k 1,4
+
