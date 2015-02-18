@@ -8,6 +8,7 @@
 (depends-on "better-defaults")
 (depends-on "bind-key")
 (depends-on "cask")
+(depends-on "color-theme-solarized")
 (depends-on "company")
 (depends-on "dash")
 (depends-on "diminish")
