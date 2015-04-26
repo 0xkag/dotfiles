@@ -1,0 +1,6 @@
+[include]
+    path = ~/.gitconfig-identity
+
+[include]
+    path = ~/.dotfiles/git/aliases
+
