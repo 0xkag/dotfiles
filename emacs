@@ -17,6 +17,13 @@
 (show-paren-mode 1)
 (setq show-paren-style 'expression)
 
+;; color
+
+(require 'color)
+(set-frame-parameter nil 'background-mode 'dark)
+
+;; TODO
+
 ;; package: ace-jump
 
 (require 'ace-jump-mode)
@@ -41,6 +48,32 @@
 
 (require 'bind-key)
 
+;; package: company
+
+(require 'company)
+
+(let ((bg (face-attribute 'default :background)))
+  (custom-set-faces
+    ;`(company-tooltip ((t (:inherit default :background ,(color-lighten-name bg 2)))))
+    `(company-tooltip ((t (:inherit default :background ))))
+    ;`(company-scrollbar-bg ((t (:background ,(color-lighten-name bg 10)))))
+    ;`(company-scrollbar-fg ((t (:background ,(color-lighten-name bg 5)))))
+    `(company-tooltip-selection ((t (:inherit font-lock-function-name-face))))
+    `(company-tooltip-common ((t (:inherit font-lock-constant-face))))))
+
+;; from https://github.com/company-mode/company-mode/issues/216
+(defun company-complete-common-or-cycle ()
+  (interactive)
+  (when (company-manual-begin)
+    (let ((tick (buffer-chars-modified-tick)))
+      (call-interactively 'company-complete-common)
+      (when (eq tick (buffer-chars-modified-tick))
+        (let ((company-selection-wrap-around t))
+          (call-interactively 'company-select-next))))))
+
+(define-key company-active-map [tab] 'company-complete-common-or-cycle)
+(define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
+
 ;; package: drag-stuff
 
 (require 'drag-stuff)
@@ -49,6 +82,10 @@
 ;; package: diminish
 
 (require 'diminish)
+
+;; package: elpy
+
+(require 'elpy)
 
 ;; package: evil
 
@@ -104,6 +141,18 @@
 ;; package: projectile
 
 (projectile-global-mode)
+
+;; mode: python
+
+(add-hook 'python-mode-hook
+  (lambda ()
+    (setq fill-column 78)
+    (elpy-mode 1)
+    ;;(fci-mode 1)
+    (setq indent-tabs-mode t)
+    (setq python-indent 4)
+    (setq tab-width 4)
+    (tabify (point-min) (point-max))))
 
 ;; package: smartparens
 
