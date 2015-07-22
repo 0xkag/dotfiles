@@ -1,9 +1,16 @@
 [submodule "lib/oh-my-zsh"]
 	path = lib/oh-my-zsh
 	url = git://github.com/robbyrussell/oh-my-zsh.git
+	branch = master
 [submodule "sshrc"]
 	path = lib/sshrc
 	url = https://github.com/Russell91/sshrc
+	branch = master
 [submodule "lib/cask"]
 	path = lib/cask
 	url = https://github.com/cask/cask.git
+	branch = master
+[submodule "lib/spacemacs"]
+	path = lib/spacemacs
+	url = https://github.com/syl20bnr/spacemacs
+	branch = master
