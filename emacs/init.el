@@ -167,7 +167,7 @@
 
 (require 'yasnippet)
 (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
-(add-to-list 'yas-snippet-dirs "~/.dotfiles/snippets")
+(add-to-list 'yas-snippet-dirs "~/.dotfiles/emacs/snippets")
 (yas-global-mode 1)
 
 ;; keybindings: global
