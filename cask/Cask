@@ -1,6 +1,8 @@
 (source gnu)
-(source marmalade)
+;(source marmalade)
 (source melpa)
+
+(depends-on "pallet")
 
 (depends-on "ace-jump-buffer")
 (depends-on "ace-jump-mode")
@@ -42,7 +44,6 @@
 (depends-on "magit")
 (depends-on "multiple-cursors")
 (depends-on "org")
-(depends-on "pallet")
 (depends-on "popwin")
 (depends-on "prodigy")
 (depends-on "projectile")
