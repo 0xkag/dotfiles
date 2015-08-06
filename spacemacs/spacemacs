@@ -23,6 +23,7 @@
      ;; company-contrib
      emacs-lisp
      ;; git
+     ;; gtags
      haskell
      markdown
      org
