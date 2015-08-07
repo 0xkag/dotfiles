@@ -1,0 +1,9 @@
+# vim: set noet sw=30 ts=30:
+autoflake	# spacemacs python anaconda
+docutils	#
+jedi==0.8.1	# spacemacs python anaconda
+json-rpc==1.8.1	# spacemacs python anaconda
+pyflakes	# dep of autoflake
+rope	# ropemacs
+service_factory==0.1.2	# spacemacs python anadonda
+
