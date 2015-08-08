@@ -1,9 +1,17 @@
 # vim: set noet sw=30 ts=30:
 autoflake	# spacemacs python anaconda
+coverage	#
 docutils	#
+ipython	#
 jedi==0.8.1	# spacemacs python anaconda
 json-rpc==1.8.1	# spacemacs python anaconda
+nose	#
+pep8	#
 pyflakes	# dep of autoflake
+pylint	#
+-e "git+https://github.com/pinard/Pymacs.git#egg=Pymacs"
 rope	# ropemacs
+ropemacs	# ropemacs
 service_factory==0.1.2	# spacemacs python anadonda
+tox	#
 
