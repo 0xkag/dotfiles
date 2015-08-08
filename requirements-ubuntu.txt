@@ -1,0 +1,12 @@
+# vim: set noet sw=30 ts=30:
+automake
+bash-completion
+bc
+gdb
+ipython
+ipython-doc
+ipython-notebook
+pandoc
+texlive
+zsh
+
