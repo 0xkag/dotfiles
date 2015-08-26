@@ -17,18 +17,17 @@
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     anaconda-company
      (auto-completion :variables
                       auto-completion-complete-with-key-sequence nil
                       ;;auto-completion-enable-help-tooltip t
                       auto-completion-return-key-behavior 'complete
                       auto-completion-tab-key-behavior 'cycle
-                      company-show-numbers
+                      company-show-numbers t
       )
      ;; better-defaults
      ;; company-contrib
      emacs-lisp
-     ;; git
+     git
      ;; gtags
      haskell
      markdown
@@ -49,8 +48,7 @@
    ;; configuration in `dotspacemacs/config'.
    dotspacemacs-additional-packages '(
      org-trello
-     pymacs
-     ropemacs
+     ;; ropemacs
      )
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages '()
@@ -84,7 +82,8 @@ before layers configuration."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(twilight
+   dotspacemacs-themes '(ujelly
+                         twilight
                          solarized-light
                          solarized-dark
                          spacemacs-light
