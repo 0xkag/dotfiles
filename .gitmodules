@@ -22,3 +22,7 @@
 	path = lib/pyenv
 	url = https://github.com/yyuu/pyenv.git
 	branch = master
+[submodule "lib/pyenv-virtualenv"]
+	path = lib/pyenv-virtualenv
+	url = https://github.com/yyuu/pyenv-virtualenv.git
+	branch = master
