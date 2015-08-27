@@ -18,3 +18,7 @@
 	path = lib/fasd
 	url = https://github.com/clvv/fasd
 	branch = master
+[submodule "lib/pyenv"]
+	path = lib/pyenv
+	url = https://github.com/yyuu/pyenv.git
+	branch = master
