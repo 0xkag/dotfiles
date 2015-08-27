@@ -7,7 +7,7 @@
   (setq-default
    ;; List of additional paths where to look for configuration layers.
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
-   dotspacemacs-configuration-layer-path '("~/.dotfiles/spacemacs")
+   dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load. If it is the symbol `all' instead
    ;; of a list then all discovered layers will be installed.
    dotspacemacs-configuration-layers
@@ -17,6 +17,8 @@
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
+     ansible
+     asciidoc
      (auto-completion :variables
                       auto-completion-complete-with-key-sequence nil
                       ;;auto-completion-enable-help-tooltip t
@@ -24,34 +26,47 @@
                       auto-completion-tab-key-behavior 'cycle
                       company-show-numbers t
       )
-     ;; better-defaults
-     ;; company-contrib
+     better-defaults
+     c-c++
+     (colors :variables
+             colors-enable-rainbow-identifiers t)
      emacs-lisp
      git
      ;; gtags
      haskell
+     html
+     ;; ibuffer
+     java
+     latex
      markdown
      org
      pandoc
      python
+     semantic
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
+     shell-scripts
      ;; smex
+     spell-checking
+     sql
      syntax-checking
      themes-megapack
      version-control
+     yaml
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages then consider to create a layer, you can also put the
    ;; configuration in `dotspacemacs/config'.
    dotspacemacs-additional-packages '(
+     jinja2-mode
      org-trello
-     ;; ropemacs
      )
    ;; A list of packages and/or extensions that will not be install and loaded.
-   dotspacemacs-excluded-packages '()
+   dotspacemacs-excluded-packages '(
+     ;; exec-path-from-shell
+     )
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
    ;; are declared in a layer which is not a member of
    ;; the list `dotspacemacs-configuration-layers'
@@ -64,8 +79,10 @@ before layers configuration."
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
-   ;; Either `vim' or `emacs'. Evil is always enabled but if the variable
-   ;; is `emacs' then the `holy-mode' is enabled at startup.
+   ;; One of `vim', `emacs' or `hybrid'. Evil is always enabled but if the
+   ;; variable is `emacs' then the `holy-mode' is enabled at startup. `hybrid'
+   ;; uses emacs key bindings for vim's insert mode, but otherwise leaves evil
+   ;; unchanged.
    dotspacemacs-editing-style 'vim
    ;; If non nil output loading progress in `*Messages*' buffer.
    dotspacemacs-verbose-loading nil
@@ -78,16 +95,16 @@ before layers configuration."
    dotspacemacs-startup-banner 'official
    ;; List of items to show in the startup buffer. If nil it is disabled.
    ;; Possible values are: `recents' `bookmarks' `projects'."
-   dotspacemacs-startup-lists '(recents projects)
+   dotspacemacs-startup-lists '(recents bookmarks projects)
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(ujelly
                          twilight
+                         spacemacs-dark
+                         spacemacs-light
                          solarized-light
                          solarized-dark
-                         spacemacs-light
-                         spacemacs-dark
                          leuven
                          monokai
                          zenburn)
@@ -158,11 +175,12 @@ before layers configuration."
    dotspacemacs-smooth-scrolling t
    ;; If non-nil smartparens-strict-mode will be enabled in programming modes.
    dotspacemacs-smartparens-strict-mode nil
-   ;; Select a scope to highlight delimiters. Possible value is `all',
-   ;; `current' or `nil'. Default is `all'
+   ;; Select a scope to highlight delimiters. Possible values are `any',
+   ;; `current', `all' or `nil'. Default is `all' (highlight any scope and
+   ;; emphasis the current one).
    dotspacemacs-highlight-delimiters 'all
    ;; If non nil advises quit functions to keep server open when quitting.
-   dotspacemacs-persistent-server nil
+   dotspacemacs-persistent-server t
    ;; List of search tool executable names. Spacemacs uses the first installed
    ;; tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.
    dotspacemacs-search-tools '("ag" "pt" "ack" "grep")
