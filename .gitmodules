@@ -13,7 +13,7 @@
 [submodule "lib/spacemacs"]
 	path = lib/spacemacs
 	url = https://github.com/syl20bnr/spacemacs
-	branch = master
+	branch = develop
 [submodule "lib/fasd"]
 	path = lib/fasd
 	url = https://github.com/clvv/fasd
