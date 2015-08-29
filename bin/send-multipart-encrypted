@@ -1,0 +1,42 @@
+#!/bin/bash
+
+set -e
+set -u
+
+KEY_ME=${KEY_ME:?}
+KEY_TO=${KEY_TO:?}
+EMAIL_ME=${EMAIL_ME:?}
+EMAIL_TO=${EMAIL_TO:?}
+EMAIL_INREPLYTO=${EMAIL_INREPLYTO:?}
+EMAIL_REFERENCES=${EMAIL_REFERENCES:?}
+EMAIL_SUBJECT=${EMAIL_SUBJECT:?}
+PLAINTEXT_FILENAME=${PLAINTEXT_FILENAME:?}
+
+[ $(id -u) -eq 0 ] && exit 1
+[ -r "$PLAINTEXT_FILENAME" ] || exit 1
+
+mime-construct \
+  --multipart "multipart/mixed" \
+  --type "text/plain; charset=utf-8" \
+  --file "$PLAINTEXT_FILENAME" \
+  --output \
+  --subpart | \
+gpg -e -a -s \
+  -r $KEY_ME \
+  -r $KEY_TO | \
+mime-construct \
+  --multipart "multipart/encrypted; protocol=\"application/pgp-encrypted\"" \
+  --type "application/pgp-encrypted" \
+  --encoding 7bit \
+  --string "Version: 1" \
+  --type application/octet-stream \
+  --file - \
+  --to $EMAIL_ME \
+  --to $EMAIL_TO \
+  --subject "$EMAIL_SUBJECT" \
+  --header "From: <$EMAIL_ME>" \
+  --header "Return-Path: <$EMAIL_ME>" \
+  --header "References: $EMAIL_REFERENCES" \
+  --header "In-Reply-To: $EMAIL_INREPLYTO" \
+  --output
+
