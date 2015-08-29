@@ -196,6 +196,19 @@ before layers configuration."
   "Configuration function.
  This function is called at the very end of Spacemacs initialization after
 layers configuration."
+
+  (setq org-todo-keywords
+        '((sequence "TODO" "DOING" "WAITING" "VERIFY" "|" "DONE" "WONTFIX")))
+
+  (setq org-todo-keyword-faces
+        '(("TODO" . (:foreground "red" :weight bold))
+          ("DOING" . (:foreground "yellow" :weight bold))
+          ("WAITING" . (:foreground "blue" :weight bold))
+          ("VERIFY" . (:foreground "blue" :weight bold))
+          ("DONE" . (:foreground "green" :weight bold))
+          ("WONTFIX" . (:foreground "green" :weight bold))
+         )
+  )
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
