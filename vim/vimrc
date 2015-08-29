@@ -1,4 +1,6 @@
 set nocompatible
-set bs=2
 set bg=dark
+set bs=2
+colorscheme ron
 syntax on
+
