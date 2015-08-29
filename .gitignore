@@ -1,0 +1,4 @@
+_sites/*
+!_sites/.empty
+!_sites/README
+
