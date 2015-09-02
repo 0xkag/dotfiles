@@ -24,3 +24,11 @@ manpath=(
 
 export MANPATH=$(join : ${manpath[@]})
 
+# nodejs local installs (from http://stackoverflow.com/a/13021677)
+export NPM_PACKAGES="$HOME/.npm-packages"
+mkdir -p "$NPM_PACKAGES"
+export PATH="$PATH:$NPM_PACKAGES/bin"
+export MANPATH="$MANPATH:$NPM_PACKAGES/share/man"
+export NODE_PATH=$(join : "$NPM_PACKAGES/lib/node_modules" $(echo "${NODE_PATH:-}" | xargs))
+echo "prefix = $NPM_PACKAGES" > "$HOME/.npmrc"
+

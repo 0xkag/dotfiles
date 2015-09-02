@@ -6,6 +6,8 @@ gdb
 ipython
 ipython-doc
 ipython-notebook
+nodejs-legacy
+npm
 pandoc
 texlive
 zsh
