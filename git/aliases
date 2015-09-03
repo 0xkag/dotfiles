@@ -1,3 +1,5 @@
 [alias]
-	tree = log --oneline --decorate --all --graph
+	logtree = log --oneline --decorate --graph --all
+	logfull = log --pretty=fuller --decorate --graph --stat --summary --all
+	logshort = log --pretty=format:"%h%x09%an%x20<%ae>%x09%ad%x09%s"
 
