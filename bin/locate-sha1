@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-locate "$1" | xargs -I {} sha1 -r {} 
+locate -0 "$1" | xargs -0 -I {} bash -c "[ -f \"{}\" ] || exit 0; sha1 -r {} | awk '{ printf \"%s \", \$1 }'; find {} -ls" | sort
