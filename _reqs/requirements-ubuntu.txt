@@ -65,6 +65,7 @@ pwgen
 python
 python-pip
 python-setuptools
+rake
 rsync
 sharutils
 smartmontools
