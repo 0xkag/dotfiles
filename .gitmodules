@@ -26,3 +26,7 @@
 	path = lib/pyenv-virtualenv
 	url = https://github.com/yyuu/pyenv-virtualenv.git
 	branch = master
+[submodule "lib/gollum"]
+	path = lib/gollum
+	url = https://github.com/gollum/gollum
+	branch = master
