@@ -1,0 +1,4 @@
+#!/bin/bash
+
+less -R -x$1
+
