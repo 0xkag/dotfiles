@@ -1,4 +1,5 @@
 # vim: set noet sw=30 ts=30:
+apt-file
 autoconf
 autofs
 automake
@@ -75,12 +76,12 @@ stow
 strace
 subversion
 suckless-tools
+synaptic
 systemtap
 tcl
 tcpdump
 telnet
 texinfo
-texlive
 tmux
 ufw
 unrar
