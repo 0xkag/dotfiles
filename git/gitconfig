@@ -4,3 +4,5 @@
 [include]
     path = ~/.dotfiles/git/aliases
 
+[color]
+	ui = true
