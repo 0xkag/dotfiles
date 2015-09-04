@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+# vim: et sw=4 ts=4:
+
+import os
+import sys
+
+def relink(target, linkname):
+    if os.path.exists(linkname):
+        if os.path.islink(linkname):
+            os.unlink(linkname)
+        else:
+            raise Exception('%s is not a symlink' % linkname)
+    os.symlink(target, linkname)
+
+def main():
+    h = os.path.expanduser('~')
+    relink(h + '/.dotfiles/git/gitconfig', h + '/.gitconfig')
+    relink(h + '/.dotfiles/lib/spacemacs', h + '/.emacs.d')
+    relink(h + '/.dotfiles/spacemacs/spacemacs', h + '/.spacemacs')
+    relink(h + '/.dotfiles/zsh/zshrc', h + '/.zshrc')
+
+if __name__ == '__main__':
+    sys.exit(main())
+
