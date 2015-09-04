@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Format a multipart MIME message for sending with an encrypted message
+# part.
+#
+# Example usage:
+#
+# KEY_ME=mykeyid KEY_TO=theirkeyid EMAIL_ME=myemail EMAIL_TO=theiremail \
+# EMAIL_INREPLYTO=inreplytoheader EMAIL_REFERENCES=referencesheader \
+# EMAIL_SUBJECT=subject PLAINTEXT_FILENAME=something.txt \
+# ./send-multipart-encrypted
+
 set -e
 set -u
 
