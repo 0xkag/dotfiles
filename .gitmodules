@@ -30,3 +30,7 @@
 	path = lib/gollum
 	url = https://github.com/gollum/gollum
 	branch = master
+[submodule "lib/ps_mem"]
+	path = lib/ps_mem
+	url = https://github.com/pixelb/ps_mem/
+	branch = master
