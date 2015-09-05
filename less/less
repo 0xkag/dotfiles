@@ -1,2 +1,2 @@
-LESS="-R"
+LESS="-i -R"
 
