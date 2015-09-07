@@ -1,0 +1,9 @@
+* Deps
+** Where possible, I use submodules to pull in dependencies
+** Where no submodule exists, then I will commit upstream code directly.
+** Updating submodules
+To update the submodules, use git submodule foreach git fetch --all.
+Then note which ones have pulled in new commits.
+Look at the logs and/or diff HEAD with origin and see what's new.
+If it all looks ok, git pull --rebase the submodule.
+Then add and commit the updated submodule ref.
