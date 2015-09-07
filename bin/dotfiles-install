@@ -12,12 +12,23 @@ def relink(target, linkname):
             raise Exception('%s is not a symlink' % linkname)
     os.symlink(target, linkname)
 
+def mkdir(p):
+    try:
+        os.mkdir(p)
+    except:
+        pass
+
 def main():
     h = os.path.expanduser('~')
-    relink(h + '/.dotfiles/git/gitconfig', h + '/.gitconfig')
-    relink(h + '/.dotfiles/lib/spacemacs', h + '/.emacs.d')
-    relink(h + '/.dotfiles/spacemacs/spacemacs', h + '/.spacemacs')
-    relink(h + '/.dotfiles/zsh/zshrc', h + '/.zshrc')
+
+    relink('.dotfiles/git/gitconfig', h + '/.gitconfig')
+
+    relink('.dotfiles/i3', h + '/.i3')
+
+    relink('.dotfiles/lib/spacemacs', h + '/.emacs.d')
+    relink('.dotfiles/spacemacs/spacemacs', h + '/.spacemacs')
+
+    relink('.dotfiles/zsh/zshrc', h + '/.zshrc')
 
 if __name__ == '__main__':
     sys.exit(main())
