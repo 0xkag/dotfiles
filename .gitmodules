@@ -34,3 +34,7 @@
 	path = lib/ps_mem
 	url = https://github.com/pixelb/ps_mem/
 	branch = master
+[submodule "lib/password-store"]
+	path = lib/password-store
+	url = http://git.zx2c4.com/password-store
+	branch = master
