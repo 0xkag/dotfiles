@@ -27,11 +27,10 @@ values."
      asciidoc
      (auto-completion :variables
                       auto-completion-complete-with-key-sequence nil
-                      ;;auto-completion-enable-help-tooltip t
+                      auto-completion-enable-help-tooltip t
                       auto-completion-return-key-behavior 'complete
                       auto-completion-tab-key-behavior 'cycle
-                      company-show-numbers t
-      )
+                      company-show-numbers t)
      better-defaults
      c-c++
      (colors :variables
@@ -42,7 +41,6 @@ values."
      gtags
      haskell
      html
-     ;; ibuffer
      java
      latex
      markdown
@@ -50,11 +48,11 @@ values."
      pandoc
      python
      semantic
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
+     (shell :variables
+            shell-default-height 30
+            shell-default-position 'bottom
+            shell-default-shell 'eshell)
      shell-scripts
-     ;; smex
      spell-checking
      sql
      syntax-checking
@@ -230,8 +228,18 @@ user code."
  This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
+  ;; version control follow symlinks
+
+  (setq vc-follow-symlinks t)
+
+  ;; org
+
+  ;; ... todo keywords
+
   (setq org-todo-keywords
         '((sequence "TODO" "DOING" "WAITING" "VERIFY" "|" "DONE" "WONTFIX")))
+
+  ;; ... todo keyword faces
 
   (setq org-todo-keyword-faces
         '(("TODO" . (:foreground "red" :weight bold))
@@ -239,10 +247,16 @@ layers configuration. You are free to put any user code."
           ("WAITING" . (:foreground "blue" :weight bold))
           ("VERIFY" . (:foreground "blue" :weight bold))
           ("DONE" . (:foreground "green" :weight bold))
-          ("WONTFIX" . (:foreground "green" :weight bold))
-         )
+          ("WONTFIX" . (:foreground "green" :weight bold))))
+
+  ;; smartparens
+
+  ;; ... disable smartparens auto-close for these symbols
+
+  (dolist (sym '("(" "[" "'" "\"" "}"))
+    (sp-pair sym nil :actions :rem))
+
   )
-)
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
