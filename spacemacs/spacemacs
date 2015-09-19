@@ -250,6 +250,17 @@ layers configuration. You are free to put any user code."
           ("DONE" . (:foreground "green" :weight bold))
           ("WONTFIX" . (:foreground "green" :weight bold))))
 
+  ;; ... hook, for babel
+
+  ;; (add-hook org-mode-hook '(lambda ()
+  ;;                            (org-babel-do-load-languages
+  ;;                             'org-babel-load-languages
+  ;;                             '((python . t)
+  ;;                               (sh . t))
+  ;;                             )
+  ;;                            )
+  ;;           )
+
   ;; smartparens
 
   ;; ... disable smartparens auto-close for these symbols

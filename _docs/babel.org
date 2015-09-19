@@ -1,0 +1,18 @@
+#+begin_src sh :results output :dir ssh:hostname:
+hostname
+pwd
+whoami
+#+end_src
+
+#+begin_src python :session
+import os
+#+end_src
+
+#+RESULTS:
+
+#+begin_src python :results output :session
+print(os.path.join(os.getcwd(), 'foo'))
+#+end_src
+
+#+RESULTS:
+
