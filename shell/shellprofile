@@ -1,4 +1,64 @@
-# vim: noet sw=4 ts=4:
+# vim: sw=4 ts=4 ft=sh:
 
-source $HOME/.dotfiles/shellenv
+source $HOME/.dotfiles/shell/shellrc
+source $HOME/.dotfiles/shell/shellenv
+source $HOME/.dotfiles/shell/shellcolors
+
+# aliases
+
+alias h="history"
+alias j="jobs"
+
+# ... ls
+
+ls --color &> /dev/null && COLOR="--color=auto" || COLOR=""
+alias ls="ls -CF $COLOR"
+alias l="ls -CF $COLOR"
+alias ll='ls -l'
+alias la='ls -lA'
+
+# ... navigation
+
+alias up='cd ..'
+
+# ... bsd / linux compat
+
+[ ! command -v sha1sum &> /dev/null ] && alias sha1sum='sha1 -r'
+
+# ... zsh global aliases
+
+if [[ -n "$ZSH_VERSION" ]]; then
+    alias -g ,h="| head"
+    alias -g ,t="| tail"
+    alias -g ,g="| egrep"
+    alias -g ,gi="| egrep -i"
+    alias -g ,l="| less"
+    alias -g ,ll="2>&1 | less"
+    alias -g ,ca="2>&1 | cat -A"
+    alias -g ,cs="2>&1"
+    alias -g ,ne="2> /dev/null"
+    alias -g ,nul="> /dev/null 2>&1"
+    alias -g ,null="> /dev/null 2>&1"
+fi
+
+# set up warp
+
+if command -v wd &> /dev/null; then
+    cwd="$(pwd)"
+    cd ~ && wd -q add! home
+    cd ~/.dotfiles && wd -q add! dot
+    cd ~/.ssh && wd -q add! ssh
+    { cd ~/root 2> /dev/null || cd ~/.root 2> /dev/null; } && wd -q add! root
+    { cd ~/wc 2> /dev/null || cd ~/local/wc 2> /dev/null; } && wd -q add! wc
+    cd "$cwd"
+fi
+
+# nodejs local installs (from http://stackoverflow.com/a/13021677)
+
+export NPM_PACKAGES="$HOME/.npm-packages"
+mkdir -p "$NPM_PACKAGES"
+export PATH="$NPM_PACKAGES/bin:$PATH"
+export MANPATH="$NPM_PACKAGES/share/man:$MANPATH"
+export NODE_PATH=$(join : "$NPM_PACKAGES/lib/node_modules" $(echo "${NODE_PATH:-}" | xargs))
+echo "prefix = $NPM_PACKAGES" > "$HOME/.npmrc"
 

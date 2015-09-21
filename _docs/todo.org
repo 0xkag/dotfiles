@@ -1,4 +1,3 @@
-* shell: clean this up
 * tmux: import config
 * zsh: move away from oh-my-zsh and do my own config?
 
