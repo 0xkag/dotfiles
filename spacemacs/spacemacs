@@ -222,7 +222,7 @@ values."
   "Initialization function for user code.
 It is called immediately after `dotspacemacs/init'.  You are free to put any
 user code."
-  )
+ )
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
@@ -252,14 +252,27 @@ layers configuration. You are free to put any user code."
 
   ;; ... hook, for babel
 
-  ;; (add-hook org-mode-hook '(lambda ()
-  ;;                            (org-babel-do-load-languages
-  ;;                             'org-babel-load-languages
-  ;;                             '((python . t)
-  ;;                               (sh . t))
-  ;;                             )
-  ;;                            )
-  ;;           )
+  (add-hook 'org-load-hook '(lambda ()
+                             (org-babel-do-load-languages
+                              'org-babel-load-languages
+                              '((C . t)
+                                (awk . t)
+                                (css . t)
+                                (dot . t)
+                                (emacs-lisp . nil)
+                                (haskell . t)
+                                (java . t)
+                                (js . t)
+                                (org . t)
+                                (perl . t)
+                                (python . t)
+                                (ruby . t)
+                                (sh . t)
+                                (sql . t)
+                                (sqlite . t)
+                                ))
+                             )
+            )
 
   ;; smartparens
 
