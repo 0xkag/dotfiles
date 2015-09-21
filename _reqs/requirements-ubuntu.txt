@@ -33,6 +33,7 @@ gnupg
 gpgv
 hdparm
 htop
+httpie
 i3
 i3-wm
 i3lock
@@ -57,6 +58,7 @@ nmap
 nodejs-legacy
 npm
 pandoc
+https://github.com/jgm/pandoc/releases/download/1.15.0.6/pandoc-1.15.0.6-1-amd64.deb
 pastebinit
 patch
 patchutils

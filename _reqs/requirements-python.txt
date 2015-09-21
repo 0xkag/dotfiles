@@ -10,6 +10,7 @@ json-rpc==1.8.1	# spacemacs python anaconda
 nose	# devtools
 pep8	# devtools
 pyflakes	# devtools; dep of autoflake
+pygments	# devtools
 pylint	# devtools
 pytest	# devtools
 # DISABLED -e "git+https://github.com/pinard/Pymacs.git#egg=Pymacs"
