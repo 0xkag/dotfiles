@@ -38,3 +38,7 @@
 	path = lib/password-store
 	url = http://git.zx2c4.com/password-store
 	branch = master
+[submodule "lib/python-audio-tools"]
+	path = lib/python-audio-tools
+	url = git://github.com/tuffy/python-audio-tools.git
+	branch = master
