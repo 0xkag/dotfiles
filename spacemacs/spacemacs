@@ -274,6 +274,12 @@ layers configuration. You are free to put any user code."
                              )
             )
 
+  ;; sh-mode: don't insert a here document automatically on <<
+
+  (add-hook 'sh-mode-hook
+            (lambda ()
+              (sh-electric-here-document-mode -1)))
+
   ;; smartparens
 
   ;; ... disable smartparens auto-close for these symbols
