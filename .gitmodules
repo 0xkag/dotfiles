@@ -42,3 +42,7 @@
 	path = lib/python-audio-tools
 	url = git://github.com/tuffy/python-audio-tools.git
 	branch = master
+[submodule "lib/git-diff-blame"]
+	path = lib/git-diff-blame
+	url = https://github.com/dmnd/git-diff-blame
+	branch = master
