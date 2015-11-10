@@ -1,3 +1,8 @@
-* tmux: import config
-* zsh: move away from oh-my-zsh and do my own config?
-
+* spacemacs / emacs
+** create dired mkdir binding
+** enable dired auto-revert mode
+** jabber (hipchat) integration
+* tmux
+** import config
+* zsh
+** move away from oh-my-zsh and do my own config?
