@@ -46,3 +46,7 @@
 	path = lib/git-diff-blame
 	url = https://github.com/dmnd/git-diff-blame
 	branch = master
+[submodule "lib/pandoc"]
+	path = lib/pandoc
+	url = https://github.com/jgm/pandoc
+	branch = master
