@@ -258,6 +258,10 @@ user code."
 This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
+  ;; dired refresh on file change
+
+  (add-hook 'dired-mode-hook 'auto-revert-mode)
+
   ;; version control follow symlinks
 
   (setq vc-follow-symlinks t)
