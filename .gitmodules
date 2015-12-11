@@ -2,7 +2,7 @@
 	path = lib/oh-my-zsh
 	url = git://github.com/robbyrussell/oh-my-zsh.git
 	branch = master
-[submodule "sshrc"]
+[submodule "lib/sshrc"]
 	path = lib/sshrc
 	url = https://github.com/Russell91/sshrc
 	branch = master
@@ -49,15 +49,15 @@
 [submodule "lib/pandoc"]
 	path = lib/pandoc
 	url = https://github.com/jgm/pandoc
-[submodule "aspiers-shell-env"]
+[submodule "lib/aspiers-shell-env"]
 	path = lib/aspiers-shell-env
 	url = https://github.com/aspiers/shell-env
 	branch = master
-[submodule "aspiers-git-config"]
+[submodule "lib/aspiers-git-config"]
 	path = lib/aspiers-git-config
 	url = https://github.com/aspiers/git-config
 	branch = master
-[submodule "bup"]
+[submodule "lib/bup"]
 	path = lib/bup
 	url = https://github.com/bup/bup
 	branch = master
