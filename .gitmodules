@@ -57,3 +57,7 @@
 	path = lib/aspiers-git-config
 	url = https://github.com/aspiers/git-config
 	branch = master
+[submodule "bup"]
+	path = lib/bup
+	url = https://github.com/bup/bup
+	branch = master
