@@ -28,6 +28,8 @@ def main():
     relink('.dotfiles/lib/spacemacs', h + '/.emacs.d')
     relink('.dotfiles/spacemacs/spacemacs', h + '/.spacemacs')
 
+    relink('.dotfiles/vim/vimrc', h + '/.vimrc')
+
     relink('.dotfiles/zsh/zshrc', h + '/.zshrc')
 
 if __name__ == '__main__':
