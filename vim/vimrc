@@ -1,6 +1,8 @@
 set nocompatible
 set bg=dark
 set bs=2
+set modeline
 colorscheme ron
+filetype plugin on
 syntax on
 
