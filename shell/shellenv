@@ -6,6 +6,7 @@ function join { local IFS="$1"; shift; echo "$*"; }
 
 path=(
     $HOME/bin
+    $HOME/.dotfiles/_sites/current/bin
     $HOME/.dotfiles/bin
     $HOME/root/bin
     $HOME/root/usr/bin
