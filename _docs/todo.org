@@ -1,6 +1,7 @@
 * spacemacs / emacs
+** org-babel bindings? (upstream)
+** ob-restclient integration (upstream)
 ** create dired mkdir binding
-** enable dired auto-revert mode
 ** jabber (hipchat) integration
 * tmux
 ** import config
