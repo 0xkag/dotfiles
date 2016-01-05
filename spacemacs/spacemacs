@@ -35,6 +35,7 @@ values."
      c-c++
      (colors :variables
              colors-enable-rainbow-identifiers t)
+     ;; elfeed
      emacs-lisp
      eyebrowse
      git
@@ -42,17 +43,20 @@ values."
      haskell
      html
      java
+     javascript
      latex
      markdown
      org
      pandoc
      python
      ;; semantic
+     restclient
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom
             shell-default-shell 'eshell)
      shell-scripts
+     speed-reading
      spell-checking
      sql
      syntax-checking
@@ -66,6 +70,7 @@ values."
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages '(
      jinja2-mode
+     ob-restclient
      org-trello
      )
    ;; A list of packages and/or extensions that will not be install and loaded.
@@ -311,6 +316,7 @@ layers configuration. You are free to put any user code."
                                 (haskell . t)
                                 (java . t)
                                 (js . t)
+                                (restclient . t)
                                 (org . t)
                                 (perl . t)
                                 (python . t)
