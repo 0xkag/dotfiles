@@ -5,6 +5,8 @@ import os
 import sys
 
 def relink(target, linkname):
+    target = os.path.expanduser(target)
+    linkname = os.path.expanduser(linkname)
     if os.path.exists(linkname):
         if os.path.islink(linkname):
             os.unlink(linkname)
@@ -14,25 +16,28 @@ def relink(target, linkname):
 
 def mkdir(p):
     try:
-        os.mkdir(p)
+        os.mkdir(os.path.expanduser(p))
     except:
         pass
 
 def main():
-    h = os.path.expanduser('~')
+    mkdir('~/.fonts')
+    mkdir('~/.fonts/adobe-fonts')
+    relink('~/.dotfiles/lib/source-code-pro', '~/.fonts/adobe-fonts/source-code-pro')
+    os.system('fc-cache -f -v ~/.fonts/adobe-fonts/source-code-pro')
 
-    relink('.dotfiles/git/gitconfig', h + '/.gitconfig')
+    relink('.dotfiles/git/gitconfig', '~/.gitconfig')
 
-    relink('.dotfiles/i3', h + '/.i3')
+    relink('.dotfiles/i3', '~/.i3')
 
-    relink('.dotfiles/lib/spacemacs', h + '/.emacs.d')
-    relink('.dotfiles/spacemacs/spacemacs', h + '/.spacemacs')
+    relink('.dotfiles/lib/spacemacs', '~/.emacs.d')
+    relink('.dotfiles/spacemacs/spacemacs', '~/.spacemacs')
 
-    relink('.dotfiles/tmux/tmux.conf', h + '/.tmux.conf')
+    relink('.dotfiles/tmux/tmux.conf', '~/.tmux.conf')
 
-    relink('.dotfiles/vim/vimrc', h + '/.vimrc')
+    relink('.dotfiles/vim/vimrc', '~/.vimrc')
 
-    relink('.dotfiles/zsh/zshrc', h + '/.zshrc')
+    relink('.dotfiles/zsh/zshrc', '~/.zshrc')
 
 if __name__ == '__main__':
     sys.exit(main())
