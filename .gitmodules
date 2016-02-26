@@ -61,3 +61,7 @@
 	path = lib/bup
 	url = https://github.com/bup/bup
 	branch = master
+[submodule "lib/source-code-pro"]
+	path = lib/source-code-pro
+	url = https://github.com/adobe-fonts/source-code-pro.git
+	branch = release
