@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+set -x
+
+VERSION=3.3.9
+
+wget https://archive.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-${VERSION}-bin.tar.gz
+tar -xzvf apache-maven-${VERSION}-bin.tar.gz
+mv apache-maven-${VERSION} ~/.root/var/
+rm -f apache-maven-${VERSION}-bin.tar.gz
+
