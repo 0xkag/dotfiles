@@ -34,4 +34,7 @@ manpath=(
 
 export MANPATH=$(join : ${manpath[@]})
 
+export SHELL=$([[ -x /bin/zsh ]] && echo /bin/zsh || \
+               [[ -x /usr/local/bin/zsh ]] && echo /usr/local/bin/zsh || \
+               echo $SHELL)
 
