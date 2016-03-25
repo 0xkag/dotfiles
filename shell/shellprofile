@@ -4,6 +4,12 @@ source $HOME/.dotfiles/shell/shellrc
 source $HOME/.dotfiles/shell/shellenv
 source $HOME/.dotfiles/shell/shellcolors
 
+# which shell?
+
+export SHELL=$({ [[ -x /usr/local/bin/zsh ]] && echo /usr/local/bin/zsh; } || \
+               { [[ -x /bin/zsh ]] && echo /bin/zsh; } || \
+               echo $SHELL)
+
 # aliases
 
 alias h="history"

@@ -12,6 +12,7 @@ path=(
     $HOME/root/usr/bin
     $HOME/.root/bin
     $HOME/.root/usr/bin
+    $HOME/.local/bin
     /usr/local/bin
     /usr/local/sbin
     /usr/bin
@@ -27,14 +28,11 @@ export PATH=$(join : ${path[@]})
 manpath=(
     $HOME/root/share/man
     $HOME/.root/share/man
+    $HOME/.local/share/man
     /usr/local/man
     /usr/local/share/man
     /usr/share/man
 )
 
 export MANPATH=$(join : ${manpath[@]})
-
-export SHELL=$([[ -x /bin/zsh ]] && echo /bin/zsh || \
-               [[ -x /usr/local/bin/zsh ]] && echo /usr/local/bin/zsh || \
-               echo $SHELL)
 
