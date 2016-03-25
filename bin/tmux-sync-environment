@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# eval the output of this file
+
+set -e
+set -o pipefail
+
+tmux show-env | \
+    grep -v -- '^-' | \
+    awk -F '=' '{ printf "export %s=\"%s\"\n", $1, $2; }'
+
