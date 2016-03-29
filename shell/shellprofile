@@ -68,3 +68,5 @@ export MANPATH="$NPM_PACKAGES/share/man:$MANPATH"
 export NODE_PATH=$(join : "$NPM_PACKAGES/lib/node_modules" $(echo "${NODE_PATH:-}" | xargs))
 echo "prefix = $NPM_PACKAGES" > "$HOME/.npmrc"
 
+export EDITOR="emacsclient -a vim"
+
