@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+CHECKID=$1
+
+aws support describe-trusted-advisor-check-result \
+    --check-id $CHECKID \
+    --query 'result.flaggedResources[*].[metadata[0], metadata[1], metadata[2], metadata[3], metadata[4], metadata[5]]' \
+    --output text | \
+sort -k 3,3 -k 1,1
+
