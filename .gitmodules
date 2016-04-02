@@ -49,6 +49,7 @@
 [submodule "lib/pandoc"]
 	path = lib/pandoc
 	url = https://github.com/jgm/pandoc
+	branch = master
 [submodule "lib/aspiers-shell-env"]
 	path = lib/aspiers-shell-env
 	url = https://github.com/aspiers/shell-env
