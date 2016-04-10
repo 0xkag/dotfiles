@@ -1,0 +1,5 @@
+* put absolute path to ~/.root/bin in ~/.stack/config.yml like:
+
+  local-bin-path: /path/to/homedir/.root/bin
+
+  in order to override the default of ~/.local/bin
