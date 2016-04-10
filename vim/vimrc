@@ -1,7 +1,124 @@
+"" ---------------------------
+"" nocompatible; do this first
+"" ---------------------------
+
 set nocompatible
-set bg=dark
-set bs=2
-set modeline
-colorscheme ron
-syntax on
+
+"" ------------
+"" visual stuff
+"" ------------
+
+set background=dark      " 
+set modeline             " 
+set ruler                " 
+set number               " 
+set showcmd              " 
+set showmatch            " 
+set wildmenu             " 
+set lazyredraw           " 
+set list                 " 
+colorscheme ron          " 
+syntax enable            " 
+let &showbreak = '+++ '  " 
+
+" highlight > 80 column text; there are two alternatives:
+
+" set colorcolumn=80
+au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%80v.\+', -1)
+
+"" TODO
+
+filetype indent on       " 
+
+"" ---------
+"" searching
+"" ---------
+
+set incsearch            " 
+set hlsearch             " 
+
+"" ----------------
+"" editing behavior
+"" ----------------
+
+set backspace=2          " 
+set tabstop=4            " 
+set softtabstop=4        " 
+set textwidth=78         " 
+set joinspaces           " two spaces after punctuation; useful for gqap
+
+"" --------------------------------
+"" keybindings and mapping behavior
+"" --------------------------------
+
+set timeout              " 
+set timeoutlen=500       " 
+let mapleader=" "        " 
+
+" emulate spacemacs keychord for escape
+
+inoremap fd <esc>
+
+" move by visual line
+
+nnoremap j gj
+nnoremap k gk
+nnoremap $ g$
+
+" highlight last inserted text
+
+nnoremap gv `[v`]
+
+" leader mappings
+
+map <leader>h :nohlsearch<cr>
+
+"" -----------------
+"" filetype autocmds
+"" -----------------
+
+augroup configgroup
+    autocmd!
+    autocmd VimEnter * highlight clear SignColumn
+    autocmd BufWritePre *.php,*.py,*.js,*.txt,*.hs,*.java,*.md
+                \: call <SID>StripTrailingWhitespaces()
+    autocmd FileType java setlocal noexpandtab
+    autocmd FileType java setlocal list
+    autocmd FileType java setlocal listchars=tab:+\ ,eol:-
+    autocmd FileType java setlocal formatprg=par\ -w80\ -T4
+    autocmd FileType php setlocal expandtab
+    autocmd FileType php setlocal list
+    autocmd FileType php setlocal listchars=tab:+\ ,eol:-
+    autocmd FileType php setlocal formatprg=par\ -w80\ -T4
+    autocmd FileType python setlocal commentstring=#\ %s
+    autocmd FileType ruby setlocal tabstop=2
+    autocmd FileType ruby setlocal shiftwidth=2
+    autocmd FileType ruby setlocal softtabstop=2
+    autocmd FileType ruby setlocal commentstring=#\ %s
+    autocmd BufEnter *.cls setlocal filetype=java
+    autocmd BufEnter *.zsh-theme setlocal filetype=zsh
+    autocmd BufEnter *.sh setlocal tabstop=2
+    autocmd BufEnter *.sh setlocal shiftwidth=2
+    autocmd BufEnter *.sh setlocal softtabstop=2
+    autocmd BufEnter Makefile setlocal noexpandtab
+augroup END
+
+"" ---------
+"" functions
+"" ---------
+
+" Strips trailing whitespace at the end of files.  This is called on buffer
+" write in the autogroup above.
+"
+" Credit: http://dougblack.io/words/a-good-vimrc.html
+
+function! <SID>StripTrailingWhitespaces()
+    " save last search & cursor position
+    let _s=@/
+    let l = line(".")
+    let c = col(".")
+    %s/\s\+$//e
+    let @/=_s
+    call cursor(l, c)
+endfunction
 
