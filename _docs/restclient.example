@@ -1,0 +1,28 @@
+# -*- restclient -*-
+
+# github
+
+GET https://api.github.com
+User-Agent: Emacs Restclient
+
+# get an image
+
+GET http://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png
+User-Agent: Emacs Restclient
+
+# POST some json
+
+POST http://putsreq.com/ei0PIiFjeCgd0rZazWNu
+Content-Type: applications/json
+
+{
+  "x": 1,
+  "hello": "world"
+}
+
+# POST some url encoded
+
+POST http://putsreq.com/ei0PIiFjeCgd0rZazWNu
+Content-Type: application/x-www-form-urlencoded
+
+hello=world&foo=bar+baz
