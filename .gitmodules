@@ -66,6 +66,3 @@
 	path = lib/source-code-pro
 	url = https://github.com/adobe-fonts/source-code-pro.git
 	branch = release
-[submodule "lib/git-annex"]
-	path = lib/git-annex
-	url = git://git-annex.branchable.com/
