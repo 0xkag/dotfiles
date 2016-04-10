@@ -44,7 +44,7 @@ COMPLETION_WAITING_DOTS="true"
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# HIST_STAMPS="mm/dd/yyyy"
+HIST_STAMPS="yyyy-mm-dd"
 
 # Would you like to use another custom folder than $ZSH/custom?
 ZSH_CUSTOM=$HOME/.dotfiles/zsh/custom
@@ -77,11 +77,10 @@ plugins=(
 
 # User configuration
 
-export OLDPATH=$PATH
-export PATH=$HOME/bin:$HOME/.dotfiles/bin:$HOME/.local/bin
-test -n "$OLDPATH" && export PATH=$PATH:$OLDPATH
-export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
 # export MANPATH="/usr/local/man:$MANPATH"
+
+source $HOME/.dotfiles/shell/shellprofile
 
 # Load oh-my-zsh
 
@@ -111,6 +110,4 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-source $HOME/.dotfiles/shell/shellprofile
 
