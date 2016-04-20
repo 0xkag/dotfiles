@@ -2,29 +2,45 @@
 "" nocompatible; do this first
 "" ---------------------------
 
-set nocompatible
+set nocompatible         " 
 
 "" ------------
 "" visual stuff
 "" ------------
 
-set background=dark      " 
-set modeline             " 
-set ruler                " 
-set number               " 
+set background=dark      " use colors that look good on a dark background
+set lazyredraw           " don't redraw the screen when we don't have to
+set list                 " show certain non-printable characters
+set modeline             " look for modelines in opened files
+set number               " display line numbers
+set ruler                " display position
+let &showbreak = '+++ '  " indicate wrapped lines (wrap has to be on)
 set showcmd              " 
-set showmatch            " 
-set wildmenu             " 
-set lazyredraw           " 
-set list                 " 
+set showmatch            " show matching brackets/parens
+set wildmenu             " display completions above the cmdline
+
 colorscheme ron          " 
 syntax enable            " 
-let &showbreak = '+++ '  " 
+
+" highlight certain whitespace characters
+
+if has("multi_byte")
+	if $LANG == "en_US.utf-8" || $LANG == "en_US.UTF-8"
+		set listchars=eol:¶,extends:>,nbsp:_,precedes:<,tab:»·
+	else
+		set listchars=eol:$,extends:>,nbsp:_,precedes:<,tab:>-
+	endif
+endif
 
 " highlight > 80 column text; there are two alternatives:
 
-" set colorcolumn=80
-au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%80v.\+', -1)
+set colorcolumn=+1
+" au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%80v.\+', -1)
+
+" highlight line and column
+
+hi CursorLine cterm=NONE ctermbg=darkblue ctermfg=NONE guibg=darkblue guifg=NONE
+hi CursorColumn cterm=NONE ctermbg=darkblue ctermfg=NONE guibg=darkblue guifg=NONE
 
 "" TODO
 
@@ -34,8 +50,10 @@ filetype indent on       "
 "" searching
 "" ---------
 
-set incsearch            " 
 set hlsearch             " 
+set ignorecase           " 
+set incsearch            " 
+set smartcase            " 
 
 "" ----------------
 "" editing behavior
@@ -47,6 +65,21 @@ set softtabstop=4        "
 set textwidth=78         " 
 set joinspaces           " two spaces after punctuation; useful for gqap
 
+"" --------
+"" spelling
+"" --------
+
+set dictionary=/usr/share/dict/words
+set spelllang=en_us
+" set spellfile=~/.dotfiles/spell/words
+set spellsuggest=best,8
+
+"" ----
+"" misc
+"" ----
+
+set autoread             " 
+
 "" --------------------------------
 "" keybindings and mapping behavior
 "" --------------------------------
@@ -54,6 +87,7 @@ set joinspaces           " two spaces after punctuation; useful for gqap
 set timeout              " 
 set timeoutlen=500       " 
 let mapleader=" "        " 
+set pastetoggle=<f12>    " 
 
 " emulate spacemacs keychord for escape
 
@@ -65,11 +99,37 @@ nnoremap j gj
 nnoremap k gk
 nnoremap $ g$
 
+" remap Y to y$
+
+map Y y$
+
 " highlight last inserted text
 
 nnoremap gv `[v`]
 
+" emulate some emacs behavior since I switch back and forth
+
+" ... map C-x C-s to save in insert and normal modes
+
+inoremap <C-x><C-s> <C-\><C-o>:w<cr>
+nnoremap <C-x><C-s> :w<cr>
+
+" ... map C-a / C-e movements
+
+cnoremap <C-a> <home>
+cnoremap <C-e> <end>
+inoremap <C-a> <home>
+inoremap <C-e> <end>
+nnoremap <C-a> <home>
+nnoremap <C-e> <end>
+
 " leader mappings
+
+" ... toggle line and col highlight
+
+nnoremap <Leader>c :set cursorline! cursorcolumn!<cr>
+
+" ... remove all search highlights
 
 map <leader>h :nohlsearch<cr>
 
