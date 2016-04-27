@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+sumlines | numfmt --to=iec
