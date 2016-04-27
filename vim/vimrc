@@ -24,12 +24,13 @@ syntax enable            "
 
 " highlight certain whitespace characters
 
-if has("multi_byte")
-	if $LANG == "en_US.utf-8" || $LANG == "en_US.UTF-8"
-		set listchars=eol:¶,extends:>,nbsp:_,precedes:<,tab:»·
-	else
-		set listchars=eol:$,extends:>,nbsp:_,precedes:<,tab:>-
-	endif
+let listchars_unicode="eol:¶,extends:>,nbsp:_,precedes:<,tab:»·"
+let listchars_ascii="eol:$,extends:>,nbsp:_,precedes:<,tab:>-"
+
+if has("multi_byte") && ( $LANG == "en_US.utf-8" || $LANG == "en_US.UTF-8")
+	let &listchars=listchars_unicode
+else
+	let &listchars=listchars_ascii
 endif
 
 " highlight > 80 column text; there are two alternatives:
@@ -42,7 +43,7 @@ set colorcolumn=+1
 hi CursorLine cterm=NONE ctermbg=darkblue ctermfg=NONE guibg=darkblue guifg=NONE
 hi CursorColumn cterm=NONE ctermbg=darkblue ctermfg=NONE guibg=darkblue guifg=NONE
 
-"" TODO
+" TODO
 
 filetype indent on       " 
 
@@ -128,6 +129,13 @@ nnoremap <C-e> <end>
 " ... toggle line and col highlight
 
 nnoremap <Leader>c :set cursorline! cursorcolumn!<cr>
+
+" ... reset listchars to us-ascii
+
+" nnoremap <Leader>L :set listchars=eol:$,extends:>,nbsp:_,precedes:<,tab:>-<cr>
+
+nnoremap <Leader>LA :let &listchars=listchars_ascii<cr>
+nnoremap <Leader>LU :let &listchars=listchars_unicode<cr>
 
 " ... remove all search highlights
 
