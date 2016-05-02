@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+
+SINCE="$1"
+UNTIL="$2"
+shift 2
+
+git logfull --since="$SINCE" --until="$UNTIL" $@
+
