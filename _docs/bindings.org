@@ -5,4 +5,5 @@
 * readline
 * i3
 * chrome
+* ipython
 
