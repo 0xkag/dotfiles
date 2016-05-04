@@ -1,0 +1,8 @@
+* vim
+* spacemacs
+* tmux
+* less
+* readline
+* i3
+* chrome
+
