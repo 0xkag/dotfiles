@@ -141,6 +141,22 @@ nnoremap <Leader>LU :let &listchars=listchars_unicode<cr>
 
 map <leader>h :nohlsearch<cr>
 
+" ... yank and copy visual selection to X clipboard
+
+vnoremap <leader>C y :call system("xclip -sel clipboard -i", @")<cr>
+
+" ... copy visual selection to X clipboard
+
+vnoremap <leader>u :w !xclip -sel clipboard -i<cr>
+
+" ... copy previously yanked text from register to clipboard
+
+nnoremap <leader>C :call system("xclip -sel clipboard -i", @")<cr>
+
+" ... paste from X clipboard
+
+noremap <leader>P :r !xclip -sel clipboard -o<cr>
+
 "" -----------------
 "" filetype autocmds
 "" -----------------
