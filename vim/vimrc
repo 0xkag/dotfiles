@@ -128,14 +128,12 @@ nnoremap <C-e> <end>
 
 " ... toggle line and col highlight
 
-nnoremap <Leader>c :set cursorline! cursorcolumn!<cr>
+nnoremap <leader>c :set cursorline! cursorcolumn!<cr>
 
 " ... reset listchars to us-ascii
 
-" nnoremap <Leader>L :set listchars=eol:$,extends:>,nbsp:_,precedes:<,tab:>-<cr>
-
-nnoremap <Leader>LA :let &listchars=listchars_ascii<cr>
-nnoremap <Leader>LU :let &listchars=listchars_unicode<cr>
+nnoremap <leader>la :let &listchars=listchars_ascii<cr>
+nnoremap <leader>lu :let &listchars=listchars_unicode<cr>
 
 " ... remove all search highlights
 
