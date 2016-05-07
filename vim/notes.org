@@ -1,1 +1,5 @@
 * http://dougblack.io/words/a-good-vimrc.html
+* :g/pattern/normal "Ayy
+* :g/pattern0/s/pattern1/replacement/g
+* :g/pattern/visual
+

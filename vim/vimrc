@@ -104,9 +104,13 @@ nnoremap $ g$
 
 map Y y$
 
-" highlight last inserted text
+" yank and copy visual selection to X clipboard
 
-nnoremap gv `[v`]
+" vnoremap <silent> y y :call system("xclip -sel clipboard -i", @")<cr>
+
+" highlight last inserted text (this overrides the default gV)
+
+nnoremap gV `[v`]
 
 " emulate some emacs behavior since I switch back and forth
 
@@ -130,30 +134,27 @@ nnoremap <C-e> <end>
 
 nnoremap <leader>c :set cursorline! cursorcolumn!<cr>
 
-" ... reset listchars to us-ascii
+" ... set listchars to ascii or unicode; toggle set list
 
-nnoremap <leader>la :let &listchars=listchars_ascii<cr>
-nnoremap <leader>lu :let &listchars=listchars_unicode<cr>
+nnoremap <leader>tvt :set list!<cr>
+nnoremap <leader>tva :let &listchars=listchars_ascii<cr>
+nnoremap <leader>tvu :let &listchars=listchars_unicode<cr>
 
 " ... remove all search highlights
 
 map <leader>h :nohlsearch<cr>
 
-" ... yank and copy visual selection to X clipboard
-
-vnoremap <leader>C y :call system("xclip -sel clipboard -i", @")<cr>
-
 " ... copy visual selection to X clipboard
 
-vnoremap <leader>u :w !xclip -sel clipboard -i<cr>
+vnoremap <silent> <leader>C :w !xclip -sel clipboard -i<cr>
 
-" ... copy previously yanked text from register to clipboard
+" ... copy previously yanked/deleted text from register to clipboard
 
-nnoremap <leader>C :call system("xclip -sel clipboard -i", @")<cr>
+nnoremap <silent> <leader>C :call system("xclip -sel clipboard -i", @")<cr>
 
 " ... paste from X clipboard
 
-noremap <leader>P :r !xclip -sel clipboard -o<cr>
+noremap <silent> <leader>P :r !xclip -sel clipboard -o<cr>
 
 "" -----------------
 "" filetype autocmds
