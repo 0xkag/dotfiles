@@ -1,5 +1,19 @@
-* http://dougblack.io/words/a-good-vimrc.html
-* :g/pattern/normal "Ayy
-* :g/pattern0/s/pattern1/replacement/g
-* :g/pattern/visual
+* good reads I've come across
+** http://dougblack.io/words/a-good-vimrc.html
+** http://stackoverflow.com/questions/1497958/how-do-i-use-vim-registers
 
+* :g ex mode tricks
+** :g/pattern/normal "Ayy
+** :g/pattern0/s/pattern1/replacement/g
+** :g/pattern/visual
+
+* registers
+** insert contents of register in insert or command mode
+*** <C-r>register
+
+* only find pattern after a certain line
+** :execute '1,$/pattern0/normal! ma' | nohlsearch | 1
+   /^\%>'apattern1
+** or, equivalently (except for some search highlighting that may be
+   confusing):
+** /pattern0/;/pattern1

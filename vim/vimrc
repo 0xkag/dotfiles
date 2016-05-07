@@ -98,6 +98,8 @@ inoremap fd <esc>
 
 nnoremap j gj
 nnoremap k gk
+nnoremap 0 g0
+nnoremap ^ g^
 nnoremap $ g$
 
 " remap Y to y$
@@ -115,6 +117,7 @@ nnoremap gV `[v`]
 " emulate some emacs behavior since I switch back and forth
 
 " ... map C-x C-s to save in insert and normal modes
+" ... TODO do these work still?
 
 inoremap <C-x><C-s> <C-\><C-o>:w<cr>
 nnoremap <C-x><C-s> :w<cr>
@@ -127,6 +130,11 @@ inoremap <C-a> <home>
 inoremap <C-e> <end>
 nnoremap <C-a> <home>
 nnoremap <C-e> <end>
+
+" ... delete word and line from cursor
+
+inoremap <C-w> <C-o>daW
+inoremap <C-k> <C-o>D
 
 " leader mappings
 
