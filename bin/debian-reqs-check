@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 for i in $(cat $(dirname $0)/../_reqs/requirements-ubuntu.txt | strip-comments | xargs); do
     dpkg --list $i > /dev/null

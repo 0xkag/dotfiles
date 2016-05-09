@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 N=${1:-53}
 N=$(($N + 9)) # because 7 character hash plus space plus one

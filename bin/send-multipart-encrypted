@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Format a multipart MIME message for sending with an encrypted message
 # part.
