@@ -66,3 +66,7 @@
 	path = lib/source-code-pro
 	url = https://github.com/adobe-fonts/source-code-pro.git
 	branch = release
+[submodule "lib/git-hg"]
+	path = lib/git-hg
+	url = https://github.com/cosmin/git-hg
+	branch = master
