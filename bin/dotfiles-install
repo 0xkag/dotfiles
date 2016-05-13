@@ -39,6 +39,9 @@ def main():
 
     relink('.dotfiles/zsh/zshrc', '~/.zshrc')
 
+    relink('~/.dotfiles/lib/pyenv-virtualenv',
+           '~/.dotfiles/lib/pyenv/plugins/pyenv-virtualenv')
+
 if __name__ == '__main__':
     sys.exit(main())
 

@@ -9,6 +9,9 @@ source $HOME/.dotfiles/shell/shellcolors
 export SHELL=$({ [[ -x /usr/local/bin/zsh ]] && echo /usr/local/bin/zsh; } || \
                { [[ -x /bin/zsh ]] && echo /bin/zsh; } || \
                echo $SHELL)
+# editor
+
+export EDITOR="emacsclient -a vim"
 
 # aliases
 
@@ -68,5 +71,10 @@ export MANPATH="$NPM_PACKAGES/share/man:$MANPATH"
 export NODE_PATH=$(join : "$NPM_PACKAGES/lib/node_modules" $(echo "${NODE_PATH:-}" | xargs))
 echo "prefix = $NPM_PACKAGES" > "$HOME/.npmrc"
 
-export EDITOR="emacsclient -a vim"
+# pyenv
+
+export PYENV_ROOT=~/.dotfiles/lib/pyenv
+export PATH=~/.dotfiles/lib/pyenv/bin:$PATH
+command -v pyenv &> /dev/null && eval "$(pyenv init -)"
+command -v pyenv &> /dev/null && eval "$(pyenv virtualenv-init -)"
 
