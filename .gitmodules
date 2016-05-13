@@ -6,10 +6,6 @@
 	path = lib/sshrc
 	url = https://github.com/Russell91/sshrc
 	branch = master
-[submodule "lib/cask"]
-	path = lib/cask
-	url = https://github.com/cask/cask.git
-	branch = master
 [submodule "lib/spacemacs"]
 	path = lib/spacemacs
 	url = https://github.com/syl20bnr/spacemacs
