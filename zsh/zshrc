@@ -109,6 +109,8 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+compdef sshrc=ssh
+
 # source my profile after oh-my-zsh init
 
 source $HOME/.dotfiles/shell/shellprofile
