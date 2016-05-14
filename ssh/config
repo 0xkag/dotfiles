@@ -1,1 +1,3 @@
 ForwardAgent=yes
+ForwardX11=yes
+
