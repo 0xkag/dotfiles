@@ -1,4 +1,5 @@
 * good reads I've come across
+** http://stackoverflow.com/questions/1218390/what-is-your-most-productive-shortcut-with-vim/1220118#1220118
 ** http://dougblack.io/words/a-good-vimrc.html
 ** http://stackoverflow.com/questions/1497958/how-do-i-use-vim-registers
 
@@ -6,6 +7,10 @@
 ** :g/pattern/normal "Ayy
 ** :g/pattern0/s/pattern1/replacement/g
 ** :g/pattern/visual
+
+* command mode history
+** :<C-f>
+** q:
 
 * registers
 ** insert contents of register in insert or command mode

@@ -7,3 +7,7 @@
 ** import config
 * zsh
 ** move away from oh-my-zsh and do my own config?
+* jumpers
+** wd vs. z vs. fasd vs. ...
+** https://github.com/rupa/z
+
