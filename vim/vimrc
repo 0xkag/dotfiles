@@ -164,6 +164,11 @@ nnoremap <silent> <leader>C :call system("xclip -sel clipboard -i", @")<cr>
 
 noremap <silent> <leader>P :r !xclip -sel clipboard -o<cr>
 
+" ... map <leader><space> to use C mapping (copy)
+
+vmap <silent> <leader><space> <space>C
+nmap <silent> <leader><space> V<space>C<esc>
+
 "" -----------------
 "" filetype autocmds
 "" -----------------
