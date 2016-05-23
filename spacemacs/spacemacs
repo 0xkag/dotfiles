@@ -310,6 +310,9 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
   (setq sentence-end-double-space t)
+  ;; enabled C-r register replace in search mode
+  ;; https://github.com/syl20bnr/spacemacs/issues/5101
+  (setq-default evil-search-module 'evil-search)
   )
 
 (defun dotspacemacs/user-config ()
