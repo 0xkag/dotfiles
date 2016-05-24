@@ -30,6 +30,8 @@ def main():
 
     relink('.dotfiles/i3', '~/.i3')
 
+    relink('.dotfiles/iftop/iftoprc', '~/.iftoprc')
+
     relink('.dotfiles/lib/spacemacs', '~/.emacs.d')
     relink('.dotfiles/spacemacs/spacemacs', '~/.spacemacs')
 

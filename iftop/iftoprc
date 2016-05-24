@@ -1,0 +1,4 @@
+# filter-code: not port domain
+line-display: one-line-both
+show-bars: yes
+show-totals: yes
