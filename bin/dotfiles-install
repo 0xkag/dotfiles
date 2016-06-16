@@ -26,6 +26,9 @@ def main():
     relink('~/.dotfiles/lib/source-code-pro', '~/.fonts/adobe-fonts/source-code-pro')
     os.system('fc-cache -f -v ~/.fonts/adobe-fonts/source-code-pro')
 
+    relink('.dotfiles/bash/bashrc', '~/.bashrc')
+    relink('.dotfiles/bash/bash_profile', '~/.bash_profile')
+
     relink('.dotfiles/git/gitconfig', '~/.gitconfig')
 
     relink('.dotfiles/i3', '~/.i3')

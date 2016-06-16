@@ -1,6 +1,11 @@
-# vim: sw=4 ts=4 ft=sh:
+# vim: et sw=4 ts=4 ft=sh:
 
 source $HOME/.dotfiles/shell/shellenv
+
+case $- in
+    *i*) # source $HOME/.dotfiles/shell/shellprofile
+        ;;
+esac
 
 export LANG=en_US.UTF-8
 export LC_COLLATE=C

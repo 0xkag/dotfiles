@@ -1,4 +1,4 @@
-# vim: sw=4 ts=4 ft=sh:
+# vim: et sw=4 ts=4 ft=sh:
 
 source $HOME/.dotfiles/shell/shellrc
 source $HOME/.dotfiles/shell/shellenv
@@ -9,6 +9,25 @@ source $HOME/.dotfiles/shell/shellcolors
 export SHELL=$({ [[ -x /usr/local/bin/zsh ]] && echo /usr/local/bin/zsh; } || \
                { [[ -x /bin/zsh ]] && echo /bin/zsh; } || \
                echo $SHELL)
+
+# bash options
+
+case $0 in
+    *bash*)
+        shopt -s autocd
+        shopt -s checkjobs
+        shopt -s checkwinsize
+        shopt -s globstar
+        shopt -s histappend
+        export HISTCONTROL=ignoreboth
+        export HISTSIZE=10000
+        export HISTFILESIZE=20000
+        ;;
+    *zsh*)
+        compdef sshrc=ssh
+        ;;
+esac
+
 # editor
 
 export EDITOR="emacsclient -a vim"
