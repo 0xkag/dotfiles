@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+
+inum=$1
+device=$2
+
+sudo debugfs -R "ncheck $inum" $device
+
