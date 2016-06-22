@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Join multiple lines on stdin.  By default use " ", but any arbitrary join
+# string can be used with "c=<string> joinlines".  If only single character
+# was required, then tr '\n' "$c" could be used.  But this supports multi-
+# character.
+
+c=${c:-" "}
+
+sed ":a;{N;s/\\n/$c/};ba"
+
