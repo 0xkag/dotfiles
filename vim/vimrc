@@ -27,10 +27,10 @@ syntax enable            "
 let listchars_unicode="eol:¶,extends:>,nbsp:_,precedes:<,tab:»·"
 let listchars_ascii="eol:$,extends:>,nbsp:_,precedes:<,tab:>-"
 
-if has("multi_byte") && ( $LANG == "en_US.utf-8" || $LANG == "en_US.UTF-8")
-	let &listchars=listchars_unicode
+if has("multi_byte") && ($LANG == "en_US.utf-8" || $LANG == "en_US.UTF-8")
+    let &listchars=listchars_unicode
 else
-	let &listchars=listchars_ascii
+    let &listchars=listchars_ascii
 endif
 
 " highlight > 80 column text; there are two alternatives:
