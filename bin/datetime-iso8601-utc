@@ -4,15 +4,15 @@ set -e
 set -u
 
 if command -v gdate &> /dev/null; then
-	DATE=gdate
+    DATE=gdate
 else
-	DATE=date
+    DATE=date
 fi
 
 if [ $# -gt 0 ]; then
-	X="-d @$1"
+    X="-d @$1"
 else
-	X=""
+    X=""
 fi
 
 $DATE $X --iso-8601=ns -u | sed 's/+00:00/Z/g' | sed -e 's/,[0-9]\{1,\}Z/Z/g'
