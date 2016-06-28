@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# vim: et sw=4 ts=4 tw=78:
+
+# Find instances of the git blob with hash $1.  Note that the hash is not
+# simply the sha1 of the file, rather it is git hash-object <file>, which is
+# roughly sha1("blob " + str(filesize) + "\0" + data).  So use like this:
+#
+#   git-findhash $(git hash-object path/to/file)
+#
+# inspired by:
+#
+#   http://stackoverflow.com/questions/223678/which-commit-has-this-blob
+#
+# TODO make this take either the blob hash or a path/to/file
+
+blob="$1"
+shift
+git log "$@" --pretty=format:'%T %h %s' | \
+while read tree commit subject; do
+    if git ls-tree -r $tree | grep -q "$blob"; then
+        echo $commit "$subject"
+    fi
+done
+
