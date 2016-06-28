@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+
+for file in /proc/*/status; do
+    echo -n "$file "
+    awk '/VmSwap|Name/{printf $2 " " $3}END{ print ""}' $file;
+done | sort -k 3 -n -r
+
