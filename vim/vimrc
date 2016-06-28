@@ -43,9 +43,9 @@ set colorcolumn=+1
 hi CursorLine cterm=NONE ctermbg=darkblue ctermfg=NONE guibg=darkblue guifg=NONE
 hi CursorColumn cterm=NONE ctermbg=darkblue ctermfg=NONE guibg=darkblue guifg=NONE
 
-" TODO
+" filetype on
 
-filetype indent on       " 
+filetype plugin indent on " load plugins and indentation files
 
 "" ---------
 "" searching
@@ -116,8 +116,8 @@ nnoremap gV `[v`]
 
 " emulate some emacs behavior since I switch back and forth
 
-" ... map C-x C-s to save in insert and normal modes
-" ... TODO do these work still?
+" ... map C-x C-s to save in insert and normal modes; these require that
+" the terminal have flow control turned off (stty stop '' -ixoff)
 
 inoremap <C-x><C-s> <C-\><C-o>:w<cr>
 nnoremap <C-x><C-s> :w<cr>
