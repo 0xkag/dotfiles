@@ -1,0 +1,133 @@
+# http://www.stat.rice.edu/~helpdesk/dotfiles/.muttrc.pine.html
+#
+# Date: Mon, 7 Dec 1998 21:49:17 +0100
+# From: Daniel Gonzalez Gasull <gasull[at]usa.net>
+# Subject: .muttrc for Pine users
+#
+# muttrc.Pine 1.0 by Daniel Gonzalez Gasull
+# Feedback is welcome.  Email: gasull[at]usa.net
+#                       http://gasull.home.ml.org
+#
+# This file contains commands to change the keybindings in Mutt to be
+# similar to those of PINE 3.96.
+#
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#
+# Key bindings
+#
+#       maps:
+#               alias           alias menu
+#               attach          attachment menu
+#               browser         directory browser
+#               compose         compose menu
+#               index           message index
+#               pgp             pgp menu
+#               postpone        postponed message recall menu
+#               generic         generic keymap for all of the above
+#               editor          line editor
+#               pager           text viewer
+#               
+
+bind alias ' ' next-page
+bind alias - previous-page
+bind alias . enter-command
+bind alias : tag-entry
+bind alias n next-entry
+bind alias p previous-entry
+bind alias w search
+bind alias x tag-entry
+
+bind browser ' ' next-page
+bind browser - previous-page
+macro browser c "qc"    # Compose a message
+bind browser g select-new
+bind browser i exit
+bind browser n next-entry
+bind browser p previous-entry
+
+bind index $ sort-mailbox
+bind index ' ' next-page
+bind index * set-flag
+bind index + clear-flag
+bind index , tag-subthread
+bind index - previous-page
+bind index . enter-command
+bind index : tag-entry
+bind index <down> next-entry
+bind index <up> previous-entry
+bind index L limit    # Not possible to simulate zoom-out...
+bind index N next-unread
+bind index R group-reply
+macro index W "w\Cu~B "  # Search in the whole content of any message
+bind index \; tag-pattern
+bind index \Cr list-reply# Because 'l' is for GotoFldr
+bind index a tag-prefix
+bind index c mail
+bind index d delete-message
+bind index g change-folder
+macro index j "1<backspace>"# like Jump in Pine
+macro index l "g?"# like GotoFldr in Pine
+bind index n next-entry
+bind index p previous-entry
+bind index t create-alias
+bind index u undelete-message
+bind index v display-message
+bind index w search
+bind index x sync-mailbox
+bind index y print-message
+
+bind attach . enter-command
+bind attach : tag-entry
+bind attach R group-reply
+bind attach \Cr list-reply# Because 'l' is for GotoFldr
+bind attach a tag-prefix
+macro attach c "qic"
+macro attach g "qg"
+
+bind pager ' ' next-page
+macro pager * "i*"
+macro pager + "i+"
+macro pager , "i,v"
+bind pager . enter-command
+bind pager : tag-message
+bind pager <down> next-line
+bind pager <up> previous-line
+bind pager N next-unread
+bind pager Q exit
+bind pager R group-reply
+macro pager W "iW"# Search in the whole content of any message
+macro pager \; "i;"
+bind pager \Cr list-reply# Because 'l' is for GotoFldr
+macro pager a "ia"
+macro pager b "Qb"
+macro pager c "Qc"# like Pine
+bind pager d delete-message
+bind pager g change-folder
+macro pager j "1<backspace>"# like Jump in Pine
+macro pager l "g?"      # like GotoFdlr in Pine
+bind pager n next-entry
+bind pager p previous-entry
+bind pager q quit
+bind pager t create-alias
+bind pager u undelete-message
+bind pager w search
+bind pager y print-message
+
+bind compose . enter-command
+bind compose : tag-entry
+bind compose D edit-description
+bind compose \Cj attach-file
+bind compose \Co postpone-message
+bind compose \Cr edit-headers
+bind compose \Cx send-message
+bind compose a tag-prefix
+bind compose d detach-file
+bind compose e edit-file
+
+
+# PINE has different defaults for this variables
+set nosave_name
+set hdr_format=3D"%Z %3C %{%b %d} %-19.19L (%5c) %s"
+set editor="pico"
+
