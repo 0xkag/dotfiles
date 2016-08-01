@@ -18,6 +18,7 @@ let &showbreak = '+++ '  " indicate wrapped lines (wrap has to be on)
 set showcmd              " 
 set showmatch            " show matching brackets/parens
 set wildmenu             " display completions above the cmdline
+" TODO set wildmode=longest:full,full,list "
 
 colorscheme ron          " 
 syntax enable            " 
@@ -42,10 +43,6 @@ set colorcolumn=+1
 
 hi CursorLine cterm=NONE ctermbg=darkblue ctermfg=NONE guibg=darkblue guifg=NONE
 hi CursorColumn cterm=NONE ctermbg=darkblue ctermfg=NONE guibg=darkblue guifg=NONE
-
-" filetype on
-
-filetype plugin indent on " load plugins and indentation files
 
 "" ---------
 "" searching
@@ -74,6 +71,15 @@ set dictionary=/usr/share/dict/words
 set spelllang=en_us
 " set spellfile=~/.dotfiles/spell/words
 set spellsuggest=best,8
+
+"" ---------------------------------------
+"" filetype indentation/plugins/completion
+"" ---------------------------------------
+
+filetype indent on       " load indentation files
+filetype plugin on       " load plugin files
+
+" TODO set omnifunc=syntaxcomplete#Complete
 
 "" ----
 "" misc
