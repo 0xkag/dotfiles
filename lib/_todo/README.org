@@ -1,0 +1,3 @@
+* submodules that I've added but are not actually being used
+* in general, these I things I found but just haven't had time to look at /
+  integrate yet

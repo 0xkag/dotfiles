@@ -11,7 +11,7 @@
 	url = https://github.com/syl20bnr/spacemacs
 	branch = develop
 [submodule "lib/fasd"]
-	path = lib/fasd
+	path = lib/_todo/fasd
 	url = https://github.com/clvv/fasd
 	branch = master
 [submodule "lib/pyenv"]
@@ -47,15 +47,15 @@
 	url = https://github.com/jgm/pandoc
 	branch = master
 [submodule "lib/aspiers-shell-env"]
-	path = lib/aspiers-shell-env
+	path = lib/_todo/aspiers-shell-env
 	url = https://github.com/aspiers/shell-env
 	branch = master
 [submodule "lib/aspiers-git-config"]
-	path = lib/aspiers-git-config
+	path = lib/_todo/aspiers-git-config
 	url = https://github.com/aspiers/git-config
 	branch = master
 [submodule "lib/bup"]
-	path = lib/bup
+	path = lib/_todo/bup
 	url = https://github.com/bup/bup
 	branch = master
 [submodule "lib/source-code-pro"]
