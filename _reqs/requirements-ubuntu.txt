@@ -58,7 +58,7 @@ nmap
 nodejs-legacy
 npm
 pandoc
-https://github.com/jgm/pandoc/releases/download/1.15.0.6/pandoc-1.15.0.6-1-amd64.deb
+https://github.com/jgm/pandoc/releases/download/1.17.0.2/pandoc-1.17.0.2-1-amd64.deb
 pastebinit
 patch
 patchutils

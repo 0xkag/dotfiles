@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 
+git submodule sync
+git submodule update
 git submodule foreach -q --recursive 'branch="$(git config -f "$toplevel/.gitmodules" submodule.$name.branch)"; echo $branch; git checkout $branch'
 
