@@ -8,7 +8,7 @@ VERSION=6.5.2
 wget https://ftp.gnu.org/pub/gnu/global/global-${VERSION}.tar.gz
 tar -xzvf global-${VERSION}.tar.gz
 cd global-${VERSION}
-./configure --prefix ~/.root
+./configure --prefix ~/.root --with-exuberant-ctags=/usr/bin/ctags
 make && make install
 cd ..
 rm -rf global-${VERSION}.tar.gz global-${VERSION}
