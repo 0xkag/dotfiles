@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+set -u
+set -x
+
+pushd .
+cd $(dirname $0)
+cd ../lib/pandoc
+git submodule update --init
+stack setup
+stack install
+popd
+
