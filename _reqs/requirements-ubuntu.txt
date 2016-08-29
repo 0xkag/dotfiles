@@ -19,6 +19,7 @@ dmidecode
 dnsutils
 elinks
 emacs
+exuberant-ctags
 gcc
 gddrescue
 gdb

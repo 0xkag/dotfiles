@@ -1,5 +1,6 @@
 # vim: set noet sw=30 ts=30:
 autoflake	# spacemacs python anaconda
+cookiecutter	# devtools
 coverage	# devtools
 docutils	# doctools
 flake8	# devtools
