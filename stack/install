@@ -11,6 +11,7 @@ wget https://www.stackage.org/stack/linux-x86_64 -O stack.tar.gz
 tar -xzf stack.tar.gz
 name="$(find . -type d -name 'stack-*' | cut -d '/' -f 2)"
 mv "$name" ~/.root/var/
-ln -sf "~/.root/var/$name/stack" ~/.dotfiles/bin/stack
+ln -sf "../../.root/var/$name/stack" ~/.dotfiles/bin/stack
 rm -f stack.tar.gz
+stack setup
 

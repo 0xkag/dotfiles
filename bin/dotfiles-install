@@ -43,6 +43,8 @@ def main():
     relink('.dotfiles/sshrc', '~/.sshrc.d')
     relink('.dotfiles/sshrc/sshrc', '~/.sshrc')
 
+    relink('~/.dotfiles/stack/config.yaml', '~/.stack/config.yaml')
+
     relink('.dotfiles/tmux/tmux.conf', '~/.tmux.conf')
 
     relink('.dotfiles/vim/vimrc', '~/.vimrc')
