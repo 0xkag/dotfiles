@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+
+RESOLVER=$1
+DOMAIN=$2
+
+dig -4 +noall +answer @$RESOLVER $DOMAIN -t axfr | sort -k 1,1 -k 4,4 -k 2,2
+
