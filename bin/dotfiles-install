@@ -29,6 +29,8 @@ def main():
     relink('.dotfiles/bash/bashrc', '~/.bashrc')
     relink('.dotfiles/bash/bash_profile', '~/.bash_profile')
 
+    relink('.dotfiles/gdb/gdbinit', '~/.gdbinit')
+
     relink('.dotfiles/git/gitconfig', '~/.gitconfig')
 
     relink('.dotfiles/i3', '~/.i3')
@@ -43,6 +45,7 @@ def main():
     relink('.dotfiles/sshrc', '~/.sshrc.d')
     relink('.dotfiles/sshrc/sshrc', '~/.sshrc')
 
+    mkdir('~/.stack')
     relink('~/.dotfiles/stack/config.yaml', '~/.stack/config.yaml')
 
     relink('.dotfiles/tmux/tmux.conf', '~/.tmux.conf')

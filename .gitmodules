@@ -66,3 +66,7 @@
 	path = lib/git-hg
 	url = https://github.com/cosmin/git-hg
 	branch = master
+[submodule "lib/peda"]
+	path = lib/peda
+	url = https://github.com/longld/peda
+	branch = master
