@@ -62,6 +62,9 @@ set tabstop=4            "
 set softtabstop=4        " 
 set textwidth=78         " 
 set joinspaces           " two spaces after punctuation; useful for gqap
+set formatoptions+=l     " 
+set formatoptions+=c     " 
+" set formatoptions-=t     " 
 
 "" --------
 "" spelling
