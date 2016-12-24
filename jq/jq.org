@@ -1,0 +1,7 @@
+# vim: set tw=999:
+
+* diff -i -u <(cat before | tr '[:upper:]' '[:lower:]' | jq --sort-keys 'sort_by(.mail)') <(cat after | tr '[:upper:]' '[:lower:]' | jq --sort-keys 'sort_by(.mail)')
+* cat ~/snapshots.json | jq -r '.Snapshots[] | [.SnapshotId, .VolumeId, (if .Tags != null then (.Tags[] | select(.Key == "Name") | .Value) else "" end)] | @tsv'
+* cat ~/snapshots.json | jq -r '.Snapshots[] | [.SnapshotId, .VolumeId, (.Tags[]? | select(.Key == "Name") | .Value)] | @tsv'
+* cat ~/snapshots.json | jq -r '.Snapshots[] | [.SnapshotId, .VolumeId, .StartTime, (.Tags? | sort_by(.Key)? | .[].Value)] | @tsv'
+* aws iam list-policies --scope Local | jq -r '.Policies[] | to_entries | sort_by(.key) | from_entries | ([.PolicyName, .CreateDate, .UpdateDate, .AttachmentCount, .IsAttachable]) | @tsv' | LC_ALL=C sort -k 1,1 | column -t
