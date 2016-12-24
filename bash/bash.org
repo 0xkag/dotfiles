@@ -1,0 +1,4 @@
+* echo 'bash -c '"'"'echo "hello world"'"'"''
+** '"'"' --> ' inside the other ' quoted string
+** so this will emit: bash -c 'echo "hello world"'
+
