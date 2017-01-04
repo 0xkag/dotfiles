@@ -60,7 +60,7 @@ values."
      html
      ;; ivy
      ;; java -- requires eclim and eclipse
-     ;; javascript
+     javascript
      latex
      markdown
      ;; mu4e -- try this maybe
