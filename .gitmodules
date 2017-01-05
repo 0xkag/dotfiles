@@ -70,3 +70,7 @@
 	path = lib/peda
 	url = https://github.com/longld/peda
 	branch = master
+[submodule "lib/vim"]
+	path = lib/vim
+	url = https://github.com/vim/vim.git
+	branch = master
