@@ -49,13 +49,17 @@ hi CursorColumn cterm=NONE ctermbg=darkblue ctermfg=NONE guibg=darkblue guifg=NO
 "" ---------
 
 set hlsearch             " 
-set ignorecase           " 
+set ignorecase           " case in-sensitive searching
 set incsearch            " 
 set smartcase            " 
 
 "" ----------------
 "" editing behavior
 "" ----------------
+
+" set autoindent
+" set smartindent
+" set smarttab
 
 set backspace=2          " 
 set tabstop=4            " 
@@ -88,7 +92,7 @@ filetype plugin on       " load plugin files
 "" misc
 "" ----
 
-set autoread             " 
+set autoread             " auto read changed files
 
 "" --------------------------------
 "" keybindings and mapping behavior
@@ -123,6 +127,13 @@ map Y y$
 
 nnoremap gV `[v`]
 
+" move in insert mode
+
+imap <C-h> <C-o>h
+imap <C-j> <C-o>j
+imap <C-k> <C-o>k
+imap <C-l> <C-o>l
+
 " emulate some emacs behavior since I switch back and forth
 
 " ... map C-x C-s to save in insert and normal modes; these require that
@@ -146,6 +157,10 @@ inoremap <C-w> <C-o>daW
 inoremap <C-k> <C-o>D
 
 " leader mappings
+
+" ... search and replace highlighted text
+
+vnoremap <leader>% "hy:%s/<C-r>h//gc<left><left><left>
 
 " ... toggle line and col highlight
 
