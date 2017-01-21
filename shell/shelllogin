@@ -1,13 +1,12 @@
 # vim: et sw=4 ts=4 ft=sh:
 
-[ -n ${DOTFILES_DEBUG:-""} ] && echo "dotfiles: shellrc"
+[ -n ${DOTFILES_DEBUG:-""} ] && echo "dotfiles: shelllogin"
 
 case $- in
     *i*)
         source ~/.dotfiles/shell/shellinteractive
         ;;
     *)
-        source ~/.dotfiles/shell/shellenv
+        source ~/.dotfiles/shell/shellrc
         ;;
 esac
-

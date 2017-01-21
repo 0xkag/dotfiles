@@ -1,4 +1,6 @@
-# vim: sw=4 ts=4 ft=sh:
+# vim: et sw=4 ts=4 ft=sh:
+
+[ -n ${DOTFILES_DEBUG:-""} ] && echo "dotfiles: shellcolors"
 
 # BSD ls colors
 

@@ -1,6 +1,15 @@
-# vim: sw=4 ts=4 ft=sh:
+# vim: et sw=4 ts=4 ft=sh:
+
+[ -n ${DOTFILES_DEBUG:-""} ] && echo "dotfiles: shellenv"
 
 function join { local IFS="$1"; shift; echo "$*"; }
+
+# home & user & logname
+
+[ -z ${HOME:-} ] && export HOME=$(cd ~; pwd)
+[ -z ${USER:-} ] && export USER=$(whoami)
+[ -z ${LOGNAME:-} ] && export LOGNAME=$(logname 2> /dev/null)
+[ -z ${LOGNAME:-} ] && export LOGNAME=$USER
 
 # path
 
@@ -35,4 +44,23 @@ manpath=(
 )
 
 export MANPATH=$(join : ${manpath[@]})
+
+# locale
+
+export LANG=en_US.UTF-8
+export LC_COLLATE=C
+
+# shell
+
+export IS_BASH=false
+export IS_KSH=false
+export IS_ZSH=false
+
+if [[ -n $BASH_VERSION ]]; then
+    export IS_BASH=true
+elif [[ -n $KSH_VERSION ]]; then
+    export IS_KSH=true
+elif [[ -n $ZSH_VERSION ]]; then
+    export IS_ZSH=true
+fi
 

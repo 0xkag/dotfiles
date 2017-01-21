@@ -1,1 +1,6 @@
-../shell/shellrc
+# vim: set ft=sh:
+
+[ -n ${DOTFILES_DEBUG:-""} ] && echo "dotfiles: bashrc"
+
+source ~/.dotfiles/shell/shellrc
+
