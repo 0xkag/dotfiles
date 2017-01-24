@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# vim: set et sw=4 ts=4:
 
 set -e
 set -u
@@ -11,9 +12,17 @@ fi
 
 if [ $# -gt 0 ]; then
     X="-d @$1"
+    P=${P:-seconds}
 else
     X=""
+    P=${P:-ns}
 fi
 
-$DATE $X --iso-8601=ns -u | sed 's/+00:00/Z/g' | sed -e 's/,[0-9]\{1,\}Z/Z/g'
+if [[ $P == seconds ]]; then
+    R='sed -e ''s/,[0-9]\{1,\}Z/Z/g'''
+else
+    R=cat
+fi
+
+$DATE $X --iso-8601=$P -u | sed 's/+00:\?00$/Z/g' | $R
 
