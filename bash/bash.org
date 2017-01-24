@@ -1,4 +1,52 @@
-* echo 'bash -c '"'"'echo "hello world"'"'"''
-** '"'"' --> ' inside the other ' quoted string
-** so this will emit: bash -c 'echo "hello world"'
+* Quoting
+** echo 'bash -c '"'"'echo "hello world"'"'"''
+*** '"'"' --> ' inside the other ' quoted string
+*** so this will emit: bash -c 'echo "hello world"'
 
+* Startup behavior
+
+#+NAME: bash-types-of-shells
+| shell       | definition                                                      |
+|-------------+-----------------------------------------------------------------|
+|             | <63>                                                            |
+|-------------+-----------------------------------------------------------------|
+| login       | argv[0][0] == '-' OR --login option                             |
+| interactive | -i option OR ("started [w/o] non-option arguments" AND "[w/o] the -c option" AND std{in,out} are isatty()) |
+
+#+TBLNAME: bash-behavior-atoms
+| behavior                                                                   |
+|----------------------------------------------------------------------------|
+| etcprofile followed by first one of one of bash_profile bash_login profile |
+| PS1 set dollar dash contains i                                             |
+| home bash_logout and etc bashdotbash_logout if they exist                  |
+| home bashrc if that exists                                                 |
+| sources expansion of BASH_ENV                                              |
+
+#+NAME: bash-behavior-of-shell-types
+| shell                       | startup                        | env                            | exit                                                      |                          |
+|-----------------------------+--------------------------------+--------------------------------+-----------------------------------------------------------+--------------------------|
+|                             | <30>                           |                                |                                                           |                          |
+|-----------------------------+--------------------------------+--------------------------------+-----------------------------------------------------------+--------------------------|
+| stdin is network connection | home bashrc if that exists     |                                |                                                           | ssh localhost            |
+| interactive + non-login     | home bashrc if that exists     | PS1 set dollar dash contains i |                                                           | bash, bash -i            |
+| interactive + login         | etcprofile followed by first one of one of bash_profile bash_login profile | PS1 set dollar dash contains i | home bash_logout and etc bashdotbash_logout if they exist | bash -, bash --login     |
+| non-interactive + non-login | sources expansion of BASH_ENV  |                                |                                                           | #!/bin/bash              |
+| non-interactive + --login   | etcprofile followed by first one of one of bash_profile bash_login profile |                                | home bash_logout and etc bashdotbash_logout if they exist | bash --login -c 'echo x' |
+#+TBLFM: @3$2=remote(bash-behavior-atoms, @5$1)::@4$2=remote(bash-behavior-atoms, @5$1)::@4$3=remote(bash-behavior-atoms, @3$1)::@5$2=remote(bash-behavior-atoms, @2$1)::@5$3=remote(bash-behavior-atoms, @3$1)::@5$4=remote(bash-behavior-atoms, @4$1)::@6$2=remote(bash-behavior-atoms, @6$1)::@7$2=remote(bash-behavior-atoms, @2$1)::@7$4=remote(bash-behavior-atoms, @4$1)
+
+* Note: above table does not include the behavior when bash is invoked as sh
+
+* Ways to start bash to see how it behaves
+** (from already-interactive session) bash
+** bash -i
+** bash -c "echo hello"
+** bash --login
+** bash --login -c "echo hello"
+** bash --login -i
+** bash --login -i -c "echo hello"
+
+* Environment inheritance
+** Bash will inherit the environment unless cleaned (with env(1), for example)
+
+* Startup with clean environment: env -i bash <options>
+* Startup with clean environment and no startup files: env -i bash --noprofile --norc
