@@ -1,0 +1,12 @@
+# https://pycodestyle.readthedocs.io/en/latest/intro.html#error-codes
+# http://flake8.pycqa.org/en/latest/user/error-codes.html
+#
+# E129 -- visually indented line with same indent as next logical line
+# E261 -- at least two spaces before inline comment
+# E302 -- expected 2 blank lines, found 0
+# E305 -- expected 2 blank lines after class or function definition, found 1
+# W391 -- blank line at end of file
+
+[flake8]
+ignore = E261,E302,E305,W391
+
