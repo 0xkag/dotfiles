@@ -74,3 +74,15 @@
 	path = lib/vim
 	url = https://github.com/vim/vim.git
 	branch = master
+[submodule "lib/pelican"]
+	path = lib/pelican
+	url = https://github.com/getpelican/pelican
+	branch = master
+[submodule "lib/pelican-themes"]
+	path = lib/pelican-themes
+	url = https://github.com/getpelican/pelican-themes
+	branch = master
+[submodule "lib/pelican-plugins"]
+	path = lib/pelican-plugins
+	url = https://github.com/getpelican/pelican-plugins
+	branch = master
