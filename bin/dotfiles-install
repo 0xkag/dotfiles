@@ -21,41 +21,77 @@ def mkdir(p):
         pass
 
 def main():
+    # top level mkdirs
+
     mkdir('~/.fonts')
+    mkdir('~/.config')
+
+    # fonts
+
     mkdir('~/.fonts/adobe-fonts')
     relink('~/.dotfiles/lib/source-code-pro', '~/.fonts/adobe-fonts/source-code-pro')
     os.system('fc-cache -f -v ~/.fonts/adobe-fonts/source-code-pro')
 
+    # bash
+
     relink('.dotfiles/bash/bashrc', '~/.bashrc')
     relink('.dotfiles/bash/bash_profile', '~/.bash_profile')
 
+    # flake8
+
+    relink('~/.dotfiles/flake8/flake8', '~/.config/flake8')
+
+    # gdb
+
     relink('.dotfiles/gdb/gdbinit', '~/.gdbinit')
+
+    # git
 
     relink('.dotfiles/git/gitconfig', '~/.gitconfig')
 
+    # i3
+
     relink('.dotfiles/i3', '~/.i3')
 
+    # iftop
+
     relink('.dotfiles/iftop/iftoprc', '~/.iftoprc')
+
+    # pyenv
+
+    relink('~/.dotfiles/lib/pyenv-virtualenv',
+           '~/.dotfiles/lib/pyenv/plugins/pyenv-virtualenv')
+
+    # spacemacs
 
     relink('.dotfiles/lib/spacemacs', '~/.emacs.d')
     relink('.dotfiles/spacemacs/spacemacs', '~/.spacemacs')
 
+    # ssh
+
     relink('~/.dotfiles/ssh/config', '~/.ssh/config')
+
+    # sshrc
 
     relink('.dotfiles/sshrc', '~/.sshrc.d')
     relink('.dotfiles/sshrc/sshrc', '~/.sshrc')
 
+    # stack
+
     mkdir('~/.stack')
     relink('~/.dotfiles/stack/config.yaml', '~/.stack/config.yaml')
 
+    # tmux
+
     relink('.dotfiles/tmux/tmux.conf', '~/.tmux.conf')
+
+    # vim
 
     relink('.dotfiles/vim/vimrc', '~/.vimrc')
 
-    relink('.dotfiles/zsh/zshrc', '~/.zshrc')
+    # zsh
 
-    relink('~/.dotfiles/lib/pyenv-virtualenv',
-           '~/.dotfiles/lib/pyenv/plugins/pyenv-virtualenv')
+    relink('.dotfiles/zsh/zshrc', '~/.zshrc')
 
 if __name__ == '__main__':
     sys.exit(main())
