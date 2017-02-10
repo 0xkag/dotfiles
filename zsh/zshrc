@@ -69,6 +69,7 @@ plugins=(
     # nmap
     pass
     pip
+    # pyenv
     # ssh-agent
     # systemadmin
     urltools
