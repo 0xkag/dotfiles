@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+
+echo 1 > /sys/block/$1/device/delete
+
