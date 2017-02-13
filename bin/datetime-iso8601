@@ -10,19 +10,55 @@ else
     DATE=date
 fi
 
-if [ $# -gt 0 ]; then
-    X="-d @$1"
-    P=${P:-seconds}
+epoch=
+precision=
+utc=true
+
+argv=$(getopt \
+         -o 'e:lp:u' \
+         -l 'epoch:' \
+         -l 'local' \
+         -l 'precision:' \
+         -l 'utc' \
+         -- \
+         "$@")
+
+eval set -- "$argv"
+
+while true; do
+    case "$1" in
+        -e|--epoch)
+            epoch=$2
+            shift 2
+            ;;
+        -l|--local)
+            utc=false
+            shift
+            ;;
+        -p|--precision)
+            precision=$2
+            shift 2
+            ;;
+        -u|--utc)
+            utc=true
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+    esac
+done
+
+if [[ -n $epoch ]]; then
+    precision=${precision:-seconds}
 else
-    X=""
-    P=${P:-ns}
+    precision=${precision:-ns}
 fi
 
-if [[ $P == seconds ]]; then
-    R='sed -e ''s/,[0-9]\{1,\}Z/Z/g'''
-else
-    R=cat
-fi
-
-$DATE $X --iso-8601=$P -u | sed -e 's/+00:\{0,1\}00$/Z/g' | $R
+$DATE \
+    --iso-8601=$precision \
+    $([[ -n $epoch ]] && echo "-d @$epoch") \
+    $($utc && echo '-u') | \
+        sed -e 's/+00:\{0,1\}00$/Z/g'
 
