@@ -6,18 +6,18 @@ set -u
 which=${1:-pagecache}
 
 case $which in
-	pagecache)
-		N=1
-		;;
-	fscache)
-		N=2
-		;;
-	all)
-		N=3
-		;;
-	*)
-		exit 1
-		;;
+    pagecache)
+        N=1
+        ;;
+    fscache)
+        N=2
+        ;;
+    all)
+        N=3
+        ;;
+    *)
+        exit 1
+        ;;
 esac
 
 echo $N > /proc/sys/vm/drop_caches
