@@ -1,0 +1,2 @@
+* These "docs" are more or less notes about various tools and subsystems.
+* They are not complete, well-organized, or comprehensive.
