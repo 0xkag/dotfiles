@@ -64,3 +64,11 @@ elif [[ -n $ZSH_VERSION ]]; then
     export IS_ZSH=true
 fi
 
+# terminal (used by i3-sensible-terminal)
+
+if command -v xfce4-terminal > /dev/null 2>&1; then
+    export TERMINAL=xfce4-terminal
+elif command -v gnome-terminal > /dev/null 2>&1; then
+    export TERMINAL=gnome-terminal
+fi
+
