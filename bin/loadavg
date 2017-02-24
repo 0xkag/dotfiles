@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# TODO does this work on FreeBSD too?
+
+uptime | sed "s/.*load.*: \(.*\\)/\1/g" | tr -d ","
