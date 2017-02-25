@@ -52,6 +52,7 @@ def main():
     # i3
 
     relink('.dotfiles/i3', '~/.i3')
+    relink('.dotfiles/i3/i3blocks.conf', '~/.i3blocks.conf')
 
     # iftop
 

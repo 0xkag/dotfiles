@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+avail_kb=$(cat /proc/meminfo | grep MemAvailable | awk '{ print $2 }')
+total_kb=$(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }')
+avail_gb=$(echo "scale=2; $avail_kb / 1048576.0" | bc)
+total_gb=$(echo "scale=2; $total_kb / 1048576.0" | bc)
+used_gb=$(echo "scale=2; $total_gb - $avail_gb" | bc)
+used_percent=$(echo "scale=2; ($used_gb / $total_gb) * 100" | bc)
+
+echo "$used_gb / $total_gb GB ($used_percent%)"
+

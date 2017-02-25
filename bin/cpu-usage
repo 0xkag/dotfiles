@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# TODO make this work on FreeBSD
+
+mpstat 2 1 | grep Average: | awk '{print (100 - $12)"%"}'
