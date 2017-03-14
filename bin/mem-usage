@@ -1,11 +1,47 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python
 
-avail_kb=$(cat /proc/meminfo | grep MemAvailable | awk '{ print $2 }')
-total_kb=$(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }')
-avail_gb=$(echo "scale=2; $avail_kb / 1048576.0" | bc)
-total_gb=$(echo "scale=2; $total_kb / 1048576.0" | bc)
-used_gb=$(echo "scale=2; $total_gb - $avail_gb" | bc)
-used_percent=$(echo "scale=2; ($used_gb / $total_gb) * 100" | bc)
+# TODO make this work on FreeBSD
 
-echo "$used_gb / $total_gb GB ($used_percent%)"
+import argparse
+from math import ceil
+import subprocess
+import sys
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--i3', action='store_true')
+args = parser.parse_args()
+
+proc = subprocess.Popen(
+    "cat /proc/meminfo | grep MemAvailable | awk '{ print $2 }'; cat /proc/meminfo | grep MemTotal | awk '{ print $2 }'",
+    shell=True,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE)
+stdout, stderr = proc.communicate()
+avail_kb, total_kb = [int(x.strip()) for x in stdout.splitlines()]
+
+avail_gb = avail_kb / 1048576.0
+total_gb = total_kb / 1048576.0
+used_gb = total_gb - avail_gb
+used_percent = (used_gb / total_gb) * 100
+
+# non-i3 mode
+
+if not args.i3:
+    print '{0:.2f} / {1:.2f} ({2:.2f}%)'.format(
+       used_gb, total_gb, used_percent)
+    sys.exit(0)
+
+# i3 mode -- this follows the i3blocks protocol
+
+rounded = int(ceil(used_percent))
+
+print '{0: >2}%'.format(rounded)
+print ''
+if rounded >= 70:
+    print '#ff0000'
+elif rounded >= 50:
+    print '#ffff00'
+
+if rounded >= 90:
+    sys.exit(33)
 
