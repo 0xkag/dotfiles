@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# vim: set et sw=4 ts=4:
 
 # TODO make this work on FreeBSD
 
@@ -7,35 +8,18 @@ from math import ceil
 import subprocess
 import sys
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--i3', action='store_true')
-args = parser.parse_args()
+import x_usage
 
-proc = subprocess.Popen(
-    "mpstat 2 1 | grep Average: | awk '{ print (100 - $12) }'",
-    shell=True,
-    stdout=subprocess.PIPE,
-    stderr=subprocess.PIPE)
-stdout, stderr = proc.communicate()
-percent = float(stdout.strip())
+command = "mpstat 2 1 | grep Average: | awk '{ print (100 - $12) }'",
 
-# non-i3 mode
+args = x_usage.parse_args()
 
-if not args.i3:
-    print percent
-    sys.exit(0)
+returncode, stdout, stderr = x_usage.exec_command(args, command)
 
-# i3 mode
+used_percent = float(stdout.strip())
 
-rounded = int(ceil(percent))
-
-print '{0: >2}%'.format(rounded)
-print ''
-if rounded >= 70:
-    print '#ff0000'
-elif rounded >= 50:
-    print '#ffff00'
-
-if rounded >= 90:
-    sys.exit(33)
+x_usage.output(args,
+               format_string_default='{used_percent:.2f}',
+               format_string_i3='{used_percent:.2f}%',
+               used_percent=used_percent)
 
