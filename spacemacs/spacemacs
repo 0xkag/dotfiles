@@ -59,7 +59,8 @@ values."
      helm
      html
      ;; ivy
-     ;; java -- requires eclim and eclipse
+     (java :variables
+           java-backend 'meghanada)
      javascript
      latex
      markdown
