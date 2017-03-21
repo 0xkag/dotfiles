@@ -430,6 +430,15 @@ you should place your code here."
                              )
             )
 
+  ;; magit
+
+  ;; ... https://magit.vc/manual/magit/Editing-commit-messages.html
+  ;; TODO not sure if this is the right place to hook, but it works
+
+  (add-hook 'git-commit-mode-hook
+            (lambda ()
+              (setq git-commit-fill-column 75)))
+
   ;; sh-mode: don't insert a here document automatically on <<
 
   (add-hook 'sh-mode-hook
