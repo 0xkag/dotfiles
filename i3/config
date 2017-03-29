@@ -19,8 +19,8 @@ set $alt Mod1
 # clear in small sizes. However, if you need a lot of unicode glyphs or
 # right-to-left text rendering, you should instead use pango for rendering and
 # chose a FreeType font, such as:
-#font pango:DejaVu Sans Mono 10
-font xft:Droid Sans Mono 12
+font pango:DejaVu Sans Mono 10
+#font xft:Droid Sans Mono 12
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -166,5 +166,6 @@ exec --no-startup-id nm-applet
 # Start i3bar to display a workspace bar (plus the system information i3blocks
 # finds out, if available)
 bar {
+        font pango:DejaVu Sans Mono 10
         status_command i3blocks
 }
