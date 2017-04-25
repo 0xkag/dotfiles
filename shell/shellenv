@@ -11,17 +11,30 @@ function join { local IFS="$1"; shift; echo "$*"; }
 [ -z ${LOGNAME:-} ] && export LOGNAME=$(logname 2> /dev/null)
 [ -z ${LOGNAME:-} ] && export LOGNAME=$USER
 
+# nodejs local installs (from http://stackoverflow.com/a/13021677)
+
+export NPM_PACKAGES="$HOME/.npm-packages"
+export NODE_PATH=$(join \
+                     : \
+                     "$NPM_PACKAGES/lib/node_modules" \
+                     $(echo "${NODE_PATH:-}" | \
+                   xargs))
+
+# pyenv
+
+export PYENV_ROOT=$HOME/.dotfiles/lib/pyenv
+
 # path
 
 path=(
     $HOME/bin
     $HOME/.dotfiles/_sites/current/bin
     $HOME/.dotfiles/bin
-    $HOME/root/bin
-    $HOME/root/usr/bin
     $HOME/.root/bin
     $HOME/.root/usr/bin
     $HOME/.local/bin
+    $PYENV_ROOT/bin
+    $NPM_PACKAGES/bin
     /usr/local/bin
     /usr/local/sbin
     /usr/bin
@@ -35,9 +48,9 @@ export PATH=$(join : ${path[@]})
 # manpath
 
 manpath=(
-    $HOME/root/share/man
     $HOME/.root/share/man
     $HOME/.local/share/man
+    $NPM_PACKAGES/share/man
     /usr/local/man
     /usr/local/share/man
     /usr/share/man
@@ -66,9 +79,9 @@ fi
 
 # terminal (used by i3-sensible-terminal)
 
-if command -v xfce4-terminal > /dev/null 2>&1; then
+if command -v xfce4-terminal &> /dev/null; then
     export TERMINAL=xfce4-terminal
-elif command -v gnome-terminal > /dev/null 2>&1; then
+elif command -v gnome-terminal &> /dev/null; then
     export TERMINAL=gnome-terminal
 fi
 

@@ -97,17 +97,12 @@ export LESS
 
 # nodejs local installs (from http://stackoverflow.com/a/13021677)
 
-export NPM_PACKAGES="$HOME/.npm-packages"
 mkdir -p "$NPM_PACKAGES"
-export PATH="$NPM_PACKAGES/bin:$PATH"
-export MANPATH="$NPM_PACKAGES/share/man:$MANPATH"
-export NODE_PATH=$(join : "$NPM_PACKAGES/lib/node_modules" $(echo "${NODE_PATH:-}" | xargs))
-echo "prefix = $NPM_PACKAGES" > "$HOME/.npmrc"
+echo "prefix = $NPM_PACKAGES" > "$HOME/.npmrc.$$"
+mv -f "$HOME/.npmrc.$$" "$HOME/.npmrc" || rm -f "$HOME/.npmrc.$$"
 
 # pyenv
 
-export PYENV_ROOT=~/.dotfiles/lib/pyenv
-export PATH=~/.dotfiles/lib/pyenv/bin:$PATH
 command -v pyenv &> /dev/null && eval "$(pyenv init -)"
 command -v pyenv &> /dev/null && eval "$(pyenv virtualenv-init -)"
 
@@ -122,3 +117,22 @@ if command -v wd &> /dev/null; then
     { cd ~/wc 2> /dev/null || cd ~/local/wc 2> /dev/null; } && wd -q add! wc
     cd "$cwd"
 fi
+
+# awscli completion
+
+if $IS_BASH; then
+    # complete -C $(which aws_completer) aws
+    # TODO
+    true
+elif $IS_ZSH; then
+    # TODO
+    # [[ $(which aws_zsh_completer.sh) =~ ".*pyenv/shims.*" ]] && {
+    #     [ -r $(pyenv which aws_zsh_completer.sh) ] && \
+    #         source $(pyenv which aws_zsh_completer.sh)
+    # } || {
+    #     [ -r $(which aws_zsh_completer.sh) ] && \
+    #         source $(which aws_zsh_completer.sh)
+    # }
+    true
+fi
+
