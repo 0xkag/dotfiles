@@ -1,2 +1,9 @@
 * C-b:setw synchronize-panes<enter>
+* Sharing, same user
+  tmux new-session -s shared
+  tmux attach-session -t shared
+* Sharing, different user
+  tmux -S /tmp/shareds new -s shared
+  chgrp joint /tmp/shareds
+  tmux -S /tmp/shareds attach -t shared # -r for voluntary read-only
 
