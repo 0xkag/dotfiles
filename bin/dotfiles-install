@@ -58,6 +58,11 @@ def main():
 
     relink('.dotfiles/iftop/iftoprc', '~/.iftoprc')
 
+    # pip
+
+    mkdir('~/.config/pip')
+    relink('~/.dotfiles/pip/pip.conf', '~/.config/pip/pip.conf')
+
     # pyenv
 
     relink('~/.dotfiles/lib/pyenv-virtualenv',
