@@ -2,12 +2,41 @@
 ** org-babel bindings? (upstream)
 ** ob-restclient integration (upstream)
 ** create dired mkdir binding
-** jabber (hipchat) integration
+** DONE "tern binary not found"
+   CLOSED: [2017-03-22 Wed 02:50]
+** magit show diff during rebase/reword?
+** spacemacs dotspacemacs/customize vs. dotspacemacs/user-config?
+** spacemacs w/ emacs 25.1 customize writes a bunch of stuff I didn't customize?
+** DONE spacemacs warnings on startup about PATH
+   CLOSED: [2017-03-22 Wed 02:50]
+* vim
+** git commit message fill column at 75 in vim
+* spacemacs & vim
+** try to mimic some behaviors in the other
 * tmux
 ** import config
+** tmux auto-sync environment?
 * zsh
 ** move away from oh-my-zsh and do my own config?
 * jumpers
 ** wd vs. z vs. fasd vs. ...
 ** https://github.com/rupa/z
+
+dotfiles todo
+	requirements move to lib
+	clean up requirements
+	clean up bin
+	finish bin
+	clean up lib
+	catch up on changes to spacemacs, RTFM
+	sync the best parts of spacemacs and vim configs / behaviors
+	clipboard behavior the same between spacemacs, vim, and tmux (and less?)
+	re-rationalize the keybindings
+		windows
+		i3
+		tmux
+		vim
+		spacemacs
+		readline
+	... gqap behavior in markdown mode, for example
 
