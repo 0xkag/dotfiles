@@ -1,5 +1,8 @@
 # vim: set noet sw=30 ts=30:
 autoflake	# spacemacs python anaconda
+aws-shell	# aws
+awscli	# aws
+click	# cli
 cookiecutter	# devtools
 coverage	# devtools
 docutils	# doctools
@@ -15,6 +18,8 @@ pygments	# devtools
 pylint	# devtools
 pytest	# devtools
 # DISABLED -e "git+https://github.com/pinard/Pymacs.git#egg=Pymacs"
+requests	# useful
+requests-kerberos	# useful
 # DISABLED rope	# ropemacs
 # DIABLED ropemacs	# ropemacs
 service_factory==0.1.2	# spacemacs python anadonda
