@@ -1,0 +1,7 @@
+* list of tools that are interesting / useful; some are obvious or standard
+  tools, others are not
+
+* mbuffer
+* pv
+* tc
+
