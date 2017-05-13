@@ -1,0 +1,11 @@
+* install auditd (if uninstalled)
+* start auditd (if stopped)
+* sudo auditctl -a exit,always -F arch=b64 -F a0=2 -F a1=2 -S socket -k SOCKET
+** a0=2 AF_INET
+** a1=2 SOCK_DGRAM
+* sudo auditctl -a exit,always -F arch=b64 -S connect -k CONNECT
+* sudo auditctl -a exit,always -F arch=b64 -S sendmsg -k SENDMSG
+* sudo auditctl -a exit,always -F arch=b64 -S sendto -k SENDTO
+* sudo ausearch -i -ts today -k SOCKET
+* stop auditd (if we started it)
+* uninstall auditd (if we installed it)
