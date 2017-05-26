@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
+# vim: et sw=4 ts=4:
 
-find $HOME/.password-store -name 'password.gpg' -type f | \
-  sed "s/^${HOME//\//\\\/}\/.password-store\///g" | \
-  sed 's/.gpg$//g' | \
-  xargs -I {} bash -c "echo -ne {}\\\t; pass show {} 2>/dev/null" | \
-  sort -t $'\t' -k 2,2 | \
-  column -t
+cd $HOME/.password-store
+
+git ls-tree -r --name-only HEAD | grep /password.gpg | while read filename; do
+    passname=${filename%.gpg}
+    echo -n $passname
+    echo -ne \\t
+    echo -n $(pass show $passname 2>/dev/null)
+    echo -ne \\t
+    echo -n $(pass git log -1 --format='%aI' -- $filename)
+    echo
+done
 
