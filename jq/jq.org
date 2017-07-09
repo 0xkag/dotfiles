@@ -1,5 +1,8 @@
 # vim: set tw=999:
 
+* https://github.com/stedolan/jq/wiki/Cookbook
+* http://hyperpolyglot.org/json
+
 * diff -i -u <(cat before | tr '[:upper:]' '[:lower:]' | jq --sort-keys 'sort_by(.mail)') <(cat after | tr '[:upper:]' '[:lower:]' | jq --sort-keys 'sort_by(.mail)')
 * cat ~/snapshots.json | jq -r '.Snapshots[] | [.SnapshotId, .VolumeId, (if .Tags != null then (.Tags[] | select(.Key == "Name") | .Value) else "" end)] | @tsv'
 * cat ~/snapshots.json | jq -r '.Snapshots[] | [.SnapshotId, .VolumeId, (.Tags[]? | select(.Key == "Name") | .Value)] | @tsv'
