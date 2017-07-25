@@ -1,0 +1,2 @@
+* strace -e trace=all -f -c -T -tt -v -x -yy
+
