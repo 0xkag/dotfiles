@@ -86,3 +86,7 @@
 	path = lib/pelican-plugins
 	url = https://github.com/getpelican/pelican-plugins
 	branch = master
+[submodule "lib/_todo/reveal.js"]
+	path = lib/_todo/reveal.js
+	url = https://github.com/hakimel/reveal.js.git
+	branch = master
