@@ -65,6 +65,7 @@ This function should only modify configuration layer settings."
      latex
      markdown
      ;; mu4e -- try this maybe
+     neotree
      org
      pandoc
      (python :variables python-test-runner '(pytest nose))
