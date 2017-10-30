@@ -3,7 +3,7 @@
 set -e
 set -x
 
-VERSION=6.5.2
+VERSION=6.5.7
 
 wget https://ftp.gnu.org/pub/gnu/global/global-${VERSION}.tar.gz
 tar -xzvf global-${VERSION}.tar.gz
