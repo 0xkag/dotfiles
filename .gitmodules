@@ -90,3 +90,15 @@
 	path = lib/_todo/reveal.js
 	url = https://github.com/hakimel/reveal.js.git
 	branch = master
+[submodule "lib/tmux"]
+	path = lib/tmux
+	url = https://github.com/tmux/tmux.git
+	branch = master
+[submodule "lib/tarsnap"]
+	path = lib/tarsnap
+	url = https://github.com/Tarsnap/tarsnap.git
+	branch = master
+[submodule "lib/_todo/shellcheck"]
+	path = lib/_todo/shellcheck
+	url = https://github.com/koalaman/shellcheck.git
+	branch = master
