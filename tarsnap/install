@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+set -u
+set -x
+
+pushd .
+cd $(dirname $0)
+cd ../lib/tarsnap
+git reset --hard
+git clean -fdx
+[ ! -f ./configure ] && {
+    autoreconf -i
+    # libtoolize --force
+    # aclocal
+    # autoheader
+    # automake --force-missing --add-missing
+    # autoconf
+}
+./configure --prefix ~/.root
+make && make install
+popd
+
