@@ -1,3 +1,3 @@
-source ~/.dotfiles/lib/peda/peda.py
+source ~/.dotfiles/_lib/peda/peda.py
 set disassembly-flavor att
 

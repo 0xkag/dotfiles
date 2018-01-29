@@ -3,7 +3,7 @@
 # the top level of this repo to diff the template and this file.
 
 # Path to your oh-my-zsh installation.
-export ZSH=$HOME/.dotfiles/lib/oh-my-zsh
+export ZSH=$HOME/.dotfiles/_lib/oh-my-zsh
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/

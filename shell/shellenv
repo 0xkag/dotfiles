@@ -16,13 +16,13 @@ function join { local IFS="$1"; shift; echo "$*"; }
 export NPM_PACKAGES="$HOME/.npm-packages"
 export NODE_PATH=$(join \
                      : \
-                     "$NPM_PACKAGES/lib/node_modules" \
+                     "$NPM_PACKAGES/_lib/node_modules" \
                      $(echo "${NODE_PATH:-}" | \
                    xargs))
 
 # pyenv
 
-export PYENV_ROOT=$HOME/.dotfiles/lib/pyenv
+export PYENV_ROOT=$HOME/.dotfiles/_lib/pyenv
 
 # path
 

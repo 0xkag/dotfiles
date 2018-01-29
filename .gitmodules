@@ -1,108 +1,108 @@
-[submodule "lib/oh-my-zsh"]
-	path = lib/oh-my-zsh
+[submodule "_lib/oh-my-zsh"]
+	path = _lib/oh-my-zsh
 	url = git://github.com/robbyrussell/oh-my-zsh.git
 	branch = master
-[submodule "lib/sshrc"]
-	path = lib/sshrc
+[submodule "_lib/sshrc"]
+	path = _lib/sshrc
 	url = https://github.com/Russell91/sshrc
 	branch = master
-[submodule "lib/spacemacs"]
-	path = lib/spacemacs
+[submodule "_lib/spacemacs"]
+	path = _lib/spacemacs
 	url = https://github.com/syl20bnr/spacemacs
 	branch = develop
-[submodule "lib/fasd"]
-	path = lib/_todo/fasd
+[submodule "_lib/fasd"]
+	path = _lib/_todo/fasd
 	url = https://github.com/clvv/fasd
 	branch = master
-[submodule "lib/pyenv"]
-	path = lib/pyenv
+[submodule "_lib/pyenv"]
+	path = _lib/pyenv
 	url = https://github.com/yyuu/pyenv.git
 	branch = master
-[submodule "lib/pyenv-virtualenv"]
-	path = lib/pyenv-virtualenv
+[submodule "_lib/pyenv-virtualenv"]
+	path = _lib/pyenv-virtualenv
 	url = https://github.com/yyuu/pyenv-virtualenv.git
 	branch = master
-[submodule "lib/gollum"]
-	path = lib/gollum
+[submodule "_lib/gollum"]
+	path = _lib/gollum
 	url = https://github.com/gollum/gollum
 	branch = master
-[submodule "lib/ps_mem"]
-	path = lib/ps_mem
+[submodule "_lib/ps_mem"]
+	path = _lib/ps_mem
 	url = https://github.com/pixelb/ps_mem/
 	branch = master
-[submodule "lib/password-store"]
-	path = lib/password-store
+[submodule "_lib/password-store"]
+	path = _lib/password-store
 	url = http://git.zx2c4.com/password-store
 	branch = master
-[submodule "lib/python-audio-tools"]
-	path = lib/python-audio-tools
+[submodule "_lib/python-audio-tools"]
+	path = _lib/python-audio-tools
 	url = git://github.com/tuffy/python-audio-tools.git
 	branch = master
-[submodule "lib/git-diff-blame"]
-	path = lib/git-diff-blame
+[submodule "_lib/git-diff-blame"]
+	path = _lib/git-diff-blame
 	url = https://github.com/dmnd/git-diff-blame
 	branch = master
-[submodule "lib/pandoc"]
-	path = lib/pandoc
+[submodule "_lib/pandoc"]
+	path = _lib/pandoc
 	url = https://github.com/jgm/pandoc
 	branch = master
-[submodule "lib/aspiers-shell-env"]
-	path = lib/_todo/aspiers-shell-env
+[submodule "_lib/aspiers-shell-env"]
+	path = _lib/_todo/aspiers-shell-env
 	url = https://github.com/aspiers/shell-env
 	branch = master
-[submodule "lib/aspiers-git-config"]
-	path = lib/_todo/aspiers-git-config
+[submodule "_lib/aspiers-git-config"]
+	path = _lib/_todo/aspiers-git-config
 	url = https://github.com/aspiers/git-config
 	branch = master
-[submodule "lib/bup"]
-	path = lib/_todo/bup
+[submodule "_lib/bup"]
+	path = _lib/_todo/bup
 	url = https://github.com/bup/bup
 	branch = master
-[submodule "lib/source-code-pro"]
-	path = lib/source-code-pro
+[submodule "_lib/source-code-pro"]
+	path = _lib/source-code-pro
 	url = https://github.com/adobe-fonts/source-code-pro.git
 	branch = release
-[submodule "lib/git-hg"]
-	path = lib/git-hg
+[submodule "_lib/git-hg"]
+	path = _lib/git-hg
 	url = https://github.com/cosmin/git-hg
 	branch = master
-[submodule "lib/peda"]
-	path = lib/peda
+[submodule "_lib/peda"]
+	path = _lib/peda
 	url = https://github.com/longld/peda
 	branch = master
-[submodule "lib/vim"]
-	path = lib/vim
+[submodule "_lib/vim"]
+	path = _lib/vim
 	url = https://github.com/vim/vim.git
 	branch = master
-[submodule "lib/pelican"]
-	path = lib/pelican
+[submodule "_lib/pelican"]
+	path = _lib/pelican
 	url = https://github.com/getpelican/pelican
 	branch = master
-[submodule "lib/pelican-themes"]
-	path = lib/pelican-themes
+[submodule "_lib/pelican-themes"]
+	path = _lib/pelican-themes
 	url = https://github.com/getpelican/pelican-themes
 	branch = master
-[submodule "lib/pelican-plugins"]
-	path = lib/pelican-plugins
+[submodule "_lib/pelican-plugins"]
+	path = _lib/pelican-plugins
 	url = https://github.com/getpelican/pelican-plugins
 	branch = master
-[submodule "lib/_todo/reveal.js"]
-	path = lib/_todo/reveal.js
+[submodule "_lib/_todo/reveal.js"]
+	path = _lib/_todo/reveal.js
 	url = https://github.com/hakimel/reveal.js.git
 	branch = master
-[submodule "lib/tmux"]
-	path = lib/tmux
+[submodule "_lib/tmux"]
+	path = _lib/tmux
 	url = https://github.com/tmux/tmux.git
 	branch = master
-[submodule "lib/tarsnap"]
-	path = lib/tarsnap
+[submodule "_lib/tarsnap"]
+	path = _lib/tarsnap
 	url = https://github.com/Tarsnap/tarsnap.git
 	branch = master
-[submodule "lib/_todo/shellcheck"]
-	path = lib/_todo/shellcheck
+[submodule "_lib/_todo/shellcheck"]
+	path = _lib/_todo/shellcheck
 	url = https://github.com/koalaman/shellcheck.git
 	branch = master
-[submodule "lib/alpine"]
-	path = lib/alpine
+[submodule "_lib/alpine"]
+	path = _lib/alpine
 	url = git@github.com:0xkag/alpine.git
 	branch = custom-2.21.x
