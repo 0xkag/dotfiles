@@ -113,6 +113,10 @@ def main():
     relink('~/.dotfiles/stack/config.yaml', '~/.stack/config.yaml')
     print 'remember to run stack/install'
 
+    # tarsnap
+
+    print 'remember to run tarsnap/install'
+
     # tmux
 
     relink('.dotfiles/tmux/tmux.conf', '~/.tmux.conf')
