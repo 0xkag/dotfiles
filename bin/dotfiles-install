@@ -21,12 +21,12 @@ def mkdir(p):
         pass
 
 def main():
-    # top level mkdirs
+    # <top level mkdirs>
 
     mkdir('~/.fonts')
     mkdir('~/.config')
 
-    # fonts
+    # <fonts>
 
     mkdir('~/.fonts/adobe-fonts')
     relink('~/.dotfiles/lib/source-code-pro', '~/.fonts/adobe-fonts/source-code-pro')
@@ -49,6 +49,10 @@ def main():
 
     relink('.dotfiles/git/gitconfig', '~/.gitconfig')
 
+    # global
+
+    print 'remember to run global/install'
+
     # i3
 
     relink('.dotfiles/i3', '~/.i3')
@@ -57,6 +61,22 @@ def main():
     # iftop
 
     relink('.dotfiles/iftop/iftoprc', '~/.iftoprc')
+
+    # less
+
+    # ... sourced in shell/shellinteractive
+
+    # maven
+
+    print 'remember to run maven/install'
+
+    # nodejs
+
+    print 'remember to run nodejs/install'
+
+    # pandoc
+
+    print 'remember to run pandoc/install'
 
     # pip
 
@@ -68,10 +88,15 @@ def main():
     relink('~/.dotfiles/lib/pyenv-virtualenv',
            '~/.dotfiles/lib/pyenv/plugins/pyenv-virtualenv')
 
-    # spacemacs
+    # readline
+
+    relink('.dotfiles/readline/inputrc', '~/.inputrc')
+
+    # spacemacs / emacs
 
     relink('.dotfiles/lib/spacemacs', '~/.emacs.d')
     relink('.dotfiles/spacemacs/spacemacs', '~/.spacemacs')
+    print 'remember to run emacs/install'
 
     # ssh
 
@@ -86,14 +111,17 @@ def main():
 
     mkdir('~/.stack')
     relink('~/.dotfiles/stack/config.yaml', '~/.stack/config.yaml')
+    print 'remember to run stack/install'
 
     # tmux
 
     relink('.dotfiles/tmux/tmux.conf', '~/.tmux.conf')
+    print 'remember to run tmux/install'
 
     # vim
 
     relink('.dotfiles/vim/vimrc', '~/.vimrc')
+    print 'remember to run vim/install'
 
     # zsh
 
