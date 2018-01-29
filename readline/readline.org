@@ -1,1 +1,3 @@
 * ^V<char> inserts literal character
+* https://clementc.github.io/figures/moving_cli.png
+
