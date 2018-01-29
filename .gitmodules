@@ -106,3 +106,6 @@
 	path = _lib/alpine
 	url = git@github.com:0xkag/alpine.git
 	branch = custom-2.21.x
+[submodule "_lib/_todo/pyringe"]
+	path = _lib/_todo/pyringe
+	url = https://github.com/google/pyringe
