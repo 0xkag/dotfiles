@@ -102,3 +102,7 @@
 	path = lib/_todo/shellcheck
 	url = https://github.com/koalaman/shellcheck.git
 	branch = master
+[submodule "lib/alpine"]
+	path = lib/alpine
+	url = git@github.com:0xkag/alpine.git
+	branch = custom-2.21.x
