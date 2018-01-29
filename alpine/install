@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -e
+set -u
+set -x
+
+pushd .
+cd $(dirname $0)
+cd ../lib/alpine
+git reset --hard
+git clean -fdx
+./configure --prefix ~/.root --with-passfile=.pine-passfile
+make && make install
+popd
+
