@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+set -u
+set -x
+
+pushd .
+cd $(dirname $0)
+cd ../lib/tmux
+git reset --hard
+git clean -fdx
+[ ! -f ./configure ] && sh autogen.sh
+./configure --prefix ~/.root
+make && make install
+popd
+
