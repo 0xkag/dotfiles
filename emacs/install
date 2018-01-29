@@ -4,7 +4,7 @@ set -e
 set -u
 set -x
 
-VERSION=25.2
+VERSION=25.3
 
 wget https://ftp.gnu.org/pub/gnu/emacs/emacs-${VERSION}.tar.gz
 tar -xzvf emacs-${VERSION}.tar.gz
