@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+
+TARGET=${1:-root}
+
+xauth extract - $DISPLAY | sudo -u $TARGET xauth merge -
+
