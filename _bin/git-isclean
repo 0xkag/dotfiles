@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+
+echo '# git status'
+
+git status --porcelain --ignored
+
+echo '# git stash list'
+
+git stash list | cat
+
+echo '# git branch'
+
+git branch -vv
+
