@@ -28,8 +28,8 @@ export PYENV_ROOT=$HOME/.dotfiles/_lib/pyenv
 
 path=(
     $HOME/bin
-    $HOME/.dotfiles/_sites/current/bin
-    $HOME/.dotfiles/bin
+    $HOME/.dotfiles/_sites/current/_bin
+    $HOME/.dotfiles/_bin
     $HOME/.root/bin
     $HOME/.root/usr/bin
     $HOME/.local/bin
