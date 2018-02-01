@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+p=${1:-.}
+
+find $p -type l \! -exec test -e {} \; -print
+
