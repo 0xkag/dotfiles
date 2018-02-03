@@ -119,6 +119,15 @@ nnoremap $ g$
 
 map Y y$
 
+" map . in visual mode
+
+vnoremap . :norm.<cr>
+
+" apply macro saved to register q with Q in normal and visual modes
+
+" nnoremap Q @q
+" vnoremap Q :norm @q<cr>
+
 " yank and copy visual selection to X clipboard
 
 " vnoremap <silent> y y :call system("xclip -sel clipboard -i", @")<cr>
@@ -175,6 +184,10 @@ nnoremap <leader>tvu :let &listchars=listchars_unicode<cr>
 " ... remove all search highlights
 
 map <leader>h :nohlsearch<cr>
+
+" ... align current paragraph
+
+noremap <leader>a =ip
 
 " ... copy visual selection to X clipboard
 
