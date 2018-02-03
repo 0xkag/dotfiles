@@ -95,12 +95,6 @@ man() {
 source ~/.dotfiles/less/less
 export LESS
 
-# nodejs local installs (from http://stackoverflow.com/a/13021677)
-
-mkdir -p "$NPM_PACKAGES"
-echo "prefix = $NPM_PACKAGES" > "$HOME/.npmrc.$$"
-mv -f "$HOME/.npmrc.$$" "$HOME/.npmrc" || rm -f "$HOME/.npmrc.$$"
-
 # pyenv
 
 command -v pyenv &> /dev/null && eval "$(pyenv init -)"
