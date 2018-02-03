@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+set -u
 set -x
 
 VERSION=6.5.7
