@@ -60,5 +60,6 @@ $DATE \
     --iso-8601=$precision \
     $([[ -n $epoch ]] && echo "-d @$epoch") \
     $($utc && echo '-u') | \
-        sed -e 's/+00:\{0,1\}00$/Z/g'
+        sed -e 's/+00:\{0,1\}00$/Z/g' | \
+        sed -e 's/\([+-]\)\(..\):\(..\)/\1\2\3/g'
 
