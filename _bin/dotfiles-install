@@ -53,6 +53,10 @@ def main():
 
     print 'remember to run global/install'
 
+    # gnome
+
+    os.system('~/.dotfiles/gnome/load')
+
     # i3
 
     relink('.dotfiles/i3', '~/.i3')

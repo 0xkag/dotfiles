@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+
+pushd .
+cd $(dirname $0)
+gconftool-2 --dump /apps/gnome-terminal > gnomeconfig.xml
+popd
+
