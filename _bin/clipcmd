@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+REDIR=${REDIR:-}
+
+eval "$@" $REDIR | tee >(xclip)
+{ echo "% $@"; xclip -o; } | xclip
+
