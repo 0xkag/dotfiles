@@ -2,6 +2,17 @@
 
 REDIR=${REDIR:-}
 
+NOW=$(date "+%s")
+
+NOW_UTC=$(datetime-iso8601 --precision=seconds --epoch=$NOW 2>/dev/null ||
+          date --iso-8601=seconds -u -d@$NOW 2>/dev/null ||
+          echo $NOW)
+
+NOW_LOCAL=$(datetime-iso8601 --precision=seconds --local --epoch=$NOW \
+                2>/dev/null ||
+            date --iso-8601=seconds -d@$NOW 2>/dev/null ||
+            echo $NOW)
+
 eval "$@" $REDIR | tee >(xclip)
-{ echo "% $@"; xclip -o; } | xclip
+{ echo "# $NOW_UTC ($NOW_LOCAL) $(whoami)@$HOSTNAME% $@"; xclip -o; } | xclip
 
