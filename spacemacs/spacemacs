@@ -502,6 +502,13 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+  ;; normal mode keybindings
+
+  (define-key evil-visual-state-map (kbd "gl") 'evil-lion-left)
+  (define-key evil-visual-state-map (kbd "gL") 'evil-lion-right)
+  (define-key evil-normal-state-map (kbd "gl") 'evil-lion-left)
+  (define-key evil-normal-state-map (kbd "gL") 'evil-lion-right)
+  (define-key evil-normal-state-map (kbd "g!") 'evil-lion--squeeze-spaces)
 
   ;; dired refresh on file change
 
