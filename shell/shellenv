@@ -11,6 +11,10 @@ function join { local IFS="$1"; shift; echo "$*"; }
 [ -z ${LOGNAME:-} ] && export LOGNAME=$(logname 2> /dev/null)
 [ -z ${LOGNAME:-} ] && export LOGNAME=$USER
 
+# go
+
+export GOPATH=$HOME/.go
+
 # nodejs local installs (from http://stackoverflow.com/a/13021677)
 
 export NPM_PACKAGES="$HOME/.npm-packages"
@@ -34,6 +38,7 @@ path=(
     $HOME/.root/usr/bin
     $HOME/.local/bin
     $PYENV_ROOT/bin
+    $GOPATH/bin
     $NPM_PACKAGES/bin
     /usr/local/bin
     /usr/local/sbin
