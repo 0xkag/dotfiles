@@ -2,6 +2,10 @@
 ;
 ; From https://www.autohotkey.com/docs/scripts/KeyboardOnScreen.ahk
 ;
+; Modifications by Kyle George:
+; -- add ESC and ` key support
+; -- flatten keyboard
+;
 ; http://www.autohotkey.com
 ; This script creates a mock keyboard at the bottom of your screen that shows
 ; the keys you are pressing in real time. I made it to help me to learn to
@@ -30,7 +34,6 @@ k_Monitor =
 ;---- End of configuration section.  Don't change anything below this point
 ; unless you want to alter the basic nature of the script.
 
-
 ;---- Alter the tray icon menu:
 Menu, Tray, Add, %k_MenuItemHide%, k_ShowHide
 Menu, Tray, Add, &Exit, k_MenuExit
@@ -40,14 +43,14 @@ Menu, Tray, NoStandard
 ;---- Calculate object dimensions based on chosen font size:
 k_KeyWidth = %k_FontSize%
 k_KeyWidth *= 3
+k_KeyWidthLarge = %k_FontSize%
+k_KeyWidthLarge *= 4
+k_KeyWidthXLarge = %k_FontSize%
+k_KeyWidthXLarge *= 5
 k_KeyHeight = %k_FontSize%
-k_KeyHeight *= 3
+k_KeyHeight *= 2
 k_KeyMargin = %k_FontSize%
 k_KeyMargin /= 6
-k_SpacebarWidth = %k_FontSize%
-k_SpacebarWidth *= 25
-k_KeyWidthHalf = %k_KeyWidth%
-k_KeyWidthHalf /= 2
 
 k_KeySize = w%k_KeyWidth% h%k_KeyHeight%
 k_Position = x+%k_KeyMargin% %k_KeySize%
@@ -58,9 +61,32 @@ Gui, -Caption +E0x200 +ToolWindow
 TransColor = F1ECED
 Gui, Color, %TransColor%  ; This color will be made transparent later below.
 
-;---- Add a button for each key. Position the first button with absolute
-; coordinates so that all other buttons can be positioned relative to it:
-Gui, Add, Button, section %k_KeySize% xm+%k_KeyWidth%, 1
+;---- Add a button for each key.
+
+Gui, Add, Button, %k_Position%, ESC ; Auto-width.
+Gui, Add, Button, %k_Position% w%k_KeyWidthLarge%, Ctrl
+Gui, Add, Button, %k_Position%, Alt ; Auto-width.
+Gui, Add, Button, %k_Position%, Win ; Auto-width.
+Gui, Add, Button, %k_Position% w%k_KeyWidthXLarge%, Space
+Gui, Add, Button, %k_Position%, Tab ; Auto-width.
+Gui, Add, Button, %k_Position%, Bk ; Auto-width.
+Gui, Add, Button, %k_Position% w%k_KeyWidthXLarge%, Enter
+Gui, Add, Button, %k_Position% w%k_KeyWidthXLarge%, Shift
+
+Gui, Add, Button, %k_Position%, ``
+Gui, Add, Button, %k_Position%, '
+Gui, Add, Button, %k_Position%, -
+Gui, Add, Button, %k_Position%, =
+Gui, Add, Button, %k_Position%, [
+Gui, Add, Button, %k_Position%, ]
+Gui, Add, Button, %k_Position%, `,
+Gui, Add, Button, %k_Position%, `;
+Gui, Add, Button, %k_Position%, .
+Gui, Add, Button, %k_Position%, \
+Gui, Add, Button, %k_Position%, /
+
+Gui, Add, Button, %k_Position%, 0
+Gui, Add, Button, %k_Position%, 1
 Gui, Add, Button, %k_Position%, 2
 Gui, Add, Button, %k_Position%, 3
 Gui, Add, Button, %k_Position%, 4
@@ -69,58 +95,33 @@ Gui, Add, Button, %k_Position%, 6
 Gui, Add, Button, %k_Position%, 7
 Gui, Add, Button, %k_Position%, 8
 Gui, Add, Button, %k_Position%, 9
-Gui, Add, Button, %k_Position%, 0
-Gui, Add, Button, %k_Position%, -
-Gui, Add, Button, %k_Position%, =
-Gui, Add, Button, %k_Position%, Bk
 
-Gui, Add, Button, xm y+%k_KeyMargin% h%k_KeyHeight%, Tab  ; Auto-width.
-Gui, Add, Button, %k_Position%, Q
-Gui, Add, Button, %k_Position%, W
-Gui, Add, Button, %k_Position%, E
-Gui, Add, Button, %k_Position%, R
-Gui, Add, Button, %k_Position%, T
-Gui, Add, Button, %k_Position%, Y
-Gui, Add, Button, %k_Position%, U
-Gui, Add, Button, %k_Position%, I
-Gui, Add, Button, %k_Position%, O
-Gui, Add, Button, %k_Position%, P
-Gui, Add, Button, %k_Position%, [
-Gui, Add, Button, %k_Position%, ]
-Gui, Add, Button, %k_Position%, \
-
-Gui, Add, Button, xs+%k_KeyWidthHalf% y+%k_KeyMargin% %k_KeySize%, A
-Gui, Add, Button, %k_Position%, S
+Gui, Add, Button, %k_Position%, A
+Gui, Add, Button, %k_Position%, B
+Gui, Add, Button, %k_Position%, C
 Gui, Add, Button, %k_Position%, D
+Gui, Add, Button, %k_Position%, E
 Gui, Add, Button, %k_Position%, F
 Gui, Add, Button, %k_Position%, G
 Gui, Add, Button, %k_Position%, H
+Gui, Add, Button, %k_Position%, I
 Gui, Add, Button, %k_Position%, J
 Gui, Add, Button, %k_Position%, K
 Gui, Add, Button, %k_Position%, L
-Gui, Add, Button, %k_Position%, `;
-Gui, Add, Button, %k_Position%, '
-Gui, Add, Button, x+%k_KeyMargin% h%k_KeyHeight%, Enter  ; Auto-width.
-
-; The first button below adds %A_Space% at the end to widen it a little,
-; making the layout of keys next to it more accurately reflect a real keyboard:
-Gui, Add, Button, xm y+%k_KeyMargin% h%k_KeyHeight%, Shift%A_Space%%A_Space%
-Gui, Add, Button, %k_Position%, Z
-Gui, Add, Button, %k_Position%, X
-Gui, Add, Button, %k_Position%, C
-Gui, Add, Button, %k_Position%, V
-Gui, Add, Button, %k_Position%, B
-Gui, Add, Button, %k_Position%, N
 Gui, Add, Button, %k_Position%, M
-Gui, Add, Button, %k_Position%, `,
-Gui, Add, Button, %k_Position%, .
-Gui, Add, Button, %k_Position%, /
-
-Gui, Add, Button, xm y+%k_KeyMargin% h%k_KeyHeight%, Ctrl  ; Auto-width.
-Gui, Add, Button, h%k_KeyHeight% x+%k_KeyMargin%, Win      ; Auto-width.
-Gui, Add, Button, h%k_KeyHeight% x+%k_KeyMargin%, Alt      ; Auto-width.
-Gui, Add, Button, h%k_KeyHeight% x+%k_KeyMargin% w%k_SpacebarWidth%, Space
-
+Gui, Add, Button, %k_Position%, N
+Gui, Add, Button, %k_Position%, O
+Gui, Add, Button, %k_Position%, P
+Gui, Add, Button, %k_Position%, Q
+Gui, Add, Button, %k_Position%, R
+Gui, Add, Button, %k_Position%, S
+Gui, Add, Button, %k_Position%, T
+Gui, Add, Button, %k_Position%, U
+Gui, Add, Button, %k_Position%, V
+Gui, Add, Button, %k_Position%, W
+Gui, Add, Button, %k_Position%, X
+Gui, Add, Button, %k_Position%, Y
+Gui, Add, Button, %k_Position%, Z
 
 ;---- Show the window:
 Gui, Show
@@ -150,7 +151,6 @@ WinMove, A,, %k_WindowX%, %k_WindowY%
 WinSet, AlwaysOnTop, On, ahk_id %k_ID%
 WinSet, TransColor, %TransColor% 220, ahk_id %k_ID%
 
-
 ;---- Set all keys as hotkeys. See www.asciitable.com
 k_n = 1
 k_ASCII = 45
@@ -163,22 +163,30 @@ Loop
 		Hotkey, ~*%k_char%, k_KeyPress
 		; In the above, the asterisk prefix allows the key to be detected regardless
 		; of whether the user is holding down modifier keys such as Control and Shift.
-	if k_ASCII = 93
+	if k_ASCII = 96
 		break
-	k_ASCII++
+	if k_ASCII = 93
+		k_ASCII = 96
+	else
+		k_ASCII++
 }
 
 return ; End of auto-execute section.
 
-
 ;---- When a key is pressed by the user, click the corresponding button on-screen:
+
+$ESC::
+ControlClick, ESC, ahk_id %k_ID%, , LEFT, 1, D
+KeyWait, ESC
+ControlClick, ESC, ahk_id %k_ID%, , LEFT, 1, U
+SendInput, {Escape}
+return
 
 ~*Backspace::
 ControlClick, Bk, ahk_id %k_ID%, , LEFT, 1, D
 KeyWait, Backspace
 ControlClick, Bk, ahk_id %k_ID%, , LEFT, 1, U
 return
-
 
 ; LShift and RShift are used rather than "Shift" because when used as a hotkey,
 ; "Shift" would default to firing upon release of the key (in older AHK versions):
@@ -196,7 +204,6 @@ KeyWait, %k_ThisHotkey%
 ControlClick, %k_ThisHotkey%, ahk_id %k_ID%, , LEFT, 1, U
 return
 
-
 ~*,::
 ~*'::
 ~*Space::
@@ -210,7 +217,6 @@ ControlClick, %k_ThisHotkey%, ahk_id %k_ID%, , LEFT, 1, D
 KeyWait, %k_ThisHotkey%
 ControlClick, %k_ThisHotkey%, ahk_id %k_ID%, , LEFT, 1, U
 Return
-
 
 k_ShowHide:
 if k_IsVisible = y
@@ -226,7 +232,6 @@ else
 	k_IsVisible = y
 }
 return
-
 
 GuiClose:
 k_MenuExit:
