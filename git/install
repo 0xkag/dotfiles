@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+
+go get -v github.com/google/git-appraise/git-appraise
+

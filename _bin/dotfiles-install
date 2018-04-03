@@ -48,6 +48,7 @@ def main():
     # git
 
     relink('.dotfiles/git/gitconfig', '~/.gitconfig')
+    print 'remember to run git/install'
 
     # global
 
