@@ -15,7 +15,7 @@
 ; Changing this font size will make the entire on-screen keyboard get
 ; larger or smaller:
 k_FontSize = 10
-k_FontName = Verdana  ; This can be blank to use the system's default font.
+k_FontName = Consolas ; This can be blank to use the system's default font.
 k_FontStyle = Bold    ; Example of an alternative: Italic Underline
 
 ; Names for the tray menu items:
