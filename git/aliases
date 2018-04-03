@@ -3,6 +3,7 @@
 	logfullp = log --pretty=fuller --decorate --graph --stat --summary --find-copies-harder -p
 	logfullo = log --pretty=fuller --decorate --graph --stat --summary --find-copies-harder origin/master..master
 	logfullpo = log --pretty=fuller --decorate --graph --stat --summary --find-copies-harder -p origin/master..master
+	logfullop = !git logfullpo
 	logshort = log --pretty=format:"%h%x09%an%x20<%ae>%x09%ad%x09%s"
 	logshorto = log --pretty=format:"%h%x09%an%x20<%ae>%x09%ad%x09%s" --decorate --graph --find-copies-harder origin/master..master
 	logtags = log --tags --simplify-by-decoration --pretty=format:"%h%x09%an%x20<%ae>%x09%ai%x09%d"
