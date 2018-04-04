@@ -37,6 +37,10 @@ def main():
     relink('.dotfiles/bash/bashrc', '~/.bashrc')
     relink('.dotfiles/bash/bash_profile', '~/.bash_profile')
 
+    # compton
+
+    print 'remember to run compton/install'
+
     # flake8
 
     relink('~/.dotfiles/flake8/flake8', '~/.config/flake8')

@@ -162,6 +162,7 @@ mode "resize" {
 bindsym $mod+z mode "resize"
 
 exec --no-startup-id nm-applet
+exec --no-startup-id compton -b
 
 # Start i3bar to display a workspace bar (plus the system information i3blocks
 # finds out, if available)

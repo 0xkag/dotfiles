@@ -113,3 +113,15 @@
 	path = _lib/_todo/git-annex
 	url = git://git-annex.branchable.com/
 	branch = master
+[submodule "_lib/_todo/recordmydesktop"]
+	path = _lib/_todo/recordmydesktop
+	url = https://github.com/jamoozy/recordmydesktop
+	branch = master
+[submodule "_lib/_todo/screenkey"]
+	path = _lib/_todo/screenkey
+	url = https://github.com/wavexx/screenkey
+	branch = master
+[submodule "_lib/_todo/compton"]
+	path = _lib/compton
+	url = https://github.com/chjj/compton.git
+	branch = master
