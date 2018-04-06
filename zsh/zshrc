@@ -57,6 +57,7 @@ ZSH_CUSTOM=$HOME/.dotfiles/zsh/custom
 plugins=(
     catimg
     colorize
+    # dirhistory
     emacs
     encode64
     extract
