@@ -599,6 +599,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(org-trello-current-prefix-keybinding "C-c o")
+ '(paragraph-start "\\|[ 	]*$\\|-- [ ]")
  )
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
