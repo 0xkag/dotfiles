@@ -13,5 +13,5 @@ git stash list | cat
 
 echo '# git branch'
 
-git branch -vv
+git branch -vv | cat
 
