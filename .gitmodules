@@ -125,3 +125,7 @@
 	path = _lib/compton
 	url = https://github.com/chjj/compton.git
 	branch = master
+[submodule "_lib/xdotool"]
+	path = _lib/xdotool
+	url = https://github.com/jordansissel/xdotool.git
+	branch = master

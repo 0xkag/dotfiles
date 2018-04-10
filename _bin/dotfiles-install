@@ -137,6 +137,10 @@ def main():
     relink('.dotfiles/vim/vimrc', '~/.vimrc')
     print 'remember to run vim/install'
 
+    # x11 (xdotool)
+
+    print 'remember to run x11/install (x11 utils)'
+
     # zsh
 
     relink('.dotfiles/zsh/zshrc', '~/.zshrc')

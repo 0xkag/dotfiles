@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+
+TMPDIR=$(mktemp -d)
+
+cd $TMPDIR
+
+cleanup () {
+    rm -rf $TMPDIR
+}
+
+trap cleanup EXIT
+
+F=wmctrl_1.07.orig.tar.gz
+P=wmctrl_1.07-7.debian.tar.gz
+
+wget http://http.debian.net/debian/pool/main/w/wmctrl/$F
+wget http://http.debian.net/debian/pool/main/w/wmctrl/$P
+
+tar -xzvf $F
+tar -xzvf $P
+cd wmctrl-1.07
+for patch in ../debian/patches/*.patch; do
+    patch -p1 < $patch
+done
+./configure --prefix ~/.root
+make && make install
+

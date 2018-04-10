@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+
+pushd .
+cd $(dirname $0)
+cd ../_lib/xdotool
+git submodule update --init
+export PREFIX=$HOME/.root
+make clean
+make install-static
+popd
+

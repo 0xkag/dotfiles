@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+
+$(dirname $0)/install-wmctrl
+$(dirname $0)/install-xdotool
