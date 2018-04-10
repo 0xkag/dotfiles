@@ -129,3 +129,7 @@
 	path = _lib/xdotool
 	url = https://github.com/jordansissel/xdotool.git
 	branch = master
+[submodule "_lib/fzf"]
+	path = _lib/fzf
+	url = https://github.com/junegunn/fzf.git
+	branch = master
