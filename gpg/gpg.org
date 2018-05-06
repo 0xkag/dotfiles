@@ -1,0 +1,10 @@
+* Philosophy
++ https://alexcabal.com/creating-the-perfect-gpg-keypair/
+* GPG & QR codes
++ https://gist.github.com/joostrijneveld/59ab61faa21910c8434c
++ https://unix.stackexchange.com/questions/280222/generating-qr-code-of-very-big-file
++ https://github.com/4bitfocus/asc-key-to-qr-code
+* Commands
++ gpg ... | gpg --list-packets --verbose
++ cat ....gpg | gpg --list-packets --verbose
+
