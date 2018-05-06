@@ -9,6 +9,11 @@ set mark-symlinked-directories on
 set menu-complete-display-prefix on
 set visible-stats on
 
+# 8 bit; currently disabled
+# set input-meta on
+# set convert-meta off
+# set output-meta on
+
 # editing mode
 
 set editing-mode emacs
