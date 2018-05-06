@@ -1,5 +1,6 @@
 # vim: set noet sw=30 ts=30:
 apt-file
+asciidoc
 autoconf
 autofs
 automake
@@ -46,6 +47,8 @@ ipython-doc
 ipython-notebook
 jq
 less
+libconfig-dev
+libevent-dev
 locate
 lockfile-progs
 lshw
