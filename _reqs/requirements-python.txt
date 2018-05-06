@@ -2,6 +2,8 @@
 autoflake	# spacemacs python anaconda
 aws-shell	# aws
 awscli	# aws
+boto3	# aws
+botocore	# aws
 click	# cli
 cookiecutter	# devtools
 coverage	# devtools
