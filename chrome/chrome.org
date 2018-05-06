@@ -1,0 +1,2 @@
+* site isolation
++ https://www.chromium.org/Home/chromium-security/site-isolation
