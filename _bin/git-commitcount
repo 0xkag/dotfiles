@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-git shortlog -s -n --all --no-merges $@
+git shortlog -s -n "$@"
 
