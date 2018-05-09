@@ -14,5 +14,5 @@ NOW_LOCAL=$(datetime-iso8601 --precision=seconds --local --epoch=$NOW \
             echo $NOW)
 
 eval "$@" $REDIR | tee >(xclip)
-{ echo "# $NOW_UTC ($NOW_LOCAL) $(whoami)@$HOSTNAME% $@"; xclip -o; } | xclip
+{ echo "# $NOW_UTC ($NOW_LOCAL) $(whoami)@$HOSTNAME:$(pwd)% $@"; xclip -o; } | xclip
 
