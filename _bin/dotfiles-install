@@ -45,6 +45,10 @@ def main():
 
     relink('~/.dotfiles/flake8/flake8', '~/.config/flake8')
 
+    # fzf
+
+    os.system('~/.dotfiles/_lib/fzf/install --key-bindings --completion --no-update-rc --no-fish')
+
     # gdb
 
     relink('.dotfiles/gdb/gdbinit', '~/.gdbinit')

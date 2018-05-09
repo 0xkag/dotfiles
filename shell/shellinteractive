@@ -90,6 +90,14 @@ man() {
             man "$@"
 }
 
+# fzf
+
+if $IS_BASH; then
+    [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+elif $IS_ZSH; then
+    [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+fi
+
 # less
 
 source ~/.dotfiles/less/less
