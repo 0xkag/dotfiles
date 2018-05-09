@@ -1,3 +1,5 @@
+# vim: et sw=4 ts=4:
+#
 [include]
     path = ~/.dotfiles/git/identity
 
@@ -5,8 +7,11 @@
     path = ~/.dotfiles/git/aliases
 
 [color]
-	ui = true
+    ui = true
+
 [pull]
-	rebase = true
+    rebase = true
+
 [push]
-	followTags = true
+    followTags = true
+
