@@ -92,6 +92,16 @@ man() {
 
 # fzf
 
+export FZF_DEFAULT_OPTS=""\
+"--bind='"\
+"ctrl-o:execute(less -f {}),"\
+"ctrl-y:execute-silent(echo {} | xclip)+abort"\
+"'"
+
+export FZF_CTRL_R_OPTS=""\
+"--reverse "\
+"--bind='ctrl-y:execute-silent(echo {2..-1} | xclip)+abort'"
+
 if $IS_BASH; then
     [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 elif $IS_ZSH; then

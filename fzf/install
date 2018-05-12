@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+
+pushd .
+cd $(dirname $0)
+cd ../_lib/fzf
+git reset --hard
+git clean -fdx
+make clean && make && make install
+./install --key-bindings --completion --no-update-rc --no-fish
+mkdir -p ~/.root/share/man/man1
+ln -sf \
+    ~/.dotfiles/_lib/fzf/man/man1/fzf.1 \
+    ~/.root/share/man/man1/fzf.1
+ln -sf \
+    ~/.dotfiles/_lib/fzf/man/man1/fzf-tmux.1 \
+    ~/.root/share/man/man1/fzf-tmux.1
+popd
+

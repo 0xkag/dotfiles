@@ -16,15 +16,16 @@ def relink(target, linkname):
 
 def mkdir(p):
     try:
-        os.mkdir(os.path.expanduser(p))
+        os.mkdirs(os.path.expanduser(p))
     except:
         pass
 
 def main():
     # <top level mkdirs>
 
-    mkdir('~/.fonts')
     mkdir('~/.config')
+    mkdir('~/.fonts')
+    mkdir('~/.root')
 
     # <fonts>
 
@@ -47,7 +48,7 @@ def main():
 
     # fzf
 
-    os.system('~/.dotfiles/_lib/fzf/install --key-bindings --completion --no-update-rc --no-fish')
+    print 'remember to run fzf/install'
 
     # gdb
 
