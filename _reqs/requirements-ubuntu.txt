@@ -33,6 +33,7 @@ git-man
 git-svn
 global
 gnupg
+golang
 gpgv
 hdparm
 htop
