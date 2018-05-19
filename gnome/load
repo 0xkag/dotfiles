@@ -2,11 +2,13 @@
 
 set -e
 set -u
-set -x
 
-pushd .
+pushd . &> /dev/null
 cd $(dirname $0)
-diff -u <(gconftool-2 --dump /apps/gnome-terminal) gnomeconfig.xml
+diff -u \
+     <(gconftool-2 --dump /apps/gnome-terminal) \
+     gnomeconfig.xml &> /dev/null || \
+    echo "gnomeconfig.xml difference!"
 gconftool-2 --load gnomeconfig.xml
-popd
+popd &> /dev/null
 

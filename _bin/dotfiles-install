@@ -65,7 +65,7 @@ def main():
 
     # gnome
 
-    os.system('~/.dotfiles/gnome/load')
+    print 'remember to run gnome/load'
 
     # i3
 
