@@ -33,14 +33,26 @@ def main():
     relink('~/.dotfiles/_lib/source-code-pro', '~/.fonts/adobe-fonts/source-code-pro')
     os.system('fc-cache -f -v ~/.fonts/adobe-fonts/source-code-pro')
 
+    # alpine
+
+    print 'remember to run alpine/install'
+
     # bash
 
     relink('.dotfiles/bash/bashrc', '~/.bashrc')
     relink('.dotfiles/bash/bash_profile', '~/.bash_profile')
 
+    # bup
+
+    print 'remember to run bup/install'
+
     # compton
 
     print 'remember to run compton/install'
+
+    # emacs
+
+    print 'remember to run emacs/install'
 
     # flake8
 
@@ -107,11 +119,10 @@ def main():
 
     relink('.dotfiles/readline/inputrc', '~/.inputrc')
 
-    # spacemacs / emacs
+    # spacemacs
 
     relink('.dotfiles/_lib/spacemacs', '~/.emacs.d')
     relink('.dotfiles/spacemacs/spacemacs', '~/.spacemacs')
-    print 'remember to run emacs/install'
 
     # ssh
 
@@ -142,9 +153,9 @@ def main():
     relink('.dotfiles/vim/vimrc', '~/.vimrc')
     print 'remember to run vim/install'
 
-    # x11 (xdotool)
+    # x11
 
-    print 'remember to run x11/install (x11 utils)'
+    print 'remember to run x11/install'
 
     # zsh
 

@@ -55,7 +55,7 @@
 	url = https://github.com/aspiers/git-config
 	branch = master
 [submodule "_lib/bup"]
-	path = _lib/_todo/bup
+	path = _lib/bup
 	url = https://github.com/bup/bup
 	branch = master
 [submodule "_lib/source-code-pro"]
