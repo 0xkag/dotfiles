@@ -3,11 +3,22 @@
 set -e
 set -u
 set -x
+set -o pipefail
+
+TMPDIR=$(mktemp -d)
+
+cd $TMPDIR
+
+cleanup () {
+    rm -rf $TMPDIR
+}
+
+trap cleanup EXIT
 
 VERSION=3.5.2
 
 wget https://archive.apache.org/dist/maven/maven-3/$VERSION/binaries/apache-maven-${VERSION}-bin.tar.gz
 tar -xzvf apache-maven-${VERSION}-bin.tar.gz
+mkdir -p ~/.root/var
 mv apache-maven-${VERSION} ~/.root/var/
-rm -f apache-maven-${VERSION}-bin.tar.gz
 

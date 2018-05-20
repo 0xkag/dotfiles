@@ -3,6 +3,7 @@
 set -e
 set -u
 set -x
+set -o pipefail
 
 # nodejs local installs (from http://stackoverflow.com/a/13021677)
 mkdir -p "$NPM_PACKAGES"

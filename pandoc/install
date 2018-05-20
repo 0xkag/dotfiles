@@ -3,11 +3,13 @@
 set -e
 set -u
 set -x
+set -o pipefail
 
 pushd .
 cd $(dirname $0)
 cd ../_lib/pandoc
-git submodule update --init
+git reset --hard
+git clean -fdx
 stack setup
 stack install
 popd

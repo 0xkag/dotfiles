@@ -3,6 +3,17 @@
 set -e
 set -u
 set -x
+set -o pipefail
+
+TMPDIR=$(mktemp -d)
+
+cd $TMPDIR
+
+cleanup () {
+    rm -rf $TMPDIR
+}
+
+trap cleanup EXIT
 
 VERSION=25.3
 
@@ -11,6 +22,4 @@ tar -xzvf emacs-${VERSION}.tar.gz
 cd emacs-${VERSION}
 ./configure --prefix ~/.root
 make && make install
-cd ..
-rm -rf emacs-${VERSION}.tar.gz emacs-${VERSION}
 

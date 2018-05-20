@@ -19,7 +19,6 @@ P=wmctrl_1.07-7.debian.tar.gz
 
 wget http://http.debian.net/debian/pool/main/w/wmctrl/$F
 wget http://http.debian.net/debian/pool/main/w/wmctrl/$P
-
 tar -xzvf $F
 tar -xzvf $P
 cd wmctrl-1.07
