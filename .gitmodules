@@ -137,3 +137,11 @@
 	path = _lib/emacs
 	url = git@github.com:0xkag/emacs.git
 	branch = pdumper
+[submodule "_lib/flamegraph"]
+	path = _lib/flamegraph
+	url = https://github.com/brendangregg/FlameGraph.git
+	branch = master
+[submodule "_lib/ansifilter"]
+	path = _lib/ansifilter
+	url = https://github.com/andre-simon/ansifilter.git
+	branch = master
