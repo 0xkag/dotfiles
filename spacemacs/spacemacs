@@ -75,6 +75,7 @@ This function should only modify configuration layer settings."
      (python :variables python-test-runner '(pytest nose))
      ;; semantic
      restclient
+     rust
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom
