@@ -133,3 +133,7 @@
 	path = _lib/fzf
 	url = https://github.com/junegunn/fzf.git
 	branch = master
+[submodule "_lib/emacs"]
+	path = _lib/emacs
+	url = git@github.com:0xkag/emacs.git
+	branch = pdumper
