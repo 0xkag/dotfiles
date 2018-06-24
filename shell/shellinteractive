@@ -148,3 +148,13 @@ elif $IS_ZSH; then
     true
 fi
 
+# kubectl completion
+
+if command -v kubectl &> /dev/null; then
+    if $IS_BASH; then
+        source <(kubectl completion bash)
+    else
+        source <(kubectl completion zsh)
+    fi
+fi
+
