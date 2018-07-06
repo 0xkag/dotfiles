@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -u
+
+git log --oneline "$@" | \
+    fzf --reverse --multi --preview 'git show --color --color-words {+1}'
+

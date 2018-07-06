@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# vim: et sw=4 ts=4:
+
+set -e
+set -u
+set -o pipefail
+
+git status | \
+    grep 'new commits' | \
+    awk '{print $2}' | \
+    xargs -I {} \
+        bash -c "echo \$'+++ {} +++\n'; git submodule summary {} | cat"
