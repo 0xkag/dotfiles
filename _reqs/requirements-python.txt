@@ -1,29 +1,76 @@
 # vim: set noet sw=30 ts=30:
-autoflake	# spacemacs python anaconda
-aws-shell	# aws
-awscli	# aws
-boto3	# aws
-botocore	# aws
-click	# cli
-cookiecutter	# devtools
-coverage	# devtools
-docutils	# doctools
-flake8	# devtools
-ipdb	# repl
-ipython	# repl
-jedi==0.8.1	# spacemacs python anaconda
-json-rpc==1.8.1	# spacemacs python anaconda
-nose	# devtools
-pep8	# devtools
-pyflakes	# devtools; dep of autoflake
-pygments	# devtools
-pylint	# devtools
-pytest	# devtools
-# DISABLED -e "git+https://github.com/pinard/Pymacs.git#egg=Pymacs"
-requests	# useful
-requests-kerberos	# useful
-# DISABLED rope	# ropemacs
-# DIABLED ropemacs	# ropemacs
-service_factory==0.1.2	# spacemacs python anadonda
-tox	# devtools
+
+# spacemacs python mode -- anaconda backend
+
+jedi>=0.9.0
+json-rpc>=1.8.1
+service_factory>=0.1.5
+
+# spacemacs python mode -- python language server backend
+
+pyls-isort
+python-language-server
+
+# aws
+
+aws-shell
+awscli
+boto3
+botocore
+
+# devtools
+
+autoflake
+bumpversion
+cookiecutter
+coverage
+docutils
+flake8
+mock
+nose
+pep8
+pip
+pyflakes<1.7.0
+pygments
+pylint
+pytest
+pytest-runner
+tox
+
+# libraries: general
+
+click
+requests
+requests-kerberos
+toml
+
+# libraries: 3.x backports
+
+futures
+scandir
+
+# libraries: 3.x compat
+
+future
+
+# libraries: crypto
+
+certifi
+cryptography
+pycrypto
+
+# libraries: datetime
+
+arrow
+
+# libraries: systems
+
+atomicwrites
+psutil
+ptyprocess
+
+# repl
+
+ipdb
+ipython
 
