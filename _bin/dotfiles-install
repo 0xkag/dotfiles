@@ -52,7 +52,7 @@ def main():
 
     # emacs
 
-    print 'remember to run emacs/install'
+    print 'remember to run one of emacs/install-*'
 
     # flake8
 

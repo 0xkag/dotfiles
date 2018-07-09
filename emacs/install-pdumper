@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+set -o pipefail
+
+# https://github.com/syl20bnr/spacemacs/blob/develop/EXPERIMENTAL.org#spacemacs-dumps-using-the-portable-dumper
+
+pushd .
+cd $(dirname $0)
+cd ../_lib/emacs
+git reset --hard
+git clean -fdx
+[ ! -f ./configure ] && sh autogen.sh
+./configure --prefix ~/.root --with-dbus --with-gnutls --with-imagemagick \
+    --with-rsvg --with-mailutils --with-xml2 --with-modules
+make && make install
+popd
+
