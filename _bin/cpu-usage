@@ -19,7 +19,7 @@ returncode, stdout, stderr = x_usage.exec_command(args, command)
 used_percent = float(stdout.strip())
 
 x_usage.output(args,
-               format_string_default='{used_percent:.2f}',
-               format_string_i3='{used_percent:.2f}%',
-               used_percent=used_percent)
+               value=used_percent,
+               format_string_default='{value:.2f}',
+               format_string_i3='{value:03.0f}%')
 

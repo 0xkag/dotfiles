@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
 # TODO does this work on FreeBSD too?
+# TODO this needs to do i3blocks protocol
 
 uptime | sed "s/.*load.*: \(.*\\)/\1/g" | tr -d ","

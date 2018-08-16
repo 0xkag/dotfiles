@@ -25,31 +25,44 @@ def exec_command(args, command):
 
     return (proc.returncode, stdout, stderr)
 
+def i3blocks_colorize(args, value, thresholds=None, inverse=False):
+    if thresholds is None:
+        thresholds = [0, 50, 70, 90]
+
+    if inverse:
+        value = 100 - value
+
+    if value >= thresholds[-2]:
+        print '#ff0000'
+    elif value >= thresholds[-3]:
+        print '#ffff00'
+    elif value >= thresholds[-4]:
+        pass
+
+    if value >= thresholds[-1]:
+        sys.exit(33)
+
 def output(args,
-           used_percent,
+           value,
            format_string_default,
            format_string_i3='{0: >2}%',
+           thresholds=None,
+           inverse=False,
            **kwargs):
 
-    rounded = int(ceil(used_percent))
+    kwargs['value'] = value
+
+    rounded = int(ceil(value))
 
     if not args.i3:
         # non-i3 mode
 
-        print format_string_default.format(used_percent=used_percent,
-                                           **kwargs)
+        print format_string_default.format(**kwargs)
+    else:
+        # i3 mode -- this follows the i3blocks protocol
 
-        sys.exit(0)
-
-    # i3 mode -- this follows the i3blocks protocol
-
-    print format_string_i3.format(used_percent=used_percent, **kwargs)
-    print ''
-    if rounded >= 70:
-        print '#ff0000'
-    elif rounded >= 50:
-        print '#ffff00'
-
-    if rounded >= 90:
-        sys.exit(33)
+        print format_string_i3.format(**kwargs)
+        print ''
+        i3blocks_colorize(args, rounded, thresholds=thresholds,
+                          inverse=inverse)
 
