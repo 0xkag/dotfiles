@@ -167,6 +167,12 @@ mode "resize" {
 
 bindsym $mod+z mode "resize"
 
+mode "passthrough" {
+    bindsym $mod+Escape mode "default"
+}
+
+bindsym $mod+Escape mode "passthrough"
+
 exec --no-startup-id nm-applet
 exec --no-startup-id compton -b
 
