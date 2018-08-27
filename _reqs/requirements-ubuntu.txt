@@ -1,12 +1,17 @@
 # vim: set noet sw=30 ts=30:
+acpi
+ack-grep
 apt-file
 asciidoc
+attr
 autoconf
 autofs
 automake
+bash
 bash-completion
 bc
 binutils
+# blktrace
 bsdutils
 bundler
 bvi
@@ -27,6 +32,7 @@ gddrescue
 gdb
 ghc
 ghc-doc
+gir1.2-gtksource-3.0 # for autokey
 git
 git-doc
 git-man
@@ -49,7 +55,12 @@ ipython-notebook
 jq
 less
 libconfig-dev
+libdbus-1-dev
+libev-dev
 libevent-dev
+libgl1-mesa-dev
+libpcre3-dev
+libx11-dev
 locate
 lockfile-progs
 lshw
@@ -106,6 +117,9 @@ wget
 whois
 wireshark
 x11vnc
+xz-utils
+# youtube-dl
+# zenmap
 zip
 zsh
 zsh-doc
