@@ -32,7 +32,7 @@
 	branch = master
 [submodule "_lib/password-store"]
 	path = _lib/password-store
-	url = http://git.zx2c4.com/password-store
+	url = https://git.zx2c4.com/password-store
 	branch = master
 [submodule "_lib/python-audio-tools"]
 	path = _lib/python-audio-tools
