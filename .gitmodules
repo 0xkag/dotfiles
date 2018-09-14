@@ -143,7 +143,7 @@
 	branch = master
 [submodule "_lib/ansifilter"]
 	path = _lib/ansifilter
-	url = https://github.com/andre-simon/ansifilter.git
+	url = https://gitlab.com/saalen/ansifilter
 	branch = master
 [submodule "_lib/autokey"]
 	path = _lib/autokey

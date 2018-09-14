@@ -37,6 +37,10 @@ def main():
 
     print 'remember to run alpine/install'
 
+    # ansifilter
+
+    print 'remember to run ansifilter/install'
+
     # bash
 
     relink('.dotfiles/bash/bashrc', '~/.bashrc')
