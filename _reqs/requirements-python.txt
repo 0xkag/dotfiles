@@ -37,6 +37,12 @@ pytest
 pytest-runner
 tox
 
+# hacking/security
+
+pwntools
+pyelftools
+scapy
+
 # libraries: general
 
 click
