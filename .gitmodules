@@ -149,3 +149,11 @@
 	path = _lib/autokey
 	url = https://github.com/autokey/autokey
 	branch = master
+[submodule "_lib/_todo/fpart"]
+	path = _lib/_todo/fpart
+	url = https://github.com/martymac/fpart
+	branch = master
+[submodule "_lib/_todo/pcstat"]
+	path = _lib/_todo/pcstat
+	url = https://github.com/tobert/pcstat
+	branch = master
