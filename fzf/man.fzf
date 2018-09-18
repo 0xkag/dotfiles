@@ -1,0 +1,12 @@
+_fzf_complete_man() {
+    _fzf_complete "--multi --reverse" "$@" < <(
+        man -k '.'
+    )
+}
+
+_fzf_complete_man_post() {
+    sed -r 's/^(\S+)\s+\(([^)]+)\).*/\2 \1/g'
+}
+
+[ -n "$BASH" ] && complete -F _fzf_complete_man -o default -o bashdefault man
+
