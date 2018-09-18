@@ -18,6 +18,29 @@ awscli
 boto3
 botocore
 
+# 3.x backports
+
+futures
+scandir
+
+# 3.x compat
+
+future
+
+# cli
+
+click
+
+# crypto
+
+certifi
+cryptography
+pycrypto
+
+# datetime
+
+arrow
+
 # devtools
 
 autoflake
@@ -31,52 +54,33 @@ nose
 pep8
 pip
 pyflakes<1.7.0
-pygments
 pylint
 pytest
 pytest-runner
 tox
 
-# hacking/security
+# formats/text/converters
 
+pygments
+toml
+
+# debugging/hacking/pcap/network/security/systems
+
+atomicwrites
+ipdb
+psutil
+ptyprocess
 pwntools
 pyelftools
 scapy
 
-# libraries: general
+# http
 
-click
 requests
 requests-kerberos
-toml
-
-# libraries: 3.x backports
-
-futures
-scandir
-
-# libraries: 3.x compat
-
-future
-
-# libraries: crypto
-
-certifi
-cryptography
-pycrypto
-
-# libraries: datetime
-
-arrow
-
-# libraries: systems
-
-atomicwrites
-psutil
-ptyprocess
+urllib3
 
 # repl
 
-ipdb
 ipython
 
