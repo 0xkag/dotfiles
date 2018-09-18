@@ -157,3 +157,15 @@
 	path = _lib/_todo/pcstat
 	url = https://github.com/tobert/pcstat
 	branch = master
+[submodule "_lib/_todo/zappa"]
+	path = _lib/_todo/zappa
+	url = https://github.com/Miserlou/Zappa
+	branch = master
+[submodule "_lib/_todo/xsel"]
+	path = _lib/_todo/xsel
+	url = https://github.com/kfish/xsel
+	branch = master
+[submodule "_lib/xclip"]
+	path = _lib/xclip
+	url = https://github.com/astrand/xclip
+	branch = master

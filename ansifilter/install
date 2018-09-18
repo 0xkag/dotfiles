@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+set -o pipefail
+
+pushd .
+cd $(dirname $0)
+cd ../_lib/ansifilter
+make clean
+make
+make PREFIX=~/.root install
+popd
+

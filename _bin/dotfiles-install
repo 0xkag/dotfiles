@@ -4,6 +4,12 @@
 import os
 import sys
 
+def heading(s):
+    print '\033[31m[*] %s' % s
+
+def step(s):
+    print '\033[33m[+] %s' % s
+
 def relink(target, linkname):
     target = os.path.expanduser(target)
     linkname = os.path.expanduser(linkname)
@@ -23,146 +29,178 @@ def mkdir(p):
 def main():
     # <top level mkdirs>
 
-    mkdir('~/.config')
+    heading('<dirs>')
+    mkdir('~/.confmig')
     mkdir('~/.fonts')
     mkdir('~/.root')
 
     # <fonts>
 
+    heading('<fonts>')
     mkdir('~/.fonts/adobe-fonts')
     relink('~/.dotfiles/_lib/source-code-pro', '~/.fonts/adobe-fonts/source-code-pro')
-    os.system('fc-cache -f -v ~/.fonts/adobe-fonts/source-code-pro')
+    os.system('fc-cache -f -v ~/.fonts/adobe-fonts/source-code-pro &> /dev/null')
 
     # alpine
 
-    print 'remember to run alpine/install'
+    heading('alpine')
+    step('remember to run alpine/install')
 
     # ansifilter
 
-    print 'remember to run ansifilter/install'
+    heading('ansifilter')
+    step('remember to run ansifilter/install')
 
     # bash
 
+    heading('bash')
     relink('.dotfiles/bash/bashrc', '~/.bashrc')
     relink('.dotfiles/bash/bash_profile', '~/.bash_profile')
 
     # bup
 
-    print 'remember to run bup/install'
+    heading('bup')
+    step('remember to run bup/install')
 
     # compton
 
-    print 'remember to run compton/install'
+    heading('compton')
+    step('remember to run compton/install')
 
     # emacs
 
-    print 'remember to run one of emacs/install-*'
+    heading('emacs')
+    step('remember to run emacs/install-* (pick one)')
 
     # flake8
 
+    heading('flake8')
     relink('~/.dotfiles/flake8/flake8', '~/.config/flake8')
 
     # fzf
 
-    print 'remember to run fzf/install'
+    heading('fzf')
+    step('remember to run fzf/install')
 
     # gdb
 
+    heading('gdb')
     relink('.dotfiles/gdb/gdbinit', '~/.gdbinit')
 
     # git
 
+    heading('git')
     relink('.dotfiles/git/gitconfig', '~/.gitconfig')
-    print 'remember to run git/install'
+    step('remember to run git/install')
 
     # global
 
-    print 'remember to run global/install'
+    heading('global')
+    step('remember to run global/install')
 
     # gnome
 
-    print 'remember to run gnome/load'
+    heading('gnome')
+    step('remember to run gnome/load')
 
     # i3
 
+    heading('i3')
     relink('.dotfiles/i3', '~/.i3')
     relink('.dotfiles/i3/i3blocks.conf', '~/.i3blocks.conf')
 
     # iftop
 
+    heading('iftop')
     relink('.dotfiles/iftop/iftoprc', '~/.iftoprc')
 
     # less
 
+    heading('less')
     # ... sourced in shell/shellinteractive
 
     # maven
 
-    print 'remember to run maven/install'
+    heading('maven')
+    step('remember to run maven/install')
 
     # nodejs
 
+    heading('nodejs')
     relink('.dotfiles/nodejs/npmrc', '~/.npmrc')
-    print 'remember to run nodejs/install'
+    step('remember to run nodejs/install')
 
     # pandoc
 
-    print 'remember to run pandoc/install'
+    heading('pandoc')
+    step('remember to run pandoc/install')
 
     # pip
 
+    heading('pip')
     mkdir('~/.config/pip')
     relink('~/.dotfiles/pip/pip.conf', '~/.config/pip/pip.conf')
 
     # pyenv
 
+    heading('pyenv & pyenv-virtualenv')
     relink('~/.dotfiles/_lib/pyenv-virtualenv',
            '~/.dotfiles/_lib/pyenv/plugins/pyenv-virtualenv')
 
     # readline
 
+    heading('readline')
     relink('.dotfiles/readline/inputrc', '~/.inputrc')
 
     # spacemacs
 
+    heading('spacemacs')
     relink('.dotfiles/_lib/spacemacs', '~/.emacs.d')
     relink('.dotfiles/spacemacs/spacemacs', '~/.spacemacs')
 
     # ssh
 
+    heading('ssh')
     relink('~/.dotfiles/ssh/config', '~/.ssh/config')
 
     # sshrc
 
+    heading('sshrc')
     relink('.dotfiles/sshrc', '~/.sshrc.d')
     relink('.dotfiles/sshrc/sshrc', '~/.sshrc')
 
     # stack
 
+    heading('stack')
     mkdir('~/.stack')
     relink('~/.dotfiles/stack/config.yaml', '~/.stack/config.yaml')
-    print 'remember to run stack/install'
+    step('remember to run stack/install')
 
     # tarsnap
 
-    print 'remember to run tarsnap/install'
+    heading('tarsnap')
+    step('remember to run tarsnap/install')
 
     # tmux
 
+    heading('tmux')
     relink('.dotfiles/tmux/tmux.conf', '~/.tmux.conf')
-    print 'remember to run tmux/install'
+    step('remember to run tmux/install')
 
     # vim
 
+    heading('vim')
     relink('.dotfiles/vim/vimrc', '~/.vimrc')
-    print 'remember to run vim/install'
+    step('remember to run vim/install')
 
     # x11
 
-    print 'remember to run x11/install'
+    heading('x11')
+    step('remember to run x11/install (installs multiple utils)')
 
     # zsh
 
+    heading('zsh')
     relink('.dotfiles/zsh/zshrc', '~/.zshrc')
 
 if __name__ == '__main__':

@@ -6,4 +6,5 @@ set -x
 set -o pipefail
 
 $(dirname $0)/install-wmctrl
+$(dirname $0)/install-xclip
 $(dirname $0)/install-xdotool
