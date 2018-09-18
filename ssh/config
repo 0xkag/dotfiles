@@ -1,8 +1,8 @@
 Host github.com
-	ForwardAgent=no
-	ForwardX11=no
+    ForwardAgent=no
+    ForwardX11=no
 
 Host *
-	ForwardAgent=yes
-	ForwardX11=yes
+    ForwardAgent=yes
+    ForwardX11=yes
 

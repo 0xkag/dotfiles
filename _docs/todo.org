@@ -23,20 +23,20 @@
 ** https://github.com/rupa/z
 
 dotfiles todo
-	requirements move to lib
-	clean up requirements
-	clean up bin
-	finish bin
-	clean up lib
-	catch up on changes to spacemacs, RTFM
-	sync the best parts of spacemacs and vim configs / behaviors
-	clipboard behavior the same between spacemacs, vim, and tmux (and less?)
-	re-rationalize the keybindings
-		windows
-		i3
-		tmux
-		vim
-		spacemacs
-		readline
-	... gqap behavior in markdown mode, for example
+    requirements move to lib
+    clean up requirements
+    clean up bin
+    finish bin
+    clean up lib
+    catch up on changes to spacemacs, RTFM
+    sync the best parts of spacemacs and vim configs / behaviors
+    clipboard behavior the same between spacemacs, vim, and tmux (and less?)
+    re-rationalize the keybindings
+        windows
+        i3
+        tmux
+        vim
+        spacemacs
+        readline
+    ... gqap behavior in markdown mode, for example
 

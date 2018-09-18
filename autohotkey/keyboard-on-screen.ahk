@@ -157,18 +157,18 @@ k_ASCII = 45
 
 Loop
 {
-	Transform, k_char, Chr, %k_ASCII%
-	StringUpper, k_char, k_char
-	if k_char not in <,>,^,~,Å,`,
-		Hotkey, ~*%k_char%, k_KeyPress
-		; In the above, the asterisk prefix allows the key to be detected regardless
-		; of whether the user is holding down modifier keys such as Control and Shift.
-	if k_ASCII = 96
-		break
-	if k_ASCII = 93
-		k_ASCII = 96
-	else
-		k_ASCII++
+    Transform, k_char, Chr, %k_ASCII%
+    StringUpper, k_char, k_char
+    if k_char not in <,>,^,~,Å,`,
+        Hotkey, ~*%k_char%, k_KeyPress
+        ; In the above, the asterisk prefix allows the key to be detected regardless
+        ; of whether the user is holding down modifier keys such as Control and Shift.
+    if k_ASCII = 96
+        break
+    if k_ASCII = 93
+        k_ASCII = 96
+    else
+        k_ASCII++
 }
 
 return ; End of auto-execute section.
@@ -221,15 +221,15 @@ Return
 k_ShowHide:
 if k_IsVisible = y
 {
-	Gui, Cancel
-	Menu, Tray, Rename, %k_MenuItemHide%, %k_MenuItemShow%
-	k_IsVisible = n
+    Gui, Cancel
+    Menu, Tray, Rename, %k_MenuItemHide%, %k_MenuItemShow%
+    k_IsVisible = n
 }
 else
 {
-	Gui, Show
-	Menu, Tray, Rename, %k_MenuItemShow%, %k_MenuItemHide%
-	k_IsVisible = y
+    Gui, Show
+    Menu, Tray, Rename, %k_MenuItemShow%, %k_MenuItemHide%
+    k_IsVisible = y
 }
 return
 
