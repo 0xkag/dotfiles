@@ -1,3 +1,5 @@
+EscapeChar ~
+
 Host github.com
     ForwardAgent=no
     ForwardX11=no
