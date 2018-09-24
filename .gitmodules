@@ -23,7 +23,7 @@
 	url = https://github.com/yyuu/pyenv-virtualenv.git
 	branch = master
 [submodule "_lib/gollum"]
-	path = _lib/gollum
+	path = _lib/_todo/gollum
 	url = https://github.com/gollum/gollum
 	branch = master
 [submodule "_lib/ps_mem"]
@@ -35,7 +35,7 @@
 	url = https://git.zx2c4.com/password-store
 	branch = master
 [submodule "_lib/python-audio-tools"]
-	path = _lib/python-audio-tools
+	path = _lib/_todo/python-audio-tools
 	url = git://github.com/tuffy/python-audio-tools.git
 	branch = master
 [submodule "_lib/git-diff-blame"]
@@ -63,7 +63,7 @@
 	url = https://github.com/adobe-fonts/source-code-pro.git
 	branch = release
 [submodule "_lib/git-hg"]
-	path = _lib/git-hg
+	path = _lib/_todo/git-hg
 	url = https://github.com/cosmin/git-hg
 	branch = master
 [submodule "_lib/peda"]
@@ -138,7 +138,7 @@
 	url = git@github.com:0xkag/emacs.git
 	branch = pdumper
 [submodule "_lib/flamegraph"]
-	path = _lib/flamegraph
+	path = _lib/_todo/flamegraph
 	url = https://github.com/brendangregg/FlameGraph.git
 	branch = master
 [submodule "_lib/ansifilter"]
