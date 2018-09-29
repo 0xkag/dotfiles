@@ -20,6 +20,12 @@ def relink(target, linkname):
             raise Exception('%s is not a symlink' % linkname)
     os.symlink(target, linkname)
 
+def unlink(p):
+    try:
+        os.unlink(os.path.expanuser(p))
+    except:
+        pass
+
 def mkdir(p):
     try:
         os.mkdirs(os.path.expanduser(p))
@@ -39,7 +45,7 @@ def main():
     heading('<fonts>')
     mkdir('~/.fonts/adobe-fonts')
     relink('~/.dotfiles/_lib/source-code-pro', '~/.fonts/adobe-fonts/source-code-pro')
-    os.system('fc-cache -f -v ~/.fonts/adobe-fonts/source-code-pro &> /dev/null')
+    os.system('fc-cache -f -v ~/.fonts/adobe-fonts/source-code-pro > /dev/null 2>&1')
 
     # alpine
 
@@ -173,7 +179,7 @@ def main():
 
     heading('stack')
     mkdir('~/.stack')
-    relink('~/.dotfiles/stack/config.yaml', '~/.stack/config.yaml')
+    unlink('~/.stack/config.yaml')
     step('remember to run stack/install')
 
     # tarsnap
