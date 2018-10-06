@@ -41,6 +41,7 @@ This function should only modify configuration layer settings."
      ;; ----------------------------------------------------------------
      ansible
      asciidoc
+     asm
      (auto-completion :variables
                       auto-completion-complete-with-key-sequence nil
                       auto-completion-enable-help-tooltip t
@@ -53,13 +54,16 @@ This function should only modify configuration layer settings."
      (colors :variables
              colors-enable-rainbow-identifiers t)
      ;; command-log
+     ;; confluence
      ;; cscope -- requires cscope and pip install pycscope, and create index
      csv
-     ;; (debug :variables
-     ;;        debug-additional-debuggers '("ipdb"))
-     ;; docker
+     (debug :variables
+            debug-additional-debuggers '("ipdb"))
+     ;; deft
+     docker
      elfeed
      emacs-lisp
+     ;; epub
      evil-commentary
      ;; evil-snipe
      ;; finance
@@ -69,32 +73,40 @@ This function should only modify configuration layer settings."
      haskell
      helm
      html
+     ibuffer
      imenu-list
      ;; ipython-notebook
      ;; ivy
      (java :variables
            java-backend 'meghanada)
      javascript
+     json
      latex
      ;; lsp
      markdown
      ;; mu4e -- try this maybe
      neotree
+     ;; nixos
      ;; notmuch
      (org :variables
-          org-enable-trello-support nil)
+          org-enable-github-support t
+          org-enable-reveal-js-support t
+          org-enable-trello-support t
+          org-projectile-file "TODO.org")
      pandoc
      ;; pass
+     pdf
      (python :variables
              python-test-runner '(pytest nose))
-     ;; semantic
      restclient
      rust
+     ;; semantic
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom
             shell-default-shell 'eshell)
      shell-scripts
+     ;; smex
      speed-reading
      spell-checking
      sql
@@ -102,8 +114,10 @@ This function should only modify configuration layer settings."
      systemd
      themes-megapack
      ;; tmux
+     ;; treemacs
      ;; vinegar
      version-control
+     xclipboard
      xkcd
      yaml
      )
@@ -118,6 +132,7 @@ This function should only modify configuration layer settings."
    dotspacemacs-additional-packages '(
      jinja2-mode
      ob-restclient
+     org-trello
      pycoverage
      )
 
@@ -612,8 +627,16 @@ before packages are loaded."
                                 (sql . t)
                                 (sqlite . t)
                                 ))
+                              (setq org-reveal-root "file:///d:/reveal.js")
                              )
             )
+
+  (with-eval-after-load 'org-agenda
+    (require 'org-projectile)
+    (mapcar '(lambda (file)
+               (when (file-exists-p file)
+                 (push file org-agenda-files)))
+            (org-projectile-todo-files)))
 
   ;; magit
 
@@ -630,6 +653,9 @@ before packages are loaded."
             (lambda ()
               (sh-electric-here-document-mode -1)))
 
+  ;; asm mode
+
+  (setq x86-lookup-pdf "~/.dotfiles/_docs/intel-sdm-vol-1-2abcd-3abcd.pdf")
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -646,7 +672,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  ;'(org-trello-current-prefix-keybinding "C-c o" nil (org-trello))
-)
+ )
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
