@@ -169,3 +169,7 @@
 	path = _lib/xclip
 	url = https://github.com/astrand/xclip
 	branch = master
+[submodule "_lib/_todo/retdec"]
+	path = _lib/_todo/retdec
+	url = https://github.com/avast-tl/retdec.git
+	branch = master
