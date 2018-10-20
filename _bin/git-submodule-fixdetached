@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-git submodule sync
-git submodule foreach -q --recursive 'branch="$(git config -f "$toplevel/.gitmodules" submodule.$name.branch)"; echo $branch; git checkout $branch'
-git submodule update --init --rebase
+git submodule sync --recursive
+git submodule foreach --recursive 'branch="$(git config -f "$toplevel/.gitmodules" submodule.$name.branch)"; echo $branch; git checkout $branch'
+git submodule update --recursive --init --rebase
 
