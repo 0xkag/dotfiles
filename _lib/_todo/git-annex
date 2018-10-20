@@ -1,0 +1,4 @@
+[submodule "_lib/_todo/git-annex"]
+    path = _lib/_todo/git-annex
+    url = git://git-annex.branchable.com/
+    branch = master
