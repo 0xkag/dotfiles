@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -o pipefail
+
+cat $1/Info.plist | \
+    sed -n -e '/.*.key.Target Identifier/{n;s/.*>\(.*\)<.*/\1/g;p;}'
+
