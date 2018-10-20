@@ -161,6 +161,7 @@ thunar
 tig
 tk
 tmux
+tshark
 ttf-mscorefonts-installer
 ufw
 unrar
