@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+set -o pipefail
+
+git fetch --all --no-recurse-submodules
+git rebase origin/master
+git submodule-fixdetached
+
