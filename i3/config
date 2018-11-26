@@ -173,6 +173,13 @@ mode "passthrough" {
 
 bindsym $mod+Escape mode "passthrough"
 
+mode "state" {
+    bindsym s exec "systemctl suspend"
+    bindsym Escape mode "default"
+}
+
+bindsym $mod+Print mode "state"
+
 exec --no-startup-id nm-applet
 exec --no-startup-id compton -b
 
