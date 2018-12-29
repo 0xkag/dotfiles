@@ -5,10 +5,10 @@ import os
 import sys
 
 def heading(s):
-    print '\033[31m[*] %s' % s
+    print '\033[31m[*] %s\033[0m' % s
 
 def step(s):
-    print '\033[33m[+] %s' % s
+    print '\033[33m[+] %s\033[0m' % s
 
 def relink(target, linkname):
     target = os.path.expanduser(target)
@@ -28,7 +28,7 @@ def unlink(p):
 
 def mkdir(p):
     try:
-        os.mkdirs(os.path.expanduser(p))
+        os.makedirs(os.path.expanduser(p))
     except:
         pass
 
@@ -114,6 +114,7 @@ def main():
     heading('i3')
     relink('.dotfiles/i3', '~/.i3')
     relink('.dotfiles/i3/i3blocks.conf', '~/.i3blocks.conf')
+    # TODO i3lock systemd
 
     # iftop
 
@@ -202,6 +203,10 @@ def main():
     # x11
 
     heading('x11')
+    relink('.dotfiles/x11/Xdefaults', '~/.Xdefaults')
+    relink('.dotfiles/x11/Xresources', '~/.Xresources')
+    relink('.dotfiles/x11/xinitrc', '~/.xinitrc')
+    relink('.dotfiles/x11/xscreensaver', '~/.xscreensaver')
     step('remember to run x11/install (installs multiple utils)')
 
     # zsh
