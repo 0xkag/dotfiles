@@ -22,6 +22,9 @@ set $alt Mod1
 font pango:DejaVu Sans Mono 10
 #font xft:Droid Sans Mono 12
 
+# https://i3wm.org/docs/multi-monitor.html
+# force_xinerama yes
+
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
@@ -168,10 +171,10 @@ mode "resize" {
 bindsym $mod+z mode "resize"
 
 mode "passthrough" {
-    bindsym $mod+Escape mode "default"
+    bindsym $mod+Shift+Escape mode "default"
 }
 
-bindsym $mod+Escape mode "passthrough"
+bindsym $mod+Shift+Escape mode "passthrough"
 
 mode "state" {
     bindsym s exec "systemctl suspend"
