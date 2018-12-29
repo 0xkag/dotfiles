@@ -85,8 +85,8 @@ i3lock
 i3status
 imagemagick
 ipython
-ipython-doc
-ipython-notebook
+# ipython-doc
+# ipython-notebook
 jq
 less
 locate
@@ -103,8 +103,10 @@ nano
 nasm
 nfs-common
 nmap
-nodejs-legacy
-npm
+# node-gyp
+# nodejs-dev
+# nodejs-legacy
+# npm
 openssh-client
 openssh-server
 openssl
@@ -219,6 +221,7 @@ libfontconfig1-dev
 libfreetype6-dev
 libgc-dev
 libgconf2-dev
+libgif-dev
 libgl1-mesa-dev
 libglib2.0-cil-dev
 libglib2.0-dev
@@ -237,6 +240,7 @@ libharfbuzz-dev
 libidn11-dev
 libidn2-0-dev
 libidn2-dev
+libjpeg-dev
 libkrb5-dev
 libldap2-dev
 libltdl-dev
@@ -258,6 +262,7 @@ librsvg2-dev
 libsm-dev
 libssl-dev
 libtasn1-6-dev
+libtiff-dev
 libtinfo-dev
 libuv1-dev
 libwayland-dev
@@ -266,6 +271,8 @@ libx11-xcb-dev
 libx264-dev
 libxau-dev
 libxml2-dev
+libxmu-dev
+libxpm-dev
 libxslt1-dev
 linux-libc-dev
 nettle-dev
