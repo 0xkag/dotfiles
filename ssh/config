@@ -1,4 +1,7 @@
-Include ~/.dotfiles/_sites/current/ssh/config
+# TODO I wish something like this worked, but it doesn't:
+#
+# Match exec ssh-can-include
+#    Include ~/.dotfiles/_sites/current/ssh/config
 
 EscapeChar ~
 
