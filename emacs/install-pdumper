@@ -14,7 +14,7 @@ git reset --hard
 git clean -fdx
 [ ! -f ./configure ] && sh autogen.sh
 ./configure --prefix ~/.root --with-dbus --with-gnutls --with-imagemagick \
-    --with-rsvg --with-mailutils --with-xml2 --with-modules
+    --with-rsvg --with-mailutils --with-xml2 --with-modules --with-pdumper=yes
 make && make install
 popd
 
