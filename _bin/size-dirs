@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -o pipefail
+
+D=${1:-.}
+
+du -hs $(find $D/. -maxdepth 1 \! -name '.' -type d | sort | xargs) | sort -h
