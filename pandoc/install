@@ -12,5 +12,6 @@ git reset --hard
 git clean -fdx
 stack setup
 stack install
+rm -rf .stack-work
 popd
 
