@@ -95,7 +95,7 @@ man() {
 export FZF_DEFAULT_OPTS=""\
 "--bind='"\
 "ctrl-o:execute(less -f {}),"\
-"ctrl-y:execute-silent(echo {} | xclip)+abort"\
+"ctrl-y:execute-silent(echo {} | clip-in)+abort"\
 "'"
 
 export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
@@ -105,7 +105,7 @@ export FZF_CTRL_R_OPTS=""\
 "--preview 'echo {}' "\
 "--preview-window 'down:3:hidden:wrap' "\
 "--bind='"\
-"ctrl-y:execute-silent(echo {2..-1} | xclip)+abort,"\
+"ctrl-y:execute-silent(echo {2..-1} | clip-in)+abort,"\
 "?:toggle-preview"\
 "'"
 

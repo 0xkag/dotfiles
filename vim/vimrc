@@ -130,7 +130,7 @@ vnoremap . :norm.<cr>
 
 " yank and copy visual selection to X clipboard
 
-" vnoremap <silent> y y :call system("xclip -sel clipboard -i", @")<cr>
+" vnoremap <silent> y y :call system("clip-in", @")<cr>
 
 " highlight last inserted text (this overrides the default gV)
 
@@ -191,15 +191,15 @@ noremap <leader>a =ip
 
 " ... copy visual selection to X clipboard
 
-vnoremap <silent> <leader>C :w !xclip -sel clipboard -i<cr>
+vnoremap <silent> <leader>C :w !clip-in<cr>
 
 " ... copy previously yanked/deleted text from register to clipboard
 
-nnoremap <silent> <leader>C :call system("xclip -sel clipboard -i", @")<cr>
+nnoremap <silent> <leader>C :call system("clip-in", @")<cr>
 
 " ... paste from X clipboard
 
-noremap <silent> <leader>P :r !xclip -sel clipboard -o<cr>
+noremap <silent> <leader>P :r !clip-out<cr>
 
 " ... map <leader><space> to use C mapping (copy)
 
