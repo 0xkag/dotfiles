@@ -13,8 +13,15 @@ cd ../_lib/emacs
 git reset --hard
 git clean -fdx
 [ ! -f ./configure ] && sh autogen.sh
-./configure --prefix ~/.root --with-dbus --with-gnutls --with-imagemagick \
-    --with-rsvg --with-mailutils --with-xml2 --with-modules --with-pdumper=yes
+./configure \
+    --prefix ~/.root \
+    --with-dbus \
+    --with-gnutls \
+    --with-imagemagick \
+    --with-mailutils \
+    --with-modules \
+    --with-rsvg \
+    --with-xml2
 make && make install
 popd
 
