@@ -1,0 +1,20 @@
+exec 3<>${BASH_TRACE_LOGFILE}
+cat <&3 > /dev/null
+set -o functrace
+shopt -s extdebug
+
+trace_debug() {
+    [[ ${FUNCNAME[1]} == $BASH_COMMAND ]] && S=enter || S=debug
+    printf "\
+%(%Y%m%dT%T%z)T\t\
+$$\t\
+$S\t\
+${#FUNCNAME[@]}\t\
+${FUNCNAME[1]}\t\
+${BASH_COMMAND}\
+\n" \
+-1 >&3
+}
+
+trap trace_debug DEBUG
+
