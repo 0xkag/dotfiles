@@ -97,7 +97,6 @@ def main():
 
     heading('git')
     relink('.dotfiles/git/gitconfig', '~/.gitconfig')
-    step('remember to run git/install')
 
     # global
 
