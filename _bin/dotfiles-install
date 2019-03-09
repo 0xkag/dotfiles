@@ -131,6 +131,11 @@ def main():
     heading('maven')
     step('remember to run maven/install')
 
+    # mosh
+
+    heading('mosh')
+    step('remember to run mosh/install')
+
     # nodejs
 
     heading('nodejs')

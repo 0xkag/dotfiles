@@ -172,3 +172,7 @@
 	path = _lib/_todo/lambdash
 	url = https://github.com/alestic/lambdash
 	branch = master
+[submodule "_lib/mosh"]
+	path = _lib/mosh
+	url = https://github.com/mobile-shell/mosh
+	branch = master
