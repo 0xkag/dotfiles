@@ -10,7 +10,8 @@ cd $(dirname $0)
 cd ../_lib/fzf
 git reset --hard
 git clean -fdx
-make clean && make && make install
+ln -sf ~/.dotfiles/_lib/fzf ~/.fzf
+cd ~/.fzf
 ./install --key-bindings --completion --no-update-rc --no-fish
 mkdir -p ~/.root/share/man/man1
 ln -sf \
