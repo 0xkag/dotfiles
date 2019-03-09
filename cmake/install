@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+set -o pipefail
+
+TMPDIR=$(mktemp -d)
+
+cd $TMPDIR
+
+cleanup () {
+    rm -rf $TMPDIR
+}
+
+trap cleanup EXIT
+
+VERSION=3.13.4
+
+wget https://github.com/Kitware/CMake/releases/download/v${VERSION}/cmake-${VERSION}.tar.gz
+tar -xzvf cmake-${VERSION}.tar.gz
+cd cmake-${VERSION}
+./bootstrap --prefix=$HOME/.root && make && make install
+
