@@ -1,0 +1,17 @@
+# Random notes
+
+* git for-each-ref
+* git show
+
+* tags
+** git cat-file -t $tag
++ if it's an annotated tag, "tag"
++ if it's not annotated (simple tag), "commit"
+** git describe
+** git for-each-ref refs/tags
++ if it's an annotated tag, "tag"
++ if it's not annotated (simple tag), "commit"
+** git show $tag
++ shows the full commit
+** git show-ref $tag
+

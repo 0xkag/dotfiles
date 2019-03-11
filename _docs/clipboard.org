@@ -1,0 +1,3 @@
+# Random notes on clipboard & X11 / Windows clipboard interactions
+
+* https://stackoverflow.com/questions/3261379/getting-html-source-or-rich-text-from-the-x-clipboard

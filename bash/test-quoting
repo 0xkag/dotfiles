@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# vim: et sw=4 ts=4:
+
+set -x
+
+out () {
+    echo $*
+}
+
+out '$*'
+echo $*
+out '"$*"'
+echo "$*"
+out '$@'
+echo $@
+out '"$@"'
+echo "$@"
+
+X=$1
+Y="$1"
+A=$X
+B="$X"
+
