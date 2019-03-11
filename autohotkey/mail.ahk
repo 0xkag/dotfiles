@@ -23,6 +23,11 @@ return
 Send ^+4
 return
 
+; C-5 --> C-S-5 (for Outlook)
+^5::
+Send ^+5
+return
+
 ; C-6 --> Alpine 
 ^6::
 Send asINBOX-temp-
