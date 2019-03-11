@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+set -o pipefail
+
+cd $(dirname $0)
+SRCDIR=$(pwd)
+TMPDIR=$(mktemp -d)
+
+cd $TMPDIR
+
+cleanup () {
+    rm -rf $TMPDIR
+}
+
+trap cleanup EXIT
+
+# using 0.62.0, an older version, because of std C++14 dependency on new
+# releases
+#
+# also, this has to be applied on some systems, so patch it always:
+#
+#   https://bugs.freedesktop.org/show_bug.cgi?id=106388
+
+VERSION=0.62.0
+
+wget https://poppler.freedesktop.org/poppler-${VERSION}.tar.xz
+tar -xJvf poppler-${VERSION}.tar.xz
+cd poppler-${VERSION}
+patch -p1 < $SRCDIR/buildfix.patch
+mkdir build
+cd build
+cmake .. \
+    -DCMAKE_INSTALL_PREFIX=/u/george/.root \
+    -DCMAKE_BUILD_TYPE=debugfull \
+    -DENABLE_LIBOPENJPEG=unmaintained \
+    -DENABLE_XPDF_HEADERS=ON
+make && make install
+cd ..
+cp cpp/poppler-private.h ~/.root/include/poppler/cpp
+cp glib/poppler-private.h ~/.root/include/poppler/glib
+

@@ -50,6 +50,11 @@ path=(
 
 export PATH=$(join : ${path[@]})
 
+# library path
+
+export LD_LIBRARY_PATH=$HOME/.root/lib64:$HOME/.root/lib
+export PKG_CONFIG_PATH=$HOME/.root/lib64/pkgconfig:$HOME/.root/lib/pkgconfig
+
 # manpath
 
 manpath=(
