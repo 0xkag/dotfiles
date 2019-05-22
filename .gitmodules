@@ -109,6 +109,7 @@
 [submodule "_lib/_todo/pyringe"]
 	path = _lib/_todo/pyringe
 	url = https://github.com/google/pyringe
+	branch = master
 [submodule "_lib/_todo/recordmydesktop"]
 	path = _lib/_todo/recordmydesktop
 	url = https://github.com/jamoozy/recordmydesktop
@@ -168,6 +169,7 @@
 [submodule "_lib/_todo/retdec"]
 	path = _lib/_todo/retdec
 	url = https://github.com/avast-tl/retdec.git
+	branch = master
 [submodule "_lib/_todo/lambdash"]
 	path = _lib/_todo/lambdash
 	url = https://github.com/alestic/lambdash
