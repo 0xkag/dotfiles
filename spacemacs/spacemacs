@@ -537,8 +537,6 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-  (setq sentence-end-double-space t)
-
   ;; enabled C-r register replace in search mode
   ;; https://github.com/syl20bnr/spacemacs/issues/5101
   (setq-default evil-search-module 'evil-search)
@@ -563,6 +561,10 @@ Put your configuration code here, except for variables that should be set
 before packages are loaded."
   (require 'helm)
   (require 'tramp)
+
+  ;; sentence end double space
+
+  (setq sentence-end-double-space t)
 
   ;; normal mode keybindings
 
