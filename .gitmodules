@@ -116,7 +116,7 @@
 	branch = master
 [submodule "_lib/_todo/screenkey"]
 	path = _lib/_todo/screenkey
-	url = https://github.com/wavexx/screenkey
+	url = https://gitlab.com/wavexx/screenkey
 	branch = master
 [submodule "_lib/_todo/compton"]
 	path = _lib/compton
