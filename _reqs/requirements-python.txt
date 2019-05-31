@@ -11,6 +11,11 @@ service_factory>=0.1.5
 pyls-isort
 python-language-server
 
+# spacemacs python mode -- general
+
+epc
+importmagic
+
 # aws
 
 aws-shell
@@ -63,6 +68,7 @@ tox
 
 pygments
 toml
+ruamel.yaml
 
 # debugging/hacking/pcap/network/security/systems
 
