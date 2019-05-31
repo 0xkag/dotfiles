@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# vim: et sw=4 ts=4:
+
+set -e
+set -u
+set -o pipefail
+
+ag --nobreak --numbers --noheading "$1" | \
+    fzf --delimiter=: \
+        --preview="\
+          (pygmentize -g {1} 2>/dev/null || cat {1}) | \
+          awk '{printf \"%d\t%s\n\", NR, \$0}' | \
+          sed -n -e '{2},\$ p'" \
+        --preview-window='up:75%:wrap' \
+        --bind='enter:execute(vim +{2} {1} < /dev/tty)'
+
