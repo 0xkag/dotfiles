@@ -13,5 +13,12 @@ git stash list | cat
 
 echo '# git branch'
 
+# TODO what I really want to find is branches that have no remote or
+# branches that are out of sync from the remote
+
 git branch -vv | cat
+
+echo '# git submodules isclean'
+
+git submodule foreach --recursive git isclean
 
