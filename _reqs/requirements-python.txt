@@ -73,6 +73,9 @@ ruamel.yaml
 # debugging/hacking/pcap/network/security/systems
 
 atomicwrites
+httpie
+httpie-aws-auth
+httpie-negotiate
 ipdb
 psutil
 ptyprocess
