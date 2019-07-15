@@ -5,12 +5,18 @@ set -u
 set -x
 set -o pipefail
 
+if command -v gmake &> /dev/null; then
+    MAKE=gmake
+else
+    MAKE=make
+fi
+
 pushd .
 cd $(dirname $0)
 cd ../_lib/bup
 git reset --hard
 git clean -fdx
 ./configure
-make PREFIX=~/.root && make PREFIX=~/.root install
+$MAKE PREFIX=~/.root && $MAKE PREFIX=~/.root install
 popd
 
