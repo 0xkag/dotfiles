@@ -7,7 +7,5 @@ set -o pipefail
 strings $1/Info.plist | \
     grep '<date>' | \
     sed 's/.*>\(.*\)<.*/\1/g' | \
-    tr -d -- '-' | \
-    sed 's/\(.*\):..Z/\1Z/g' | \
-    tr -d ':'
+    sed 's/\(.*\)\(..:..\)Z/\1\2Z/g'
 
