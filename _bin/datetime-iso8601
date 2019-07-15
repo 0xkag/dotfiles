@@ -4,17 +4,27 @@
 set -e
 set -u
 
+# for freebsd
+
 if command -v gdate &> /dev/null; then
     DATE=gdate
 else
     DATE=date
 fi
 
+# for freebsd; needs getopt package installed
+
+if command -v /usr/local/bin/getopt &> /dev/null; then
+    GETOPT=/usr/local/bin/getopt
+else
+    GETOPT=getopt
+fi
+
 epoch=
 precision=
 utc=true
 
-argv=$(getopt \
+argv=$($GETOPT \
          -o 'e:lp:u' \
          -l 'epoch:' \
          -l 'local' \
