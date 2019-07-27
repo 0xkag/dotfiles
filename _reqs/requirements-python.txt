@@ -30,6 +30,7 @@ scandir
 
 # 3.x compat
 
+2to3
 future
 
 # cli
@@ -70,13 +71,16 @@ pygments
 toml
 ruamel.yaml
 
-# debugging/hacking/pcap/network/security/systems
+# debugging
+
+better_exceptions
+icecream
+ipdb
+q
+
+# hacking/pcap/network/security/systems
 
 atomicwrites
-httpie
-httpie-aws-auth
-httpie-negotiate
-ipdb
 psutil
 ptyprocess
 pwntools
@@ -89,11 +93,13 @@ requests
 requests-kerberos
 urllib3
 
+# http cli
+
+httpie
+httpie-aws-auth
+httpie-negotiate
+
 # repl
 
 ipython
-
-# text
-
-pygments
 
