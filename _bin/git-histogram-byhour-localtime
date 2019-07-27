@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# vim: et sw=4 ts=4:
+
+git log \
+      --pretty=format:"%h%x09%an%x20<%ae>%x09%aI%x09%cI" \
+      --author="${1:-}" \
+      --all | \
+    cut -d $'\t' -f 3 | \
+    cut -d 'T' -f 2 | \
+    cut -d '-' -f 1 | \
+    cut -d ':' -f 1 | \
+    sort | \
+    uniq -c | \
+    awk '{printf "%s\t%s\n", $2, $1}'
