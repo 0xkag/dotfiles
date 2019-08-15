@@ -178,3 +178,7 @@
 	path = _lib/mosh
 	url = https://github.com/mobile-shell/mosh
 	branch = master
+[submodule "_lib/_todo/git-hammer"]
+	path = _lib/_todo/git-hammer
+	url = https://github.com/asharov/git-hammer.git
+	branch = master
