@@ -9,6 +9,8 @@ apache2
 apache2-utils
 apt-file
 apt-rdepends
+apt-transport-https
+apt-utils
 asciidoc
 aspell
 aspell-en
@@ -72,6 +74,7 @@ global
 gnome-disk-utility
 gnupg2
 golang
+golang-doc
 gpg
 gpg-agent
 gpgv
@@ -101,6 +104,7 @@ mime-construct
 mutt
 nano
 nasm
+ncdu
 nfs-common
 nmap
 # node-gyp
