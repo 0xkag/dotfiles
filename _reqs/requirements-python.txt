@@ -4,7 +4,7 @@
 
 # spacemacs python mode -- anaconda backend
 
-jedi>=0.9.0
+jedi>=0.13.0
 json-rpc>=1.8.1
 service_factory>=0.1.5
 
