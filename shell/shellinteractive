@@ -31,6 +31,14 @@ elif $IS_ZSH; then
         export SHELL=$(which zsh)
 fi
 
+# term
+
+if [[ "$(uname -o)" == "FreeBSD" ]]; then
+    # FreeBSD colors misbehave for me when xterm-256color, for example, but
+    # not for xterm
+    export TERM=${TERM/-*/}
+fi
+
 # editor
 
 if command -v emacsclient &> /dev/null; then
@@ -39,6 +47,10 @@ else
     export EDITOR=vim
 fi
 
+# pager
+
+export PAGER=less
+
 # aliases (and overrides)
 
 alias h="history"
@@ -46,9 +58,18 @@ alias j="jobs"
 
 # ... ls
 
-ls --color &> /dev/null && COLOR="--color=auto" || COLOR=""
-alias ls="ls -CF $COLOR"
-alias l="ls -CF $COLOR"
+if ! $IS_ZSH; then
+    # oh-my-zsh handles ls / gls color automatically
+    ls --color &> /dev/null && COLOR="--color=auto" || COLOR=""
+    alias ls="ls -CF $COLOR"
+else
+    LS="$(alias ls)"
+    LS="${LS/#ls=\'/}"
+    LS="${LS/%\'/}"
+    alias ls="$LS -CF"
+fi
+
+alias l='ls -CF'
 alias ll='ls -l'
 alias la='ls -lA'
 
