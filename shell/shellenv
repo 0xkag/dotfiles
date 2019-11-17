@@ -95,6 +95,12 @@ elif command -v gnome-terminal &> /dev/null; then
     export TERMINAL=gnome-terminal
 fi
 
+# nix
+
+if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then
+    source $HOME/.nix-profile/etc/profile.d/nix.sh
+fi
+
 # site customizations
 
 site_shellenv=$HOME/.dotfiles/_sites/current/shell/shellenv
