@@ -186,3 +186,7 @@
 	path = _lib/bitwise
 	url = https://github.com/mellowcandle/bitwise
 	branch = master
+[submodule "_lib/_todo/pwndbg"]
+	path = _lib/_todo/pwndbg
+	url = https://github.com/pwndbg/pwndbg
+	branch = dev
