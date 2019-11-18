@@ -3,7 +3,7 @@
 
 cd $HOME/.password-store
 
-git ls-tree -r --name-only HEAD | grep /password.gpg | while read filename; do
+git ls-tree -r --name-only HEAD | grep '\.gpg' | while read filename; do
     passname=${filename%.gpg}
     echo -n $passname
     echo -ne \\t
