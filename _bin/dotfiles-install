@@ -2,6 +2,7 @@
 # vim: et sw=4 ts=4:
 
 import os
+import subprocess
 import sys
 
 def heading(s):
@@ -31,6 +32,12 @@ def mkdir(p):
         os.makedirs(os.path.expanduser(p))
     except:
         pass
+
+def run(p):
+    try:
+        subprocess.check_call(p, shell=True)
+    except:
+        raise
 
 def main():
     # <top level mkdirs>
@@ -217,6 +224,16 @@ def main():
 
     heading('zsh')
     relink('.dotfiles/zsh/zshrc', '~/.zshrc')
+
+    # _sites/current
+
+    heading('_sites/current')
+    p = os.path.expanduser('~/.dotfiles/_sites/current/_bin/dotfiles-install-site')
+    if os.path.exists(p):
+        step('running site-specific dotfiles-install-site')
+        run(p)
+    else:
+        step('no site-specific dotfiles-install-site')
 
 if __name__ == '__main__':
     sys.exit(main())
