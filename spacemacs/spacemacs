@@ -115,7 +115,7 @@ This function should only modify configuration layer settings."
      systemd
      themes-megapack
      ;; tmux
-     ;; treemacs
+     treemacs
      ;; vinegar
      version-control
      xclipboard
