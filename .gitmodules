@@ -190,3 +190,7 @@
 	path = _lib/_todo/pwndbg
 	url = https://github.com/pwndbg/pwndbg
 	branch = dev
+[submodule "_lib/pycoverage.el"]
+	path = _lib/pycoverage.el
+	url = https://github.com/mattharrison/pycoverage.el
+	branch = master

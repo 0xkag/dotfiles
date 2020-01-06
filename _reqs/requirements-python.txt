@@ -88,14 +88,16 @@ icecream
 ipdb
 q
 
-# hacking/pcap/network/security/systems
+# hacking/pcap/network/security/systems/protocols
 
 atomicwrites
+dnspython
 ipaddress
 psutil
 ptyprocess
 pwntools
 pyelftools
+python-ldap
 scapy
 
 # http
