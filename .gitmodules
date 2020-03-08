@@ -2,10 +2,6 @@
 	path = _lib/oh-my-zsh
 	url = git://github.com/robbyrussell/oh-my-zsh.git
 	branch = master
-[submodule "_lib/sshrc"]
-	path = _lib/sshrc
-	url = https://github.com/Russell91/sshrc
-	branch = master
 [submodule "_lib/spacemacs"]
 	path = _lib/spacemacs
 	url = https://github.com/syl20bnr/spacemacs
