@@ -11,12 +11,15 @@ else
     MAKE=make
 fi
 
+export MAKE
+
 pushd .
 cd $(dirname $0)
 cd ../_lib/bup
 git reset --hard
 git clean -fdx
 ./configure
-$MAKE PREFIX=~/.root && $MAKE PREFIX=~/.root install
+$MAKE PREFIX=$HOME/.root && \
+    $MAKE PREFIX=$HOME/.root install
 popd
 
