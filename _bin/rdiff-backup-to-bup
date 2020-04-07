@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# vim: et sw=4 ts=4:
+
+set -e
+set -u
+set -x
+set -o pipefail
+
+rdiff_backup_root="$1"
+bup_root="$2"
+backup_name="$3"
+
+if command -v gdate &> /dev/null; then
+    DATE=gdate
+else
+    DATE=date
+fi
+
+TMPDIR="$(mktemp -d)"
+
+cleanup () {
+    rm -rf "$TMPDIR"
+}
+
+trap cleanup EXIT
+
+export BUP_DIR="$bup_root"
+
+while read increment; do
+    epoch=$($DATE --date "$increment" "+%s")
+    echo "[+] $increment -- epoch $epoch"
+    dest="$TMPDIR/$epoch"
+    mkdir -p "$dest"
+    rdiff-backup -r "$increment" "$rdiff_backup_root" "$dest"
+    bup index -u "$dest"
+    bup save -v -d "$epoch" -n "$backup_name" --strip "$dest"
+    rm -rf "$dest"
+done < <(\
+    rdiff-backup --list-increments "$rdiff_backup_root" | \
+    grep 'increments\.' | sed '1d' | sed '1d' | \
+    awk '{print $1}' | \
+    cut -d '.' -f 2)
+
