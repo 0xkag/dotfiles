@@ -13,7 +13,7 @@
 [submodule "_lib/pyenv"]
 	path = _lib/pyenv
 	url = git@github.com:0xkag/pyenv.git
-	branch = fix-exec-change
+	branch = revert-exec-change
 [submodule "_lib/pyenv-virtualenv"]
 	path = _lib/pyenv-virtualenv
 	url = https://github.com/pyenv/pyenv-virtualenv.git
