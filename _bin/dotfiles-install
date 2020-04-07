@@ -182,12 +182,6 @@ def main():
     heading('ssh')
     relink('~/.dotfiles/ssh/config', '~/.ssh/config')
 
-    # sshrc
-
-    heading('sshrc')
-    relink('.dotfiles/sshrc', '~/.sshrc.d')
-    relink('.dotfiles/sshrc/sshrc', '~/.sshrc')
-
     # stack
 
     heading('stack')
