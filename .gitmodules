@@ -82,7 +82,7 @@
 	path = _lib/_todo/pelican-plugins
 	url = https://github.com/getpelican/pelican-plugins
 	branch = master
-[submodule "_lib/_todo/reveal.js"]
+[submodule "_lib/reveal.js"]
 	path = _lib/_todo/reveal.js
 	url = https://github.com/hakimel/reveal.js.git
 	branch = master
@@ -94,7 +94,7 @@
 	path = _lib/tarsnap
 	url = https://github.com/Tarsnap/tarsnap.git
 	branch = master
-[submodule "_lib/_todo/shellcheck"]
+[submodule "_lib/shellcheck"]
 	path = _lib/_todo/shellcheck
 	url = https://github.com/koalaman/shellcheck.git
 	branch = master
@@ -102,19 +102,19 @@
 	path = _lib/alpine
 	url = git@github.com:0xkag/alpine.git
 	branch = custom-2.21.x
-[submodule "_lib/_todo/pyringe"]
+[submodule "_lib/pyringe"]
 	path = _lib/_todo/pyringe
 	url = https://github.com/google/pyringe
 	branch = master
-[submodule "_lib/_todo/recordmydesktop"]
+[submodule "_lib/recordmydesktop"]
 	path = _lib/_todo/recordmydesktop
 	url = https://github.com/jamoozy/recordmydesktop
 	branch = master
-[submodule "_lib/_todo/screenkey"]
+[submodule "_lib/screenkey"]
 	path = _lib/_todo/screenkey
 	url = https://gitlab.com/wavexx/screenkey.git
 	branch = master
-[submodule "_lib/_todo/compton"]
+[submodule "_lib/compton"]
 	path = _lib/compton
 	url = https://github.com/chjj/compton.git
 	branch = master
@@ -142,19 +142,19 @@
 	path = _lib/autokey
 	url = https://github.com/autokey/autokey
 	branch = master
-[submodule "_lib/_todo/fpart"]
+[submodule "_lib/fpart"]
 	path = _lib/_todo/fpart
 	url = https://github.com/martymac/fpart
 	branch = master
-[submodule "_lib/_todo/pcstat"]
+[submodule "_lib/pcstat"]
 	path = _lib/_todo/pcstat
 	url = https://github.com/tobert/pcstat
 	branch = master
-[submodule "_lib/_todo/zappa"]
+[submodule "_lib/zappa"]
 	path = _lib/_todo/zappa
 	url = https://github.com/Miserlou/Zappa
 	branch = master
-[submodule "_lib/_todo/xsel"]
+[submodule "_lib/xsel"]
 	path = _lib/_todo/xsel
 	url = https://github.com/kfish/xsel
 	branch = master
@@ -162,11 +162,11 @@
 	path = _lib/xclip
 	url = https://github.com/astrand/xclip
 	branch = master
-[submodule "_lib/_todo/retdec"]
+[submodule "_lib/retdec"]
 	path = _lib/_todo/retdec
 	url = https://github.com/avast-tl/retdec.git
 	branch = master
-[submodule "_lib/_todo/lambdash"]
+[submodule "_lib/lambdash"]
 	path = _lib/_todo/lambdash
 	url = https://github.com/alestic/lambdash
 	branch = master
@@ -174,7 +174,7 @@
 	path = _lib/mosh
 	url = https://github.com/mobile-shell/mosh
 	branch = master
-[submodule "_lib/_todo/git-hammer"]
+[submodule "_lib/git-hammer"]
 	path = _lib/_todo/git-hammer
 	url = https://github.com/asharov/git-hammer.git
 	branch = master
@@ -182,7 +182,7 @@
 	path = _lib/bitwise
 	url = https://github.com/mellowcandle/bitwise
 	branch = master
-[submodule "_lib/_todo/pwndbg"]
+[submodule "_lib/pwndbg"]
 	path = _lib/_todo/pwndbg
 	url = https://github.com/pwndbg/pwndbg
 	branch = dev
