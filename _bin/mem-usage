@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # vim: set et sw=4 ts=4:
 
 # TODO make this work on FreeBSD
@@ -7,6 +7,8 @@ import argparse
 from math import ceil
 import subprocess
 import sys
+
+sys.path.append('')
 
 import x_usage
 

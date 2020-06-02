@@ -1,7 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # vim: set et sw=4 ts=4:
 
 # TODO make this work on FreeBSD
+
+from __future__ import print_function
 
 import argparse
 from math import ceil
@@ -33,9 +35,9 @@ def i3blocks_colorize(args, value, thresholds=None, inverse=False):
         value = 100 - value
 
     if value >= thresholds[-2]:
-        print '#ff0000'
+        print('#ff0000')
     elif value >= thresholds[-3]:
-        print '#ffff00'
+        print('#ffff00')
     elif value >= thresholds[-4]:
         pass
 
@@ -57,12 +59,12 @@ def output(args,
     if not args.i3:
         # non-i3 mode
 
-        print format_string_default.format(**kwargs)
+        print(format_string_default.format(**kwargs))
     else:
         # i3 mode -- this follows the i3blocks protocol
 
-        print format_string_i3.format(**kwargs)
-        print ''
+        print(format_string_i3.format(**kwargs))
+        print('')
         i3blocks_colorize(args, rounded, thresholds=thresholds,
                           inverse=inverse)
 
