@@ -70,18 +70,6 @@
 	path = _lib/vim
 	url = https://github.com/vim/vim.git
 	branch = master
-[submodule "_lib/pelican"]
-	path = _lib/_todo/pelican
-	url = https://github.com/getpelican/pelican
-	branch = master
-[submodule "_lib/pelican-themes"]
-	path = _lib/_todo/pelican-themes
-	url = https://github.com/getpelican/pelican-themes
-	branch = master
-[submodule "_lib/pelican-plugins"]
-	path = _lib/_todo/pelican-plugins
-	url = https://github.com/getpelican/pelican-plugins
-	branch = master
 [submodule "_lib/reveal.js"]
 	path = _lib/_todo/reveal.js
 	url = https://github.com/hakimel/reveal.js.git
