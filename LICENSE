@@ -2,7 +2,7 @@ Unless otherwise noted by headers in individual files, or by licenses in
 subdirs or submodules, the contents of this repository are:
 
 /*
- * Copyright (c) 2014-2015 Kyle A. George <kgeorge@tcpsoft.com>
+ * Copyright (c) 2014-2020 Kyle A. George <kgeorge@tcpsoft.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
