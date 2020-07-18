@@ -26,21 +26,23 @@ percent = None
 time = None
 
 for line in stdout.splitlines():
-    if line.startswith('Adapter 0:'):
-        plugged = 'off-line' not in line
-    elif line.startswith('Battery 0:'):
-        discharging = 'discharging' in line.lower()
-        _, percent, time = line.split(',')
+    if line.startswith(b'Adapter 0:'):
+        plugged = b'off-line' not in line
+    elif line.startswith(b'Battery 0:'):
+        discharging = b'discharging' in line.lower()
+        _, percent, time = line.split(b',')
         percent = percent.strip()
-        percent = int(percent.split('%')[0])
+        percent = int(percent.split(b'%')[0])
         time = time.strip()
-        time = time.split(' ')[0]
+        time = time.split(b' ')[0]
     else:
         raise ValueError('unrecognized line')
 
 assert percent is not None
 assert plugged is not None
 assert not (plugged and discharging)
+
+time = time.decode('utf-8')
 
 x_usage.output(args,
                value=percent,
