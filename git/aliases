@@ -9,5 +9,6 @@
 	logtags = log --tags --simplify-by-decoration --pretty=format:"%h%x09%an%x20<%ae>%x09%ai%x09%d"
 	logtree = log --oneline --decorate --graph --all
 	logtreefull = log --pretty=fuller --decorate --graph --all --stat --summary --find-copies-harder
+	mergelogmsg = "!f() { var=$(git symbolic-ref --short HEAD) && printf 'Merge branch %s into %s\n\n::SUMMARY::\nBranch %s commits:\n' $1 $var $1 > temp_merge_msg && git log --format=format:'%s' $var..$1 >> temp_merge_msg && printf '\n\nBranch %s commits:\n' $var >> temp_merge_msg && git log --format=format:'%s' $1..$var >> temp_merge_msg && printf '\n\n* * * * * * * * * * * * * * * * * * * * * * * * *\n::DETAILS::\n' >> temp_merge_msg && git log --left-right $var...$1 >> temp_merge_msg && git merge --no-ff --no-commit $1 && git commit -eF temp_merge_msg; rm -f temp_merge_msg;}; f"
 	stashlistdate = stash list --date=local
 
