@@ -15,7 +15,7 @@ cleanup () {
 
 trap cleanup EXIT
 
-VERSION=6.6.4
+VERSION=6.6.5
 
 wget https://ftp.gnu.org/pub/gnu/global/global-${VERSION}.tar.gz
 tar -xzvf global-${VERSION}.tar.gz

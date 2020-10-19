@@ -15,7 +15,7 @@ cleanup () {
 
 trap cleanup EXIT
 
-VERSION=3.18.0
+VERSION=3.18.4
 
 wget https://github.com/Kitware/CMake/releases/download/v${VERSION}/cmake-${VERSION}.tar.gz
 tar -xzvf cmake-${VERSION}.tar.gz
