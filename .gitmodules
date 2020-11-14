@@ -89,7 +89,7 @@
 [submodule "_lib/alpine"]
 	path = _lib/alpine
 	url = git@github.com:0xkag/alpine.git
-	branch = custom-2.22.x
+	branch = custom-2.24.x
 [submodule "_lib/pyringe"]
 	path = _lib/_todo/pyringe
 	url = https://github.com/google/pyringe
