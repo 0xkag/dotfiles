@@ -167,7 +167,7 @@
 	url = https://github.com/asharov/git-hammer.git
 	branch = master
 [submodule "_lib/bitwise"]
-	path = _lib/bitwise
+	path = _lib/_todo/bitwise
 	url = https://github.com/mellowcandle/bitwise
 	branch = master
 [submodule "_lib/pwndbg"]
@@ -175,6 +175,6 @@
 	url = https://github.com/pwndbg/pwndbg
 	branch = dev
 [submodule "_lib/pycoverage.el"]
-	path = _lib/pycoverage.el
+	path = _lib/_todo/pycoverage.el
 	url = https://github.com/mattharrison/pycoverage.el
 	branch = master
