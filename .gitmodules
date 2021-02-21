@@ -140,7 +140,7 @@
 	branch = master
 [submodule "_lib/zappa"]
 	path = _lib/_todo/zappa
-	url = https://github.com/Miserlou/Zappa
+	url = https://github.com/zappa/Zappa
 	branch = master
 [submodule "_lib/xsel"]
 	path = _lib/_todo/xsel
@@ -178,5 +178,3 @@
 	path = _lib/_todo/pycoverage.el
 	url = https://github.com/mattharrison/pycoverage.el
 	branch = master
-[submodule "zappa"]
-	url = https://github.com/zappa/Zappa
