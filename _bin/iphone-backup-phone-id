@@ -4,6 +4,17 @@ set -e
 set -u
 set -o pipefail
 
-cat $1/Info.plist | \
-    sed -n -e '/.*.key.Target Identifier/{n;s/.*>\(.*\)<.*/\1/g;p;}'
+UI=$(cat $1/Info.plist | \
+		sed -n -e '/.*.key.Unique Identifier/{n;s/.*>\(.*\)<.*/\1/g;p;}')
+
+PT=$(cat $1/Info.plist | \
+		sed -n -e '/.*.key.Product Type/{n;s/.*>\(.*\)<.*/\1/g;p;}')
+
+DN=$(cat $1/Info.plist | \
+		sed -n -e '/.*.key.Device Name/{n;s/.*>\(.*\)<.*/\1/g;p;}')
+
+LBD=$(cat $1/Info.plist | \
+		sed -n -e '/.*.key.Last Backup Date/{n;s/.*>\(.*\)<.*/\1/g;p;}')
+
+echo -n -e $(echo ${UI} | tr '[:upper:]' '[:lower:]')$'\t'${PT}$'\t'${DN}$'\t'${LBD}$'\t'"$1"
 
