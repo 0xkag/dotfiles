@@ -33,7 +33,7 @@ fi
 
 # term
 
-if [[ "$(uname -o)" == "FreeBSD" ]]; then
+if [[ "$(uname -o 2> /dev/null || uname)" == "FreeBSD" ]]; then
     # FreeBSD colors misbehave for me when xterm-256color, for example, but
     # not for xterm
     export TERM=${TERM/-*/}

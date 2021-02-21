@@ -1,0 +1,14 @@
+bash
+bzip2
+coreutils
+curl
+git
+gmake
+gnugetopt
+gawk
+gsed
+htop
+pv
+vim
+zsh
+
