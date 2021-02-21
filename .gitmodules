@@ -178,3 +178,5 @@
 	path = _lib/_todo/pycoverage.el
 	url = https://github.com/mattharrison/pycoverage.el
 	branch = master
+[submodule "zappa"]
+	url = https://github.com/zappa/Zappa
