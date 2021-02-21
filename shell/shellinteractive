@@ -27,7 +27,6 @@ if $IS_BASH; then
         export SHELL=$(which bash)
 elif $IS_ZSH; then
         # most of my zsh options are set by oh-my-zsh
-        compdef sshrc=ssh
         export SHELL=$(which zsh)
 fi
 
