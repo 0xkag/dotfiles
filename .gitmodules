@@ -167,7 +167,7 @@
 	url = https://github.com/asharov/git-hammer.git
 	branch = master
 [submodule "_lib/bitwise"]
-	path = _lib/_todo/bitwise
+	path = _lib/bitwise
 	url = https://github.com/mellowcandle/bitwise
 	branch = master
 [submodule "_lib/pwndbg"]

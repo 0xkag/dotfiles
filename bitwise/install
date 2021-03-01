@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+set -o pipefail
+
+pushd .
+cd $(dirname $0)
+
+cd ../_lib/bitwise
+git reset --hard
+git clean -fdx
+./bootstrap.sh
+./configure --prefix ~/.root
+make
+make install
+popd
+
