@@ -11,28 +11,21 @@ cd $(dirname $0)
 MANDIR=~/.root/share/man/man1
 mkdir -p $MANDIR
 
+cd ../_lib/fzf
+git reset --hard
+git clean -fdx
+
 if [[ "$(uname -m)" == i686 ]]; then
 	echo "WARNING: fzf builds stopped supporting i686 at 0.22.0" >&2
-	TMPDIR=$(mktemp -d)
-	trap "rm -rf $TMPDIR" EXIT
-	cd $TMPDIR
-	git clone --branch 0.22.0 --depth 1 https://github.com/junegunn/fzf.git
-	cd fzf
-	./install --key-bindings --completion --no-update-rc --no-fish
-	rm -f $MANDIR/fzf.1 $MANDIR/fzf-tmux.1
-	cp man/man1/fzf.1 $MANDIR/
-	cp man/man1/fzf-tmux.1 $MANDIR/
-else
-	cd ../_lib/fzf
-	git reset --hard
-	git clean -fdx
-	ln -sf ~/.dotfiles/_lib/fzf ~/.fzf
-	cd ~/.fzf
-	./install --key-bindings --completion --no-update-rc --no-fish
-	rm -f $MANDIR/fzf.1 $MANDIR/fzf-tmux.1
-	ln -sf ~/.dotfiles/_lib/fzf/man/man1/fzf.1 $MANDIR/
-	ln -sf ~/.dotfiles/_lib/fzf/man/man1/fzf-tmux.1 $MANDIR/
+	git checkout 0.22.0
 fi
+
+ln -sf ~/.dotfiles/_lib/fzf ~/.fzf
+cd ~/.fzf
+bash -x ./install --key-bindings --completion --no-update-rc --no-fish
+rm -f $MANDIR/fzf.1 $MANDIR/fzf-tmux.1
+ln -sf ~/.dotfiles/_lib/fzf/man/man1/fzf.1 $MANDIR/
+ln -sf ~/.dotfiles/_lib/fzf/man/man1/fzf-tmux.1 $MANDIR/
 
 popd
 
