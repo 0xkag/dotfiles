@@ -5,7 +5,7 @@ set -e
 set -u
 set -o pipefail
 
-ag --nobreak --numbers --noheading "$@" | \
+ag --hidden --ignore '.git/' --nobreak --numbers --noheading "$@" | \
     fzf --delimiter=: \
         --preview="\
           (pygmentize -g {1} 2>/dev/null || cat {1}) | \
