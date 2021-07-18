@@ -27,6 +27,7 @@ export NODE_PATH=$(join \
 # pyenv
 
 export PYENV_ROOT=$HOME/.dotfiles/_lib/pyenv
+command -v pyenv &> /dev/null && eval "$(pyenv init -)"
 
 # path
 
