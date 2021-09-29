@@ -13,7 +13,7 @@
 [submodule "_lib/pyenv"]
 	path = _lib/pyenv
 	url = git@github.com:0xkag/pyenv.git
-	branch = master
+	branch = revert-exec-change-2.x
 [submodule "_lib/pyenv-virtualenv"]
 	path = _lib/pyenv-virtualenv
 	url = https://github.com/pyenv/pyenv-virtualenv.git
@@ -137,7 +137,7 @@
 [submodule "_lib/pcstat"]
 	path = _lib/_todo/pcstat
 	url = https://github.com/tobert/pcstat
-	branch = master
+	branch = main
 [submodule "_lib/zappa"]
 	path = _lib/_todo/zappa
 	url = https://github.com/zappa/Zappa
