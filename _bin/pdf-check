@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# vim: et sw=4 ts=4:
+
+# inspired by https://gist.github.com/hubgit/6078384
+
+set -u
+
+out () {
+    echo "[+] $*"
+}
+
+die () {
+    echo "$*" >&2
+    exit 1
+}
+
+diematch () {
+    die "match found!"
+}
+
+INPUT="$(realpath "$1")"
+REGEX="${2:-}"
+
+if [[ -z "$REGEX" ]]; then
+    # dump metadata
+
+    out "dump pdftk"
+
+    pdftk "$INPUT" dump_data \
+        2> >(egrep -v "^Warning: no info dictionary found")
+
+    out "dump pdfinfo"
+
+    pdfinfo -meta "$INPUT"
+
+    out "dump exiftool"
+
+    exiftool "$INPUT"
+
+    out "dump exiftool embedded"
+
+    exiftool -extractEmbedded -all:all "$INPUT"
+elif [[ ! -z "$REGEX" ]]; then
+    # check metadata for regex matches
+
+    out "checking for regex matches; output means unsafe"
+
+    out "checking pdftk dump_data"
+
+    pdftk "$INPUT" dump_data \
+        2> >(egrep -v "^Warning: no info dictionary found") | \
+        egrep -e "$REGEX" && diematch
+
+    out "checking pdfinfo -meta"
+
+    pdfinfo -meta "$INPUT" | egrep -e "$REGEX" && diematch
+
+    out "checking exiftool"
+
+    # Directory is a pseudo-tag
+
+    exiftool "$INPUT" | egrep -v 'Directory\s' | egrep -e "$REGEX" && diematch
+
+    out "checking exiftool -extractEmbedded"
+
+    # Directory is a pseudo-tag
+
+    exiftool -extractEmbedded -all:all "$INPUT" | egrep -v '^Directory\s' | \
+        egrep -e "$REGEX" && diematch
+
+    out "checking strings"
+
+    strings "$INPUT" | egrep -e "$REGEX" && diematch
+fi
+

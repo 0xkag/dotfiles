@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# vim: et sw=4 ts=4:
+
+# inspired by https://gist.github.com/hubgit/6078384
+
+set -u
+
+TMPDIR="$(mktemp -d)"
+
+cleanup () {
+    rm -rf $TMPDIR
+}
+
+trap cleanup EXIT
+
+out () {
+    echo "[+] $*"
+}
+
+INPUT="$(realpath "$1")"
+OUTPUT="$(realpath "$2")"
+REGEX="${3:-}"
+
+cd "$TMPDIR"
+
+# prune Info Dictionary
+
+out "prune PDF Info Dictionary"
+
+pdftk "$INPUT" dump_data | \
+    sed -e 's#InfoValue:.*#InfoValue:#g' | \
+    pdftk "$INPUT" update_info - output "clean.pdf"
+
+# remove tags
+
+out "remove tags"
+
+exiftool -all:all= "clean.pdf"
+
+# read tags, and also remove the pointer to Info Dictionary (but does not
+# remove it)
+
+out "read tags and remove pointer to PDF Info Dictionary"
+
+exiftool -all:all "clean.pdf" > /dev/null
+exiftool -extractEmbedded -all:all "clean.pdf" > /dev/null
+
+# linearize the PDF, which removes orphaned data
+
+out "linearize pdf"
+
+qpdf --linearize "clean.pdf" "$OUTPUT"
+
+if [[ ! -z "$REGEX" ]]; then
+    "$(dirname "$0")/pdf-check" "$OUTPUT" "$REGEX"
+fi
+
