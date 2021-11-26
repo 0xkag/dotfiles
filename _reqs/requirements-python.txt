@@ -99,6 +99,7 @@ pwntools
 pyelftools
 python-ldap
 scapy
+sh
 
 # http
 
