@@ -70,10 +70,20 @@ def main():
     relink('.dotfiles/bash/bashrc', '~/.bashrc')
     relink('.dotfiles/bash/bash_profile', '~/.bash_profile')
 
+    # bitwise
+
+    heading('bitwise')
+    step('remember to run bitwise/install')
+
     # bup
 
     heading('bup')
     step('(optional) remember to run bup/install')
+
+    # cmake
+
+    heading('cmake')
+    step('(optional) remember to run cmake/install')
 
     # compton
 
@@ -105,6 +115,7 @@ def main():
 
     heading('git')
     relink('.dotfiles/git/gitconfig', '~/.gitconfig')
+    step('(optional) remember to run git/install (for git-appraise)')
 
     # global
 
@@ -154,6 +165,11 @@ def main():
     heading('pandoc')
     step('(optional) remember to run pandoc/install')
 
+    # poppler
+
+    heading('poppler')
+    step('(optional) remember to run poppler/install')
+
     # pip
 
     heading('pip')
@@ -200,6 +216,11 @@ def main():
     relink('.dotfiles/tmux/tmux.conf', '~/.tmux.conf')
     step('(optional) remember to run tmux/install')
 
+    # wmctrl
+
+    heading('wmctrl')
+    step('remember to run wmctrl/install')
+
     # vim
 
     heading('vim')
@@ -213,6 +234,16 @@ def main():
     relink('.dotfiles/x11/xinitrc', '~/.xinitrc')
     relink('.dotfiles/x11/xscreensaver', '~/.xscreensaver')
     step('remember to run x11/install (installs multiple utils)')
+
+    # xclip
+
+    heading('xclip')
+    step('remember to run xclip/install')
+
+    # xdotool
+
+    heading('xdotool')
+    step('remember to run xdotool/install')
 
     # zsh
 
