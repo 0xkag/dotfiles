@@ -178,3 +178,6 @@
 	path = _lib/_todo/pycoverage.el
 	url = https://github.com/mattharrison/pycoverage.el
 	branch = master
+[submodule "_lib/_todo/radare2"]
+	path = _lib/_todo/radare2
+	url = https://github.com/radareorg/radare2
