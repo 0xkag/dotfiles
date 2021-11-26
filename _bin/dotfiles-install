@@ -233,7 +233,6 @@ def main():
     relink('.dotfiles/x11/Xresources', '~/.Xresources')
     relink('.dotfiles/x11/xinitrc', '~/.xinitrc')
     relink('.dotfiles/x11/xscreensaver', '~/.xscreensaver')
-    step('remember to run x11/install (installs multiple utils)')
 
     # xclip
 

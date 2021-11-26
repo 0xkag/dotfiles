@@ -15,7 +15,7 @@ cleanup () {
 
 trap cleanup EXIT
 
-VERSION=26.1
+VERSION=27.2
 
 wget https://ftp.gnu.org/pub/gnu/emacs/emacs-${VERSION}.tar.gz
 tar -xzvf emacs-${VERSION}.tar.gz
