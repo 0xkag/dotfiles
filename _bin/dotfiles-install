@@ -230,9 +230,9 @@ def main():
     # x11
 
     heading('x11')
-    relink('.dotfiles/x11/Xresources', '~/.Xresources')
-    relink('.dotfiles/x11/xinitrc', '~/.xinitrc')
-    relink('.dotfiles/x11/xscreensaver', '~/.xscreensaver')
+    relink('.dotfiles/_x11/Xresources', '~/.Xresources')
+    relink('.dotfiles/_x11/xinitrc', '~/.xinitrc')
+    relink('.dotfiles/_x11/xscreensaver', '~/.xscreensaver')
 
     # xclip
 
