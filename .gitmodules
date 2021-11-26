@@ -23,11 +23,11 @@
 	url = https://github.com/gollum/gollum
 	branch = master
 [submodule "_lib/ps_mem"]
-	path = _lib/ps_mem
+	path = _lib/_opt/ps_mem
 	url = https://github.com/pixelb/ps_mem/
 	branch = master
 [submodule "_lib/password-store"]
-	path = _lib/password-store
+	path = _lib/_opt/password-store
 	url = https://git.zx2c4.com/password-store
 	branch = master
 [submodule "_lib/python-audio-tools"]
@@ -39,7 +39,7 @@
 	url = https://github.com/dmnd/git-diff-blame
 	branch = master
 [submodule "_lib/pandoc"]
-	path = _lib/pandoc
+	path = _lib/_opt/pandoc
 	url = https://github.com/jgm/pandoc
 	branch = master
 [submodule "_lib/aspiers-shell-env"]
@@ -51,7 +51,7 @@
 	url = https://github.com/aspiers/git-config
 	branch = master
 [submodule "_lib/bup"]
-	path = _lib/bup
+	path = _lib/_opt/bup
 	url = https://github.com/bup/bup
 	branch = master
 [submodule "_lib/source-code-pro"]
@@ -67,7 +67,7 @@
 	url = https://github.com/longld/peda
 	branch = master
 [submodule "_lib/vim"]
-	path = _lib/vim
+	path = _lib/_opt/vim
 	url = https://github.com/vim/vim.git
 	branch = master
 [submodule "_lib/reveal.js"]
@@ -75,11 +75,11 @@
 	url = https://github.com/hakimel/reveal.js.git
 	branch = master
 [submodule "_lib/tmux"]
-	path = _lib/tmux
+	path = _lib/_opt/tmux
 	url = https://github.com/tmux/tmux.git
 	branch = master
 [submodule "_lib/tarsnap"]
-	path = _lib/tarsnap
+	path = _lib/_opt/tarsnap
 	url = https://github.com/Tarsnap/tarsnap.git
 	branch = master
 [submodule "_lib/shellcheck"]
@@ -87,7 +87,7 @@
 	url = https://github.com/koalaman/shellcheck.git
 	branch = master
 [submodule "_lib/alpine"]
-	path = _lib/alpine
+	path = _lib/_opt/alpine
 	url = git@github.com:0xkag/alpine.git
 	branch = custom-2.24.x
 [submodule "_lib/pyringe"]
@@ -127,7 +127,7 @@
 	url = https://gitlab.com/saalen/ansifilter.git
 	branch = master
 [submodule "_lib/autokey"]
-	path = _lib/autokey
+	path = _lib/_opt/autokey
 	url = https://github.com/autokey/autokey
 	branch = master
 [submodule "_lib/fpart"]
@@ -159,7 +159,7 @@
 	url = https://github.com/alestic/lambdash
 	branch = master
 [submodule "_lib/mosh"]
-	path = _lib/mosh
+	path = _lib/_opt/mosh
 	url = https://github.com/mobile-shell/mosh
 	branch = master
 [submodule "_lib/git-hammer"]

@@ -15,7 +15,7 @@ export MAKE
 
 pushd .
 cd $(dirname $0)
-cd ../_lib/bup
+cd ../_lib/_opt/bup
 git reset --hard
 git clean -fdx
 ./configure

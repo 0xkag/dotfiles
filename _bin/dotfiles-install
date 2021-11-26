@@ -57,7 +57,7 @@ def main():
     # alpine
 
     heading('alpine')
-    step('remember to run alpine/install')
+    step('(optional) remember to run alpine/install')
 
     # ansifilter
 
@@ -73,7 +73,7 @@ def main():
     # bup
 
     heading('bup')
-    step('remember to run bup/install')
+    step('(optional) remember to run bup/install')
 
     # compton
 
@@ -136,12 +136,12 @@ def main():
     # maven
 
     heading('maven')
-    step('remember to run maven/install')
+    step('(optional) remember to run maven/install')
 
     # mosh
 
     heading('mosh')
-    step('remember to run mosh/install')
+    step('(optional) remember to run mosh/install')
 
     # nodejs
 
@@ -152,7 +152,7 @@ def main():
     # pandoc
 
     heading('pandoc')
-    step('remember to run pandoc/install')
+    step('(optional) remember to run pandoc/install')
 
     # pip
 
@@ -187,24 +187,24 @@ def main():
     heading('stack')
     mkdir('~/.stack')
     unlink('~/.stack/config.yaml')
-    step('remember to run stack/install')
+    step('(optional) remember to run stack/install')
 
     # tarsnap
 
     heading('tarsnap')
-    step('remember to run tarsnap/install')
+    step('(optional) remember to run tarsnap/install')
 
     # tmux
 
     heading('tmux')
     relink('.dotfiles/tmux/tmux.conf', '~/.tmux.conf')
-    step('remember to run tmux/install')
+    step('(optional) remember to run tmux/install')
 
     # vim
 
     heading('vim')
     relink('.dotfiles/vim/vimrc', '~/.vimrc')
-    step('remember to run vim/install')
+    step('(optional) remember to run vim/install')
 
     # x11
 

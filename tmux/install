@@ -7,7 +7,7 @@ set -o pipefail
 
 pushd .
 cd $(dirname $0)
-cd ../_lib/tmux
+cd ../_lib/_opt/tmux
 git reset --hard
 git clean -fdx
 [ ! -f ./configure ] && sh autogen.sh

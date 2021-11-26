@@ -7,7 +7,7 @@ set -o pipefail
 
 pushd .
 cd $(dirname $0)
-cd ../_lib/mosh
+cd ../_lib/_opt/mosh
 git reset --hard
 git clean -fdx
 [ ! -f ./configure ] && sh autogen.sh

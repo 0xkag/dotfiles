@@ -1,4 +1,7 @@
-_todo: Things I've flagged to use but haven't integrated yet.
+* _opt: Things that are optional (or only used when modern packages aren't
+  available on $machine).
 
-<everything else>: Things used.
+* _todo: Things I've flagged to use but haven't integrated yet.
+
+<everything else>: Things used everywhere.
 
