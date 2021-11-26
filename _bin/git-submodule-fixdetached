@@ -2,5 +2,6 @@
 
 git submodule sync --recursive
 git submodule foreach --recursive 'branch="$(git config -f "$toplevel/.gitmodules" submodule.$name.branch)"; echo $branch; git checkout $branch'
-git submodule update --recursive --init --rebase
+#git submodule update --recursive --init --rebase
+git submodule foreach git pull --rebase
 
