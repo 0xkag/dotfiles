@@ -4,10 +4,10 @@
 
 case $- in
     *i*)
-        source ~/.dotfiles/shell/shellinteractive
+        source ~/.dotfiles/_shell/shellinteractive
         ;;
     *)
-        source ~/.dotfiles/shell/shellenv
+        source ~/.dotfiles/_shell/shellenv
         ;;
 esac
 

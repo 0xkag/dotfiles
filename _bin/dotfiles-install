@@ -131,7 +131,7 @@ def main():
     # less
 
     heading('less')
-    # ... sourced in shell/shellinteractive
+    # ... sourced in _shell/shellinteractive
 
     # maven
 

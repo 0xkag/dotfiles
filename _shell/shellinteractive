@@ -2,8 +2,8 @@
 
 [ -n ${DOTFILES_DEBUG:-""} ] && echo "dotfiles: shellinteractive"
 
-source ~/.dotfiles/shell/shellenv
-source ~/.dotfiles/shell/shellcolors
+source ~/.dotfiles/_shell/shellenv
+source ~/.dotfiles/_shell/shellcolors
 
 # shell-specific options; SHELL is set by login(1) normally but we make sure
 # it's set to whatever shell is actually in use ($SHELL is used by tmux also
@@ -192,7 +192,7 @@ fi
 
 # site customizations
 
-site_shellinteractive=$HOME/.dotfiles/_sites/current/shell/shellinteractive
+site_shellinteractive=$HOME/.dotfiles/_sites/current/_shell/shellinteractive
 [[ -f $site_shellinteractive ]] && source "$site_shellinteractive"
 unset site_shellinteractive
 

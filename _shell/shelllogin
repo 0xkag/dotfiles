@@ -4,9 +4,9 @@
 
 case $- in
     *i*)
-        source ~/.dotfiles/shell/shellinteractive
+        source ~/.dotfiles/_shell/shellinteractive
         ;;
     *)
-        source ~/.dotfiles/shell/shellrc
+        source ~/.dotfiles/_shell/shellrc
         ;;
 esac

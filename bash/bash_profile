@@ -2,7 +2,7 @@
 
 [ -n ${DOTFILES_DEBUG:-""} ] && echo "dotfiles: bash_profile"
 
-source ~/.dotfiles/shell/shellprofile
+source ~/.dotfiles/_shell/shellprofile
 
 case $- in
     *i*) source ~/.dotfiles/bash/bash_completion

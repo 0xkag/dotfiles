@@ -126,5 +126,5 @@ source $ZSH/oh-my-zsh.sh
 
 # source my profile after oh-my-zsh init
 
-source $HOME/.dotfiles/shell/shellprofile
+source $HOME/.dotfiles/_shell/shellprofile
 

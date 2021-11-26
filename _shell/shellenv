@@ -104,7 +104,7 @@ fi
 
 # site customizations
 
-site_shellenv=$HOME/.dotfiles/_sites/current/shell/shellenv
+site_shellenv=$HOME/.dotfiles/_sites/current/_shell/shellenv
 [[ -f $site_shellenv ]] && source "$site_shellenv"
 unset site_shellenv
 
