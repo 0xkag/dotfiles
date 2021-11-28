@@ -71,6 +71,7 @@ This function should only modify configuration layer settings."
      gtags
      haskell
      helm
+     helpful
      html
      ibuffer
      imenu-list
