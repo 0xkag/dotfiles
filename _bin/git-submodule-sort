@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+
+import configparser
+import sys
+
+c = configparser.ConfigParser()
+c.read(sys.argv[1])
+
+with open(f'{sys.argv[1]}.new', 'w') as newfile:
+    for x in sorted(c.sections(), key=lambda z: c[z]['path'].split('/')[-1]):
+        n = c[x]['path'].split('/')[-1]
+        c[f'submodule "{n}"'] = c[x]
+        del c[x]
+    c.write(newfile)
+
+# TODO .gitmodules file still needs to manual fixup afterwards for indentation
