@@ -181,3 +181,6 @@
 [submodule "_lib/_todo/radare2"]
 	path = _lib/_todo/radare2
 	url = https://github.com/radareorg/radare2
+[submodule "_lib/_todo/testssl.sh"]
+	path = _lib/_todo/testssl.sh
+	url = https://github.com/drwetter/testssl.sh.git
