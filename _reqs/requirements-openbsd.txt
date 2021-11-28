@@ -2,13 +2,27 @@ bash
 bzip2
 coreutils
 curl
+desktop-file-utils
+dmidecode
+flock
+free
 git
 gmake
 gnugetopt
 gawk
+go
 gsed
 htop
+iftop
+iperf3
+mtr
+nmap
 pv
+ripgrep
+speedtest-cli
 vim
+wget
+wireguard-tools
+xz
 zsh
 
