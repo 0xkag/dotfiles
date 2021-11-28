@@ -1,186 +1,188 @@
-[submodule "_lib/oh-my-zsh"]
-	path = _lib/oh-my-zsh
-	url = git://github.com/robbyrussell/oh-my-zsh.git
-	branch = master
-[submodule "_lib/spacemacs"]
-	path = _lib/spacemacs
-	url = https://github.com/syl20bnr/spacemacs
-	branch = develop
-[submodule "_lib/fasd"]
-	path = _lib/_todo/fasd
-	url = https://github.com/clvv/fasd
-	branch = master
-[submodule "_lib/pyenv"]
-	path = _lib/pyenv
-	url = git@github.com:0xkag/pyenv.git
-	branch = revert-exec-change-2.x
-[submodule "_lib/pyenv-virtualenv"]
-	path = _lib/pyenv-virtualenv
-	url = https://github.com/pyenv/pyenv-virtualenv.git
-	branch = master
-[submodule "_lib/gollum"]
-	path = _lib/_todo/gollum
-	url = https://github.com/gollum/gollum
-	branch = master
-[submodule "_lib/ps_mem"]
-	path = _lib/_opt/ps_mem
-	url = https://github.com/pixelb/ps_mem/
-	branch = master
-[submodule "_lib/password-store"]
-	path = _lib/_opt/password-store
-	url = https://git.zx2c4.com/password-store
-	branch = master
-[submodule "_lib/python-audio-tools"]
-	path = _lib/_todo/python-audio-tools
-	url = git://github.com/tuffy/python-audio-tools.git
-	branch = master
-[submodule "_lib/git-diff-blame"]
-	path = _lib/git-diff-blame
-	url = https://github.com/dmnd/git-diff-blame
-	branch = master
-[submodule "_lib/pandoc"]
-	path = _lib/_opt/pandoc
-	url = https://github.com/jgm/pandoc
-	branch = master
-[submodule "_lib/aspiers-shell-env"]
-	path = _lib/_todo/aspiers-shell-env
-	url = https://github.com/aspiers/shell-env
-	branch = master
-[submodule "_lib/aspiers-git-config"]
-	path = _lib/_todo/aspiers-git-config
-	url = https://github.com/aspiers/git-config
-	branch = master
-[submodule "_lib/bup"]
-	path = _lib/_opt/bup
-	url = https://github.com/bup/bup
-	branch = master
-[submodule "_lib/source-code-pro"]
-	path = _lib/source-code-pro
-	url = https://github.com/adobe-fonts/source-code-pro.git
-	branch = release
-[submodule "_lib/git-hg"]
-	path = _lib/_todo/git-hg
-	url = https://github.com/cosmin/git-hg
-	branch = master
-[submodule "_lib/peda"]
-	path = _lib/peda
-	url = https://github.com/longld/peda
-	branch = master
-[submodule "_lib/vim"]
-	path = _lib/_opt/vim
-	url = https://github.com/vim/vim.git
-	branch = master
-[submodule "_lib/reveal.js"]
-	path = _lib/_todo/reveal.js
-	url = https://github.com/hakimel/reveal.js.git
-	branch = master
-[submodule "_lib/tmux"]
-	path = _lib/_opt/tmux
-	url = https://github.com/tmux/tmux.git
-	branch = master
-[submodule "_lib/tarsnap"]
-	path = _lib/_opt/tarsnap
-	url = https://github.com/Tarsnap/tarsnap.git
-	branch = master
-[submodule "_lib/shellcheck"]
-	path = _lib/_todo/shellcheck
-	url = https://github.com/koalaman/shellcheck.git
-	branch = master
-[submodule "_lib/alpine"]
+[submodule "alpine"]
 	path = _lib/_opt/alpine
 	url = git@github.com:0xkag/alpine.git
 	branch = custom-2.24.x
-[submodule "_lib/pyringe"]
-	path = _lib/_todo/pyringe
-	url = https://github.com/google/pyringe
-	branch = master
-[submodule "_lib/recordmydesktop"]
-	path = _lib/_todo/recordmydesktop
-	url = https://github.com/jamoozy/recordmydesktop
-	branch = master
-[submodule "_lib/screenkey"]
-	path = _lib/_todo/screenkey
-	url = https://gitlab.com/wavexx/screenkey.git
-	branch = master
-[submodule "_lib/compton"]
-	path = _lib/compton
-	url = https://github.com/chjj/compton.git
-	branch = master
-[submodule "_lib/xdotool"]
-	path = _lib/xdotool
-	url = https://github.com/jordansissel/xdotool.git
-	branch = master
-[submodule "_lib/fzf"]
-	path = _lib/fzf
-	url = https://github.com/junegunn/fzf.git
-	branch = master
-[submodule "_lib/emacs"]
-	path = _lib/emacs
-	url = git@github.com:0xkag/emacs.git
-	branch = emacs-27
-[submodule "_lib/flamegraph"]
-	path = _lib/_todo/flamegraph
-	url = https://github.com/brendangregg/FlameGraph.git
-	branch = master
-[submodule "_lib/ansifilter"]
+[submodule "ansifilter"]
 	path = _lib/ansifilter
 	url = https://gitlab.com/saalen/ansifilter.git
 	branch = master
-[submodule "_lib/autokey"]
+[submodule "aspiers-git-config"]
+	path = _lib/_todo/aspiers-git-config
+	url = https://github.com/aspiers/git-config
+	branch = master
+[submodule "aspiers-shell-env"]
+	path = _lib/_todo/aspiers-shell-env
+	url = https://github.com/aspiers/shell-env
+	branch = master
+[submodule "autokey"]
 	path = _lib/_opt/autokey
 	url = https://github.com/autokey/autokey
 	branch = master
-[submodule "_lib/fpart"]
-	path = _lib/_todo/fpart
-	url = https://github.com/martymac/fpart
-	branch = master
-[submodule "_lib/pcstat"]
-	path = _lib/_todo/pcstat
-	url = https://github.com/tobert/pcstat
-	branch = main
-[submodule "_lib/zappa"]
-	path = _lib/_todo/zappa
-	url = https://github.com/zappa/Zappa
-	branch = master
-[submodule "_lib/xsel"]
-	path = _lib/_todo/xsel
-	url = https://github.com/kfish/xsel
-	branch = master
-[submodule "_lib/xclip"]
-	path = _lib/xclip
-	url = https://github.com/astrand/xclip
-	branch = master
-[submodule "_lib/retdec"]
-	path = _lib/_todo/retdec
-	url = https://github.com/avast-tl/retdec.git
-	branch = master
-[submodule "_lib/lambdash"]
-	path = _lib/_todo/lambdash
-	url = https://github.com/alestic/lambdash
-	branch = master
-[submodule "_lib/mosh"]
-	path = _lib/_opt/mosh
-	url = https://github.com/mobile-shell/mosh
-	branch = master
-[submodule "_lib/git-hammer"]
-	path = _lib/_todo/git-hammer
-	url = https://github.com/asharov/git-hammer.git
-	branch = master
-[submodule "_lib/bitwise"]
+[submodule "bitwise"]
 	path = _lib/bitwise
 	url = https://github.com/mellowcandle/bitwise
 	branch = master
-[submodule "_lib/pwndbg"]
+[submodule "bup"]
+	path = _lib/_opt/bup
+	url = https://github.com/bup/bup
+	branch = master
+[submodule "compton"]
+	path = _lib/compton
+	url = https://github.com/chjj/compton.git
+	branch = master
+[submodule "emacs"]
+	path = _lib/emacs
+	url = git@github.com:0xkag/emacs.git
+	branch = emacs-27
+[submodule "fasd"]
+	path = _lib/_todo/fasd
+	url = https://github.com/clvv/fasd
+	branch = master
+[submodule "flamegraph"]
+	path = _lib/_todo/flamegraph
+	url = https://github.com/brendangregg/FlameGraph.git
+	branch = master
+[submodule "fpart"]
+	path = _lib/_todo/fpart
+	url = https://github.com/martymac/fpart
+	branch = master
+[submodule "fzf"]
+	path = _lib/fzf
+	url = https://github.com/junegunn/fzf.git
+	branch = master
+[submodule "git-diff-blame"]
+	path = _lib/git-diff-blame
+	url = https://github.com/dmnd/git-diff-blame
+	branch = master
+[submodule "git-hammer"]
+	path = _lib/_todo/git-hammer
+	url = https://github.com/asharov/git-hammer.git
+	branch = master
+[submodule "git-hg"]
+	path = _lib/_todo/git-hg
+	url = https://github.com/cosmin/git-hg
+	branch = master
+[submodule "gollum"]
+	path = _lib/_todo/gollum
+	url = https://github.com/gollum/gollum
+	branch = master
+[submodule "lambdash"]
+	path = _lib/_todo/lambdash
+	url = https://github.com/alestic/lambdash
+	branch = master
+[submodule "mosh"]
+	path = _lib/_opt/mosh
+	url = https://github.com/mobile-shell/mosh
+	branch = master
+[submodule "oh-my-zsh"]
+	path = _lib/oh-my-zsh
+	url = git://github.com/robbyrussell/oh-my-zsh.git
+	branch = master
+[submodule "pandoc"]
+	path = _lib/_opt/pandoc
+	url = https://github.com/jgm/pandoc
+	branch = master
+[submodule "password-store"]
+	path = _lib/_opt/password-store
+	url = https://git.zx2c4.com/password-store
+	branch = master
+[submodule "pcstat"]
+	path = _lib/_todo/pcstat
+	url = https://github.com/tobert/pcstat
+	branch = main
+[submodule "peda"]
+	path = _lib/peda
+	url = https://github.com/longld/peda
+	branch = master
+[submodule "ps_mem"]
+	path = _lib/_opt/ps_mem
+	url = https://github.com/pixelb/ps_mem/
+	branch = master
+[submodule "pwndbg"]
 	path = _lib/_todo/pwndbg
 	url = https://github.com/pwndbg/pwndbg
 	branch = dev
-[submodule "_lib/pycoverage.el"]
+[submodule "pycoverage.el"]
 	path = _lib/_todo/pycoverage.el
 	url = https://github.com/mattharrison/pycoverage.el
 	branch = master
-[submodule "_lib/_todo/radare2"]
+[submodule "pyenv"]
+	path = _lib/pyenv
+	url = git@github.com:0xkag/pyenv.git
+	branch = revert-exec-change-2.x
+[submodule "pyenv-virtualenv"]
+	path = _lib/pyenv-virtualenv
+	url = https://github.com/pyenv/pyenv-virtualenv.git
+	branch = master
+[submodule "pyringe"]
+	path = _lib/_todo/pyringe
+	url = https://github.com/google/pyringe
+	branch = master
+[submodule "python-audio-tools"]
+	path = _lib/_todo/python-audio-tools
+	url = git://github.com/tuffy/python-audio-tools.git
+	branch = master
+[submodule "radare2"]
 	path = _lib/_todo/radare2
 	url = https://github.com/radareorg/radare2
-[submodule "_lib/_todo/testssl.sh"]
+	branch = master
+[submodule "recordmydesktop"]
+	path = _lib/_todo/recordmydesktop
+	url = https://github.com/jamoozy/recordmydesktop
+	branch = master
+[submodule "retdec"]
+	path = _lib/_todo/retdec
+	url = https://github.com/avast-tl/retdec.git
+	branch = master
+[submodule "reveal.js"]
+	path = _lib/_todo/reveal.js
+	url = https://github.com/hakimel/reveal.js.git
+	branch = master
+[submodule "screenkey"]
+	path = _lib/_todo/screenkey
+	url = https://gitlab.com/wavexx/screenkey.git
+	branch = master
+[submodule "shellcheck"]
+	path = _lib/_todo/shellcheck
+	url = https://github.com/koalaman/shellcheck.git
+	branch = master
+[submodule "source-code-pro"]
+	path = _lib/source-code-pro
+	url = https://github.com/adobe-fonts/source-code-pro.git
+	branch = release
+[submodule "spacemacs"]
+	path = _lib/spacemacs
+	url = https://github.com/syl20bnr/spacemacs
+	branch = develop
+[submodule "tarsnap"]
+	path = _lib/_opt/tarsnap
+	url = https://github.com/Tarsnap/tarsnap.git
+	branch = master
+[submodule "testssl.sh"]
 	path = _lib/_todo/testssl.sh
 	url = https://github.com/drwetter/testssl.sh.git
+	branch = master
+[submodule "tmux"]
+	path = _lib/_opt/tmux
+	url = https://github.com/tmux/tmux.git
+	branch = master
+[submodule "vim"]
+	path = _lib/_opt/vim
+	url = https://github.com/vim/vim.git
+	branch = master
+[submodule "xclip"]
+	path = _lib/xclip
+	url = https://github.com/astrand/xclip
+	branch = master
+[submodule "xdotool"]
+	path = _lib/xdotool
+	url = https://github.com/jordansissel/xdotool.git
+	branch = master
+[submodule "xsel"]
+	path = _lib/_todo/xsel
+	url = https://github.com/kfish/xsel
+	branch = master
+[submodule "zappa"]
+	path = _lib/_todo/zappa
+	url = https://github.com/zappa/Zappa
+	branch = master
