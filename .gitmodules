@@ -161,7 +161,7 @@
 [submodule "testssl.sh"]
 	path = _lib/_todo/testssl.sh
 	url = https://github.com/drwetter/testssl.sh.git
-	branch = master
+	branch = 3.1dev
 [submodule "tmux"]
 	path = _lib/_opt/tmux
 	url = https://github.com/tmux/tmux.git
