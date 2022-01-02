@@ -11,6 +11,10 @@ function join { local IFS="$1"; shift; echo "$*"; }
 [ -z ${LOGNAME:-} ] && export LOGNAME=$(logname 2> /dev/null)
 [ -z ${LOGNAME:-} ] && export LOGNAME=$USER
 
+# tz
+
+export TZ='America/New_York'
+
 # go
 
 export GOPATH=$HOME/.go
