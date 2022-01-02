@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# https://askubuntu.com/questions/66533/how-can-i-restore-configuration-files
+
+set -e
+set -u
+set -o pipefail
+
+TMPDIR="$(mktemp -d)"
+
+cleanup () {
+    rm -rf "$TMPDIR"
+}
+
+trap cleanup EXIT
+
+cd $TMPDIR
+package=$(dpkg -S "$1" | cut -d : -f 1)
+apt-get download "$package" 1>&2
+dpkg-deb --fsys-tarfile *.deb | tar -x ."$1" 1>&2
+cat ."$1"
+
