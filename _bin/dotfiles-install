@@ -1,15 +1,17 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # vim: et sw=4 ts=4:
+
+from __future__ import print_function
 
 import os
 import subprocess
 import sys
 
 def heading(s):
-    print '\033[31m[*] %s\033[0m' % s
+    print('\033[31m[*] %s\033[0m' % s)
 
 def step(s):
-    print '\033[33m[+] %s\033[0m' % s
+    print('\033[33m[+] %s\033[0m' % s)
 
 def relink(target, linkname):
     target = os.path.expanduser(target)
@@ -62,7 +64,7 @@ def main():
     # ansifilter
 
     heading('ansifilter')
-    step('remember to run ansifilter/install')
+    step('(optional) remember to run ansifilter/install')
 
     # bash
 
@@ -73,7 +75,7 @@ def main():
     # bitwise
 
     heading('bitwise')
-    step('remember to run bitwise/install')
+    step('(optional) remember to run bitwise/install')
 
     # bup
 
@@ -87,13 +89,13 @@ def main():
 
     # compton
 
-    heading('compton')
-    step('remember to run compton/install')
+    heading('compton / picom')
+    step('(optional) remember to run compton/install or install from binary')
 
     # emacs
 
     heading('emacs')
-    step('remember to run emacs/install-* (pick one)')
+    step('remember to run emacs/install-* (pick one) or install from binary')
     step('<sometimes, emacs pdumper needs cmake and poppler installed>')
 
     # flake8
@@ -104,7 +106,7 @@ def main():
     # fzf
 
     heading('fzf')
-    step('remember to run fzf/install')
+    step('remember to run fzf/install or install from binary')
 
     # gdb
 
@@ -120,7 +122,7 @@ def main():
     # global
 
     heading('global')
-    step('remember to run global/install')
+    step('remember to run global/install or install from binary')
 
     # gnome
 
@@ -152,7 +154,7 @@ def main():
     # mosh
 
     heading('mosh')
-    step('(optional) remember to run mosh/install')
+    step('(optional) remember to run mosh/install or install from binary')
 
     # nodejs
 
@@ -163,12 +165,12 @@ def main():
     # pandoc
 
     heading('pandoc')
-    step('(optional) remember to run pandoc/install')
+    step('(optional) remember to run pandoc/install or install from binary')
 
     # poppler
 
     heading('poppler')
-    step('(optional) remember to run poppler/install')
+    step('(optional) remember to run poppler/install or install from binary')
 
     # pip
 
@@ -203,7 +205,7 @@ def main():
     heading('stack')
     mkdir('~/.stack')
     unlink('~/.stack/config.yaml')
-    step('(optional) remember to run stack/install')
+    step('(optional) remember to run stack/install or install from binary')
 
     # tarsnap
 
@@ -214,18 +216,18 @@ def main():
 
     heading('tmux')
     relink('.dotfiles/tmux/tmux.conf', '~/.tmux.conf')
-    step('(optional) remember to run tmux/install')
+    step('remember to run tmux/install or install from binary')
 
     # wmctrl
 
     heading('wmctrl')
-    step('remember to run wmctrl/install')
+    step('(optional) remember to run wmctrl/install or install from binary')
 
     # vim
 
     heading('vim')
     relink('.dotfiles/vim/vimrc', '~/.vimrc')
-    step('(optional) remember to run vim/install')
+    step('remember to run vim/install or install from binary')
 
     # x11
 
@@ -237,12 +239,12 @@ def main():
     # xclip
 
     heading('xclip')
-    step('remember to run xclip/install')
+    step('remember to run xclip/install or install from binary')
 
     # xdotool
 
     heading('xdotool')
-    step('remember to run xdotool/install')
+    step('(optional) remember to run xdotool/install or install from binary')
 
     # zsh
 
