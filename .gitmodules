@@ -106,6 +106,10 @@
 	path = _lib/_opt/ps_mem
 	url = https://github.com/pixelb/ps_mem/
 	branch = master
+[submodule "pwncat"]
+	path = _lib/_todo/pwncat
+	url = https://github.com/cytopia/pwncat.git
+	branch = master
 [submodule "pwndbg"]
 	path = _lib/_todo/pwndbg
 	url = https://github.com/pwndbg/pwndbg
