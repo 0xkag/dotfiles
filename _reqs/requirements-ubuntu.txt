@@ -31,6 +31,7 @@ bzip2
 ca-certificates
 cgdb
 chromium-browser
+connect-proxy
 coreutils
 cpio
 cryptsetup
