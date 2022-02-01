@@ -1,17 +1,23 @@
 # vim: et sw=4 ts=4:
 
 [include]
-    path = ~/.dotfiles/git/identity
+	path = ~/.dotfiles/git/identity
 
 [include]
-    path = ~/.dotfiles/git/aliases
+	path = ~/.dotfiles/git/aliases
+
+[include]
+	path = ~/.dotfiles/_sits/current/git/gitconfig
 
 [color]
-    ui = true
+	ui = true
+
+[merge]
+	conflictStyle = diff3
 
 [pull]
-    rebase = true
+	rebase = true
 
 [push]
-    followTags = true
+	followTags = true
 
