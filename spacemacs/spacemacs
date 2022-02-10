@@ -325,7 +325,7 @@ It should only modify the values of Spacemacs settings."
    ;; a non-negative integer (pixel size), or a floating-point (point size).
    ;; Point size is recommended, because it's device independent. (default 10.0)
    dotspacemacs-default-font '("Source Code Pro"
-                               :size 10.0
+                               :size 14.0
                                :weight normal
                                :width normal)
 
@@ -740,6 +740,10 @@ before packages are loaded."
   (add-hook 'git-commit-mode-hook
             (lambda ()
               (setq git-commit-fill-column 75)))
+
+  ;; ... fix https://github.com/syl20bnr/spacemacs/issues/15089#issuecomment-983837230
+
+  (setq auto-mode-alist (delete '("/git-rebase-todo$" . helm-ls-git-rebase-todo-mode) auto-mode-alist))
 
   ;; sh-mode: don't insert a here document automatically on <<
 
