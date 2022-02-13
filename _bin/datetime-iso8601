@@ -20,12 +20,20 @@ else
     GETOPT=getopt
 fi
 
-epoch=
+iso=true
+date=
 precision=
 utc=true
 
+if [[ $0 = *iso8601 ]]; then
+    iso=true
+else
+    iso=false
+fi
+
 argv=$($GETOPT \
-         -o 'e:lp:u' \
+         -o 'd:e:lp:u' \
+         -l 'date:' \
          -l 'epoch:' \
          -l 'local' \
          -l 'precision:' \
@@ -37,8 +45,8 @@ eval set -- "$argv"
 
 while true; do
     case "$1" in
-        -e|--epoch)
-            epoch=$2
+        -d|--date|-e|--epoch)
+            date=$2
             shift 2
             ;;
         -l|--local)
@@ -60,16 +68,30 @@ while true; do
     esac
 done
 
-if [[ -n $epoch ]]; then
+if [[ -n $date ]]; then
     precision=${precision:-seconds}
 else
     precision=${precision:-ns}
 fi
 
-$DATE \
-    --iso-8601=$precision \
-    $([[ -n $epoch ]] && echo "-d @$epoch") \
-    $($utc && echo '-u') | \
-        sed -e 's/+00:\{0,1\}00$/Z/g' | \
-        sed -e 's/\([+-]\)\(..\):\(..\)/\1\2\3/g'
+dateargs=()
+
+if $iso; then
+    dateargs+=("--iso-8601=$precision")
+else
+    dateargs+=("+%s")
+fi
+
+if [[ -n $date ]]; then
+    dateargs+=("-d")
+    dateargs+=("$date")
+fi
+
+if $utc; then
+    dateargs+=("-u")
+fi
+
+$DATE "${dateargs[@]}" |
+    sed -e 's/+00:\{0,1\}00$/Z/g' | \
+    sed -e 's/\([+-]\)\(..\):\(..\)/\1\2\3/g'
 
