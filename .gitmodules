@@ -186,3 +186,6 @@
 	path = _lib/_todo/zappa
 	url = https://github.com/zappa/Zappa
 	branch = master
+[submodule "_lib/_opt/i3blocks"]
+	path = _lib/_opt/i3blocks
+	url = https://github.com/vivien/i3blocks.git
