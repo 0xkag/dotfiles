@@ -108,7 +108,7 @@
 	branch = master
 [submodule "pyenv"]
 	path = _lib/pyenv
-	url = https://github.com/0xkag/pyenv.git
+	url = git@github.com:0xkag/pyenv.git
 	branch = revert-exec-change-2.x
 [submodule "pyenv-virtualenv"]
 	path = _lib/pyenv-virtualenv
