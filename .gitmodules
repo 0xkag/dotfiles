@@ -76,7 +76,7 @@
 	branch = master
 [submodule "oh-my-zsh"]
 	path = _lib/oh-my-zsh
-	url = git://github.com/robbyrussell/oh-my-zsh.git
+	url = https://github.com/robbyrussell/oh-my-zsh.git
 	branch = master
 [submodule "pandoc"]
 	path = _lib/_opt/pandoc
@@ -120,7 +120,7 @@
 	branch = master
 [submodule "python-audio-tools"]
 	path = _lib/_todo/python-audio-tools
-	url = git://github.com/tuffy/python-audio-tools.git
+	url = https://github.com/tuffy/python-audio-tools.git
 	branch = master
 [submodule "radare2"]
 	path = _lib/_todo/radare2
