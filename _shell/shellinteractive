@@ -78,7 +78,11 @@ alias up='cd ..'
 
 # ... bsd / linux compat
 
-[ ! command -v sha1sum &> /dev/null ] && alias sha1sum='sha1 -r'
+command -v gnugetopt &> /dev/null && \
+    alias getopt='/usr/local/bin/gnugetopt'
+
+command -v sha1sum &> /dev/null || \
+    alias sha1sum='sha1 -r'
 
 # ... zsh global aliases
 
