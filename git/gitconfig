@@ -1,13 +1,13 @@
-# vim: et sw=4 ts=4:
-
-[include]
-	path = ~/.dotfiles/git/identity
+# vim: noet sw=4 ts=4:
 
 [include]
 	path = ~/.dotfiles/git/aliases
 
 [include]
-	path = ~/.dotfiles/_sits/current/git/gitconfig
+	path = ~/.dotfiles/git/identity
+
+[include]
+	path = ~/.dotfiles/_sites/current/git/gitconfig
 
 [color]
 	ui = true
@@ -20,4 +20,7 @@
 
 [push]
 	followTags = true
+
+[rebase]
+	autoStash = true
 
