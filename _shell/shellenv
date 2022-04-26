@@ -73,6 +73,16 @@ manpath=(
 
 export MANPATH=$(join : ${manpath[@]})
 
+# xdg
+
+xdg_data_dirs=(
+    $HOME/.root/share
+    $HOME/.local/share
+    $XDG_DATA_DIRS
+)
+
+export XDG_DATA_DIRS=$(join : ${xdg_data_dirs[@]})
+
 # locale
 
 export LANG=en_US.UTF-8
