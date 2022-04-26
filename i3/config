@@ -142,7 +142,7 @@ bindsym XF86AudioRaiseVolume exec amixer -q -D pulse set Master 4%+
 bindsym XF86AudioLowerVolume exec amixer -q -D pulse set Master 4%-
 bindsym XF86AudioMute exec amixer -q -D pulse set Master toggle
 bindsym XF86AudioMicMute exec amixer -q set Capture toggle
-bindsym $mod+$alt+l exec i3lock
+bindsym $mod+$alt+l exec xscreensaver-command -activate
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -185,6 +185,7 @@ bindsym $mod+Print mode "state"
 
 exec --no-startup-id nm-applet
 exec --no-startup-id compton -b
+exec --no-startup-id xscreensaver -nosplash
 
 # Start i3bar to display a workspace bar (plus the system information i3blocks
 # finds out, if available)
