@@ -66,6 +66,10 @@
 	path = _lib/_todo/gollum
 	url = https://github.com/gollum/gollum
 	branch = master
+[submodule "i3blocks"]
+	path = _lib/_opt/i3blocks
+	url = https://github.com/vivien/i3blocks.git
+	branch = master
 [submodule "lambdash"]
 	path = _lib/_todo/lambdash
 	url = https://github.com/alestic/lambdash
@@ -94,6 +98,10 @@
 	path = _lib/peda
 	url = https://github.com/longld/peda
 	branch = master
+[submodule "_lib/picom"]
+	path = _lib/picom
+	url = https://github.com/yshui/picom
+	branch = stable/9
 [submodule "ps_mem"]
 	path = _lib/_opt/ps_mem
 	url = https://github.com/pixelb/ps_mem/
@@ -186,6 +194,3 @@
 	path = _lib/_todo/zappa
 	url = https://github.com/zappa/Zappa
 	branch = master
-[submodule "_lib/_opt/i3blocks"]
-	path = _lib/_opt/i3blocks
-	url = https://github.com/vivien/i3blocks.git

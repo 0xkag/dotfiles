@@ -90,7 +90,7 @@ def main():
     # compton
 
     heading('compton / picom')
-    step('(optional) remember to run compton/install or install from binary')
+    step('(optional) remember to run compton/install, picom/install, or install from binary')
 
     # emacs
 
