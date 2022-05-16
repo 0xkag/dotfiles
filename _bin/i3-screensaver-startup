@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+pgrep -f /xfce4-screensaver || \
+pgrep -f /xscreensaver || \
+xscreensaver -nosplash
+

@@ -275,10 +275,20 @@ libx11-dev
 libx11-xcb-dev
 libx264-dev
 libxau-dev
+libxcb-composite0-dev
+libxcb-damage0-dev
+libxcb-glx0-dev
+libxcb-image0-dev
+libxcb-present-dev
+libxcb-randr0-dev
+libxcb-render-util0-dev
+libxcb-sync0-dev
+libxcb-xinerama0-dev
 libxml2-dev
 libxmu-dev
 libxpm-dev
 libxslt1-dev
 linux-libc-dev
 nettle-dev
+uthash-dev
 

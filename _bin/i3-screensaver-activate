@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+command -v xflock4 &> /dev/null && \
+    exec xflock4
+
+command -v xfce4-screensaver-command &> /dev/null && \
+    exec xfce4-screensaver-command --activate
+
+command -v xscreensaver-command &> /dev/null && \
+    exec xscreensaver-command -activate
+
+echo "can't trigger screensaver" >&2
+exit 1
+
