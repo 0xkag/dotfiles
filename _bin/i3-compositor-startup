@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+pgrep -f /picom || \
+pgrep -f /compton || \
+{ command -v picom &> /dev/null && picom -b; } || \
+{ command -v compton &> /dev/null && compton -b; } || \
+exit 1
+

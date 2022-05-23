@@ -178,6 +178,10 @@
 	path = _lib/_opt/tmux
 	url = https://github.com/tmux/tmux.git
 	branch = master
+[submodule "uthash"]
+	path = _lib/_opt/uthash
+	url = https://github.com/troydhanson/uthash
+	branch = master
 [submodule "vim"]
 	path = _lib/_opt/vim
 	url = https://github.com/vim/vim.git
