@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# deal with executable differences in the connect / connect-proxy binary name
+
+if command -v connect &> /dev/null; then
+	exec connect "$@"
+else
+	exec connect-proxy "$@"
+fi
+
