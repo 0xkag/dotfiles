@@ -1,7 +1,7 @@
 [submodule "alpine"]
 	path = _lib/_opt/alpine
 	url = git@github.com:0xkag/alpine.git
-	branch = custom-2.24.x
+	branch = custom-2.26.x
 [submodule "ansifilter"]
 	path = _lib/ansifilter
 	url = https://gitlab.com/saalen/ansifilter.git
