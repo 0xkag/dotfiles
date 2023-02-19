@@ -85,7 +85,7 @@
 [submodule "pandoc"]
 	path = _lib/_opt/pandoc
 	url = https://github.com/jgm/pandoc
-	branch = master
+	branch = main
 [submodule "password-store"]
 	path = _lib/_opt/password-store
 	url = https://git.zx2c4.com/password-store
