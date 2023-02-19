@@ -197,6 +197,6 @@ fi
 # site customizations
 
 site_shellinteractive=$HOME/.dotfiles/_sites/current/_shell/shellinteractive
-[[ -f $site_shellinteractive ]] && source "$site_shellinteractive"
+[ -f $site_shellinteractive ] && source "$site_shellinteractive"
 unset site_shellinteractive
 
