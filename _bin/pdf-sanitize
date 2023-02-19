@@ -17,6 +17,14 @@ out () {
     echo "[+] $*"
 }
 
+error () {
+    out "$@"
+    exit 1
+}
+
+[ -e "$2" ] && error "$2 already exists"
+touch "$2"
+
 INPUT="$(realpath "$1")"
 OUTPUT="$(realpath "$2")"
 REGEX="${3:-}"
