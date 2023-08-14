@@ -63,6 +63,7 @@ export PKG_CONFIG_PATH=$HOME/.root/lib64/pkgconfig:$HOME/.root/lib/pkgconfig
 # manpath
 
 manpath=(
+    $HOME/.root/man
     $HOME/.root/share/man
     $HOME/.local/share/man
     $NPM_PACKAGES/share/man
@@ -78,7 +79,7 @@ export MANPATH=$(join : ${manpath[@]})
 xdg_data_dirs=(
     $HOME/.root/share
     $HOME/.local/share
-    $XDG_DATA_DIRS
+    ${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}
 )
 
 export XDG_DATA_DIRS=$(join : ${xdg_data_dirs[@]})

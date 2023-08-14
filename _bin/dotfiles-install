@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # vim: et sw=4 ts=4:
 
-from __future__ import print_function
-
 import os
 import subprocess
 import sys
@@ -37,7 +35,9 @@ def mkdir(p):
 
 def run(p):
     try:
-        subprocess.check_call(p, shell=True)
+        env = os.environ.copy()
+        env['PYTHONNOCLEANSYSPATH'] = '1'
+        subprocess.check_call(p, shell=True, env=env)
     except:
         raise
 

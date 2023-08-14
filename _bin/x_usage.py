@@ -3,8 +3,6 @@
 
 # TODO make this work on FreeBSD
 
-from __future__ import print_function
-
 import argparse
 from math import ceil
 import subprocess
