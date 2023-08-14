@@ -101,7 +101,7 @@
 [submodule "_lib/picom"]
 	path = _lib/picom
 	url = https://github.com/yshui/picom
-	branch = stable/9
+	branch = stable/10
 [submodule "ps_mem"]
 	path = _lib/_opt/ps_mem
 	url = https://github.com/pixelb/ps_mem/
@@ -173,7 +173,7 @@
 [submodule "testssl.sh"]
 	path = _lib/_todo/testssl.sh
 	url = https://github.com/drwetter/testssl.sh.git
-	branch = 3.1dev
+	branch = 3.2
 [submodule "tmux"]
 	path = _lib/_opt/tmux
 	url = https://github.com/tmux/tmux.git
