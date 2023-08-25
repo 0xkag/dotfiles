@@ -92,6 +92,11 @@ def main():
     heading('compton / picom')
     step('(optional) remember to run compton/install, picom/install, or install from binary')
 
+    # curl
+
+    heading('curl')
+    relink('.dotfiles/curl/curlrc', '~/.curlrc')
+
     # emacs
 
     heading('emacs')
