@@ -168,6 +168,8 @@ fi
 
 # awscli completion
 
+export AWS_PAGER=""
+
 if $IS_BASH; then
     # complete -C $(which aws_completer) aws
     # TODO
