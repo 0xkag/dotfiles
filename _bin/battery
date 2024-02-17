@@ -18,6 +18,15 @@ args = x_usage.parse_args()
 
 returncode, stdout, stderr = x_usage.exec_command(args, command)
 
+if returncode == 127:
+    x_usage.output(args,
+                   value=100,
+                   format_string_default='no',
+                   format_string_i3='no',
+                   inverse=True)
+
+    sys.exit(0)
+
 stdout = stdout.strip()
 
 plugged = None
