@@ -202,3 +202,7 @@
 	path = _lib/_todo/zappa
 	url = https://github.com/zappa/Zappa
 	branch = master
+[submodule "_lib/asdf"]
+	path = _lib/asdf
+	url = https://github.com/asdf-vm/asdf.git
+	branch = master

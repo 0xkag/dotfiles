@@ -166,6 +166,13 @@ if command -v wd &> /dev/null; then
     cd "$cwd"
 fi
 
+# asdf
+
+if [ -f ~/.dotfiles/_lib/asdf/asdf.sh ]; then
+    source ~/.dotfiles/_lib/asdf/asdf.sh
+    source ~/.dotfiles/_lib/asdf/completions/asdf.bash
+fi
+
 # awscli completion
 
 export AWS_PAGER=""
