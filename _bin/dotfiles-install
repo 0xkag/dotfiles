@@ -177,6 +177,12 @@ def main():
     heading('pandoc')
     step('(optional) remember to run pandoc/install or install from binary')
 
+    # poetry
+
+    heading('poetry')
+    mkdir('~/.config/pypoetry')
+    relink('~/.dotfiles/poetry/config.toml', '~/.config/pypoetry/config.toml')
+
     # poppler
 
     heading('poppler')
