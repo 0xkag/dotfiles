@@ -24,3 +24,7 @@
 [rebase]
 	autoStash = true
 
+[user]
+	name = Kyle George
+[init]
+	defaultBranch = master
