@@ -1,3 +1,7 @@
+[submodule "asdf"]
+	path = _lib/asdf
+	url = https://github.com/asdf-vm/asdf.git
+	branch = master
 [submodule "alpine"]
 	path = _lib/_opt/alpine
 	url = git@github.com:0xkag/alpine.git
@@ -25,7 +29,7 @@
 [submodule "bup"]
 	path = _lib/_opt/bup
 	url = https://github.com/bup/bup
-	branch = master
+	branch = 0.33.x
 [submodule "compton"]
 	path = _lib/compton
 	url = https://github.com/chjj/compton.git
@@ -98,7 +102,7 @@
 	path = _lib/peda
 	url = https://github.com/longld/peda
 	branch = master
-[submodule "_lib/picom"]
+[submodule "picom"]
 	path = _lib/picom
 	url = https://github.com/yshui/picom
 	branch = stable/10
@@ -201,8 +205,4 @@
 [submodule "zappa"]
 	path = _lib/_todo/zappa
 	url = https://github.com/zappa/Zappa
-	branch = master
-[submodule "_lib/asdf"]
-	path = _lib/asdf
-	url = https://github.com/asdf-vm/asdf.git
 	branch = master
