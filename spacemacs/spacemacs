@@ -42,7 +42,7 @@ This function should only modify configuration layer settings."
      asciidoc
      asm
      (auto-completion :variables
-                      auto-completion-complete-with-key-sequence nil
+                      auto-completion-complete-with-key-sequence (kbd "hl")
                       auto-completion-enable-help-tooltip t
                       auto-completion-return-key-behavior 'complete
                       auto-completion-tab-key-behavior 'cycle
@@ -83,7 +83,7 @@ This function should only modify configuration layer settings."
      javascript
      json
      latex
-     ;; lsp
+     lsp
      markdown
      ;; mu4e -- try this maybe
      multiple-cursors
@@ -99,6 +99,7 @@ This function should only modify configuration layer settings."
      ;; pass
      pdf
      (python :variables
+             python-backend 'lsp
              python-test-runner '(pytest nose))
      restclient
      rust
@@ -114,6 +115,7 @@ This function should only modify configuration layer settings."
      sql
      syntax-checking
      systemd
+     terraform
      themes-megapack
      ;; tmux
      treemacs
