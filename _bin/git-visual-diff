@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# vim: et sw=4 ts=4:
+
+set -e
+set -u
+
+root="$(git rev-parse --show-toplevel)"
+args="$@"
+preview="git diff $args --color=always -- $root/{1}"
+bindcmd="\
+e:execute("${EDITOR:-vim}" $root/{1} < /dev/tty),\
+enter:execute($preview)"
+
+git \
+  diff \
+  $@ \
+  --name-only | \
+fzf \
+  -m \
+  --ansi \
+  --preview="$preview" \
+  --preview-window='up:75%:wrap' \
+  --bind="$bindcmd"
+

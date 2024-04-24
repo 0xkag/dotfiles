@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+git log --pretty=format: --name-only | \
+sed '/^$/d' | \
+sort | \
+uniq -c | \
+sort -rn
+

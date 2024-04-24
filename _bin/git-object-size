@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# from https://stackoverflow.com/a/42544963
+
+git rev-list --objects --all | \
+  git cat-file \
+      --batch-check=$'%(objecttype)\t%(objectname)\t%(objectsize)\t%(rest)' | \
+  sed -n 's/^blob\t//p' | \
+  sort -t $'\t' -n -k 2
+
