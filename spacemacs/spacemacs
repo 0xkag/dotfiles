@@ -722,17 +722,23 @@ before packages are loaded."
   ;; ... todo keywords
 
   (setq org-todo-keywords
-        '((sequence "TODO" "DOING" "WAITING" "VERIFY" "|" "DONE" "WONTFIX")))
+        '((sequence "TODO" "TODELEGATE" "DELEGATED" "DOING" "DEFERRED" "WAITING" "VERIFY" "|" "DONE" "WONTFIX")))
 
   ;; ... todo keyword faces
 
   (setq org-todo-keyword-faces
-        '(("TODO" . (:foreground "red" :weight bold))
+        '(
+          ("TODO" . (:foreground "red" :weight bold))
+          ("TODELEGATE" . (:foreground "red" :weight bold))
+          ("DELEGATED" . (:foreground "yellow" :weight bold))
           ("DOING" . (:foreground "yellow" :weight bold))
+          ("DEFERRED" . (:foreground "blue" :weight bold))
           ("WAITING" . (:foreground "blue" :weight bold))
           ("VERIFY" . (:foreground "blue" :weight bold))
           ("DONE" . (:foreground "green" :weight bold))
-          ("WONTFIX" . (:foreground "green" :weight bold))))
+          ("WONTFIX" . (:foreground "green" :weight bold))
+         )
+  )
 
   ;; ... hook, for babel
 
@@ -808,9 +814,9 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- ;'(org-trello-current-prefix-keybinding "C-c o" nil (org-trello))
- ;'(evil-want-Y-yank-to-eol t)
- )
+ '(evil-want-Y-yank-to-eol t)
+ '(org-agenda-files
+   '("~/wc/personal/personal/learn.org" "~/wc/personal/personal/todo.org"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
