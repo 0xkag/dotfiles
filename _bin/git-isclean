@@ -11,6 +11,14 @@ echo '# git stash list'
 
 git stash list | cat
 
+echo '# git worktree list'
+
+git worktree list | cat
+
+echo '# git remote -v'
+
+git remote -v
+
 echo '# git branch'
 
 # TODO what I really want to find is branches that have no remote or
