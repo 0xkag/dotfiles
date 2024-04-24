@@ -1,4 +1,9 @@
 awscli system
+perl system
 poetry system
+pre-commit system
 python system
-
+terraform system
+terraform-docs system
+terraformer system
+tflint system
