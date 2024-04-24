@@ -1,0 +1,41 @@
+groupinstall "Development Tools"
+groupinstall "RPM Development Tools"
+groupinstall "System Tools"
+groupinstall "Xfce"
+install GConf2-devel
+install ImageMagick-devel
+install bzip2
+install bzip2-devel
+install cairo-devel
+install connect-proxy
+install giflib-devel
+install gnutls-devel
+install gpgme-devel
+install jansson-devel
+install libX11-devel
+install libXaw-devel
+install libacl-devel
+install libarchive-devel
+install libffi-devel
+install libjpeg-devel
+install libpng-devel
+install libtiff-devel
+install libtirpc-devel
+install lmdb-devel
+install lsof
+install nfs-utils
+install openssl-devel
+install pam-devel
+install perl-JSON
+install perl-Parse-Yapp
+install popt-devel
+install python3-dns
+install python3-markdown
+install readline-devel
+install rpcgen
+install sqlite-devel
+install texinfo
+install tk-devel
+install vim
+install xclip
+install zsh
