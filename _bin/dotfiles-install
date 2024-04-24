@@ -228,6 +228,9 @@ def main():
     heading('tarsnap')
     step('(optional) remember to run tarsnap/install')
 
+    heading('terraform')
+    relink('.dotfiles/terraform/terraformrc', '~/.terraformrc')
+
     # tmux
 
     heading('tmux')
