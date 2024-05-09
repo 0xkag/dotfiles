@@ -70,6 +70,7 @@ def main():
 
     heading('asdf')
     relink('.dotfiles/asdf/tool-versions', '~/.tool-versions')
+    run('asdf/install')
 
     # bash
 

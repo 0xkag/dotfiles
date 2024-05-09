@@ -1,4 +1,5 @@
-awscli system
+awscli 2.15.46
+direnv 2.34.0
 perl system
 poetry system
 pre-commit system
@@ -6,4 +7,6 @@ python system
 terraform system
 terraform-docs system
 terraformer system
+terragrunt system
 tflint system
+tfupdate system
