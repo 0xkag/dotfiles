@@ -70,7 +70,8 @@ This function should only modify configuration layer settings."
      go
      gtags
      haskell
-     helm
+     (helm :variables
+           helm-use-fuzzy 'source)
      helpful
      html
      ibuffer
@@ -115,7 +116,8 @@ This function should only modify configuration layer settings."
      sql
      syntax-checking
      systemd
-     terraform
+     (terraform :variables
+                terraform-backend 'lsp)
      themes-megapack
      ;; tmux
      treemacs
@@ -667,6 +669,10 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   (setq magit-rebase-arguments '("--keep-empty"))
 
   (setq exec-path-from-shell-check-startup-files nil)
+
+  ;; lsp
+
+  (setq lsp-terraform-server '("terraform-ls" "serve"))
 )
 
 
