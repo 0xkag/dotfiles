@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+
+from collections import OrderedDict
+import os
+import re
+import sys
+
+if len(sys.argv) < 3:
+    print('requires at least search and element arguments', file=sys.stderr)
+    sys.exit(1)
+
+search = sys.argv[1]
+
+element = sys.argv[2]
+
+try:
+    input_ = sys.argv[3]
+except:
+    input_ = os.environ['PATH']
+
+try:
+    delim = sys.argv[4]
+except:
+    delim = ':'
+
+try:
+    present_action = sys.argv[5]
+except:
+    present_action = 'append'
+
+try:
+    absent_action = sys.argv[6]
+except:
+    absent_action = 'prepend'
+
+parts = input_.split(delim)
+add = element.split(delim) if element else []
+output = []
+found = False
+
+for part in parts:
+    if not found and re.match(search, part):
+        if present_action == 'prepend':
+            output.extend(add)
+            output.append(part)
+        else:
+            output.append(part)
+            output.extend(add)
+
+        found = True
+    else:
+        output.append(part)
+
+if not found:
+    if absent_action == 'prepend':
+        output = add + output
+    else:
+        output.extend(add)
+
+output = list(OrderedDict.fromkeys(output))
+print(delim.join(output))
+
