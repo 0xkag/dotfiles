@@ -1,39 +1,90 @@
 # vim: et sw=4 ts=4 ft=sh:
 
+# helpers
+
 [ -n ${DOTFILES_DEBUG:-""} ] && echo "dotfiles: shellenv"
 
 function join { local IFS="$1"; shift; echo "$*"; }
 
-# home & user & logname
+# basic environment, part one
+
+# ... home & user & logname
 
 [ -z ${HOME:-} ] && export HOME=$(cd ~; pwd)
 [ -z ${USER:-} ] && export USER=$(whoami)
 [ -z ${LOGNAME:-} ] && export LOGNAME=$(logname 2> /dev/null)
 [ -z ${LOGNAME:-} ] && export LOGNAME=$USER
 
-# tz
+# ... locale
 
-export TZ='America/New_York'
+export LANG=en_US.UTF-8
+export LC_COLLATE=C
 
-# go
+# ... tz
+
+export TZ="America/New_York"
+
+# ... shell?
+
+export IS_BASH=false
+export IS_KSH=false
+export IS_ZSH=false
+
+if [[ -n $BASH_VERSION ]]; then
+    export IS_BASH=true
+elif [[ -n $KSH_VERSION ]]; then
+    export IS_KSH=true
+elif [[ -n $ZSH_VERSION ]]; then
+    export IS_ZSH=true
+fi
+
+# language and runtime paths / bootstrapping; any PATH changes will be
+# overridden
+
+# ... go
 
 export GOPATH=$HOME/.go
 
-# nodejs local installs (from http://stackoverflow.com/a/13021677)
+# ... nodejs local installs (from http://stackoverflow.com/a/13021677)
 
 export NPM_PACKAGES="$HOME/.npm-packages"
+
 export NODE_PATH=$(join \
                      : \
                      "$NPM_PACKAGES/_lib/node_modules" \
                      $(echo "${NODE_PATH:-}" | \
                    xargs))
 
-# pyenv
+# ... pyenv (but no path manipulation)
 
 export PYENV_ROOT=$HOME/.dotfiles/_lib/pyenv
-command -v pyenv &> /dev/null && eval "$(pyenv init -)"
 
-# path
+# basic environment, part two
+
+# ... ld
+
+ld_library_path=(
+    $HOME/.root/lib64
+    $HOME/.root/lib
+)
+
+export LD_LIBRARY_PATH=$(join : ${ld_library_path[@]})
+
+# ... manpath
+
+manpath=(
+    $HOME/.root/man
+    $HOME/.root/share/man
+    $HOME/.local/share/man
+    $NPM_PACKAGES/share/man
+    /usr/local/man
+    /usr/local/share/man
+    /usr/share/man
+)
+
+export MANPATH=$(join : ${manpath[@]})
+
+# ... path
 
 path=(
     $HOME/bin
@@ -55,26 +106,19 @@ path=(
 
 export PATH=$(join : ${path[@]})
 
-# library path
+# ... pkg_config
 
-export LD_LIBRARY_PATH=$HOME/.root/lib64:$HOME/.root/lib
-export PKG_CONFIG_PATH=$HOME/.root/lib64/pkgconfig:$HOME/.root/lib/pkgconfig
-
-# manpath
-
-manpath=(
-    $HOME/.root/man
-    $HOME/.root/share/man
-    $HOME/.local/share/man
-    $NPM_PACKAGES/share/man
-    /usr/local/man
-    /usr/local/share/man
-    /usr/share/man
+pkg_config_path=(
+    $HOME/.root/lib64/pkgconfig
+    $HOME/.root/lib/pkgconfig
+    /usr/lib64/pkgconfig
+    /usr/lib/pkgconfig
+    /usr/share/pkgconfig
 )
 
-export MANPATH=$(join : ${manpath[@]})
+export PKG_CONFIG_PATH=$(join : ${pkg_config_path[@]})
 
-# xdg
+# ... xdg
 
 xdg_data_dirs=(
     $HOME/.root/share
@@ -84,37 +128,63 @@ xdg_data_dirs=(
 
 export XDG_DATA_DIRS=$(join : ${xdg_data_dirs[@]})
 
-# locale
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 
-export LANG=en_US.UTF-8
-export LC_COLLATE=C
+# binaries / tool scafolding; these things are PATH-manipulators (which will
+# modify our carefully curated PATH above) and shell-injectors (they'll inject
+# shell configuration and aliases)
 
-# shell
-
-export IS_BASH=false
-export IS_KSH=false
-export IS_ZSH=false
-
-if [[ -n $BASH_VERSION ]]; then
-    export IS_BASH=true
-elif [[ -n $KSH_VERSION ]]; then
-    export IS_KSH=true
-elif [[ -n $ZSH_VERSION ]]; then
-    export IS_ZSH=true
-fi
-
-# terminal (used by i3-sensible-terminal)
-
-if command -v xfce4-terminal &> /dev/null; then
-    export TERMINAL=xfce4-terminal
-elif command -v gnome-terminal &> /dev/null; then
-    export TERMINAL=gnome-terminal
-fi
-
-# nix
+# ... nix
 
 if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then
     source $HOME/.nix-profile/etc/profile.d/nix.sh
+fi
+
+# ... pyenv
+
+# ...... there is a --path only argument for this, but do the full thing
+# (which installs completion also since it doesn't matter)
+command -v pyenv &> /dev/null && eval "$(pyenv init -)"
+
+command -v pyenv &> /dev/null && eval "$(pyenv virtualenv-init -)"
+
+# ... asdf (which comes last on purpose, so it's the last to prepend to PATH,
+# well, until any local site customizations do so)
+
+if [ -f ~/.dotfiles/_lib/asdf/asdf.sh ]; then
+    source ~/.dotfiles/_lib/asdf/asdf.sh
+fi
+
+asdf_direnv_bashrc="${XDG_CONFIG_HOME}/asdf-direnv/bashrc"
+
+if [ -f "${asdf_direnv_bashrc}" ]; then
+    source "${asdf_direnv_bashrc}"
+fi
+
+# tools
+
+# ... python keyring; stop annoying keyring popups
+
+export PYTHON_KEYRING_BACKEND=keyring.backends.fail.Keyring
+
+# ... terraform
+
+export TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache
+
+if [ ! -d $TF_PLUGIN_CACHE_DIR ]; then
+    mkdir -p $TF_PLUGIN_CACHE_DIR
+fi
+
+# ... warp
+
+if command -v wd &> /dev/null; then
+    cwd="$(pwd)"
+    cd ~ && wd -q add! home
+    cd ~/.dotfiles && wd -q add! dot
+    cd ~/.ssh && wd -q add! ssh
+    { cd ~/root 2> /dev/null || cd ~/.root 2> /dev/null; } && wd -q add! root
+    { cd ~/wc 2> /dev/null || cd ~/local/wc 2> /dev/null; } && wd -q add! wc
+    cd "$cwd"
 fi
 
 # site customizations

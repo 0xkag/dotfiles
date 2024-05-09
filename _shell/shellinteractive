@@ -50,6 +50,11 @@ fi
 
 export PAGER=less
 
+# less
+
+source ~/.dotfiles/less/less
+export LESS
+
 # aliases (and overrides)
 
 alias h="history"
@@ -114,6 +119,16 @@ man() {
             man "$@"
 }
 
+# asdf (completion)
+
+if [ -f ~/.dotfiles/_lib/asdf/completions/asdf.bash ]; then
+    source ~/.dotfiles/_lib/asdf/completions/asdf.bash
+fi
+
+# awscli
+
+export AWS_PAGER=""
+
 # fzf
 
 export FZF_DEFAULT_OPTS=""\
@@ -144,56 +159,7 @@ fi
 
 source ~/.dotfiles/fzf/man.fzf
 
-# less
-
-source ~/.dotfiles/less/less
-export LESS
-
-# pyenv
-
-command -v pyenv &> /dev/null && eval "$(pyenv init --path)"
-command -v pyenv &> /dev/null && eval "$(pyenv virtualenv-init -)"
-
-# warp
-
-if command -v wd &> /dev/null; then
-    cwd="$(pwd)"
-    cd ~ && wd -q add! home
-    cd ~/.dotfiles && wd -q add! dot
-    cd ~/.ssh && wd -q add! ssh
-    { cd ~/root 2> /dev/null || cd ~/.root 2> /dev/null; } && wd -q add! root
-    { cd ~/wc 2> /dev/null || cd ~/local/wc 2> /dev/null; } && wd -q add! wc
-    cd "$cwd"
-fi
-
-# asdf
-
-if [ -f ~/.dotfiles/_lib/asdf/asdf.sh ]; then
-    source ~/.dotfiles/_lib/asdf/asdf.sh
-    source ~/.dotfiles/_lib/asdf/completions/asdf.bash
-fi
-
-# awscli completion
-
-export AWS_PAGER=""
-
-if $IS_BASH; then
-    # complete -C $(which aws_completer) aws
-    # TODO
-    true
-elif $IS_ZSH; then
-    # TODO
-    # [[ $(which aws_zsh_completer.sh) =~ ".*pyenv/shims.*" ]] && {
-    #     [ -r $(pyenv which aws_zsh_completer.sh) ] && \
-    #         source $(pyenv which aws_zsh_completer.sh)
-    # } || {
-    #     [ -r $(which aws_zsh_completer.sh) ] && \
-    #         source $(which aws_zsh_completer.sh)
-    # }
-    true
-fi
-
-# kubectl completion
+# kubectl
 
 if command -v kubectl &> /dev/null; then
     if $IS_BASH; then
@@ -201,6 +167,14 @@ if command -v kubectl &> /dev/null; then
     else
         source <(kubectl completion zsh)
     fi
+fi
+
+# (x)terminal (used by i3-sensible-terminal)
+
+if command -v xfce4-terminal &> /dev/null; then
+    export TERMINAL=xfce4-terminal
+elif command -v gnome-terminal &> /dev/null; then
+    export TERMINAL=gnome-terminal
 fi
 
 # site customizations
