@@ -175,6 +175,14 @@ if [ ! -d $TF_PLUGIN_CACHE_DIR ]; then
     mkdir -p $TF_PLUGIN_CACHE_DIR
 fi
 
+# ... requests (python)
+
+if [ -f /etc/ssl/certs/ca-certificates.crt ]; then
+    export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+elif [ -f /etc/ssl/certs/ca-bundle.crt ]; then
+    export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-bundle.crt
+fi
+
 # ... warp
 
 if command -v wd &> /dev/null; then
