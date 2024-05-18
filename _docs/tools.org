@@ -2,9 +2,13 @@
   tools, others are not
 
 * isoinfo
+* jmap
 * mbuffer
+* pmap
 * pv
+* rpcinfo
 * sem
 * stdbuf
 * tc
+* wmctrl
 
