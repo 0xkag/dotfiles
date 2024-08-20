@@ -169,14 +169,6 @@ if command -v kubectl &> /dev/null; then
     fi
 fi
 
-# (x)terminal (used by i3-sensible-terminal)
-
-if command -v xfce4-terminal &> /dev/null; then
-    export TERMINAL=xfce4-terminal
-elif command -v gnome-terminal &> /dev/null; then
-    export TERMINAL=gnome-terminal
-fi
-
 # site customizations
 
 site_shellinteractive=$HOME/.dotfiles/_sites/current/_shell/shellinteractive

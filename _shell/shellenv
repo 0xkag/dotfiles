@@ -118,6 +118,14 @@ pkg_config_path=(
 
 export PKG_CONFIG_PATH=$(join : ${pkg_config_path[@]})
 
+# (x)terminal (used by i3-sensible-terminal)
+
+if command -v xfce4-terminal &> /dev/null; then
+    export TERMINAL=xfce4-terminal
+elif command -v gnome-terminal &> /dev/null; then
+    export TERMINAL=gnome-terminal
+fi
+
 # ... xdg
 
 xdg_data_dirs=(
