@@ -18,8 +18,15 @@ cd $(dirname $0)
 cd ../_lib/_opt/bup
 git reset --hard
 git clean -fdx
-./configure
-$MAKE PREFIX=$HOME/.root && \
-    $MAKE PREFIX=$HOME/.root install
+# the environment needs to be free of any other tools for bup to build clean
+export PATH=/bin:/usr/bin
+export LD_LIBRARY_PATH=
+export CFLAGS="-Wno-error"
+# BUP_PYTHON_CONFIG, PKG_CONFIG_PATH are also other build-influencing
+# variables
+./configure --prefix ~/.root
+$MAKE PREFIX=$HOME/.root
+$MAKE PREFIX=$HOME/.root install
+$MAKE test
 popd
 
