@@ -1,4 +1,4 @@
-awscli 2.15.46
+awscli 2.17.34
 direnv 2.34.0
 perl system
 poetry system
