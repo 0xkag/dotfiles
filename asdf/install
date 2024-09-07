@@ -12,5 +12,6 @@ asdf plugin add terraformer https://github.com/grimoh/asdf-terraformer.git
 asdf plugin add terragrunt https://github.com/ohmer/asdf-terragrunt.git
 asdf plugin add tflint https://github.com/skyzyx/asdf-tflint
 asdf plugin add tfupdate https://github.com/yuokada/asdf-tfupdate.git
+asdf plugin add yamllint https://github.com/ericcornelissen/asdf-yamllint
 asdf install
 
