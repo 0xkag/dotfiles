@@ -69,6 +69,7 @@ set joinspaces           " two spaces after punctuation; useful for gqap
 set formatoptions+=l     " 
 set formatoptions+=c     " 
 " set formatoptions-=t     " 
+set viminfo='100,<5000,s10,h
 
 "" --------
 "" spelling

@@ -2,6 +2,7 @@
 # vim: et sw=4 ts=4:
 
 import os
+import shlex
 import subprocess
 import sys
 
@@ -35,9 +36,11 @@ def mkdir(p):
 
 def run(p):
     try:
+        parts = shlex.split(p)
+        parts = [os.path.expanduser(part) for part in parts]
         env = os.environ.copy()
         env['PYTHONNOCLEANSYSPATH'] = '1'
-        subprocess.check_call(p, shell=True, env=env)
+        subprocess.check_call(' '.join(parts), shell=True, env=env)
     except:
         raise
 
@@ -70,7 +73,7 @@ def main():
 
     heading('asdf')
     relink('.dotfiles/asdf/tool-versions', '~/.tool-versions')
-    run('asdf/install')
+    run('~/.dotfiles/asdf/install')
 
     # bash
 
@@ -229,6 +232,14 @@ def main():
     heading('tarsnap')
     step('(optional) remember to run tarsnap/install')
 
+    # terminfo
+
+    heading('terminfo')
+    relink('.dotfiles/terminfo/xterm-24bit.src', '~/.xterm-24bit.src')
+    run('tic -x -o ~/.terminfo ~/.xterm-24bit.src')
+
+    # terraform
+
     heading('terraform')
     relink('.dotfiles/terraform/terraformrc', '~/.terraformrc')
 
@@ -246,7 +257,9 @@ def main():
     # vim
 
     heading('vim')
+    mkdir('~/.vim/colors')
     relink('.dotfiles/vim/vimrc', '~/.vimrc')
+    relink('~/.dotfiles/vim/ron.vim', '~/.vim/colors/ron.vim')
     step('remember to run vim/install or install from binary')
 
     # x11
