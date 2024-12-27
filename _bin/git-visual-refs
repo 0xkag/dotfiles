@@ -15,7 +15,7 @@ fi
 
 git \
   for-each-ref \
-  --count=30 \
+  --count=1000 \
   --sort=-committerdate \
   --format='%(refname:short)' \
   $prefix | \
