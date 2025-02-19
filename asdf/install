@@ -1,5 +1,26 @@
 #!/usr/bin/env bash
 
+set -e
+set -u
+set -x
+set -o pipefail
+
+TMPDIR=$(mktemp -d)
+
+cd $TMPDIR
+
+cleanup () {
+    rm -rf $TMPDIR
+}
+
+trap cleanup EXIT
+
+VERSION=0.16.3
+
+wget https://github.com/asdf-vm/asdf/releases/download/v${VERSION}/asdf-v${VERSION}-linux-amd64.tar.gz
+tar -xzvf asdf-v${VERSION}-linux-amd64.tar.gz
+cp -p asdf ~/.local/bin
+
 asdf plugin add awscli https://github.com/MetricMike/asdf-awscli.git
 asdf plugin add direnv https://github.com/asdf-community/asdf-direnv.git
 asdf plugin add perl https://github.com/ouest/asdf-perl.git
@@ -13,5 +34,6 @@ asdf plugin add terragrunt https://github.com/ohmer/asdf-terragrunt.git
 asdf plugin add tflint https://github.com/skyzyx/asdf-tflint
 asdf plugin add tfupdate https://github.com/yuokada/asdf-tfupdate.git
 asdf plugin add yamllint https://github.com/ericcornelissen/asdf-yamllint
+
 asdf install
 

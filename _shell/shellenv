@@ -156,12 +156,11 @@ command -v pyenv &> /dev/null && eval "$(pyenv init -)"
 
 command -v pyenv &> /dev/null && eval "$(pyenv virtualenv-init -)"
 
-# ... asdf (which comes last on purpose, so it's the last to prepend to PATH,
-# well, until any local site customizations do so)
+# ... asdf
 
-if [ -f ~/.dotfiles/_lib/asdf/asdf.sh ]; then
-    source ~/.dotfiles/_lib/asdf/asdf.sh
-fi
+export ASDF_DATA_DIR=$HOME/.asdf
+
+export PATH=${ASDF_DATA_DIR}/shims:$PATH
 
 asdf_direnv_bashrc="${XDG_CONFIG_HOME}/asdf-direnv/bashrc"
 
