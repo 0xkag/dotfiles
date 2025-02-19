@@ -187,8 +187,10 @@ fi
 
 if [ -f /etc/ssl/certs/ca-certificates.crt ]; then
     export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+    export SSL_CERT_FILE=$REQUESTS_CA_BUNDLE
 elif [ -f /etc/ssl/certs/ca-bundle.crt ]; then
     export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-bundle.crt
+    export SSL_CERT_FILE=$REQUESTS_CA_BUNDLE
 fi
 
 # ... warp
