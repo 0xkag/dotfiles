@@ -5,8 +5,14 @@ set -e
 set -u
 set -o pipefail
 
-ag --hidden --skip-vcs-ignores --ignore '.git/' \
-        --nobreak --numbers --noheading \
+ag --hidden \
+   --skip-vcs-ignores \
+   --ignore '.aider*' \
+   --ignore '.git/' \
+   --ignore '.pytest_cache/' \
+   --nobreak \
+   --numbers \
+   --noheading \
         "$@" | \
     fzf --delimiter=: \
         --preview="\
