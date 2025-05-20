@@ -206,3 +206,6 @@
 	path = _lib/_todo/zappa
 	url = https://github.com/zappa/Zappa.git
 	branch = master
+[submodule "_lib/_todo/ld-preload-open"]
+	path = _lib/_todo/ld-preload-open
+	url = https://github.com/fritzw/ld-preload-open.git
