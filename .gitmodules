@@ -209,3 +209,6 @@
 [submodule "_lib/_todo/ld-preload-open"]
 	path = _lib/_todo/ld-preload-open
 	url = https://github.com/fritzw/ld-preload-open.git
+[submodule "_lib/_todo/perf-tools"]
+	path = _lib/_todo/perf-tools
+	url = https://github.com/brendangregg/perf-tools
