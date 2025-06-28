@@ -15,7 +15,7 @@ cleanup () {
 
 trap cleanup EXIT
 
-VERSION=3.9.6
+VERSION=3.9.10
 
 wget https://archive.apache.org/dist/maven/maven-3/$VERSION/binaries/apache-maven-${VERSION}-bin.tar.gz
 tar -xzvf apache-maven-${VERSION}-bin.tar.gz

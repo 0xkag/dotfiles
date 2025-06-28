@@ -16,8 +16,8 @@ git reset --hard
 git clean -fdx
 
 if [[ "$(uname -m)" == i686 ]]; then
-	echo "WARNING: fzf builds stopped supporting i686 at 0.22.0" >&2
-	git checkout 0.22.0
+    echo "WARNING: fzf builds stopped supporting i686 at 0.22.0" >&2
+    git checkout 0.22.0
 fi
 
 ln -sf ~/.dotfiles/_lib/fzf ~/.fzf

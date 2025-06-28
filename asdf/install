@@ -15,10 +15,16 @@ cleanup () {
 
 trap cleanup EXIT
 
-VERSION=0.16.3
+if [[ $(uname -o) != "Linux" ]]; then
+    echo "Only Linux is supported" >&2
+    exit 1
+fi
+
+VERSION=0.18.0
 
 wget https://github.com/asdf-vm/asdf/releases/download/v${VERSION}/asdf-v${VERSION}-linux-amd64.tar.gz
 tar -xzvf asdf-v${VERSION}-linux-amd64.tar.gz
+mkdir -p ~/.local/bin
 cp -p asdf ~/.local/bin
 
 asdf plugin add awscli https://github.com/MetricMike/asdf-awscli.git
