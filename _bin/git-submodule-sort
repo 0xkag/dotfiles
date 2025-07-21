@@ -3,14 +3,43 @@
 import configparser
 import sys
 
-c = configparser.ConfigParser()
-c.read(sys.argv[1])
+# read existing config
+
+existing_config = configparser.ConfigParser()
+existing_config.read(sys.argv[1])
+
+# rename and sort sections into new config; write out new config
 
 with open(f'{sys.argv[1]}.new', 'w') as newfile:
-    for x in sorted(c.sections(), key=lambda z: c[z]['path'].split('/')[-1]):
-        n = c[x]['path'].split('/')[-1]
-        c[f'submodule "{n}"'] = c[x]
-        del c[x]
-    c.write(newfile)
+    new_config = configparser.ConfigParser()
 
-# TODO .gitmodules file still needs to manual fixup afterwards for indentation
+    for existing_section in (
+        sorted(
+            existing_config.sections(),
+            key=lambda z: existing_config[z]['path'].split('/')[-1]
+        )
+    ):
+        dirname = existing_config[existing_section]['path'].split('/')[-1]
+        new_section = f'submodule "{dirname}"'
+        new_config[new_section] = existing_config[existing_section]
+
+    new_config.write(newfile)
+
+# fix up formatting / whitespace
+
+with open(f'{sys.argv[1]}.new', 'r') as newfile:
+    buf = newfile.read()
+
+with open(f'{sys.argv[1]}.new', 'w') as newfile:
+    output = []
+
+    for line in buf.splitlines():
+        if line == '':
+            continue
+        if not line.startswith('['):
+            line = '\t' + line
+        output.append(line)
+
+    for line in output:
+        newfile.write(line + '\n')
+
