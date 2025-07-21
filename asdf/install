@@ -15,7 +15,7 @@ cleanup () {
 
 trap cleanup EXIT
 
-if [[ $(uname -o) != "Linux" ]]; then
+if [[ ! $(uname -o) =~ .*Linux ]]; then
     echo "Only Linux is supported" >&2
     exit 1
 fi
@@ -41,5 +41,7 @@ asdf plugin add tflint https://github.com/skyzyx/asdf-tflint
 asdf plugin add tfupdate https://github.com/yuokada/asdf-tfupdate.git
 asdf plugin add yamllint https://github.com/ericcornelissen/asdf-yamllint
 
-asdf install
+# TODO: temporarily necessary because asdf misbehaves on exit code
+# https://github.com/asdf-vm/asdf/issues/2041
+asdf install || exit 0
 
