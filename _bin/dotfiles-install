@@ -248,6 +248,8 @@ def main():
     heading('tmux')
     relink('.dotfiles/tmux/tmux.conf', '~/.tmux.conf')
     step('remember to run tmux/install or install from binary')
+    mkdir('~/.tmux/plugins')
+    relink('~/.dotfiles/_lib/tmux-tpm', '~/.tmux/plugins/tpm')
 
     # wmctrl
 

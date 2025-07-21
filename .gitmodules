@@ -1,7 +1,3 @@
-[submodule "asdf"]
-	path = _lib/asdf
-	url = https://github.com/asdf-vm/asdf.git
-	branch = master
 [submodule "alpine"]
 	path = _lib/_opt/alpine
 	url = git@github.com:0xkag/alpine.git
@@ -9,6 +5,10 @@
 [submodule "ansifilter"]
 	path = _lib/ansifilter
 	url = https://gitlab.com/saalen/ansifilter.git
+	branch = master
+[submodule "asdf"]
+	path = _lib/asdf
+	url = https://github.com/asdf-vm/asdf.git
 	branch = master
 [submodule "aspiers-git-config"]
 	path = _lib/_todo/aspiers-git-config
@@ -78,6 +78,9 @@
 	path = _lib/_todo/lambdash
 	url = https://github.com/alestic/lambdash.git
 	branch = master
+[submodule "ld-preload-open"]
+	path = _lib/_todo/ld-preload-open
+	url = https://github.com/fritzw/ld-preload-open.git
 [submodule "mosh"]
 	path = _lib/_opt/mosh
 	url = https://github.com/mobile-shell/mosh.git
@@ -102,6 +105,9 @@
 	path = _lib/peda
 	url = https://github.com/longld/peda.git
 	branch = master
+[submodule "perf-tools"]
+	path = _lib/_todo/perf-tools
+	url = https://github.com/brendangregg/perf-tools
 [submodule "picom"]
 	path = _lib/picom
 	url = https://github.com/yshui/picom.git
@@ -182,6 +188,9 @@
 	path = _lib/_opt/tmux
 	url = https://github.com/tmux/tmux.git
 	branch = master
+[submodule "tmux-tpm"]
+	path = _lib/tmux-tpm
+	url = https://github.com/tmux-plugins/tpm
 [submodule "uthash"]
 	path = _lib/_opt/uthash
 	url = https://github.com/troydhanson/uthash.git
@@ -206,9 +215,3 @@
 	path = _lib/_todo/zappa
 	url = https://github.com/zappa/Zappa.git
 	branch = master
-[submodule "_lib/_todo/ld-preload-open"]
-	path = _lib/_todo/ld-preload-open
-	url = https://github.com/fritzw/ld-preload-open.git
-[submodule "_lib/_todo/perf-tools"]
-	path = _lib/_todo/perf-tools
-	url = https://github.com/brendangregg/perf-tools
