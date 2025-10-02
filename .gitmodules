@@ -148,6 +148,9 @@
 	path = _lib/_todo/radare2
 	url = https://github.com/radareorg/radare2.git
 	branch = master
+[submodule "ranger"]
+	path = _lib/_todo/ranger
+	url = git://git.savannah.nongnu.org/ranger.git
 [submodule "recordmydesktop"]
 	path = _lib/_todo/recordmydesktop
 	url = https://github.com/jamoozy/recordmydesktop.git
