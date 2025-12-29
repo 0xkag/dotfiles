@@ -9,7 +9,7 @@
 [submodule "asdf"]
 	path = _lib/asdf
 	url = https://github.com/asdf-vm/asdf.git
-	branch = master
+	branch = v0.15.0
 [submodule "aspiers-git-config"]
 	path = _lib/_todo/aspiers-git-config
 	url = https://github.com/aspiers/git-config.git
@@ -81,6 +81,7 @@
 [submodule "ld-preload-open"]
 	path = _lib/_todo/ld-preload-open
 	url = https://github.com/fritzw/ld-preload-open.git
+	branch = master
 [submodule "mosh"]
 	path = _lib/_opt/mosh
 	url = https://github.com/mobile-shell/mosh.git
@@ -108,6 +109,7 @@
 [submodule "perf-tools"]
 	path = _lib/_todo/perf-tools
 	url = https://github.com/brendangregg/perf-tools
+	branch = master
 [submodule "picom"]
 	path = _lib/picom
 	url = https://github.com/yshui/picom.git
@@ -151,6 +153,7 @@
 [submodule "ranger"]
 	path = _lib/_todo/ranger
 	url = git://git.savannah.nongnu.org/ranger.git
+	branch = master
 [submodule "recordmydesktop"]
 	path = _lib/_todo/recordmydesktop
 	url = https://github.com/jamoozy/recordmydesktop.git
@@ -194,6 +197,7 @@
 [submodule "tmux-tpm"]
 	path = _lib/tmux-tpm
 	url = https://github.com/tmux-plugins/tpm
+	branch = master
 [submodule "uthash"]
 	path = _lib/_opt/uthash
 	url = https://github.com/troydhanson/uthash.git
