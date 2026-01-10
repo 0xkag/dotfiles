@@ -148,6 +148,18 @@ if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then
     source $HOME/.nix-profile/etc/profile.d/nix.sh
 fi
 
+# ... asdf
+
+#export ASDF_DATA_DIR=$HOME/.asdf
+#
+#export PATH=${ASDF_DATA_DIR}/shims:$PATH
+#
+#asdf_direnv_bashrc="${XDG_CONFIG_HOME}/asdf-direnv/bashrc"
+#
+#if [ -f "${asdf_direnv_bashrc}" ]; then
+#    source "${asdf_direnv_bashrc}"
+#fi
+
 # ... pyenv
 
 # ...... there is a --path only argument for this, but do the full thing
@@ -155,18 +167,6 @@ fi
 command -v pyenv &> /dev/null && eval "$(pyenv init -)"
 
 command -v pyenv &> /dev/null && eval "$(pyenv virtualenv-init -)"
-
-# ... asdf
-
-export ASDF_DATA_DIR=$HOME/.asdf
-
-export PATH=${ASDF_DATA_DIR}/shims:$PATH
-
-asdf_direnv_bashrc="${XDG_CONFIG_HOME}/asdf-direnv/bashrc"
-
-if [ -f "${asdf_direnv_bashrc}" ]; then
-    source "${asdf_direnv_bashrc}"
-fi
 
 # tools
 

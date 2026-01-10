@@ -121,9 +121,9 @@ man() {
 
 # asdf (completion)
 
-if [ -f ~/.dotfiles/_lib/asdf/completions/asdf.bash ]; then
-    source ~/.dotfiles/_lib/asdf/completions/asdf.bash
-fi
+#if [ -f ~/.dotfiles/_lib/asdf/completions/asdf.bash ]; then
+#    source ~/.dotfiles/_lib/asdf/completions/asdf.bash
+#fi
 
 # awscli
 

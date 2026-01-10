@@ -4,10 +4,11 @@ perl 5.16.3
 poetry system
 pre-commit system
 python system
+shellcheck 0.11.0
 terraform 1.7.4
 terraform-docs system
 terraformer system
 terragrunt system
 tflint system
 tfupdate system
-yamllint 1.35.1
+yamllint 1.37.1

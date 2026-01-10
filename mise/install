@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+set -o pipefail
+
+TMPDIR=$(mktemp -d)
+
+cd $TMPDIR
+
+cleanup () {
+    rm -rf $TMPDIR
+}
+
+trap cleanup EXIT
+
+if [[ ! $(uname -o) =~ .*Linux ]]; then
+    echo "Only Linux is supported" >&2
+    exit 1
+fi
+
+VERSION="2025.10.15"
+
+curl -L -O https://github.com/jdx/mise/releases/download/v${VERSION}/mise-v${VERSION}-linux-x64.tar.gz
+tar -xzvf mise-v${VERSION}-linux-x64.tar.gz
+mkdir -p ~/.local/bin
+cp -p mise/bin/mise ~/.local/bin
+rsync -a mise/man/ ~/.local/share/man/
+
+mise plugin add awscli https://github.com/MetricMike/asdf-awscli.git
+mise plugin add direnv https://github.com/asdf-community/asdf-direnv.git
+mise plugin add perl https://github.com/ouest/asdf-perl.git
+mise plugin add poetry https://github.com/asdf-community/asdf-poetry.git
+mise plugin add pre-commit https://github.com/jonathanmorley/asdf-pre-commit.git
+mise plugin add python https://github.com/danhper/asdf-python.git
+mise plugin add terraform-docs https://github.com/looztra/asdf-terraform-docs.git
+mise plugin add terraform https://github.com/Banno/asdf-hashicorp.git
+mise plugin add terraformer https://github.com/grimoh/asdf-terraformer.git
+mise plugin add terragrunt https://github.com/ohmer/asdf-terragrunt.git
+mise plugin add tflint https://github.com/skyzyx/asdf-tflint
+mise plugin add tfupdate https://github.com/yuokada/asdf-tfupdate.git
+mise plugin add yamllint https://github.com/ericcornelissen/asdf-yamllint
+
+mise install
+
