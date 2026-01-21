@@ -20,7 +20,7 @@ if [[ ! $(uname -o) =~ .*Linux ]]; then
     exit 1
 fi
 
-VERSION="2025.10.15"
+VERSION="2026.1.6"
 
 curl -L -O https://github.com/jdx/mise/releases/download/v${VERSION}/mise-v${VERSION}-linux-x64.tar.gz
 tar -xzvf mise-v${VERSION}-linux-x64.tar.gz
