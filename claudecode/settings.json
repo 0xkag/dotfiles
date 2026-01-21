@@ -1,0 +1,10 @@
+{
+  "awsAuthRefresh": "aws sts get-caller-identity",
+  "statusLine": {
+    "type": "command",
+    "command": "~/.dotfiles/claudecode/statusline"
+  },
+  "autoUpdatesChannel": "latest",
+  "mcpServers": {},
+  "model": "us.anthropic.claude-opus-4-5-20251101-v1:0"
+}
