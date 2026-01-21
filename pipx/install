@@ -1,4 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+set -o pipefail
 
 PYENV_VERSION=3.12.11 pyenv exec pip install --upgrade pip==25.3
 PYENV_VERSION=3.12.11 pyenv exec pip install --user pipx

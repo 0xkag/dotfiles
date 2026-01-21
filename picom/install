@@ -13,9 +13,9 @@ git clean -fdx
 git submodule update --init --recursive
 command -v ninja &> /dev/null || { pip3 install --user ninja; hash -r; }
 command -v meson &> /dev/null || { pip3 install --user meson; hash -r; }
-export C_INCLUDE_PATH=~/.root/include
+export C_INCLUDE_PATH=~/.local/include
 meson --buildtype=release . build
-meson configure -Dprefix=$HOME/.root build
+meson configure -Dprefix=$HOME/.local build
 ninja -C build install
 popd
 

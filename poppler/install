@@ -33,12 +33,12 @@ patch -p1 < $SRCDIR/buildfix.patch
 mkdir build
 cd build
 cmake .. \
-    -DCMAKE_INSTALL_PREFIX=$HOME/.root \
+    -DCMAKE_INSTALL_PREFIX=$HOME/.local \
     -DCMAKE_BUILD_TYPE=debugfull \
     -DENABLE_LIBOPENJPEG=unmaintained \
     -DENABLE_XPDF_HEADERS=ON
 make && make install
 cd ..
-cp cpp/poppler-private.h ~/.root/include/poppler/cpp
-cp glib/poppler-private.h ~/.root/include/poppler/glib
+cp cpp/poppler-private.h ~/.local/include/poppler/cpp
+cp glib/poppler-private.h ~/.local/include/poppler/glib
 

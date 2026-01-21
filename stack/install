@@ -20,9 +20,9 @@ trap cleanup EXIT
 wget https://www.stackage.org/stack/linux-x86_64 -O stack.tar.gz
 tar -xzf stack.tar.gz
 name="$(find . -type d -name 'stack-*' | cut -d '/' -f 2)"
-mkdir -p ~/.root/var
-mv "$name" ~/.root/var/
-ln -sf "../../.root/var/$name/stack" ~/.dotfiles/_bin/stack
+mkdir -p ~/.local/var
+mv "$name" ~/.local/var/
+ln -sf "../../.local/var/$name/stack" ~/.dotfiles/_bin/stack
 rm -f stack.tar.gz
 stack setup
 

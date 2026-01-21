@@ -10,7 +10,7 @@ cd $(dirname $0)
 cd ../_lib/xdotool
 git reset --hard
 git clean -fdx
-export PREFIX=$HOME/.root
+export PREFIX=$HOME/.local
 make clean
 make install-static
 popd

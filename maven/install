@@ -19,8 +19,8 @@ VERSION=3.9.10
 
 wget https://archive.apache.org/dist/maven/maven-3/$VERSION/binaries/apache-maven-${VERSION}-bin.tar.gz
 tar -xzvf apache-maven-${VERSION}-bin.tar.gz
-mkdir -p ~/.root/var
-rm -rf ~/.root/var/apache-maven-${VERSION}
-mv apache-maven-${VERSION} ~/.root/var/
-ln -sf ~/.root/var/apache-maven-${VERSION}/bin/mvn ~/.dotfiles/_bin/mvn
+mkdir -p ~/.local/var
+rm -rf ~/.local/var/apache-maven-${VERSION}
+mv apache-maven-${VERSION} ~/.local/var/
+ln -sf ~/.local/var/apache-maven-${VERSION}/bin/mvn ~/.dotfiles/_bin/mvn
 

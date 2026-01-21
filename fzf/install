@@ -8,7 +8,7 @@ set -o pipefail
 pushd .
 cd $(dirname $0)
 
-MANDIR=~/.root/share/man/man1
+MANDIR=~/.local/share/man/man1
 mkdir -p $MANDIR
 
 cd ../_lib/fzf

@@ -12,7 +12,7 @@ cd ../_lib/bitwise
 git reset --hard
 git clean -fdx
 ./bootstrap.sh
-./configure --prefix ~/.root
+./configure --prefix ~/.local
 make
 make install
 popd

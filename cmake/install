@@ -20,5 +20,5 @@ VERSION=3.31.8
 wget https://github.com/Kitware/CMake/releases/download/v${VERSION}/cmake-${VERSION}.tar.gz
 tar -xzvf cmake-${VERSION}.tar.gz
 cd cmake-${VERSION}
-./bootstrap --prefix=$HOME/.root && make && make install
+./bootstrap --prefix=$HOME/.local && make && make install
 

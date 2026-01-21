@@ -11,7 +11,7 @@ cd ../_lib/_opt/mosh
 git reset --hard
 git clean -fdx
 [ ! -f ./configure ] && sh autogen.sh
-./configure --prefix ~/.root
+./configure --prefix ~/.local
 make && make install
 popd
 

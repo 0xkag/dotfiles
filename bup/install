@@ -24,9 +24,9 @@ export LD_LIBRARY_PATH=
 export CFLAGS="-Wno-error"
 # BUP_PYTHON_CONFIG, PKG_CONFIG_PATH are also other build-influencing
 # variables
-./configure --prefix ~/.root
-$MAKE PREFIX=$HOME/.root
-$MAKE PREFIX=$HOME/.root install
+./configure --prefix ~/.local
+$MAKE PREFIX=$HOME/.local
+$MAKE PREFIX=$HOME/.local install
 $MAKE test
 popd
 

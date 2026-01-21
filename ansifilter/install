@@ -10,6 +10,6 @@ cd $(dirname $0)
 cd ../_lib/ansifilter
 make clean
 make
-make PREFIX=~/.root install
+make PREFIX=~/.local install
 popd
 

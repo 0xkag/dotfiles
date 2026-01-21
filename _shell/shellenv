@@ -64,6 +64,8 @@ export PYENV_ROOT=$HOME/.dotfiles/_lib/pyenv
 # ... ld
 
 ld_library_path=(
+    $HOME/.local/lib64
+    $HOME/.local/lib
     $HOME/.root/lib64
     $HOME/.root/lib
 )
@@ -73,9 +75,10 @@ export LD_LIBRARY_PATH=$(join : ${ld_library_path[@]})
 # ... manpath
 
 manpath=(
+    $HOME/.local/man
+    $HOME/.local/share/man
     $HOME/.root/man
     $HOME/.root/share/man
-    $HOME/.local/share/man
     $NPM_PACKAGES/share/man
     /usr/local/man
     /usr/local/share/man
@@ -90,9 +93,10 @@ path=(
     $HOME/bin
     $HOME/.dotfiles/_sites/current/_bin
     $HOME/.dotfiles/_bin
+    $HOME/.local/bin
+    $HOME/.local/usr/bin
     $HOME/.root/bin
     $HOME/.root/usr/bin
-    $HOME/.local/bin
     $PYENV_ROOT/bin
     $GOPATH/bin
     $NPM_PACKAGES/bin
@@ -109,6 +113,8 @@ export PATH=$(join : ${path[@]})
 # ... pkg_config
 
 pkg_config_path=(
+    $HOME/.local/lib64/pkgconfig
+    $HOME/.local/lib/pkgconfig
     $HOME/.root/lib64/pkgconfig
     $HOME/.root/lib/pkgconfig
     /usr/lib64/pkgconfig
@@ -129,8 +135,8 @@ fi
 # ... xdg
 
 xdg_data_dirs=(
-    $HOME/.root/share
     $HOME/.local/share
+    $HOME/.root/share
     ${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}
 )
 
@@ -199,8 +205,9 @@ if command -v wd &> /dev/null; then
     cd ~ && wd -q add! home
     cd ~/.dotfiles && wd -q add! dot
     cd ~/.ssh && wd -q add! ssh
-    { cd ~/root 2> /dev/null || cd ~/.root 2> /dev/null; } && wd -q add! root
-    { cd ~/wc 2> /dev/null || cd ~/local/wc 2> /dev/null; } && wd -q add! wc
+    { cd ~/.local 2> /dev/null; } && wd -q add! local
+    { cd ~/.root 2> /dev/null; } && wd -q add! root
+    { cd ~/wc 2> /dev/null; } && wd -q add! wc
     cd "$cwd"
 fi
 

@@ -9,7 +9,7 @@ cd $(dirname $0)
 cd ../_lib/_opt/alpine
 git reset --hard
 git clean -fdx
-./configure --prefix ~/.root --with-passfile=.pine-passfile
+./configure --prefix ~/.local --with-passfile=.pine-passfile
 make && make install
 popd
 

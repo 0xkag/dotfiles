@@ -25,6 +25,6 @@ cd wmctrl-1.07
 for patch in ../debian/patches/*.patch; do
     patch -p1 < $patch
 done
-./configure --prefix ~/.root
+./configure --prefix ~/.local
 make && make install
 
