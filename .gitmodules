@@ -66,6 +66,10 @@
 	path = _lib/_todo/git-hg
 	url = https://github.com/cosmin/git-hg.git
 	branch = master
+[submodule "git-sizer"]
+	path = _lib/_opt/git-sizer
+	url = https://github.com/github/git-sizer.git
+	branch = master
 [submodule "gollum"]
 	path = _lib/_todo/gollum
 	url = https://github.com/gollum/gollum.git
