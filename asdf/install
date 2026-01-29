@@ -27,6 +27,7 @@ tar -xzvf asdf-v${VERSION}-linux-amd64.tar.gz
 mkdir -p ~/.local/bin
 cp -p asdf ~/.local/bin
 
+# keep in sync with mise
 asdf plugin add awscli https://github.com/MetricMike/asdf-awscli.git
 asdf plugin add direnv https://github.com/asdf-community/asdf-direnv.git
 asdf plugin add perl https://github.com/ouest/asdf-perl.git

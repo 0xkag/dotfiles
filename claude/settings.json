@@ -10,6 +10,6 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "~/.dotfiles/claude/statusline"
+    "command": "~/.dotfiles/claude/claude-statusline"
   }
 }

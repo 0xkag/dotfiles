@@ -91,15 +91,22 @@ def main():
     heading('bup')
     step('(optional) remember to run bup/install')
 
+    # claude
+
+    heading('claude')
+    mkdir('~/.claude')
+    step('(optional) remember to run claude/install')
+    relink('.dotfiles/claude/settings.json', '~/.claude/settings.json')
+
     # cmake
 
     heading('cmake')
     step('(optional) remember to run cmake/install')
 
-    # compton
+    # compton / picom
 
     heading('compton / picom')
-    step('(optional) remember to run compton/install, picom/install, or install from binary')
+    step('(optional) remember to run compton/install (deprecated), picom/install (preferred), or install from binary')
 
     # curl
 
@@ -155,6 +162,10 @@ def main():
     heading('iftop')
     relink('.dotfiles/iftop/iftoprc', '~/.iftoprc')
 
+    # irssi
+
+    # TODO
+
     # less
 
     heading('less')
@@ -164,6 +175,11 @@ def main():
 
     heading('maven')
     step('(optional) remember to run maven/install')
+
+    # mise
+
+    heading('mise')
+    run('~/.dotfiles/mise/install')
 
     # mosh
 
@@ -181,6 +197,17 @@ def main():
     heading('pandoc')
     step('(optional) remember to run pandoc/install or install from binary')
 
+    # pip
+
+    heading('pip')
+    mkdir('~/.config/pip')
+    relink('~/.dotfiles/pip/pip.conf', '~/.config/pip/pip.conf')
+
+    # pipx
+
+    heading('pipx')
+    step('remember to run pipx/install')
+
     # poetry
 
     heading('poetry')
@@ -192,17 +219,19 @@ def main():
     heading('poppler')
     step('(optional) remember to run poppler/install or install from binary')
 
-    # pip
+    # procmail
 
-    heading('pip')
-    mkdir('~/.config/pip')
-    relink('~/.dotfiles/pip/pip.conf', '~/.config/pip/pip.conf')
+    # TODO
 
     # pyenv
 
     heading('pyenv & pyenv-virtualenv')
     relink('~/.dotfiles/_lib/pyenv-virtualenv',
            '~/.dotfiles/_lib/pyenv/plugins/pyenv-virtualenv')
+
+    # pylint
+
+    # TODO
 
     # readline
 
@@ -251,11 +280,6 @@ def main():
     mkdir('~/.tmux/plugins')
     relink('~/.dotfiles/_lib/tmux-tpm', '~/.tmux/plugins/tpm')
 
-    # wmctrl
-
-    heading('wmctrl')
-    step('(optional) remember to run wmctrl/install or install from binary')
-
     # vim
 
     heading('vim')
@@ -264,9 +288,14 @@ def main():
     relink('~/.dotfiles/vim/ron.vim', '~/.vim/colors/ron.vim')
     step('remember to run vim/install or install from binary')
 
-    # x11
+    # wmctrl
 
-    heading('x11')
+    heading('wmctrl')
+    step('(optional) remember to run wmctrl/install or install from binary')
+
+    # x11 (various)
+
+    heading('x11 (various)')
     relink('.dotfiles/_x11/Xresources', '~/.Xresources')
     relink('.dotfiles/_x11/xinitrc', '~/.xinitrc')
     #relink('.dotfiles/_x11/xscreensaver', '~/.xscreensaver')

@@ -28,6 +28,7 @@ mkdir -p ~/.local/bin
 cp -p mise/bin/mise ~/.local/bin
 rsync -a mise/man/ ~/.local/share/man/
 
+# keep in sync with asdf
 mise plugin add awscli https://github.com/MetricMike/asdf-awscli.git
 mise plugin add direnv https://github.com/asdf-community/asdf-direnv.git
 mise plugin add perl https://github.com/ouest/asdf-perl.git
