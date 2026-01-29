@@ -154,6 +154,10 @@
 	path = _lib/_todo/radare2
 	url = https://github.com/radareorg/radare2.git
 	branch = master
+[submodule "ralph-claude-code"]
+	path = _lib/_opt/ralph-claude-code
+	url = https://github.com/frankbria/ralph-claude-code.git
+	branch = master
 [submodule "ranger"]
 	path = _lib/_todo/ranger
 	url = git://git.savannah.nongnu.org/ranger.git
