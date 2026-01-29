@@ -1,10 +1,15 @@
 {
+  "autoUpdatesChannel": "latest",
   "awsAuthRefresh": "aws sts get-caller-identity",
+  "mcpServers": {},
+  "model": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+  "permissions": {
+    "allow": [
+      "Bash(ldapsearch:*)"
+    ]
+  },
   "statusLine": {
     "type": "command",
-    "command": "~/.dotfiles/claudecode/statusline"
-  },
-  "autoUpdatesChannel": "latest",
-  "mcpServers": {},
-  "model": "us.anthropic.claude-opus-4-5-20251101-v1:0"
+    "command": "~/.dotfiles/claude/statusline"
+  }
 }
