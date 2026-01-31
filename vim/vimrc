@@ -17,6 +17,7 @@ set ruler                " display position
 let &showbreak = '+++ '  " indicate wrapped lines (wrap has to be on)
 set showcmd              " 
 set showmatch            " show matching brackets/parens
+set t_BE=                "
 set wildmenu             " display completions above the cmdline
 " TODO set wildmode=longest:full,full,list "
 
@@ -57,7 +58,7 @@ set smartcase            "
 "" editing behavior
 "" ----------------
 
-" set autoindent
+set autoindent           "
 " set smartindent
 " set smarttab
 
