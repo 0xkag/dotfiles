@@ -1,7 +1,7 @@
 - Manual config of zsh instead of using oh-my-zsh
 - Better integration of vim and fzf
 - Better use of fzf
-- Fully integrate mise (now that I've disabled asdf)
+- Fully integrate mise (now that I've disabled automatic asdf in _shell)
 - Redo all my tool clipboard integration (X clipboard, Windows clipboard,
   PuTTY, vim, spacemacs, tmux ... some of these have grown better options
   since I first did this)
