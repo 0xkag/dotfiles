@@ -20,13 +20,16 @@ if [[ ! $(uname -o) =~ .*Linux ]]; then
     exit 1
 fi
 
+ARCH=$(uname -m | sed s/aarch64/arm64/g)
 VERSION="2026.1.6"
 
-curl -L -O https://github.com/jdx/mise/releases/download/v${VERSION}/mise-v${VERSION}-linux-x64.tar.gz
-tar -xzvf mise-v${VERSION}-linux-x64.tar.gz
+curl -L -O https://github.com/jdx/mise/releases/download/v${VERSION}/mise-v${VERSION}-linux-${ARCH}.tar.gz
+tar -xzvf mise-v${VERSION}-linux-${ARCH}.tar.gz
 mkdir -p ~/.local/bin
 cp -p mise/bin/mise ~/.local/bin
 rsync -a mise/man/ ~/.local/share/man/
+
+export PATH=~/.local/bin:$PATH
 
 # keep in sync with asdf
 mise plugin add awscli https://github.com/MetricMike/asdf-awscli.git

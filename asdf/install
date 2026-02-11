@@ -20,12 +20,15 @@ if [[ ! $(uname -o) =~ .*Linux ]]; then
     exit 1
 fi
 
+ARCH=$(uname -m | sed s/aarch64/arm64/g)
 VERSION=0.18.0
 
-wget https://github.com/asdf-vm/asdf/releases/download/v${VERSION}/asdf-v${VERSION}-linux-amd64.tar.gz
-tar -xzvf asdf-v${VERSION}-linux-amd64.tar.gz
+wget https://github.com/asdf-vm/asdf/releases/download/v${VERSION}/asdf-v${VERSION}-linux-${ARCH}.tar.gz
+tar -xzvf asdf-v${VERSION}-linux-${ARCH}.tar.gz
 mkdir -p ~/.local/bin
 cp -p asdf ~/.local/bin
+
+export PATH=~/.local/bin:$PATH
 
 # keep in sync with mise
 asdf plugin add awscli https://github.com/MetricMike/asdf-awscli.git
