@@ -20,8 +20,8 @@ if [[ ! $(uname -o) =~ .*Linux ]]; then
     exit 1
 fi
 
-ARCH=$(uname -m | sed s/aarch64/arm64/g)
-VERSION="2026.1.6"
+ARCH=$(uname -m | sed s/aarch64/arm64/g | sed s/x86_64/x64/g)
+VERSION="2026.3.9"
 
 curl -L -O https://github.com/jdx/mise/releases/download/v${VERSION}/mise-v${VERSION}-linux-${ARCH}.tar.gz
 tar -xzvf mise-v${VERSION}-linux-${ARCH}.tar.gz

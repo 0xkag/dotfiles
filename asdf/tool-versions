@@ -1,6 +1,6 @@
-awscli 2.29.1
-direnv 2.34.0
-perl 5.16.3
+awscli 2.34.0
+direnv 2.37.1
+perl 5.42.0
 poetry system
 pre-commit system
 python system

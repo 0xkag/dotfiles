@@ -71,9 +71,9 @@ def main():
 
     # asdf
 
-    heading('asdf')
-    relink('.dotfiles/asdf/tool-versions', '~/.tool-versions')
-    run('~/.dotfiles/asdf/install')
+    #heading('asdf')
+    #relink('.dotfiles/asdf/tool-versions', '~/.tool-versions')
+    #run('~/.dotfiles/asdf/install')
 
     # bash
 
