@@ -1,15 +1,62 @@
 {
   "autoUpdatesChannel": "latest",
-  "awsAuthRefresh": "aws sts get-caller-identity",
-  "mcpServers": {},
-  "model": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+  "awsAuthRefresh": "rm -rf ~/.aws/cli/cache/* 2>/dev/null; aws sts get-caller-identity",
   "permissions": {
+    "deny": [
+      "Bash(rm *)",
+      "Bash(rm)",
+      "Bash(sts *)",
+      "Bash(sts)"
+    ],
     "allow": [
       "Bash(ldapsearch:*)"
     ]
   },
+  "model": "us.anthropic.claude-opus-4-6-v1[1m]",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tmux new-window -d 'printf \"\\a\"; sleep 2'"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tmux new-window -d 'printf \"\\a\"; sleep 2'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tmux new-window -d 'printf \"\\a\"; sleep 2'"
+          }
+        ]
+      }
+    ]
+  },
   "statusLine": {
     "type": "command",
-    "command": "~/.dotfiles/claude/claude-statusline"
-  }
+    "command": "claude-statusline"
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "gitlab@claude-plugins-official": true
+  },
+  "effortLevel": "medium",
+  "autoUpdatesChannel": "latest",
+  "mcpServers": {}
 }
