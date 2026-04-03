@@ -1,0 +1,27 @@
+{
+    "schemes": [
+        {
+            "name": "PuTTY",
+            "black": "#000000",
+            "red": "#BB0000",
+            "green": "#00BB00",
+            "yellow": "#BBBB00",
+            "blue": "#0000BB",
+            "purple": "#BB00BB",
+            "cyan": "#00BBBB",
+            "white": "#BBBBBB",
+            "brightBlack": "#555555",
+            "brightRed": "#FF5555",
+            "brightGreen": "#55FF55",
+            "brightYellow": "#FFFF55",
+            "brightBlue": "#5555FF",
+            "brightPurple": "#FF55FF",
+            "brightCyan": "#55FFFF",
+            "brightWhite": "#FFFFFF",
+            "background": "#000000",
+            "foreground": "#BBBBBB",
+            "cursorColor": "#BBBBBB",
+            "selectionBackground": "#FFFFFF"
+        }
+    ]
+}

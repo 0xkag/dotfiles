@@ -1,3 +1,439 @@
-# Random notes on clipboard & X11 / Windows clipboard interactions
+#+TITLE: Clipboard Integration
+#+AUTHOR: Kyle George (w/ Claude Code assistance)
+#+STARTUP: showall
 
-* https://stackoverflow.com/questions/3261379/getting-html-source-or-rich-text-from-the-x-clipboard
+* Overview
+
+The dotfiles clipboard system is built around two portable scripts, =clip-in=
+and =clip-out= (in =_bin/=), which abstract platform-specific clipboard access
+behind a single interface.  Everything else -- tmux, vim, fzf, =clipcmd= --
+shells out to these scripts, so platform support is centralized in one place.
+
+tmux is configured with OSC 52 (=set-clipboard on=) and =allow-passthrough=,
+which enables clipboard propagation through the terminal itself, independent
+of =clip-in=/=clip-out=.  This is especially important for remote/SSH sessions.
+
+* X11 Selections: CLIPBOARD vs PRIMARY
+
+X11 has two independent selection buffers that are often confused:
+
+** CLIPBOARD
+
+The explicit clipboard, accessed via =Ctrl-C= / =Ctrl-V= in most GUI apps.
+This is what =clip-in=/=clip-out= target, what vim's ="+= register uses, and
+what OSC 52 sets.  It persists until something else overwrites it.
+
+** PRIMARY
+
+An implicit selection set automatically whenever you highlight text with the
+mouse.  Pasted by middle-click (button 2).  It's ephemeral -- it changes
+every time you select anything, even in a different window.
+
+PRIMARY is useful for quick copy-paste without keyboard shortcuts, but it's
+also easy to accidentally overwrite.  Most clipboard integration (=clip-in=,
+tmux copy-pipe, OSC 52) deliberately targets CLIPBOARD only, because PRIMARY
+is transient and better left to the mouse workflow.
+
+** How the two interact in practice
+
+- Select text with mouse → sets PRIMARY (paste with middle-click)
+- =Ctrl-C= or =<leader>y= in vim → sets CLIPBOARD (paste with =Ctrl-V= or =<leader>p=)
+- These are independent: setting one does not affect the other
+- vim's ="*= register is PRIMARY; ="+= register is CLIPBOARD
+
+** Wayland
+
+Wayland has a single clipboard (equivalent to X11's CLIPBOARD), accessed via
+=wl-copy=/=wl-paste=.  There is also a "primary selection" protocol but it's
+optional and not all compositors implement it.  =wl-copy --primary= /
+=wl-paste --primary= work on compositors that support it (GNOME does as of
+GNOME 41+).
+
+In practice, Wayland's clipboard behaves like X11's CLIPBOARD, and
+mouse-select-to-copy works similarly to PRIMARY where the compositor supports
+it.
+
+** Windows / WSL
+
+Windows has a single clipboard.  There is no primary selection concept.
+
+* Mouse Selection and Clipboard
+
+Mouse selection behavior depends on which layer handles the mouse event:
+
+** Terminal handles mouse (tmux mouse OFF, or no tmux)
+
+When tmux mouse mode is off (=prefix M=), or when not in tmux, the *terminal
+emulator* handles mouse events directly:
+
+| Action              | Terminal behavior                                      |
+|---------------------+-------------------------------------------------------|
+| Click-drag          | Selects text in the terminal; copies to PRIMARY (X11) |
+|                     | or Windows clipboard (PuTTY, Windows Terminal)        |
+| Shift + click-drag  | Same (forces terminal selection even if tmux mouse on)|
+| Middle-click        | Pastes from PRIMARY (X11) or clipboard (PuTTY/WSL)   |
+| Right-click         | Paste (PuTTY) or context menu (most Linux terminals)  |
+| Ctrl-Shift-C        | Copy to CLIPBOARD (Linux terminals)                   |
+| Ctrl-Shift-V        | Paste from CLIPBOARD (Linux terminals)                |
+
+Terminal selection is raw terminal text -- it doesn't know about tmux panes,
+so it can select across pane boundaries (usually not what you want).
+
+*** PuTTY-specific mouse behavior
+
+PuTTY always handles mouse selection itself (there's no passthrough to tmux
+unless tmux mouse mode is on):
+
+- Left-click drag: selects text, copies to Windows clipboard immediately
+- Double-click: selects a word
+- Triple-click: selects a line
+- Right-click: pastes from Windows clipboard
+- Middle-click: extends selection (not paste, unlike X11)
+
+To select text while tmux mouse mode is on, hold *Shift* while clicking/
+dragging -- this forces PuTTY to handle the selection instead of tmux.
+
+*** Windows Terminal mouse behavior
+
+- Left-click drag: selects text, does NOT auto-copy (must =Ctrl-Shift-C=)
+- Right-click: pastes from clipboard (default; configurable)
+- Shift + click-drag: forces terminal selection when tmux mouse is on
+
+** tmux handles mouse (mouse ON -- default)
+
+When tmux mouse mode is on (=set -g mouse on=, the default), tmux intercepts
+mouse events.  Selection is *pane-aware* -- it only selects within the current
+pane, which is usually what you want.
+
+| Action              | tmux behavior                                        |
+|---------------------+------------------------------------------------------|
+| Click-drag          | Enters copy mode, selects text within pane           |
+| Release mouse       | Copies selection to system clipboard via =clip-in=   |
+|                     | (configured by =MouseDragEnd1Pane= binding)          |
+| Middle-click        | Not handled by tmux (falls through to terminal)      |
+| Shift + click-drag  | Bypasses tmux -- terminal handles selection directly |
+
+tmux mouse selection uses the =MouseDragEnd1Pane= binding (=tmux.conf=):
+
+#+begin_example
+bind-key -T copy-mode-vi MouseDragEnd1Pane \
+  send-keys -X copy-pipe-and-cancel 'clip-in'
+#+end_example
+
+This means mouse-selected text goes through =clip-in= → system clipboard
+(and also the tmux buffer).  With OSC 52, this reaches the system clipboard
+even over SSH.
+
+** vim handles mouse
+
+Vim can handle the mouse independently of tmux when =set mouse=a= is
+configured (not currently set in the dotfiles).  Without it, vim does not
+intercept mouse events -- tmux or the terminal handles them.
+
+** Summary: which layer gets the mouse?
+
+| tmux mouse | Shift held? | Who handles selection      | Where does text go?          |
+|------------+-------------+----------------------------+------------------------------|
+| ON         | No          | tmux (pane-aware)          | System clipboard via clip-in |
+| ON         | Yes         | Terminal (raw text)        | PRIMARY (X11) or Windows CB  |
+| OFF        | --          | Terminal (raw text)        | PRIMARY (X11) or Windows CB  |
+
+*Tip*: Use tmux selection (no Shift) for most work -- it's pane-aware and goes
+to the system clipboard.  Use Shift+drag when you need to select across panes
+or when tmux's selection isn't cooperating.
+
+** Unifying mouse behavior across platforms
+
+The default mouse behavior differs across terminal emulators:
+
+| Terminal          | Select to copy?        | Paste action          |
+|-------------------+------------------------+-----------------------|
+| X11 terminals     | Yes (PRIMARY)          | Middle-click          |
+| PuTTY (default)   | Yes (Windows CB)       | Right-click           |
+| Windows Terminal  | No (must Ctrl-Shift-C) | Ctrl-Shift-V          |
+
+These can't be made identical (X11 PRIMARY vs system clipboard are
+architecturally different), but they can be made close enough for consistent
+muscle memory.
+
+*** Recommended terminal settings
+
+*PuTTY*: Window > Selection > Action of mouse buttons: change from
+"Compromise" to *"xterm (Right extends, Middle pastes)"*.  Now middle-click
+pastes (matching X11 behavior) and right-click extends the selection.
+
+*Windows Terminal*: Settings > Interaction, or in =settings.json=:
+
+#+begin_src json
+{
+    "copyOnSelect": true,
+    "pasteOnRightClick": true
+}
+#+end_src
+
+This makes Windows Terminal behave like PuTTY's default: select to copy,
+right-click to paste.
+
+*X11 terminals*: No change needed.  Select → PRIMARY + middle-click paste is
+the native behavior.
+
+*** tmux mouse mode is the real unification layer
+
+Since tmux mouse mode is on by default and tmux intercepts mouse events, the
+per-terminal differences only matter when you Shift+drag to bypass tmux.  For
+day-to-day work inside tmux, the behavior is already identical everywhere:
+
+- Click-drag in a pane → tmux selects, copies to system clipboard via =clip-in=
+- =y= in copy mode → copies to system clipboard via =clip-in=
+- =prefix p= → pastes from tmux buffer
+- =prefix P= → pastes from system clipboard
+
+* Platform Detection (clip-in / clip-out)
+
+=clip-in= reads stdin and writes to the system clipboard.  =clip-out= reads
+the system clipboard and writes to stdout.  They detect the platform in this
+priority order:
+
+| Priority | Condition                         | Copy                | Paste                          |
+|----------+-----------------------------------+---------------------+--------------------------------|
+|        1 | =$WAYLAND_DISPLAY= + =wl-copy=    | =wl-copy=           | =wl-paste --no-newline=        |
+|        2 | =$DISPLAY= + =xclip=              | =xclip -sel clip=   | =xclip -sel clip -o=           |
+|        3 | =$DISPLAY= + =xsel=               | =xsel --clip -i=    | =xsel --clip -o=               |
+|        4 | WSL (=/proc/version= ~ Microsoft) | =clip.exe=          | =powershell.exe Get-Clipboard= |
+|        5 | =$TMUX= set                       | =tmux load-buffer -w= | =tmux save-buffer=           |
+|        6 | =/dev/tty= exists                 | OSC 52 via =/dev/tty= | (not supported)              |
+|        7 | (none)                            | error to stderr     | error to stderr                |
+
+Priority 5 uses =-w= to also emit OSC 52 through tmux.  Priority 6 is the
+bare OSC 52 fallback for SSH without tmux -- copy works but paste does not
+(OSC 52 read is blocked by most terminals for security).
+
+All clipboard operations target the CLIPBOARD selection (not PRIMARY).
+
+* Scenarios
+
+** Linux Native (X11) -- e.g. gnome-terminal, xfce4-terminal
+
+=clip-in=/=clip-out= use xclip (or xsel).  Vim's ="+= register works natively
+via X11.  tmux OSC 52 also works -- the terminal receives the escape sequence
+and sets the X clipboard.  Everything is seamless.
+
+** Linux Native (Wayland) -- e.g. GNOME on Wayland
+
+=clip-in=/=clip-out= detect =$WAYLAND_DISPLAY= and use =wl-copy=/=wl-paste=.
+Vim's ="+= register may or may not work depending on build (some builds use
+xwayland).  The =clip-in= fallback covers this regardless.  OSC 52 works in
+terminals that support it (gnome-terminal, foot).
+
+** Windows via PuTTY (SSH to Linux/FreeBSD/OpenBSD)
+
+*PuTTY does not support OSC 52* (as of version 0.83).  There is no setting to
+enable it -- the feature is simply not implemented.  This means clipboard
+integration over PuTTY is limited to:
+
+- *PuTTY's own mouse selection*: select text in the PuTTY window to copy to
+  the Windows clipboard, right-click to paste.  This works but doesn't
+  integrate with tmux copy-mode or vim.
+- *tmux buffer*: =clip-in= / =clip-out= fall back to =tmux load-buffer= /
+  =tmux save-buffer=.  Data round-trips through the tmux buffer but does not
+  reach the Windows clipboard.
+- *X11 forwarding*: If you enable X forwarding in PuTTY (Connection > SSH >
+  X11 > "Enable X11 forwarding") and have an X server running on Windows
+  (e.g. VcXsrv, Xming), then =$DISPLAY= will be set and =clip-in= will use
+  xclip, which reaches the X clipboard.  This is clunky but functional.
+
+*Recommended alternative*: Use *Windows Terminal* with SSH instead of PuTTY.
+Windows Terminal fully supports OSC 52, ships with Windows 10/11, and makes
+all clipboard integration (tmux copy-mode, =clip-in=, vim) work seamlessly.
+See the "Windows via Windows Terminal" section below.
+
+** Windows via Windows Terminal (SSH to Linux/FreeBSD/OpenBSD)
+
+Windows Terminal supports OSC 52 natively.  No special configuration needed.
+
+There is no =$DISPLAY= on the remote side, so =clip-in= falls through to the
+tmux fallback: =tmux load-buffer -w= (the =-w= flag tells tmux to also emit
+OSC 52).  tmux has =set-clipboard on= and =allow-passthrough on=, so the
+OSC 52 sequence passes through tmux to Windows Terminal, which sets the
+Windows clipboard.
+
+tmux copy-mode =y= also works: =copy-pipe-and-cancel 'clip-in'= invokes
+=clip-in=, which uses =tmux load-buffer -w=, reaching the Windows clipboard.
+
+** Windows WSL
+
+=clip-in= uses =clip.exe= (built into Windows, accessible from WSL).
+=clip-out= uses =powershell.exe Get-Clipboard= (with =\r= stripping).
+No =$DISPLAY= or Wayland is needed.  Vim likely lacks =+clipboard= in a
+default WSL install, so the =clip-in=/=clip-out= fallback keybindings activate.
+
+** FreeBSD / OpenBSD with X11
+
+Same as Linux Native (X11).  Ensure =xclip= or =xsel= is installed from
+packages.  OSC 52 works if the terminal supports it.
+
+** FreeBSD / OpenBSD Console (no X11)
+
+No =$DISPLAY=, no Wayland.  If inside tmux, falls back to tmux buffer
+(priority 5).  OSC 52 from tmux may work if the console terminal supports it
+(unlikely on raw console, but works over SSH with a capable client).
+
+* Tool Integration
+
+** tmux (=tmux/tmux.conf=)
+
+Mouse mode is on by default (=set -g mouse on=).  Toggle with =prefix m= /
+=prefix M=.
+
+| Binding           | Action                                    |
+|-------------------+-------------------------------------------|
+| =y= (copy mode)  | Yank selection to system clipboard        |
+| =M-y= (copy mode)| Yank to system clipboard (with message)   |
+| mouse drag end    | Copy selection to system clipboard        |
+| =C-y= (copy mode)| Append to =~/tmux.out=                    |
+| =prefix C=        | Copy tmux buffer to system clipboard      |
+| =prefix P=        | Paste from system clipboard into tmux     |
+| =prefix p=        | Paste from tmux buffer (internal)         |
+| =prefix m=        | Turn mouse mode on                        |
+| =prefix M=        | Turn mouse mode off                       |
+
+OSC 52 (=set-clipboard on=) means tmux also sets the terminal's clipboard
+whenever the tmux buffer is updated via copy-pipe.  This is the mechanism that
+makes clipboard work over SSH without =$DISPLAY= (requires a terminal that
+supports OSC 52 -- Windows Terminal, gnome-terminal, xfce4-terminal, foot,
+kitty, alacritty; *not* PuTTY).
+
+=allow-passthrough on= lets nested programs (vim, emacs) send their own OSC 52
+sequences through tmux to the outer terminal.
+
+** vim (=vim/vimrc=)
+
+Selective clipboard -- yank and paste do NOT automatically touch the system
+clipboard.  Explicit keybindings:
+
+| Binding            | Action                                        |
+|--------------------+-----------------------------------------------|
+| =<leader>y{motion}= | Yank to system clipboard (composable)       |
+| =<leader>Y=         | Yank to end of line to system clipboard     |
+| =<leader>p=         | Paste from system clipboard (after cursor)  |
+| =<leader>P=         | Paste from system clipboard (before cursor) |
+| =<leader>C=         | Legacy alias for =<leader>y=                |
+| =<leader><space>=   | Copy current line/visual selection to clipboard |
+
+When vim is compiled with =+clipboard= (or =+unnamedplus=), these use the
+native ="+= register, which communicates directly with X11/Wayland.  When vim
+lacks clipboard support (minimal installs, SSH), they fall back to shelling
+out to =clip-in=/=clip-out=.
+
+You can also use the ="+= register directly at any time:
+- ="+ y {motion}= -- yank to clipboard
+- ="+ p= -- paste from clipboard
+- =:reg "+= -- inspect clipboard register contents
+
+*** Native OSC 52 in vim (9.1+, late 2025)
+
+Vim 9.1+ includes a built-in optional =osc52= plugin that lets vim set the
+terminal clipboard directly via OSC 52, without needing =+clipboard= or
+=clip-in=.  To enable:
+
+#+begin_src vim
+if has('patch-9.1.0') && exists('+clipmethod')
+  packadd osc52
+  set clipmethod^=osc52
+endif
+#+end_src
+
+This makes the ="+= register work natively over SSH even on minimal vim builds
+without =+clipboard=.  The plugin auto-detects terminal support via DA1 query.
+Requires a terminal that supports OSC 52 (not PuTTY).
+
+*Not currently enabled in vimrc.*  The current =clip-in=/=clip-out= fallback
+already provides the same end result over SSH: =<leader>y= calls =clip-in=,
+which calls =tmux load-buffer -w=, which emits OSC 52 through tmux.  The
+difference is ergonomic -- with the osc52 plugin, the ="+= register and the
+=has('clipboard')= branch of the keybindings would activate on systems where
+they currently don't, so ="+yiw= would just work without needing =<leader>y=.
+Revisit once most target systems have vim 9.1+.
+
+** Spacemacs (=spacemacs/spacemacs=)
+
+The =xclipboard= layer is enabled, which provides:
+
+| Binding    | Action                    |
+|------------+---------------------------|
+| =SPC x y=  | Copy region to clipboard  |
+| =SPC x p=  | Paste from clipboard      |
+
+The layer auto-detects the platform (xsel, clip.exe, etc.) independently of
+=clip-in=/=clip-out=.  In terminal mode inside tmux, OSC 52 passthrough also
+works if Emacs emits the sequence.
+
+Standard Emacs/Evil clipboard interaction also works:
+- ="+y= in evil normal/visual mode (same as vim)
+- =M-w= / =C-y= in Emacs mode use the kill ring, which the xclipboard layer
+  synchronizes with the system clipboard
+
+** zsh / oh-my-zsh (=_lib/oh-my-zsh/lib/clipboard.zsh=)
+
+oh-my-zsh provides =clipcopy= and =clippaste= functions with their own
+platform detection (similar priority to =clip-in=/=clip-out= but zsh-specific).
+These are available at the shell prompt:
+
+#+begin_src sh
+echo "hello" | clipcopy      # copy stdin
+clipcopy somefile.txt         # copy file contents
+clippaste                     # paste to stdout
+clippaste | grep pattern      # paste and filter
+#+end_src
+
+** fzf (=_shell/shellinteractive=)
+
+=ctrl-y= in fzf's file finder and history search copies the selected item to
+the system clipboard via =clip-in=.
+
+** clipcmd (=_bin/clipcmd=)
+
+Runs a command, captures output, and places it on the clipboard with a
+timestamped header:
+
+#+begin_src sh
+clipcmd ls -la    # runs ls -la, copies output to clipboard
+#+end_src
+
+Uses =clip-in=/=clip-out= internally.
+
+* Dependencies
+
+| Platform     | Required packages             |
+|--------------+-------------------------------|
+| Linux (X11)  | =xclip= or =xsel=            |
+| Linux (Wayland) | =wl-clipboard=             |
+| FreeBSD      | =xclip= or =xsel=            |
+| OpenBSD      | =xclip= or =xsel=            |
+| WSL          | (none -- =clip.exe= built in) |
+
+For OSC 52 over SSH, the *local* terminal must support it.  No packages needed
+on the remote side.
+
+* Troubleshooting
+
+- *Clipboard not working over SSH*: Verify your terminal supports OSC 52.
+  *PuTTY does not support OSC 52* (as of 0.83) -- use Windows Terminal instead.
+  Verify tmux has =set-clipboard on= (=tmux show -s set-clipboard=).
+- *Clipboard not working on Wayland*: Install =wl-clipboard= package.
+  Verify =$WAYLAND_DISPLAY= is set (=echo $WAYLAND_DISPLAY=).
+- *Vim =<leader>y= shells out instead of using register*: Check =vim --version | grep clipboard=.
+  If =-clipboard=, vim was built without clipboard support; the fallback to
+  =clip-in= is working as intended.  Install a full vim (=vim-gtk3= on Debian,
+  =vim-X11= on Fedora) for native register support.
+- *tmux =y= only copies to tmux buffer, not system*: Reload config
+  (=prefix R=).  Verify =clip-in= works standalone (=echo test | clip-in && clip-out=).
+
+* References
+
+- https://stackoverflow.com/questions/3261379/getting-html-source-or-rich-text-from-the-x-clipboard
+- OSC 52 spec: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html (Operating System Commands,
+  Ps = 52).  There is no separate RFC or formal standard -- xterm's documentation is the de facto
+  spec, and terminal authors (gnome-terminal, foot, iTerm2, Windows Terminal, tmux) all implement
+  against it.  Notable exception: PuTTY does not support OSC 52 (as of 0.83).
+- tmux clipboard: https://github.com/tmux/tmux/wiki/Clipboard

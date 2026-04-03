@@ -30,7 +30,6 @@ dotfiles todo
     clean up lib
     catch up on changes to spacemacs, RTFM
     sync the best parts of spacemacs and vim configs / behaviors
-    clipboard behavior the same between spacemacs, vim, and tmux (and less?)
     re-rationalize the keybindings
         windows
         i3

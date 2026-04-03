@@ -1,0 +1,323 @@
+#+TITLE: Terminal Color Support
+#+AUTHOR: Kyle George (w/ Claude Code assistance)
+#+STARTUP: showall
+
+* Overview
+
+The dotfiles provide 24-bit truecolor support across vim, spacemacs (Emacs),
+and tmux on all target platforms.  The key mechanism is the =COLORTERM=
+environment variable, which signals truecolor capability to applications.
+
+The color stack has three layers:
+
+1. *Outer terminal* (gnome-terminal, xfce4-terminal, PuTTY, Windows Terminal)
+   -- determines actual color capability
+2. *tmux* -- mediates between outer terminal and inner programs via =TERM=,
+   =terminal-overrides=, and =set-clipboard=
+3. *Inner programs* (vim, emacs, shell) -- check =COLORTERM= and =TERM= to
+   decide whether to emit truecolor escape sequences
+
+* Key Environment Variables
+
+| Variable     | Set by                          | Used by             | Purpose                              |
+|--------------+---------------------------------+---------------------+--------------------------------------|
+| =TERM=       | Terminal emulator or tmux       | Everything          | Terminfo lookup; capability baseline |
+| =COLORTERM=  | Terminal emulator or shell      | Vim, Emacs 28+      | Signals truecolor support            |
+| =DISPLAY=    | X11 session                     | xclip, vim +clipboard | X11 availability                  |
+
+** How COLORTERM gets set
+
+Some terminals set =COLORTERM=truecolor= natively (gnome-terminal,
+xfce4-terminal, foot, Windows Terminal).  Others don't (PuTTY, some WSL
+terminals).  The shell config (=_shell/shellinteractive=) fills the gap:
+
+#+begin_src sh
+if [ -z "${COLORTERM:-}" ]; then
+    case "$TERM" in
+        xterm-256color|tmux-256color|screen-256color|putty-256color)
+            export COLORTERM=truecolor
+            ;;
+    esac
+fi
+#+end_src
+
+This is conservative -- it only fires for known-modern terminal types and
+never for truly limited terminals (FreeBSD =cons25=, OpenBSD =vt220=).
+
+* tmux Configuration
+
+** default-terminal
+
+#+begin_src tmux
+set -s default-terminal "tmux-256color"
+#+end_src
+
+Inside tmux, =$TERM= is set to =tmux-256color=.  This tells programs they
+have at least 256-color support.
+
+** terminal-overrides
+
+#+begin_src tmux
+set -as terminal-overrides ",xterm*:Tc,tmux*:Tc,putty*:Tc,*-256color:Tc"
+#+end_src
+
+The =Tc= flag tells tmux that the *outer* terminal supports truecolor.  When
+tmux knows this, it will pass through 24-bit color escape sequences from inner
+programs (vim, emacs) to the outer terminal rather than downsampling to 256.
+
+The pattern covers:
+- =xterm*= -- gnome-terminal, xfce4-terminal, xterm, and most Linux terminals
+- =tmux*= -- nested tmux sessions
+- =putty*= -- PuTTY configured with =TERM=putty-256color=
+- =*-256color= -- catch-all for any other modern terminal
+
+** update-environment
+
+#+begin_src tmux
+set -g update-environment "COLORTERM DISPLAY ..."
+#+end_src
+
+=COLORTERM= is included so that when you re-attach an existing tmux session
+from a new terminal, tmux updates =COLORTERM= in new windows/panes to match
+the current outer terminal's value.
+
+* Vim
+
+Vim enables truecolor conditionally (=vim/vimrc=):
+
+#+begin_src vim
+if has('termguicolors') && ($COLORTERM == 'truecolor' || $COLORTERM == '24bit')
+  set termguicolors
+endif
+#+end_src
+
+When =termguicolors= is set, vim uses =guifg=/=guibg= values from the
+colorscheme instead of =ctermfg=/=ctermbg=.  The =ron= colorscheme (and most
+others) defines both, so colors degrade gracefully to 256-color if
+=COLORTERM= is not set.
+
+* Spacemacs / Emacs
+
+Emacs 28+ (which modern spacemacs uses) checks =COLORTERM= automatically and
+enables 24-bit color in terminal mode when it's set to =truecolor= or
+=24bit=.  No explicit configuration is needed in =spacemacs/spacemacs=.
+
+The =cyberpunk= theme (and other themes in the theme list) support both GUI
+and terminal color modes.
+
+* Platform-Specific Behavior
+
+** Linux Native (X11)
+
+| Variable     | Value              | Source                |
+|--------------+--------------------+-----------------------|
+| =TERM=       | =xterm-256color=   | Terminal emulator     |
+| =COLORTERM=  | =truecolor=        | Terminal emulator     |
+
+Inside tmux: =TERM=tmux-256color=, =COLORTERM= preserved.  Truecolor works
+end-to-end.
+
+** Linux Native (Wayland)
+
+Same as X11.  gnome-terminal on Wayland sets =COLORTERM=truecolor=.  foot
+also sets it.
+
+** PuTTY (SSH to Linux/FreeBSD/OpenBSD)
+
+| Variable     | Value              | Source                   |
+|--------------+--------------------+--------------------------|
+| =TERM=       | =xterm-256color=   | PuTTY config (default)   |
+| =COLORTERM=  | =truecolor=        | Shell fallback (from TERM) |
+
+PuTTY does not set =COLORTERM=, but the shell config detects =xterm-256color=
+and exports =COLORTERM=truecolor=.  Modern PuTTY (0.75+, circa 2021) supports
+truecolor output.  Older PuTTY will receive truecolor sequences but may
+render them incorrectly -- upgrade PuTTY if colors look wrong.
+
+** Windows WSL
+
+| Variable     | Value              | Source                      |
+|--------------+--------------------+-----------------------------|
+| =TERM=       | =xterm-256color=   | Windows Terminal / WSL      |
+| =COLORTERM=  | =truecolor=        | Windows Terminal (or shell)  |
+
+Windows Terminal sets =COLORTERM= natively.  Other WSL terminals benefit from
+the shell fallback.
+
+** FreeBSD (X11 terminal)
+
+| Variable     | Value              | Source                |
+|--------------+--------------------+-----------------------|
+| =TERM=       | =xterm-256color=   | Terminal emulator     |
+| =COLORTERM=  | =truecolor=        | Shell fallback        |
+
+The shell config preserves =xterm-256color= on FreeBSD when running under an
+X11 terminal (the old behavior of stripping to =xterm= is now limited to
+non-X console types).
+
+** FreeBSD (native console)
+
+| Variable     | Value     | Source                     |
+|--------------+-----------+----------------------------|
+| =TERM=       | =cons25=  | Console (stripped by shell) |
+| =COLORTERM=  | (unset)   | --                         |
+
+FreeBSD's native console doesn't support 256color or truecolor.  The shell
+strips =*-256color= suffixes for non-X terminal types.  =COLORTERM= is never
+set because =cons25= doesn't match the case statement.  Programs fall back to
+basic ANSI colors.
+
+** OpenBSD (X11 terminal)
+
+| Variable     | Value              | Source                |
+|--------------+--------------------+-----------------------|
+| =TERM=       | =xterm-256color=   | Terminal emulator     |
+| =COLORTERM=  | =truecolor=        | Shell fallback        |
+
+No special handling needed.  Works the same as Linux.
+
+** OpenBSD (native console)
+
+| Variable     | Value     | Source   |
+|--------------+-----------+----------|
+| =TERM=       | =vt220=   | Console  |
+| =COLORTERM=  | (unset)   | --       |
+
+OpenBSD's console uses =vt220= which has no 256color variant, so no stripping
+is needed and =COLORTERM= is never set.  Basic ANSI colors only.
+
+* Custom Terminfo (=terminfo/xterm-24bit.src=)
+
+The file defines =xterm-24bit= and =xterm-24bits= terminfo entries with
+explicit =setb24=/=setf24= capabilities for 24-bit color.  Two variants
+exist: one using colon separators (ITU T.416 standard), one using semicolons
+(more widely supported in practice).
+
+This file is *not* referenced by any active configuration.  Modern terminals
+and tmux use the =Tc= terminal-override flag instead, which is simpler and
+more reliable.  The file is retained for manual use on edge-case systems.
+
+To compile and install manually:
+
+#+begin_src sh
+tic -x -o ~/.terminfo ~/.dotfiles/terminfo/xterm-24bit.src
+#+end_src
+
+Then use with: =TERM=xterm-24bit emacs -nw= (or similar).  This was
+historically useful for Emacs < 28 which didn't check =COLORTERM=.
+
+* Troubleshooting
+
+** Verify truecolor is working
+
+Run this in any terminal session:
+
+#+begin_src sh
+awk 'BEGIN{for(i=0;i<256;i++) printf "\033[48;2;%d;0;0m \033[0m",i; print ""}'
+#+end_src
+
+You should see a smooth red gradient.  If it looks banded (blocky steps), the
+terminal is downsampling to 256 colors.
+
+** Check current settings
+
+#+begin_src sh
+echo "TERM=$TERM"
+echo "COLORTERM=$COLORTERM"
+tmux show -s default-terminal    # should be tmux-256color
+tmux show -s terminal-overrides  # should include Tc entries
+#+end_src
+
+In vim:
+
+#+begin_src vim
+:set termguicolors?     " should show 'termguicolors' if truecolor is active
+:highlight Normal       " check guifg/guibg are populated
+#+end_src
+
+** Colors differ between PuTTY and Windows Terminal (WSL)
+
+The 16 base ANSI colors (used by tmux status bar, shell prompts, ls output,
+etc.) are defined by the terminal emulator, not the remote system.  PuTTY uses
+classic VGA colors; Windows Terminal uses the "Campbell" scheme.  The remote
+side has no control over this.
+
+*** Which terminal am I using?
+
+If your window has tabs and a modern UI, you're on *Windows Terminal*.  If it
+has the old-style title bar and no tabs, you're on the *legacy Windows console*
+(conhost.exe).  Windows 11 defaults to Windows Terminal; Windows 10 may use
+either.
+
+The color scheme solution differs between the two.
+
+*** Windows Terminal
+
+Windows Terminal's =settings.json= is at:
+
+#+begin_example
+%LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
+#+end_example
+
+Or press *Ctrl+Shift+,* (comma) in Windows Terminal to open it directly.
+
+To make Windows Terminal match PuTTY, merge the PuTTY color scheme from
+=wsl/windows-terminal-settings.json= (in this dotfiles repo) into your
+=settings.json=.  Copy the ="schemes"= array entry, then set your profiles
+to use it:
+
+#+begin_src json
+"profiles": {
+    "defaults": {
+        "colorScheme": "PuTTY"
+    }
+}
+#+end_src
+
+Or apply to individual profiles instead of ="defaults"= if you only want it
+on specific tabs (WSL, PowerShell, etc.):
+
+#+begin_src json
+"profiles": {
+    "list": [
+        {
+            "name": "Ubuntu",
+            "colorScheme": "PuTTY"
+        }
+    ]
+}
+#+end_src
+
+This applies regardless of whether the tab is running PowerShell, cmd, or
+WSL -- Windows Terminal controls the palette for all of them.
+
+*** Legacy Windows Console (conhost.exe)
+
+The =settings.json= scheme does not apply to the legacy console.  To match
+PuTTY's colors in conhost, use Microsoft's ColorTool:
+
+#+begin_example
+colortool.exe -b putty.ini
+#+end_example
+
+See https://github.com/microsoft/terminal/tree/main/src/tools/ColorTool
+
+** Colors wrong over PuTTY
+
+1. Ensure PuTTY is version 0.75+ (truecolor support)
+2. Verify PuTTY's Connection > Data > Terminal-type is =xterm-256color=
+3. Check =echo $COLORTERM= shows =truecolor= after login
+
+** Colors wrong on FreeBSD
+
+1. If on the native console: truecolor is not supported; this is expected
+2. If in an X terminal: check =echo $TERM= -- it should be =xterm-256color=
+   (not stripped to =xterm=).  If stripped, the shell's FreeBSD TERM handling
+   may need adjustment.
+
+** Emacs/Spacemacs shows limited colors
+
+1. Verify Emacs version: =emacs --version= (need 28+ for automatic COLORTERM)
+2. Check =echo $COLORTERM= is set before launching emacs
+3. Inside emacs: =M-x display-color-cells= should show 16777216 (2^24) for
+   truecolor, 256 for 256-color mode

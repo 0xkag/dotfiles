@@ -33,9 +33,30 @@ fi
 # term
 
 if [[ "$(uname -o 2> /dev/null || uname)" == "FreeBSD" ]]; then
-    # FreeBSD colors misbehave for me when xterm-256color, for example, but
-    # not for xterm
-    export TERM=${TERM/-*/}
+    # FreeBSD's native console (cons25) doesn't support 256color/truecolor,
+    # but X11 terminal emulators (xterm, xfce4-terminal, etc.) do; only strip
+    # the suffix for non-X terminal types
+
+    case "$TERM" in
+        xterm-*|tmux-*|screen-*)
+            # X/tmux terminals: leave alone
+            ;;
+        *-256color)
+            # console: strip
+            export TERM=${TERM/-256color/}
+            ;;
+    esac
+fi
+
+# colorterm -- ensure COLORTERM is set for truecolor-capable terminals
+# that don't advertise it (e.g. PuTTY, some WSL terminals)
+
+if [ -z "${COLORTERM:-}" ]; then
+    case "$TERM" in
+        xterm-256color|tmux-256color|screen-256color|putty-256color)
+            export COLORTERM=truecolor
+            ;;
+    esac
 fi
 
 # editor

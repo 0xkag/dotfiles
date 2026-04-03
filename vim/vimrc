@@ -130,10 +130,6 @@ vnoremap . :norm.<cr>
 " nnoremap Q @q
 " vnoremap Q :norm @q<cr>
 
-" yank and copy visual selection to X clipboard
-
-" vnoremap <silent> y y :call system("clip-in", @")<cr>
-
 " highlight last inserted text (this overrides the default gV)
 
 nnoremap gV `[v`]
@@ -191,22 +187,30 @@ map <leader>h :nohlsearch<cr>
 
 noremap <leader>a =ip
 
-" ... copy visual selection to X clipboard
+" ... system clipboard (selective copy/paste)
 
-vnoremap <silent> <leader>C :w !clip-in<cr>
+if has('unnamedplus') || has('clipboard')
+  nmap <leader>y "+y
+  vmap <leader>y "+y
+  nmap <leader>Y "+y$
+  nmap <leader>p "+p
+  nmap <leader>P "+P
+else
+  vnoremap <silent> <leader>y :w !clip-in<cr>
+  nnoremap <silent> <leader>Y :.w !clip-in<cr>
+  nnoremap <silent> <leader>p :r !clip-out<cr>
+  nnoremap <silent> <leader>P :.-1r !clip-out<cr>
+endif
 
-" ... copy previously yanked/deleted text from register to clipboard
+" ... legacy clipboard aliases
 
-nnoremap <silent> <leader>C :call system("clip-in", @")<cr>
+vmap <silent> <leader>C <leader>y
+nmap <silent> <leader>C <leader>y
 
-" ... paste from X clipboard
+" ... <leader><space> alias (copy current line/selection to clipboard)
 
-noremap <silent> <leader>P :r !clip-out<cr>
-
-" ... map <leader><space> to use C mapping (copy)
-
-vmap <silent> <leader><space> <space>C
-nmap <silent> <leader><space> V<space>C<esc>
+vmap <silent> <leader><space> <leader>y
+nmap <silent> <leader><space> V<leader>y
 
 "" -----------------
 "" filetype autocmds
