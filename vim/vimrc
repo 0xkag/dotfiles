@@ -21,7 +21,11 @@ set t_BE=                "
 set wildmenu             " display completions above the cmdline
 " TODO set wildmode=longest:full,full,list "
 
-colorscheme ron          " 
+if has('termguicolors') && ($COLORTERM == 'truecolor' || $COLORTERM == '24bit')
+  set termguicolors
+endif
+
+colorscheme ron          "
 syntax enable            " 
 
 " highlight certain whitespace characters
