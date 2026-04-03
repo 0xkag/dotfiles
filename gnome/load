@@ -4,11 +4,10 @@ set -e
 set -u
 
 pushd . &> /dev/null
-cd $(dirname $0)
+cd "$(dirname "$0")"
 diff -u \
-     <(gconftool-2 --dump /apps/gnome-terminal) \
-     gnomeconfig.xml &> /dev/null || \
-    echo "gnomeconfig.xml difference!"
-gconftool-2 --load gnomeconfig.xml
+     <(dconf dump /org/gnome/terminal/) \
+     gnome-terminal.dconf &> /dev/null || \
+    echo "gnome-terminal.dconf difference!"
+dconf load /org/gnome/terminal/ < gnome-terminal.dconf
 popd &> /dev/null
-

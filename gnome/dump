@@ -3,8 +3,7 @@
 set -e
 set -u
 
-pushd .
-cd $(dirname $0)
-gconftool-2 --dump /apps/gnome-terminal > gnomeconfig.xml
-popd
-
+pushd . &> /dev/null
+cd "$(dirname "$0")"
+dconf dump /org/gnome/terminal/ > gnome-terminal.dconf
+popd &> /dev/null
