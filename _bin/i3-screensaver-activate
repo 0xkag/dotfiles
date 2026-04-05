@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 
-command -v xflock4 &> /dev/null && \
-    exec xflock4
-
-command -v xfce4-screensaver-command &> /dev/null && \
-    exec xfce4-screensaver-command --activate
+#command -v xflock4 &> /dev/null && \
+#    exec xflock4
+#
+#command -v xfce4-screensaver-command &> /dev/null && \
+#    exec xfce4-screensaver-command --lock
 
 command -v xscreensaver-command &> /dev/null && \
-    exec xscreensaver-command -activate
+    exec xscreensaver-command --lock
+
+command -v i3lock &> /dev/null && \
+    exec i3lock
 
 echo "can't trigger screensaver" >&2
 exit 1
