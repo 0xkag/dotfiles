@@ -4,6 +4,11 @@
 - Fully integrate mise (now that I've disabled automatic asdf in `_shell`)
 - Remove some `_lib` submodules in favor of just installing with mise
 - Capture standard set of pipx / mise installed things
-- Support for NFS homedir mounted on multiple architectures (amd64 and arm64);
-  this is a problem for things like ~/.local, pyenv, and mise
+- Support for NFS homedir mounted on multiple architectures (amd64 and arm64); this is a problem for things like ~/.local, pyenv, and mise
 - Overhaul vimrc for newer features
+
+- vim git commit message fill column at 75
+- tmux config import and auto-sync environment
+- Directory jumpers comparison: wd vs z vs fasd (see https://github.com/rupa/z)
+- Re-rationalize keybindings across tools (windows/i3/tmux/vim/spacemacs/readline)
+- gqap behavior in markdown mode for better paragraph formatting
