@@ -221,7 +221,7 @@
 [submodule "xdotool"]
 	path = _lib/xdotool
 	url = https://github.com/jordansissel/xdotool.git
-	branch = master
+	branch = main
 [submodule "xsel"]
 	path = _lib/_todo/xsel
 	url = https://github.com/kfish/xsel.git
