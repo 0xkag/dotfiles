@@ -168,11 +168,12 @@ fi
 
 # ... pyenv
 
-# ...... there is a --path only argument for this, but do the full thing
-# (which installs completion also since it doesn't matter)
-command -v pyenv &> /dev/null && eval "$(pyenv init -)"
-
-command -v pyenv &> /dev/null && eval "$(pyenv virtualenv-init -)"
+if command -v pyenv &> /dev/null; then
+    # ...... there is a --path only argument for this, but do the full thing
+    # (which installs completion also since it doesn't matter)
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+fi
 
 # tools
 
