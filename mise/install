@@ -21,7 +21,20 @@ if [[ ! $(uname -o) =~ .*Linux ]]; then
 fi
 
 ARCH=$(uname -m | sed s/aarch64/arm64/g | sed s/x86_64/x64/g)
-VERSION="2026.3.9"
+VERSION="2026.4.5"
+
+CURRENT=$(
+    command -v mise &> /dev/null && {
+        mise version -q -J | \
+        jq -r '.version' | \
+        cut -d ' ' -f 1;
+    } ||
+    echo "0"
+)
+
+if [[ $CURRENT == $VERSION ]]; then
+    exit 0
+fi
 
 curl -L -O https://github.com/jdx/mise/releases/download/v${VERSION}/mise-v${VERSION}-linux-${ARCH}.tar.gz
 tar -xzvf mise-v${VERSION}-linux-${ARCH}.tar.gz
@@ -30,21 +43,6 @@ cp -p mise/bin/mise ~/.local/bin
 rsync -a mise/man/ ~/.local/share/man/
 
 export PATH=~/.local/bin:$PATH
-
-# keep in sync with asdf
-mise plugin add awscli https://github.com/MetricMike/asdf-awscli.git
-mise plugin add direnv https://github.com/asdf-community/asdf-direnv.git
-mise plugin add perl https://github.com/ouest/asdf-perl.git
-mise plugin add poetry https://github.com/asdf-community/asdf-poetry.git
-mise plugin add pre-commit https://github.com/jonathanmorley/asdf-pre-commit.git
-mise plugin add python https://github.com/danhper/asdf-python.git
-mise plugin add terraform-docs https://github.com/looztra/asdf-terraform-docs.git
-mise plugin add terraform https://github.com/Banno/asdf-hashicorp.git
-mise plugin add terraformer https://github.com/grimoh/asdf-terraformer.git
-mise plugin add terragrunt https://github.com/ohmer/asdf-terragrunt.git
-mise plugin add tflint https://github.com/skyzyx/asdf-tflint
-mise plugin add tfupdate https://github.com/yuokada/asdf-tfupdate.git
-mise plugin add yamllint https://github.com/ericcornelissen/asdf-yamllint
 
 mise install
 

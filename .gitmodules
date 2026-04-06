@@ -6,10 +6,6 @@
 	path = _lib/ansifilter
 	url = https://gitlab.com/saalen/ansifilter.git
 	branch = master
-[submodule "asdf"]
-	path = _lib/asdf
-	url = https://github.com/asdf-vm/asdf.git
-	branch = master
 [submodule "aspiers-git-config"]
 	path = _lib/_todo/aspiers-git-config
 	url = https://github.com/aspiers/git-config.git
