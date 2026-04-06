@@ -2,6 +2,7 @@
 # vim: et sw=4 ts=4:
 
 import os
+from pathlib import Path
 import shlex
 import subprocess
 import sys
@@ -68,12 +69,6 @@ def main():
 
     heading('ansifilter')
     step('(optional) remember to run ansifilter/install')
-
-    # asdf
-
-    #heading('asdf')
-    #relink('.dotfiles/asdf/tool-versions', '~/.tool-versions')
-    #run('~/.dotfiles/asdf/install')
 
     # bash
 
@@ -179,7 +174,11 @@ def main():
     # mise
 
     heading('mise')
+    mkdir('~/.config/mise')
+    relink('~/.dotfiles/mise/config.toml', '~/.config/mise/config.toml')
+    relink('~/.dotfiles/mise/mise.lock', '~/.config/mise/mise.lock')
     run('~/.dotfiles/mise/install')
+    # TODO mise trust
 
     # mosh
 

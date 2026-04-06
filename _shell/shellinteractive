@@ -140,11 +140,15 @@ man() {
             man "$@"
 }
 
-# asdf (completion)
+# mise
 
-#if [ -f ~/.dotfiles/_lib/asdf/completions/asdf.bash ]; then
-#    source ~/.dotfiles/_lib/asdf/completions/asdf.bash
-#fi
+if command -v mise &> /dev/null; then
+    if $IS_BASH; then
+        eval "$(mise activate bash)" 2> /dev/null || true
+    elif $IS_ZSH; then
+        eval "$(mise activate zsh)" 2> /dev/null || true
+    fi
+fi
 
 # awscli
 
