@@ -2,7 +2,6 @@
 # vim: et sw=4 ts=4:
 
 import os
-from pathlib import Path
 import shlex
 import subprocess
 import sys
@@ -59,6 +58,15 @@ def main():
     mkdir('~/.fonts/adobe-fonts')
     relink('~/.dotfiles/_lib/source-code-pro', '~/.fonts/adobe-fonts/source-code-pro')
     os.system('fc-cache -f -v ~/.fonts/adobe-fonts/source-code-pro > /dev/null 2>&1')
+
+    # mise
+
+    heading('mise')
+    mkdir('~/.config/mise')
+    relink('~/.dotfiles/mise/config.toml', '~/.config/mise/config.toml')
+    relink('~/.dotfiles/mise/mise.lock', '~/.config/mise/mise.lock')
+    run('~/.dotfiles/mise/install')
+    run('mise trust ~/.config/mise/config.toml')
 
     # alpine
 
@@ -170,15 +178,6 @@ def main():
 
     heading('maven')
     step('(optional) remember to run maven/install')
-
-    # mise
-
-    heading('mise')
-    mkdir('~/.config/mise')
-    relink('~/.dotfiles/mise/config.toml', '~/.config/mise/config.toml')
-    relink('~/.dotfiles/mise/mise.lock', '~/.config/mise/mise.lock')
-    run('~/.dotfiles/mise/install')
-    # TODO mise trust
 
     # mosh
 
