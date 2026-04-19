@@ -15,6 +15,7 @@ return {
       { "<leader>f", group = "files" },
       { "<leader>fe", group = "config" },
       { "<leader>g", group = "git" },
+      { "<leader>j", group = "jump" },
       { "<leader>o", group = "open" },
       { "<leader>p", group = "project" },
       { "<leader>q", group = "quit/session" },

@@ -16,6 +16,7 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - `2e74f1b` `Add Spacemacs-style Neovim config`
   - `c004ceb` `Improve Neovim Python env and dependency checks`
   - `5fc01c5` `Tighten Neovim keybindings and tool setup`
+  - `fdef8bc` `Add Neovim migration status file`
 
 ## Completed
 
@@ -33,14 +34,20 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 - HTTP file support
 - Dependency auditing with `:NvimDeps`
 - Non-Python language tools installed and visible to Neovim
+- Automatic formatting on save removed; formatting is manual-only via `SPC c f`
+- Evil-feel pass completed:
+  - jump plugin
+  - surround-style bindings
+  - visual-selection search
+  - tighter special-buffer close behavior
+
+## Guardrails
+
+- Do not enable automatic formatting on save for Python or other languages
+- Keep formatting as an explicit action through `SPC c f` or `:ConformInfo`
 
 ## Missing Or Partial
 
-- Exact Evil add-on feel is still partial:
-  - no dedicated jump plugin yet
-  - no closer `evil-surround` muscle-memory layer
-  - no visual-selection search helper
-  - special/plugin buffers can still be tighter and more Evil-like
 - Projectile-style project switching is still partial:
   - no recent-project switcher
   - no explicit project add/remove commands
@@ -54,11 +61,6 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 
 ## Next Milestones
 
-- Milestone 1: tighten Evil feel
-  - add jump plugin
-  - add surround-style bindings
-  - add visual-selection search
-  - tighten special-buffer keybindings
 - Milestone 2: add projectile-style project switching
   - project switcher
   - recent projects
