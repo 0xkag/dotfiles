@@ -255,6 +255,9 @@ return {
         taplo = {},
         terraformls = {
           cmd = { "terraform-ls", "serve" },
+          init_options = {
+            ignoreSingleFileWarning = true,
+          },
         },
         ts_ls = {},
         yamlls = {
