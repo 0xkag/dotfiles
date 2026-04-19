@@ -100,19 +100,24 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 - In LSP/code buffers, localleader mirrors Spacemacs major-mode navigation:
   - `,gg` definition
   - `,gD` declaration
+  - `,gd` type definition
   - `,gb` jump back
   - `,gp` jump back
   - `,gn` jump forward
   - `,ge` buffer diagnostics
+  - `,gA` search project types
   - `,gM` document symbols
   - `,gi` implementation
   - `,gr` references
+  - `,gR` references alias
   - `,gs` workspace symbols
   - `,gS` all workspace symbols
   - `,Fa`, `,Fr`, `,Fs` manage and browse LSP workspace folders
   - `,hh` hover/docs
   - `,bd` LSP session info
+  - `,ea`, `,el` execute a code action or list project diagnostics
   - `,br`, `,bs`, `,bv` restart, stop, or inspect active LSP clients
+  - `,qr` restarts the active workspace
   - `,rr` rename
   - `,aa` code action
   - `,af` fix action
@@ -131,6 +136,7 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
   - `,tt`, `,tf`, `,tl`, `,ts`, `,to`, `,tO`, `,tx` run and inspect tests
 - Go:
   - `,ga` alternate between source and test
+  - `,gc` run a coverage summary for the current package
   - `,ig` jump to imports
   - `,ir` or `,ri` organize imports
   - `,tp`, `,tP`, `,tt`, `,tl` run package, project, nearest, or last tests

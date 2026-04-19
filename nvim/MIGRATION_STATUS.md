@@ -84,6 +84,9 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 - Spacemacs code-mode parity second pass completed for secondary workflows:
   - Markdown localleader helpers added for headings, links, images, tables, emphasis, blockquotes, and rendered preview/toggles
   - Terraform localleader helpers added for validate, lint, and formatting checks without enabling autoformat on save
+- Spacemacs code-mode parity follow-up pass completed for shared aliases:
+  - shared LSP aliases now cover Java-style project diagnostics, execute action, restart workspace, project-type search, and reference/type-definition shortcuts
+  - Go coverage summary is available under localleader without adding extra external tooling
 
 ## Guardrails
 
@@ -105,7 +108,7 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - old clipboard fallback aliases are preserved only as disabled reference comments
   - exact theme parity still needs a visual review of `ron` and `cyberpunk` inside Neovim
 - Spacemacs code-mode parity is still partial:
-  - advanced Go helpers like go-play, coverage views, test generation, and deeper refactors are still missing
+  - advanced Go helpers like go-play, graphical coverage views, test generation, and deeper refactors are still missing
   - advanced Java generator/refactor actions from the old Java layer are only loosely approximated through LSP actions
   - markdown and terraform now have a useful localleader baseline, but many niche layer-specific actions are still intentionally omitted
   - some `lsp-ui`/peek-style overlays are approximated with Telescope rather than recreated exactly

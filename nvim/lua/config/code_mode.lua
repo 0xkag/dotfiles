@@ -456,7 +456,7 @@ local function markdown_blockquote()
   insert_linewise_prefix("> ")
 end
 
-local function terraform_command(name, command, opts)
+local function project_command(name, command, opts)
   opts = opts or {}
   run_command(name, command, {
     cwd = opts.cwd or util.project_root(0),
@@ -599,6 +599,13 @@ end
 
 function M.go_test_last()
   rerun_last("go_test")
+end
+
+function M.go_coverage_package()
+  project_command("go coverage", "go test -coverprofile=.coverage.out && go tool cover -func=.coverage.out", {
+    cwd = current_dir(0),
+    last_key = "go_coverage",
+  })
 end
 
 function M.go_run_package()
@@ -844,19 +851,19 @@ function M.markdown_blockquote()
 end
 
 function M.terraform_validate()
-  terraform_command("terraform validate", "terraform validate -no-color", {
+  project_command("terraform validate", "terraform validate -no-color", {
     last_key = "terraform_validate",
   })
 end
 
 function M.terraform_lint()
-  terraform_command("tflint", "tflint --format compact", {
+  project_command("tflint", "tflint --format compact", {
     last_key = "terraform_lint",
   })
 end
 
 function M.terraform_fmt_check()
-  terraform_command("terraform fmt", "terraform fmt -check -diff=false", {
+  project_command("terraform fmt", "terraform fmt -check -diff=false", {
     last_key = "terraform_fmt",
   })
 end
@@ -1039,6 +1046,7 @@ function M.setup()
       end
 
       map("<localleader>ga", M.go_switch_test_file, "Alternate test/source")
+      map("<localleader>gc", M.go_coverage_package, "Coverage summary")
       map("<localleader>ig", M.go_goto_imports, "Go to imports")
       map("<localleader>ir", M.go_organize_imports, "Remove unused imports")
       map("<localleader>tp", M.go_test_package, "Run package tests")

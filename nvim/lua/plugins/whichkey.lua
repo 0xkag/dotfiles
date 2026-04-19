@@ -38,6 +38,7 @@ return {
       { "<localleader>g", group = "goto" },
       { "<localleader>h", group = "help" },
       { "<localleader>i", group = "insert/import" },
+      { "<localleader>q", group = "workspace" },
       { "<localleader>r", group = "refactor" },
       { "<localleader>t", group = "test" },
       { "<localleader>T", group = "toggle" },
