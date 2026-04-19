@@ -49,6 +49,7 @@ opt.spellsuggest = "best,8"
 opt.modeline = true
 opt.wildmenu = true
 opt.wildmode = { "longest:full", "full" }
+opt.wildoptions = { "tagfile" }
 opt.list = true
 opt.listchars = {
   eol = "¶",
