@@ -19,6 +19,7 @@ For Python debugging tradeoffs and future DAP notes, see
 - `fd` exits insert mode
 - `Y` yanks to end of line
 - `gl` and `gL` align text
+- global `textwidth` is `78`
 
 ## Main leader groups
 
@@ -194,6 +195,7 @@ For Python debugging tradeoffs and future DAP notes, see
 - visual `.` repeats the last change across the selection
 - visual `<leader>%` seeds a whole-buffer substitute using the selected text
 - `autoread` is enabled
+- `textwidth=78` and `formatoptions` include the old Vim `c` and `l` behavior
 - dictionary/spelling helpers use `/usr/share/dict/words` when present and `spellsuggest=best,8`
 - opening `*.bin` uses the old `xxd` round-trip workflow when `xxd` is installed
 - `SPC C` and `SPC Y` provide legacy clipboard yank aliases from the old Vim setup

@@ -29,6 +29,7 @@ opt.tabstop = 4
 opt.softtabstop = 4
 opt.autoindent = true
 opt.shiftround = true
+opt.textwidth = 78
 opt.updatetime = 200
 opt.timeoutlen = 500
 opt.completeopt = { "menu", "menuone", "noselect" }
@@ -61,8 +62,8 @@ opt.fillchars = {
   foldclose = "▸",
   foldsep = " ",
 }
--- Old Vim used a global textwidth of 78. Leave that unset here to avoid
--- surprise automatic wrapping in code buffers; keep formatting explicit.
+vim.cmd("set formatoptions+=c")
+vim.cmd("set formatoptions+=l")
 opt.foldmethod = "expr"
 opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldenable = true
