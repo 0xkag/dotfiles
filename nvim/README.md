@@ -6,6 +6,9 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 For Python debugging tradeoffs and future DAP notes, see
 [DEBUGGING_NOTES.md](/home/kag/.dotfiles/nvim/DEBUGGING_NOTES.md:1).
 
+For deferred decisions around remote editing and Org-style literal runbooks,
+see [REMOTE_AND_RUNBOOK_NOTES.md](/home/kag/.dotfiles/nvim/REMOTE_AND_RUNBOOK_NOTES.md:1).
+
 ## Core keys
 
 - `SPC` is the main leader key

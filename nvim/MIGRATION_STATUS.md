@@ -97,6 +97,8 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - leader and localleader debug commands are available for file-level and pytest-based debugging
 - Python debugging options documented:
   - current terminal/ipdb flow, lightweight gutter-breakpoint option, and full DAP tradeoffs are written down in `~/.dotfiles/nvim/DEBUGGING_NOTES.md`
+- Remote editing and literal runbook options documented:
+  - remote editing choices and Org-Babel-like options are written down in `~/.dotfiles/nvim/REMOTE_AND_RUNBOOK_NOTES.md`
 - Vim parity follow-up completed:
   - restored `showmatch`, `lazyredraw`, and the old `timeoutlen`
   - restored command-line and normal-mode `Ctrl-a` / `Ctrl-e` home/end behavior
@@ -144,6 +146,10 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - PDF workflow
   - IETF/xkcd/speed-reading layers
   - some secondary language/tooling layers
+- Remote editing is intentionally deferred:
+  - Oil SSH is the leading future option if remote editing becomes important
+  - builtin `netrw` remote editing is currently unavailable because `netrw` is intentionally disabled
+  - heavier remote-workspace plugins are intentionally deferred until there is a concrete need
 
 ## Next Milestones
 
