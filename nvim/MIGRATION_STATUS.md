@@ -28,6 +28,7 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 - Modal editing with core Evil-like behavior
 - Telescope search and project grep
 - Neo-tree file explorer
+- Oil dired-style directory editor
 - Neogit and gitsigns
 - LSP-first navigation with GNU Global fallback
 - Python pyenv-aware interpreter selection
@@ -107,6 +108,11 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - textual comparison found the `ron` and `cyberpunk` ports faithful overall, with `SignColumn` intentionally blended into `Normal` to match the old Vim setup
 - Interactive theme review completed:
   - `ron` and `cyberpunk` were checked in the real terminal and look good enough to keep as-is
+- Dired-style file browsing completed:
+  - `oil.nvim` is wired in alongside Neo-tree
+  - `SPC o d` opens the current directory as an editable directory buffer
+  - `SPC o D` opens the current project root the same way
+  - Neo-tree remains the tree/sidebar workflow, while Oil covers the Dired-style editing workflow
 
 ## Guardrails
 

@@ -49,6 +49,8 @@ For Python debugging tradeoffs and future DAP notes, see
 - `SPC pf` finds files in the current project
 - `SPC pg` or `SPC p/` greps in the current project
 - `SPC pt` opens the project tree
+- `SPC od` opens the current directory in Oil
+- `SPC oD` opens the project root in Oil
 - Project switching saves the current session, changes directory, and restores the target project session when one exists
 - In the project picker, `<C-d>` in insert mode or `dd` in normal mode removes the selected project from history
 
@@ -59,6 +61,7 @@ For Python debugging tradeoffs and future DAP notes, see
 - `:Mason` manage language servers
 - `:ConformInfo` inspect formatter setup
 - `:Neogit` open the git UI
+- `:Oil` open a dired-style editable directory buffer
 - `:NvimDeps` show missing configured dependencies on `PATH`
 - `:NvimDeps current` show missing dependencies for the current buffer workflow
 - `:PyenvInfo` show the Python environment Neovim resolved for the current buffer
@@ -103,8 +106,11 @@ For Python debugging tradeoffs and future DAP notes, see
 - `gy` open type definitions through Telescope
 - `SPC ft` toggles the file tree
 - `SPC pt` opens the project tree
+- `SPC od` opens the current directory in Oil
+- `SPC oD` opens the current project root in Oil
 - `SPC cs` document symbols
 - `SPC os` toggle the outline sidebar
+- Neo-tree remains the tree/sidebar view, while Oil is the dired-style directory editor
 - Without LSP, `gd` and `gr` fall back to GNU Global when a GTAGS database exists
 - `SPC cg` prompts for a GNU Global symbol search
 - `SPC pu` updates the GNU Global database for the current project
