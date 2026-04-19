@@ -146,6 +146,17 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
   - `,i!` inserts a shebang
   - `,ic`, `,ii`, `,if`, `,io`, `,ie`, `,iw`, `,ir`, `,is`, `,iu`, `,ig` insert common shell templates
   - `,\` appends line-continuation backslashes to the current line or visual selection
+- Markdown:
+  - `,-` inserts a horizontal rule
+  - `,h1` through `,h6` set the current line to a heading level
+  - `,il`, `,ii`, `,if`, `,iw`, `,iT` insert links, images, footnotes, wiki links, and tables
+  - `,xb`, `,xi`, `,xc`, `,xq`, `,xB` add emphasis, code, blockquotes, and checkboxes
+  - `,o` follows the thing under the cursor
+  - `,cp`, `,cP`, `,cr` preview, toggle, or enable rendered Markdown
+- Terraform:
+  - `,cc` runs `terraform validate`
+  - `,cl` runs `tflint`
+  - `,=c` checks formatting with `terraform fmt -check`
 
 ## Vim-style editing helpers
 

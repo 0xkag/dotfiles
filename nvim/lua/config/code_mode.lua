@@ -156,8 +156,8 @@ local function nearest_matching_line(bufnr, match)
     local value = match(line)
     if value then
       return value
-    end
   end
+end
 
   return nil
 end
@@ -302,6 +302,166 @@ local function java_fqcn(bufnr, use_test_class)
   end
 
   return class_name
+end
+
+local function visual_positions()
+  local start_pos = vim.api.nvim_buf_get_mark(0, "<")
+  local end_pos = vim.api.nvim_buf_get_mark(0, ">")
+
+  local start_row, start_col = start_pos[1], start_pos[2]
+  local end_row, end_col = end_pos[1], end_pos[2]
+
+  if start_row == 0 or end_row == 0 then
+    return nil
+  end
+
+  if start_row > end_row or (start_row == end_row and start_col > end_col) then
+    start_row, end_row = end_row, start_row
+    start_col, end_col = end_col, start_col
+  end
+
+  return {
+    start_row = start_row,
+    start_col = start_col,
+    end_row = end_row,
+    end_col = end_col,
+  }
+end
+
+local function surround_visual_selection(prefix, suffix)
+  local range = visual_positions()
+  if not range then
+    return
+  end
+
+  vim.api.nvim_buf_set_text(0, range.end_row - 1, range.end_col + 1, range.end_row - 1, range.end_col + 1, { suffix })
+  vim.api.nvim_buf_set_text(0, range.start_row - 1, range.start_col, range.start_row - 1, range.start_col, { prefix })
+end
+
+local function insert_pair(prefix, suffix)
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local row, col = cursor[1], cursor[2]
+  vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { prefix .. suffix })
+  vim.api.nvim_win_set_cursor(0, { row, col + #prefix })
+end
+
+local function insert_linewise_prefix(prefix)
+  local range = visual_positions()
+  if range then
+    local lines = vim.api.nvim_buf_get_lines(0, range.start_row - 1, range.end_row, false)
+    for index, line in ipairs(lines) do
+      lines[index] = prefix .. line
+    end
+    vim.api.nvim_buf_set_lines(0, range.start_row - 1, range.end_row, false, lines)
+    return
+  end
+
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  local line = vim.api.nvim_buf_get_lines(0, row - 1, row, false)[1] or ""
+  vim.api.nvim_buf_set_lines(0, row - 1, row, false, { prefix .. line })
+  vim.api.nvim_win_set_cursor(0, { row, #prefix })
+end
+
+local function markdown_follow_thing()
+  local url = vim.fn.expand("<cfile>")
+  if url == "" then
+    vim.notify("No link or path detected at point.", vim.log.levels.INFO)
+    return
+  end
+
+  if vim.ui.open then
+    vim.ui.open(url)
+  else
+    vim.cmd.normal({ "gx", bang = true })
+  end
+end
+
+local function markdown_heading(level)
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  local line = vim.api.nvim_buf_get_lines(0, row - 1, row, false)[1] or ""
+  local content = vim.trim(line:gsub("^%s*#+%s*", ""))
+  local prefix = string.rep("#", level) .. " "
+  vim.api.nvim_buf_set_lines(0, row - 1, row, false, { prefix .. content })
+  vim.api.nvim_win_set_cursor(0, { row, #prefix })
+end
+
+local function markdown_insert_horizontal_rule()
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  insert_lines({ "", "---", "" }, {
+    row = row,
+    cursor_line = 2,
+    cursor_col = 0,
+  })
+end
+
+local function markdown_insert_link()
+  insert_pair("[", "](url)")
+end
+
+local function markdown_insert_image()
+  insert_pair("![", "](image.png)")
+end
+
+local function markdown_insert_footnote()
+  insert_pair("[^", "]")
+end
+
+local function markdown_insert_wiki_link()
+  insert_pair("[[", "]]")
+end
+
+local function markdown_insert_table()
+  insert_lines({
+    "| Column 1 | Column 2 |",
+    "| -------- | -------- |",
+    "|          |          |",
+  }, {
+    cursor_line = 1,
+    cursor_col = 2,
+  })
+end
+
+local function markdown_insert_checkbox()
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  local line = vim.api.nvim_buf_get_lines(0, row - 1, row, false)[1] or ""
+  local prefix = current_indent(0)
+  vim.api.nvim_buf_set_lines(0, row - 1, row, false, { prefix .. "- [ ] " .. vim.trim(line) })
+  vim.api.nvim_win_set_cursor(0, { row, #prefix + 6 })
+end
+
+local function markdown_toggle_render()
+  require("render-markdown").buf_toggle()
+end
+
+local function markdown_preview()
+  require("render-markdown").preview()
+end
+
+local function markdown_enable_render()
+  require("render-markdown").buf_enable()
+end
+
+local function markdown_wrap_pair(prefix, suffix)
+  return {
+    normal = function()
+      insert_pair(prefix, suffix)
+    end,
+    visual = function()
+      surround_visual_selection(prefix, suffix)
+    end,
+  }
+end
+
+local function markdown_blockquote()
+  insert_linewise_prefix("> ")
+end
+
+local function terraform_command(name, command, opts)
+  opts = opts or {}
+  run_command(name, command, {
+    cwd = opts.cwd or util.project_root(0),
+    last_key = opts.last_key or name,
+  })
 end
 
 local function shell_filetype()
@@ -599,6 +759,108 @@ function M.java_organize_imports()
   organize_imports()
 end
 
+function M.markdown_insert_horizontal_rule()
+  markdown_insert_horizontal_rule()
+end
+
+function M.markdown_heading(level)
+  return function()
+    markdown_heading(level)
+  end
+end
+
+function M.markdown_insert_link()
+  markdown_insert_link()
+end
+
+function M.markdown_insert_image()
+  markdown_insert_image()
+end
+
+function M.markdown_insert_footnote()
+  markdown_insert_footnote()
+end
+
+function M.markdown_insert_wiki_link()
+  markdown_insert_wiki_link()
+end
+
+function M.markdown_insert_table()
+  markdown_insert_table()
+end
+
+function M.markdown_insert_checkbox()
+  markdown_insert_checkbox()
+end
+
+function M.markdown_follow_thing()
+  markdown_follow_thing()
+end
+
+function M.markdown_preview()
+  markdown_preview()
+end
+
+function M.markdown_toggle_render()
+  markdown_toggle_render()
+end
+
+function M.markdown_render_buffer()
+  markdown_enable_render()
+end
+
+function M.markdown_bold()
+  local wrap = markdown_wrap_pair("**", "**")
+  wrap.normal()
+end
+
+function M.markdown_bold_visual()
+  local wrap = markdown_wrap_pair("**", "**")
+  wrap.visual()
+end
+
+function M.markdown_italic()
+  local wrap = markdown_wrap_pair("*", "*")
+  wrap.normal()
+end
+
+function M.markdown_italic_visual()
+  local wrap = markdown_wrap_pair("*", "*")
+  wrap.visual()
+end
+
+function M.markdown_code()
+  local wrap = markdown_wrap_pair("`", "`")
+  wrap.normal()
+end
+
+function M.markdown_code_visual()
+  local wrap = markdown_wrap_pair("`", "`")
+  wrap.visual()
+end
+
+function M.markdown_blockquote()
+  markdown_blockquote()
+end
+
+function M.terraform_validate()
+  terraform_command("terraform validate", "terraform validate -no-color", {
+    last_key = "terraform_validate",
+  })
+end
+
+function M.terraform_lint()
+  terraform_command("tflint", "tflint --format compact", {
+    last_key = "terraform_lint",
+  })
+end
+
+function M.terraform_fmt_check()
+  terraform_command("terraform fmt", "terraform fmt -check -diff=false", {
+    last_key = "terraform_fmt",
+  })
+end
+
 function M.shell_insert_shebang()
   local shebang = "#!/usr/bin/env " .. shell_name()
   local first = vim.api.nvim_buf_get_lines(0, 0, 1, false)[1] or ""
@@ -810,6 +1072,63 @@ function M.setup()
       map("<localleader>tl", M.java_run_last_test, "Run last test command")
       map("<localleader>x:", M.java_run_task, "Run build task")
       map("<localleader>ri", M.java_organize_imports, "Organize imports")
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("FileType", {
+    group = group,
+    pattern = "markdown",
+    callback = function(event)
+      local map = function(mode, lhs, rhs, desc)
+        vim.keymap.set(mode, lhs, rhs, {
+          buffer = event.buf,
+          desc = desc,
+          silent = true,
+        })
+      end
+
+      map("n", "<localleader>-", M.markdown_insert_horizontal_rule, "Insert horizontal rule")
+      map("n", "<localleader>h1", M.markdown_heading(1), "Heading level 1")
+      map("n", "<localleader>h2", M.markdown_heading(2), "Heading level 2")
+      map("n", "<localleader>h3", M.markdown_heading(3), "Heading level 3")
+      map("n", "<localleader>h4", M.markdown_heading(4), "Heading level 4")
+      map("n", "<localleader>h5", M.markdown_heading(5), "Heading level 5")
+      map("n", "<localleader>h6", M.markdown_heading(6), "Heading level 6")
+      map("n", "<localleader>il", M.markdown_insert_link, "Insert link")
+      map("n", "<localleader>ii", M.markdown_insert_image, "Insert image")
+      map("n", "<localleader>if", M.markdown_insert_footnote, "Insert footnote")
+      map("n", "<localleader>iw", M.markdown_insert_wiki_link, "Insert wiki link")
+      map("n", "<localleader>iT", M.markdown_insert_table, "Insert table")
+      map("n", "<localleader>o", M.markdown_follow_thing, "Follow thing at point")
+      map("n", "<localleader>cp", M.markdown_preview, "Preview rendered buffer")
+      map("n", "<localleader>cP", M.markdown_toggle_render, "Toggle rendered view")
+      map("n", "<localleader>cr", M.markdown_render_buffer, "Render buffer")
+      map("n", "<localleader>xB", M.markdown_insert_checkbox, "Insert checkbox")
+      map("n", "<localleader>xb", M.markdown_bold, "Insert bold")
+      map("x", "<localleader>xb", M.markdown_bold_visual, "Bold selection")
+      map("n", "<localleader>xi", M.markdown_italic, "Insert italic")
+      map("x", "<localleader>xi", M.markdown_italic_visual, "Italic selection")
+      map("n", "<localleader>xc", M.markdown_code, "Insert code")
+      map("x", "<localleader>xc", M.markdown_code_visual, "Code selection")
+      map({ "n", "x" }, "<localleader>xq", M.markdown_blockquote, "Blockquote")
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("FileType", {
+    group = group,
+    pattern = { "terraform", "terraform-vars" },
+    callback = function(event)
+      local map = function(mode, lhs, rhs, desc)
+        vim.keymap.set(mode, lhs, rhs, {
+          buffer = event.buf,
+          desc = desc,
+          silent = true,
+        })
+      end
+
+      map("n", "<localleader>cc", M.terraform_validate, "Validate project")
+      map("n", "<localleader>cl", M.terraform_lint, "Lint project")
+      map("n", "<localleader>=c", M.terraform_fmt_check, "Check formatting")
     end,
   })
 
