@@ -81,6 +81,52 @@ function M.dotfiles()
   })
 end
 
+local function normalize_range(start_pos, end_pos)
+  if start_pos[1] > end_pos[1] or (start_pos[1] == end_pos[1] and start_pos[2] > end_pos[2]) then
+    return end_pos, start_pos
+  end
+
+  return start_pos, end_pos
+end
+
+function M.visual_selection_text()
+  local start_pos = vim.api.nvim_buf_get_mark(0, "<")
+  local end_pos = vim.api.nvim_buf_get_mark(0, ">")
+  if start_pos[1] == 0 or end_pos[1] == 0 then
+    return nil
+  end
+
+  start_pos, end_pos = normalize_range(start_pos, end_pos)
+
+  local mode = vim.fn.visualmode()
+  local lines
+
+  if mode == "V" then
+    lines = vim.api.nvim_buf_get_lines(0, start_pos[1] - 1, end_pos[1], false)
+  else
+    lines = vim.api.nvim_buf_get_text(0, start_pos[1] - 1, start_pos[2], end_pos[1] - 1, end_pos[2] + 1, {})
+  end
+
+  if not lines or #lines == 0 then
+    return nil
+  end
+
+  return table.concat(lines, "\n")
+end
+
+function M.search_visual(forward)
+  local text = M.visual_selection_text()
+  if not text or text == "" then
+    return
+  end
+
+  local pattern = "\\V" .. vim.fn.escape(text, [[\]])
+  pattern = pattern:gsub("\n", [[\n]])
+  vim.fn.setreg("/", pattern)
+  vim.opt.hlsearch = true
+  vim.api.nvim_feedkeys(vim.keycode("<Esc>" .. (forward and "n" or "N")), "n", false)
+end
+
 local function set_quickfix(title, items)
   vim.fn.setqflist({}, " ", {
     title = title,

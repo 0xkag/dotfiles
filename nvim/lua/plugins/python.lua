@@ -3,7 +3,6 @@
 return {
   {
     "stevearc/conform.nvim",
-    event = { "BufWritePre" },
     cmd = { "ConformInfo" },
     keys = {
       {
@@ -55,15 +54,6 @@ return {
         yaml = { "prettier", stop_after_first = true },
         zsh = { "shfmt" },
       },
-      format_on_save = function(bufnr)
-        if vim.bo[bufnr].buftype ~= "" then
-          return nil
-        end
-        return {
-          lsp_format = "fallback",
-          timeout_ms = 500,
-        }
-      end,
     },
   },
   {

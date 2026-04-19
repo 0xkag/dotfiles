@@ -21,7 +21,6 @@ return {
           end,
         },
       })
-      require("mini.surround").setup()
 
       vim.keymap.set({ "n", "x" }, "gl", "ga", {
         remap = true,
@@ -34,6 +33,72 @@ return {
         silent = true,
       })
     end,
+  },
+  {
+    "kylechui/nvim-surround",
+    version = "^3.0.0",
+    event = "VeryLazy",
+    opts = {},
+  },
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {},
+    keys = {
+      {
+        "s",
+        mode = { "n", "x", "o" },
+        function()
+          require("flash").jump()
+        end,
+        desc = "Flash jump",
+      },
+      {
+        "S",
+        mode = { "n", "x", "o" },
+        function()
+          require("flash").treesitter()
+        end,
+        desc = "Flash treesitter",
+      },
+      {
+        "r",
+        mode = "o",
+        function()
+          require("flash").remote()
+        end,
+        desc = "Remote flash",
+      },
+      {
+        "R",
+        mode = { "o", "x" },
+        function()
+          require("flash").treesitter_search()
+        end,
+        desc = "Treesitter search",
+      },
+      {
+        "<leader>jj",
+        function()
+          require("flash").jump()
+        end,
+        desc = "Jump",
+      },
+      {
+        "<leader>jt",
+        function()
+          require("flash").treesitter()
+        end,
+        desc = "Jump treesitter",
+      },
+      {
+        "<leader>jr",
+        function()
+          require("flash").remote()
+        end,
+        desc = "Remote jump",
+      },
+    },
   },
   {
     "folke/todo-comments.nvim",

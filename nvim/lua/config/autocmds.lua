@@ -85,9 +85,27 @@ autocmd("FileType", {
 
 autocmd("FileType", {
   group = utility,
-  pattern = { "help", "man", "qf", "checkhealth", "lspinfo", "neotest-summary", "startuptime" },
+  pattern = {
+    "aerial",
+    "checkhealth",
+    "help",
+    "lazy",
+    "lspinfo",
+    "man",
+    "mason",
+    "neotest-summary",
+    "qf",
+    "startuptime",
+    "TelescopePrompt",
+  },
   callback = function(event)
+    vim.bo[event.buf].buflisted = false
     vim.keymap.set("n", "q", "<Cmd>close<CR>", {
+      buffer = event.buf,
+      desc = "Close window",
+      silent = true,
+    })
+    vim.keymap.set("n", "<Esc>", "<Cmd>close<CR>", {
       buffer = event.buf,
       desc = "Close window",
       silent = true,
@@ -101,6 +119,11 @@ autocmd("FileType", {
   callback = function(event)
     vim.opt_local.signcolumn = "auto"
     vim.keymap.set("n", "q", "<Cmd>Neotree close<CR>", {
+      buffer = event.buf,
+      desc = "Close explorer",
+      silent = true,
+    })
+    vim.keymap.set("n", "<Esc>", "<Cmd>Neotree close<CR>", {
       buffer = event.buf,
       desc = "Close explorer",
       silent = true,
