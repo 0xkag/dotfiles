@@ -1,4 +1,11 @@
 {
+    "profiles": {
+        "defaults": {
+            "font": {
+                "face": "SauceCodePro Nerd Font Mono"
+            }
+        }
+    },
     "schemes": [
         {
             "name": "PuTTY",
