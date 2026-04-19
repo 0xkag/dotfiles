@@ -1,0 +1,94 @@
+-- ~/.config/nvim/lua/config/keymaps.lua
+
+local map = vim.keymap.set
+local util = require("config.util")
+
+local function toggle_window_option(name)
+  vim.wo[name] = not vim.wo[name]
+end
+
+map("i", "fd", "<Esc>", { desc = "Escape insert", silent = true })
+map("n", "Y", "y$", { desc = "Yank to end of line", silent = true })
+map("n", "gV", "`[v`]", { desc = "Select last changed text", silent = true })
+
+map("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+map("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+map("n", "0", "g0", { silent = true })
+map("n", "^", "g^", { silent = true })
+map("n", "$", "g$", { silent = true })
+
+map("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move lines down", silent = true })
+map("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move lines up", silent = true })
+
+map({ "n", "t" }, "<C-h>", "<Cmd>wincmd h<CR>", { silent = true })
+map({ "n", "t" }, "<C-j>", "<Cmd>wincmd j<CR>", { silent = true })
+map({ "n", "t" }, "<C-k>", "<Cmd>wincmd k<CR>", { silent = true })
+map({ "n", "t" }, "<C-l>", "<Cmd>wincmd l<CR>", { silent = true })
+map("t", "<Esc>", [[<C-\><C-n>]], { desc = "Terminal normal mode", silent = true })
+map("t", "<C-w>", [[<C-\><C-n><C-w>]], { silent = true })
+
+map("n", "<C-x><C-s>", "<Cmd>write<CR>", { desc = "Save file", silent = true })
+map("i", "<C-x><C-s>", "<C-o>:write<CR>", { desc = "Save file", silent = true })
+
+map("n", "<leader>fs", "<Cmd>write<CR>", { desc = "Save file", silent = true })
+map("n", "<leader>fS", "<Cmd>wall<CR>", { desc = "Save all files", silent = true })
+
+map("n", "<leader>bn", "<Cmd>bnext<CR>", { desc = "Next buffer", silent = true })
+map("n", "<leader>bp", "<Cmd>bprevious<CR>", { desc = "Previous buffer", silent = true })
+map("n", "<leader>bd", function()
+  require("mini.bufremove").delete(0, false)
+end, { desc = "Delete buffer" })
+map("n", "<leader>bD", function()
+  require("mini.bufremove").delete(0, true)
+end, { desc = "Delete buffer force" })
+
+map("n", "<leader>h", "<Cmd>nohlsearch<CR>", { desc = "Clear search highlight", silent = true })
+map("n", "g!", util.squeeze_spaces_line, { desc = "Squeeze spaces" })
+map("x", "g!", util.squeeze_spaces_visual, { desc = "Squeeze spaces" })
+
+map({ "n", "x" }, "<leader>yy", '"+y', { desc = "Yank to clipboard" })
+map("n", "<leader>yY", '"+yy', { desc = "Yank line to clipboard" })
+map({ "n", "x" }, "<leader>yp", '"+p', { desc = "Paste after" })
+map({ "n", "x" }, "<leader>yP", '"+P', { desc = "Paste before" })
+map("n", "<leader><space>", '"+yy', { desc = "Copy current line" })
+map("x", "<leader><space>", '"+y', { desc = "Copy selection" })
+
+map("n", "<leader>wv", "<C-w>v", { desc = "Vertical split" })
+map("n", "<leader>ws", "<C-w>s", { desc = "Horizontal split" })
+map("n", "<leader>wd", "<Cmd>close<CR>", { desc = "Close window", silent = true })
+map("n", "<leader>wo", "<Cmd>only<CR>", { desc = "Only window", silent = true })
+map("n", "<leader>w=", "<C-w>=", { desc = "Balance windows" })
+map("n", "<leader>wm", "<Cmd>wincmd _<Bar>wincmd |<CR>", { desc = "Maximize window", silent = true })
+
+map("n", "<leader>tn", function()
+  if vim.wo.number and vim.wo.relativenumber then
+    vim.wo.relativenumber = false
+  elseif vim.wo.number then
+    vim.wo.number = false
+  else
+    vim.wo.number = true
+    vim.wo.relativenumber = true
+  end
+end, { desc = "Cycle line numbers" })
+map("n", "<leader>tr", function()
+  toggle_window_option("relativenumber")
+end, { desc = "Relative numbers" })
+map("n", "<leader>tw", function()
+  toggle_window_option("wrap")
+  vim.wo.linebreak = vim.wo.wrap
+end, { desc = "Wrap lines" })
+map("n", "<leader>ts", function()
+  toggle_window_option("spell")
+end, { desc = "Spell check" })
+map("n", "<leader>tl", function()
+  toggle_window_option("list")
+end, { desc = "List characters" })
+map("n", "<leader>tc", function()
+  local enabled = not (vim.wo.cursorline and vim.wo.cursorcolumn)
+  vim.wo.cursorline = enabled
+  vim.wo.cursorcolumn = enabled
+end, { desc = "Cursor guides" })
+
+map("n", "<leader>qq", "<Cmd>quit<CR>", { desc = "Quit window", silent = true })
+map("n", "<leader>qQ", "<Cmd>qa<CR>", { desc = "Quit all", silent = true })
+map("n", "<leader>qw", "<Cmd>wq<CR>", { desc = "Save and quit", silent = true })
