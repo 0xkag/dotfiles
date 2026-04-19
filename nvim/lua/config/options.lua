@@ -46,9 +46,9 @@ opt.modeline = true
 opt.wildmode = { "longest:full", "full" }
 opt.list = true
 opt.listchars = {
-  tab = "» ",
-  trail = "·",
-  nbsp = "␣",
+  eol = "¶",
+  tab = "»·",
+  nbsp = "_",
   extends = ">",
   precedes = "<",
 }

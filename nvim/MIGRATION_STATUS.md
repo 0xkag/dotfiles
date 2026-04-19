@@ -62,6 +62,7 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 - Vim baseline behavior pass completed:
   - global indent default returned to 4, with explicit per-language overrides
   - `set list` restored globally
+  - old listchars toggle paths restored on `SPC t v t`, `SPC t v a`, and `SPC t v u`
   - `showbreak` restored for wrapped lines
   - insert-mode Emacs-style keys restored
   - visual `.` repeat restored
@@ -89,7 +90,6 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 ## Missing Or Partial
 
 - Native Vim-to-Neovim parity is still not fully reviewed end-to-end:
-  - listchars ascii/unicode toggle behavior from old Vim is not ported yet
   - old clipboard fallback aliases are preserved only as disabled reference comments
   - exact theme parity still needs a visual review of `ron` and `cyberpunk` inside Neovim
 - Emacs-native long tail is still unported:
@@ -106,7 +106,6 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - keep localleader `which-key` coverage consistent across filetypes
   - decide which Emacs-native long-tail layers matter enough to port
 - Milestone 4: finish Vim parity cleanup
-  - decide whether listchars ascii/unicode toggles still matter enough to port
   - visually verify the `ron` and `cyberpunk` ports in Neovim
   - decide whether any remaining old Vim aliases should come back as active mappings
 
