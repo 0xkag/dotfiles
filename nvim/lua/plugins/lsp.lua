@@ -126,35 +126,55 @@ return {
         callback = function(event)
           local builtin = require("telescope.builtin")
           local bufnr = event.buf
-          local map = function(lhs, rhs, desc)
-            vim.keymap.set("n", lhs, rhs, {
+          local map = function(mode, lhs, rhs, desc)
+            vim.keymap.set(mode, lhs, rhs, {
               buffer = bufnr,
               desc = desc,
               silent = true,
             })
           end
 
-          map("gd", function()
+          map("n", "gd", function()
             builtin.lsp_definitions({ reuse_win = true })
           end, "Go to definition")
-          map("gD", vim.lsp.buf.declaration, "Go to declaration")
-          map("gi", builtin.lsp_implementations, "Go to implementation")
-          map("gr", builtin.lsp_references, "References")
-          map("gy", builtin.lsp_type_definitions, "Type definitions")
-          map("K", vim.lsp.buf.hover, "Hover")
-          map("<leader>ca", vim.lsp.buf.code_action, "Code action")
-          map("<leader>cr", vim.lsp.buf.rename, "Rename symbol")
-          map("<leader>cd", function()
+          map("n", "gD", vim.lsp.buf.declaration, "Go to declaration")
+          map("n", "gi", builtin.lsp_implementations, "Go to implementation")
+          map("n", "gr", builtin.lsp_references, "References")
+          map("n", "gy", builtin.lsp_type_definitions, "Type definitions")
+          map("n", "K", vim.lsp.buf.hover, "Hover")
+          map("n", "<leader>ca", vim.lsp.buf.code_action, "Code action")
+          map("n", "<leader>cr", vim.lsp.buf.rename, "Rename symbol")
+          map("n", "<leader>cd", function()
             builtin.diagnostics({ bufnr = 0 })
           end, "Buffer diagnostics")
-          map("<leader>cs", builtin.lsp_document_symbols, "Document symbols")
-          map("<leader>cS", builtin.lsp_dynamic_workspace_symbols, "Workspace symbols")
-          map("<leader>ci", builtin.lsp_implementations, "Implementations")
-          map("<leader>cR", builtin.lsp_references, "References")
-          map("<leader>cy", builtin.lsp_type_definitions, "Type definitions")
+          map("n", "<leader>cs", builtin.lsp_document_symbols, "Document symbols")
+          map("n", "<leader>cS", builtin.lsp_dynamic_workspace_symbols, "Workspace symbols")
+          map("n", "<leader>ci", builtin.lsp_implementations, "Implementations")
+          map("n", "<leader>cR", builtin.lsp_references, "References")
+          map("n", "<leader>cy", builtin.lsp_type_definitions, "Type definitions")
+
+          -- Spacemacs major-mode localleader parity for code navigation.
+          map("n", "<localleader>gg", function()
+            builtin.lsp_definitions({ reuse_win = true })
+          end, "Go to definition")
+          map("n", "<localleader>gD", vim.lsp.buf.declaration, "Go to declaration")
+          map("n", "<localleader>gi", builtin.lsp_implementations, "Go to implementation")
+          map("n", "<localleader>gr", builtin.lsp_references, "References")
+          map("n", "<localleader>gt", builtin.lsp_type_definitions, "Type definition")
+          map("n", "<localleader>gs", builtin.lsp_dynamic_workspace_symbols, "Workspace symbols")
+          map("n", "<localleader>gb", "<C-o>", "Jump back")
+          map("n", "<localleader>hh", vim.lsp.buf.hover, "Hover")
+          map("n", "<localleader>rr", vim.lsp.buf.rename, "Rename symbol")
+          map({ "n", "x" }, "<localleader>aa", vim.lsp.buf.code_action, "Code action")
+          map("n", "<localleader>=b", function()
+            require("conform").format({
+              async = true,
+              lsp_format = "fallback",
+            })
+          end, "Format buffer")
 
           if vim.lsp.inlay_hint then
-            map("<leader>ch", function()
+            map("n", "<leader>ch", function()
               local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr })
               vim.lsp.inlay_hint.enable(not enabled, { bufnr = bufnr })
             end, "Toggle inlay hints")
