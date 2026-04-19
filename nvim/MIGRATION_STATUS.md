@@ -59,6 +59,18 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - `SPC p a` add current project
   - `SPC p d` remove current project
   - session-aware project switching
+- Vim baseline behavior pass completed:
+  - global indent default returned to 4, with explicit per-language overrides
+  - `set list` restored globally
+  - `showbreak` restored for wrapped lines
+  - insert-mode Emacs-style keys restored
+  - visual `.` repeat restored
+  - visual `%s` helper restored on `<leader>%`
+  - `autoread`, dictionary, and spelling suggestions restored
+  - `*.bin` xxd editing workflow restored
+  - legacy clipboard fallback shell commands ported as disabled comments
+  - legacy `t_BE` tweak ported as a disabled comment
+  - `ron` and `cyberpunk` colorschemes ported as selectable Neovim themes
 
 ## Guardrails
 
@@ -69,9 +81,17 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 
 - Keep auditing code-mode `SPC m` and `,` bindings against Spacemacs defaults; `,gg` is restored, but more localleader parity checks may still be needed
 - Keep checking localleader `which-key` coverage in filetype-specific buffers so `,` remains discoverable everywhere it matters
+- Review the existing `~/.dotfiles/vim` config against Neovim and classify each behavior as:
+  - already matched
+  - intentionally different
+  - missing and worth porting
 
 ## Missing Or Partial
 
+- Native Vim-to-Neovim parity is still not fully reviewed end-to-end:
+  - listchars ascii/unicode toggle behavior from old Vim is not ported yet
+  - old clipboard fallback aliases are preserved only as disabled reference comments
+  - exact theme parity still needs a visual review of `ron` and `cyberpunk` inside Neovim
 - Emacs-native long tail is still unported:
   - heavy Org integrations
   - Elfeed
@@ -85,6 +105,10 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - review remaining code-mode localleader bindings
   - keep localleader `which-key` coverage consistent across filetypes
   - decide which Emacs-native long-tail layers matter enough to port
+- Milestone 4: finish Vim parity cleanup
+  - decide whether listchars ascii/unicode toggles still matter enough to port
+  - visually verify the `ron` and `cyberpunk` ports in Neovim
+  - decide whether any remaining old Vim aliases should come back as active mappings
 
 ## Validation Baseline
 

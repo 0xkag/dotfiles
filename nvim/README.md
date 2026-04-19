@@ -8,6 +8,7 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 - `SPC` is the main leader key
 - `,` is the local leader key
 - `SPC` and `,` both open `which-key` popups for discoverable mappings
+- Global indentation defaults to 4 spaces; common languages override that explicitly
 - `SPC TAB` switches to the alternate buffer
 - `SPC /` runs project grep
 - `SPC *` searches the current word in the project
@@ -48,6 +49,7 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 
 ## Useful commands
 
+- `:colorscheme cyberdream`, `:colorscheme ron`, or `:colorscheme cyberpunk`
 - `:Mason` manage language servers
 - `:ConformInfo` inspect formatter setup
 - `:Neogit` open the git UI
@@ -105,6 +107,22 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
   - `,rr` rename
   - `,aa` code action
   - `,=b` format buffer manually
+
+## Vim-style editing helpers
+
+- `list` is enabled globally
+- wrapped lines show `+++ ` as the `showbreak` marker
+- insert mode restores Vim/Emacs crossover keys:
+  - `Ctrl-a` line start
+  - `Ctrl-e` line end
+  - `Ctrl-w` delete word forward
+  - `Ctrl-k` delete to end of line
+  - `Ctrl-h`, `Ctrl-j`, `Ctrl-l` move left, down, and right
+- visual `.` repeats the last change across the selection
+- visual `<leader>%` seeds a whole-buffer substitute using the selected text
+- `autoread` is enabled
+- dictionary/spelling helpers use `/usr/share/dict/words` when present and `spellsuggest=best,8`
+- opening `*.bin` uses the old `xxd` round-trip workflow when `xxd` is installed
 
 ## Evil Feel
 

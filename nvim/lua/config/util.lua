@@ -122,17 +122,31 @@ function M.visual_selection_text()
   return table.concat(lines, "\n")
 end
 
+local function literal_pattern(text)
+  local pattern = "\\V" .. vim.fn.escape(text, [[/\]])
+  return pattern:gsub("\n", [[\n]])
+end
+
 function M.search_visual(forward)
   local text = M.visual_selection_text()
   if not text or text == "" then
     return
   end
 
-  local pattern = "\\V" .. vim.fn.escape(text, [[\]])
-  pattern = pattern:gsub("\n", [[\n]])
+  local pattern = literal_pattern(text)
   vim.fn.setreg("/", pattern)
   vim.opt.hlsearch = true
   vim.api.nvim_feedkeys(vim.keycode("<Esc>" .. (forward and "n" or "N")), "n", false)
+end
+
+function M.substitute_visual()
+  local text = M.visual_selection_text()
+  if not text or text == "" then
+    return
+  end
+
+  local command = ":%s/" .. literal_pattern(text) .. "//gc"
+  vim.api.nvim_feedkeys(vim.keycode("<Esc>" .. command .. string.rep("<Left>", 3)), "n", false)
 end
 
 local function set_quickfix(title, items)
