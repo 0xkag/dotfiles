@@ -12,12 +12,21 @@ return {
   keys = {
     { "<leader>oe", "<cmd>Neotree toggle<cr>", desc = "Explorer toggle" },
     { "<leader>oE", "<cmd>Neotree reveal<cr>", desc = "Reveal current file" },
+    { "<leader>ft", "<cmd>Neotree toggle<cr>", desc = "File tree toggle" },
+    { "<leader>fT", "<cmd>Neotree reveal<cr>", desc = "Reveal current file" },
     {
       "<leader>pe",
       function()
         vim.cmd("Neotree reveal dir=" .. vim.fn.fnameescape(util.project_root(0)))
       end,
       desc = "Project explorer",
+    },
+    {
+      "<leader>pt",
+      function()
+        vim.cmd("Neotree reveal dir=" .. vim.fn.fnameescape(util.project_root(0)))
+      end,
+      desc = "Project tree",
     },
   },
   opts = {

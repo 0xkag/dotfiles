@@ -24,6 +24,23 @@ return {
       end,
       desc = "Find files",
     },
+    {
+      "<leader>/",
+      function()
+        util.project_grep()
+      end,
+      desc = "Project grep",
+    },
+    {
+      "<leader>*",
+      function()
+        require("telescope.builtin").grep_string({
+          cwd = util.project_root(0),
+          search = vim.fn.expand("<cword>"),
+        })
+      end,
+      desc = "Project search word",
+    },
     { "<leader>fd", util.dotfiles, desc = "Find dotfiles" },
     {
       "<leader>fr",
@@ -40,7 +57,9 @@ return {
       desc = "Help tags",
     },
     { "<leader>pf", util.project_files, desc = "Project files" },
+    { "<leader>pp", util.project_files, desc = "Project files" },
     { "<leader>pg", util.project_grep, desc = "Project grep" },
+    { "<leader>p/", util.project_grep, desc = "Project grep" },
     {
       "<leader>ss",
       function()
@@ -49,6 +68,7 @@ return {
       desc = "Search buffer",
     },
     { "<leader>sg", util.cwd_grep, desc = "Search cwd" },
+    { "<leader>sp", util.project_grep, desc = "Search project" },
     {
       "<leader>sw",
       function()
