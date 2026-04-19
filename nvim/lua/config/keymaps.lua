@@ -12,6 +12,8 @@ local function edit_path(path)
 end
 
 map("i", "fd", "<Esc>", { desc = "Escape insert", silent = true })
+map("c", "<C-a>", "<Home>", { desc = "Cmdline start", silent = true })
+map("c", "<C-e>", "<End>", { desc = "Cmdline end", silent = true })
 map("i", "<C-a>", "<Home>", { desc = "Line start", silent = true })
 map("i", "<C-e>", "<End>", { desc = "Line end", silent = true })
 map("i", "<C-w>", "<C-o>daW", { desc = "Delete word forward", silent = true })
@@ -19,6 +21,8 @@ map("i", "<C-k>", "<C-o>D", { desc = "Delete to end of line", silent = true })
 map("i", "<C-h>", "<C-o>h", { desc = "Cursor left", silent = true })
 map("i", "<C-j>", "<C-o>j", { desc = "Cursor down", silent = true })
 map("i", "<C-l>", "<C-o>l", { desc = "Cursor right", silent = true })
+map("n", "<C-a>", "<Home>", { desc = "Line start", silent = true })
+map("n", "<C-e>", "<End>", { desc = "Line end", silent = true })
 map("n", "Y", "y$", { desc = "Yank to end of line", silent = true })
 map("n", "gV", "`[v`]", { desc = "Select last changed text", silent = true })
 
@@ -82,6 +86,8 @@ map("n", "<leader>cp", "<Cmd>PyenvInfo<CR>", { desc = "Python environment", sile
 map("n", "<leader>pu", util.global_update, { desc = "Update GNU Global tags", silent = true })
 
 map({ "n", "x" }, "<leader>yy", '"+y', { desc = "Yank to clipboard" })
+map({ "n", "x" }, "<leader>C", '"+y', { desc = "Yank to clipboard (legacy)" })
+map("n", "<leader>Y", '"+y$', { desc = "Yank to EOL (legacy)", silent = true })
 map("n", "<leader>yY", '"+yy', { desc = "Yank line to clipboard" })
 map({ "n", "x" }, "<leader>yp", '"+p', { desc = "Paste after" })
 map({ "n", "x" }, "<leader>yP", '"+P', { desc = "Paste before" })
