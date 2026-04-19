@@ -1,4 +1,5 @@
 local util = require("config.util")
+local projects = require("config.projects")
 
 return {
   "nvim-telescope/telescope.nvim",
@@ -57,7 +58,10 @@ return {
       desc = "Help tags",
     },
     { "<leader>pf", util.project_files, desc = "Project files" },
-    { "<leader>pp", util.project_files, desc = "Project files" },
+    { "<leader>pp", projects.pick, desc = "Switch project" },
+    { "<leader>pr", projects.pick, desc = "Recent projects" },
+    { "<leader>pa", projects.add, desc = "Add current project" },
+    { "<leader>pd", projects.remove, desc = "Remove current project" },
     { "<leader>pg", util.project_grep, desc = "Project grep" },
     { "<leader>p/", util.project_grep, desc = "Project grep" },
     {

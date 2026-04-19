@@ -17,6 +17,7 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - `c004ceb` `Improve Neovim Python env and dependency checks`
   - `5fc01c5` `Tighten Neovim keybindings and tool setup`
   - `fdef8bc` `Add Neovim migration status file`
+  - `cebe770` `Add Evil-style jump and surround behavior`
 
 ## Completed
 
@@ -35,23 +36,42 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 - Dependency auditing with `:NvimDeps`
 - Non-Python language tools installed and visible to Neovim
 - Automatic formatting on save removed; formatting is manual-only via `SPC c f`
+- Localleader popup support restored through `which-key`
+- Spacemacs-style code-buffer localleader navigation restored:
+  - `,gg` definition
+  - `,gb` jump back
+  - `,gi` implementation
+  - `,gr` references
+  - `,gs` workspace symbols
+  - `,hh` hover/docs
+  - `,rr` rename
+  - `,aa` code action
+  - `,=b` format buffer manually
 - Evil-feel pass completed:
   - jump plugin
   - surround-style bindings
   - visual-selection search
   - tighter special-buffer close behavior
+- Projectile-style project switching completed:
+  - recent project registry
+  - `SPC p p` project switcher
+  - `SPC p r` recent projects
+  - `SPC p a` add current project
+  - `SPC p d` remove current project
+  - session-aware project switching
 
 ## Guardrails
 
 - Do not enable automatic formatting on save for Python or other languages
 - Keep formatting as an explicit action through `SPC c f` or `:ConformInfo`
 
+## Alignment TODOs
+
+- Keep auditing code-mode `SPC m` and `,` bindings against Spacemacs defaults; `,gg` is restored, but more localleader parity checks may still be needed
+- Keep checking localleader `which-key` coverage in filetype-specific buffers so `,` remains discoverable everywhere it matters
+
 ## Missing Or Partial
 
-- Projectile-style project switching is still partial:
-  - no recent-project switcher
-  - no explicit project add/remove commands
-  - sessions exist, but project switching is not first-class yet
 - Emacs-native long tail is still unported:
   - heavy Org integrations
   - Elfeed
@@ -61,11 +81,10 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 
 ## Next Milestones
 
-- Milestone 2: add projectile-style project switching
-  - project switcher
-  - recent projects
-  - project commands under `SPC p`
-  - session/project workflow cleanup
+- Milestone 3: continue Spacemacs parity audit
+  - review remaining code-mode localleader bindings
+  - keep localleader `which-key` coverage consistent across filetypes
+  - decide which Emacs-native long-tail layers matter enough to port
 
 ## Validation Baseline
 

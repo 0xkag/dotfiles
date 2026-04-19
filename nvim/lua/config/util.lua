@@ -30,13 +30,21 @@ function M.cwd()
   return uv.cwd()
 end
 
+function M.find_root(path)
+  if not path or path == "" then
+    return nil
+  end
+
+  return vim.fs.root(path, root_markers)
+end
+
 function M.project_root(bufnr)
   bufnr = bufnr or 0
   local name = vim.api.nvim_buf_get_name(bufnr)
   if name == "" then
     return M.cwd()
   end
-  return vim.fs.root(name, root_markers) or M.cwd()
+  return M.find_root(name) or M.cwd()
 end
 
 function M.is_git_repo(path)

@@ -27,6 +27,7 @@ require("config.options")
 require("config.autocmds")
 require("config.python")
 require("config.deps")
+require("config.projects").setup()
 require("config.keymaps")
 
 require("lazy").setup("plugins", {
