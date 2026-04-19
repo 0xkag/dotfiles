@@ -49,18 +49,18 @@ Windows.
 
 The installer in
 [_bin/dotfiles-install](/home/kag/.dotfiles/_bin/dotfiles-install:1) still
-installs the existing plain Source Code Pro assets, and is now also
-future-ready for an optional vendored Nerd Font payload at:
+installs the existing plain Source Code Pro assets, reminds you to run
+[nerdfonts/install](/home/kag/.dotfiles/nerdfonts/install:1), and refreshes
+fontconfig for:
 
-- `~/.dotfiles/_lib/sauce-code-pro-nerd-font`
+- `~/.fonts/nerd-fonts/sauce-code-pro`
 
-If that directory exists, the installer will symlink it into:
+The actual download/install helper lives at:
 
-- `~/.local/share/fonts/nerd-fonts/sauce-code-pro`
+- [nerdfonts/install](/home/kag/.dotfiles/nerdfonts/install:1)
 
-and refresh the font cache.
-
-The repo does **not** currently vendor the Nerd Font binaries.
+and currently downloads the Source Code Pro Nerd Font release zip directly into
+that fontconfig-visible directory.
 
 ## What Still Has To Be Installed Manually
 
@@ -71,10 +71,9 @@ terminal.
 
 You can do that either by:
 
-- installing it from your distro packaging if available
-- or placing the extracted font files under a local font directory
-- or vendoring the font under `~/.dotfiles/_lib/sauce-code-pro-nerd-font` and
-  rerunning `dotfiles-install`
+- running [nerdfonts/install](/home/kag/.dotfiles/nerdfonts/install:1)
+- or installing it from your distro packaging if available
+- or placing the extracted font files under `~/.fonts/nerd-fonts/sauce-code-pro`
 
 If you install it manually, refresh fontconfig with:
 
@@ -128,9 +127,9 @@ Use `SauceCodePro Nerd Font Mono` in every GUI terminal you care about.
 
 Do not try to force full Nerd Font parity into the Linux virtual console.
 
-If a fully reproducible Linux desktop install becomes important later, vendor
-the Nerd Font files under:
+The current dotfiles workflow expects the Nerd Font payload under:
 
-- `~/.dotfiles/_lib/sauce-code-pro-nerd-font`
+- `~/.fonts/nerd-fonts/sauce-code-pro`
 
-and let `dotfiles-install` wire them into `~/.local/share/fonts`.
+with [nerdfonts/install](/home/kag/.dotfiles/nerdfonts/install:1) managing the
+download into that directory.
