@@ -26,6 +26,7 @@ return {
       { "<leader>r", group = "run" },
       { "<leader>s", group = "search" },
       { "<leader>t", group = "toggle" },
+      { "<leader>tv", group = "view/listchars" },
       { "<leader>w", group = "windows" },
       { "<leader>y", group = "clipboard" },
       { "<localleader>", group = "local" },

@@ -111,6 +111,9 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 ## Vim-style editing helpers
 
 - `list` is enabled globally
+- `SPC tvt` toggles `list`
+- `SPC tva` switches to the old ASCII listchars profile
+- `SPC tvu` switches to the old Unicode listchars profile
 - wrapped lines show `+++ ` as the `showbreak` marker
 - insert mode restores Vim/Emacs crossover keys:
   - `Ctrl-a` line start

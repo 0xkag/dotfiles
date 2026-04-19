@@ -18,6 +18,22 @@ local root_markers = {
   "ansible.cfg",
   ".terraform",
 }
+local listchars_profiles = {
+  unicode = {
+    eol = "¶",
+    extends = ">",
+    nbsp = "_",
+    precedes = "<",
+    tab = "»·",
+  },
+  ascii = {
+    eol = "$",
+    extends = ">",
+    nbsp = "_",
+    precedes = "<",
+    tab = ">-",
+  },
+}
 
 local function to_absolute(path, cwd)
   if path:sub(1, 1) == "/" then
@@ -87,6 +103,24 @@ function M.dotfiles()
     cwd = vim.fs.joinpath(vim.env.HOME, ".dotfiles"),
     title = "Dotfiles",
   })
+end
+
+function M.listchars_profile(name)
+  local profile = listchars_profiles[name]
+  if not profile then
+    vim.notify("Unknown listchars profile: " .. tostring(name), vim.log.levels.WARN)
+    return
+  end
+
+  vim.opt.listchars = vim.tbl_extend("force", {}, profile)
+end
+
+function M.listchars_unicode()
+  M.listchars_profile("unicode")
+end
+
+function M.listchars_ascii()
+  M.listchars_profile("ascii")
 end
 
 local function normalize_range(start_pos, end_pos)
