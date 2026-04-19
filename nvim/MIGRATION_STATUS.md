@@ -87,6 +87,9 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 - Spacemacs code-mode parity follow-up pass completed for shared aliases:
   - shared LSP aliases now cover Java-style project diagnostics, execute action, restart workspace, project-type search, and reference/type-definition shortcuts
   - Go coverage summary is available under localleader without adding extra external tooling
+- Reading-focused code-browsing pass completed for mixed-language inspection:
+  - shared LSP localleader now includes incoming/outgoing call hierarchy helpers
+  - shared LSP localleader now includes subtype/supertype hierarchy helpers for servers that support type hierarchy
 
 ## Guardrails
 
@@ -111,7 +114,7 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - advanced Go helpers like go-play, graphical coverage views, test generation, and deeper refactors are still missing
   - advanced Java generator/refactor actions from the old Java layer are only loosely approximated through LSP actions
   - markdown and terraform now have a useful localleader baseline, but many niche layer-specific actions are still intentionally omitted
-  - some `lsp-ui`/peek-style overlays are approximated with Telescope rather than recreated exactly
+  - some `lsp-ui`/peek-style overlays are still approximated with Telescope or quickfix rather than recreated exactly
 - Emacs-native long tail is still unported:
   - heavy Org integrations
   - Elfeed
