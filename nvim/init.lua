@@ -35,7 +35,7 @@ require("config.theme_review")
 require("lazy").setup("plugins", {
   change_detection = { notify = false },
   install = {
-    colorscheme = { "cyberdream", "habamax" },
+    colorscheme = { "cyberpunk", "cyberdream", "habamax" },
   },
   ui = {
     border = "rounded",
