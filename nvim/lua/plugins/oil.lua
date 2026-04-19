@@ -29,6 +29,7 @@ return {
     keymaps = {
       ["q"] = { "actions.close", mode = "n" },
       ["<Esc>"] = { "actions.close", mode = "n" },
+      ["<C-g>"] = { "actions.close", mode = "n" },
     },
   },
 }
