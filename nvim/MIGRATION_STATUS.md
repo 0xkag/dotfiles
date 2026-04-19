@@ -81,6 +81,9 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - Go localleader helpers added for alternate test/source, imports, tests, run, and generate
   - Java localleader helpers added for alternate test/source, build, tests, task execution, and imports
   - shell-script helpers added for shebang/template insertion and line-continuation backslashes
+- Spacemacs code-mode parity second pass completed for secondary workflows:
+  - Markdown localleader helpers added for headings, links, images, tables, emphasis, blockquotes, and rendered preview/toggles
+  - Terraform localleader helpers added for validate, lint, and formatting checks without enabling autoformat on save
 
 ## Guardrails
 
@@ -104,7 +107,7 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 - Spacemacs code-mode parity is still partial:
   - advanced Go helpers like go-play, coverage views, test generation, and deeper refactors are still missing
   - advanced Java generator/refactor actions from the old Java layer are only loosely approximated through LSP actions
-  - markdown, terraform, and other secondary major-mode actions are only partially mirrored
+  - markdown and terraform now have a useful localleader baseline, but many niche layer-specific actions are still intentionally omitted
   - some `lsp-ui`/peek-style overlays are approximated with Telescope rather than recreated exactly
 - Emacs-native long tail is still unported:
   - heavy Org integrations
@@ -116,9 +119,9 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 ## Next Milestones
 
 - Milestone 3: continue secondary Spacemacs code-mode parity
-  - port the highest-value Markdown and Terraform major-mode actions that still matter
   - decide which advanced Go and Java helpers are worth implementing versus leaving behind
   - keep auditing `,` menus for gaps in daily Python, Go, Java, shell, and mixed-language workflows
+  - decide whether any additional Markdown or Terraform actions are worth the maintenance cost beyond the current baseline
 - Milestone 4: finish Vim parity review
   - visually verify the `ron` and `cyberpunk` ports in Neovim
   - decide whether any remaining old Vim aliases should come back as active mappings
