@@ -112,6 +112,8 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
   - `,gR` references alias
   - `,gs` workspace symbols
   - `,gS` all workspace symbols
+  - `,gkk`, `,gks`, `,gku` open type hierarchy, subtype hierarchy, and supertype hierarchy
+  - `,f<`, `,f>` open incoming and outgoing call hierarchies
   - `,Fa`, `,Fr`, `,Fs` manage and browse LSP workspace folders
   - `,hh` hover/docs
   - `,bd` LSP session info

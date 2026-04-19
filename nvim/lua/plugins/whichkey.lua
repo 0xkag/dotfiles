@@ -35,6 +35,7 @@ return {
       { "<localleader>b", group = "backend" },
       { "<localleader>c", group = "compile" },
       { "<localleader>e", group = "errors/exec" },
+      { "<localleader>f", group = "flow/calls" },
       { "<localleader>g", group = "goto" },
       { "<localleader>h", group = "help" },
       { "<localleader>i", group = "insert/import" },
