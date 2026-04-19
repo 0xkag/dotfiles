@@ -128,6 +128,7 @@ For picker-stack and future fzf-integration notes, see
 - `SPC cs` document symbols
 - `SPC os` toggle the outline sidebar
 - Neo-tree remains the tree/sidebar view, while Oil is the dired-style directory editor
+- `Ctrl-g` closes most popup/transient UIs such as Telescope, Oil, Neo-tree, and utility windows without becoming a global remap
 - Without LSP, `gd` and `gr` fall back to GNU Global when a GTAGS database exists
 - `SPC cg` prompts for a GNU Global symbol search
 - `SPC pu` updates the GNU Global database for the current project

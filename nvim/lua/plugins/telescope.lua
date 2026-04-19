@@ -130,9 +130,11 @@ return {
           i = {
             ["<C-h>"] = "which_key",
             ["<Esc>"] = actions.close,
+            ["<C-g>"] = actions.close,
           },
           n = {
             ["q"] = actions.close,
+            ["<C-g>"] = actions.close,
           },
         },
         sorting_strategy = "ascending",

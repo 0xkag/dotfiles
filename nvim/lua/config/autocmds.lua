@@ -213,6 +213,11 @@ autocmd("FileType", {
       desc = "Close window",
       silent = true,
     })
+    vim.keymap.set("n", "<C-g>", "<Cmd>close<CR>", {
+      buffer = event.buf,
+      desc = "Close window",
+      silent = true,
+    })
   end,
 })
 
@@ -227,6 +232,11 @@ autocmd("FileType", {
       silent = true,
     })
     vim.keymap.set("n", "<Esc>", "<Cmd>Neotree close<CR>", {
+      buffer = event.buf,
+      desc = "Close explorer",
+      silent = true,
+    })
+    vim.keymap.set("n", "<C-g>", "<Cmd>Neotree close<CR>", {
       buffer = event.buf,
       desc = "Close explorer",
       silent = true,

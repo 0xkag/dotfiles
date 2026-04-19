@@ -162,6 +162,13 @@ return {
             mc.clearCursors()
           end
         end)
+        layer({ "n", "x" }, "<C-g>", function()
+          if not mc.cursorsEnabled() then
+            mc.enableCursors()
+          else
+            mc.clearCursors()
+          end
+        end)
       end)
     end,
   },
