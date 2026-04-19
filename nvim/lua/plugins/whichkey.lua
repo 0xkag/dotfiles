@@ -7,6 +7,10 @@ return {
       mappings = false,
     },
     preset = "modern",
+    triggers = {
+      { "<auto>", mode = "nxso" },
+      { "<localleader>", mode = { "n", "x" } },
+    },
     spec = {
       { "<leader><tab>", desc = "alternate buffer" },
       { "<leader>b", group = "buffers" },
@@ -24,6 +28,12 @@ return {
       { "<leader>t", group = "toggle" },
       { "<leader>w", group = "windows" },
       { "<leader>y", group = "clipboard" },
+      { "<localleader>", group = "local" },
+      { "<localleader>a", group = "action", mode = { "n", "x" } },
+      { "<localleader>g", group = "goto" },
+      { "<localleader>h", group = "help" },
+      { "<localleader>r", group = "refactor" },
+      { "<localleader>=", group = "format" },
     },
     win = {
       border = "rounded",

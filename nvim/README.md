@@ -7,6 +7,7 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 
 - `SPC` is the main leader key
 - `,` is the local leader key
+- `SPC` and `,` both open `which-key` popups for discoverable mappings
 - `SPC TAB` switches to the alternate buffer
 - `SPC /` runs project grep
 - `SPC *` searches the current word in the project
@@ -32,6 +33,18 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 - `SPC t` toggles
 - `SPC w` windows
 - `SPC y` clipboard
+
+## Project workflow
+
+- `SPC pp` opens the recent-project switcher
+- `SPC pr` reopens the same recent-project picker
+- `SPC pa` adds the current project to the recent list
+- `SPC pd` removes the current project from the recent list
+- `SPC pf` finds files in the current project
+- `SPC pg` or `SPC p/` greps in the current project
+- `SPC pt` opens the project tree
+- Project switching saves the current session, changes directory, and restores the target project session when one exists
+- In the project picker, `<C-d>` in insert mode or `dd` in normal mode removes the selected project from history
 
 ## Useful commands
 
@@ -82,6 +95,16 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 - Without LSP, `gd` and `gr` fall back to GNU Global when a GTAGS database exists
 - `SPC cg` prompts for a GNU Global symbol search
 - `SPC pu` updates the GNU Global database for the current project
+- In LSP/code buffers, localleader mirrors Spacemacs major-mode navigation:
+  - `,gg` definition
+  - `,gb` jump back
+  - `,gi` implementation
+  - `,gr` references
+  - `,gs` workspace symbols
+  - `,hh` hover/docs
+  - `,rr` rename
+  - `,aa` code action
+  - `,=b` format buffer manually
 
 ## Evil Feel
 
