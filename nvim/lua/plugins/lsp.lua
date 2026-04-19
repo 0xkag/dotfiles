@@ -147,6 +147,24 @@ return {
         })
       end
 
+      local function choose_type_hierarchy()
+        vim.ui.select({
+          { kind = "subtypes", label = "Subtypes" },
+          { kind = "supertypes", label = "Supertypes" },
+        }, {
+          prompt = "Type hierarchy > ",
+          format_item = function(item)
+            return item.label
+          end,
+        }, function(choice)
+          if not choice then
+            return
+          end
+
+          vim.lsp.buf.typehierarchy(choice.kind)
+        end)
+      end
+
       local function highlight_symbol(bufnr)
         if not ensure_clients(bufnr, "highlight") then
           return
@@ -329,9 +347,18 @@ return {
           map("n", "<localleader>gM", builtin.lsp_document_symbols, "Document symbols")
           map("n", "<localleader>gs", builtin.lsp_dynamic_workspace_symbols, "Workspace symbols")
           map("n", "<localleader>gS", builtin.lsp_dynamic_workspace_symbols, "All workspace symbols")
+          map("n", "<localleader>gkk", choose_type_hierarchy, "Type hierarchy")
+          map("n", "<localleader>gks", function()
+            vim.lsp.buf.typehierarchy("subtypes")
+          end, "Subtype hierarchy")
+          map("n", "<localleader>gku", function()
+            vim.lsp.buf.typehierarchy("supertypes")
+          end, "Supertype hierarchy")
           map("n", "<localleader>gb", "<C-o>", "Jump back")
           map("n", "<localleader>gp", "<C-o>", "Jump back")
           map("n", "<localleader>gn", "<C-i>", "Jump forward")
+          map("n", "<localleader>f<", vim.lsp.buf.incoming_calls, "Incoming calls")
+          map("n", "<localleader>f>", vim.lsp.buf.outgoing_calls, "Outgoing calls")
           map("n", "<localleader>Fa", vim.lsp.buf.add_workspace_folder, "Add workspace folder")
           map("n", "<localleader>Fr", remove_workspace_folder, "Remove workspace folder")
           map("n", "<localleader>Fs", browse_workspace_folder, "Browse workspace folder")
