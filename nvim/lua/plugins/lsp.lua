@@ -20,6 +20,15 @@ return {
     },
     config = function()
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
+      local python_env = require("config.python")
+      local function refresh_pyright_config(new_config, root_dir)
+        new_config.settings = vim.tbl_deep_extend(
+          "force",
+          new_config.settings or {},
+          python_env.pyright_settings(root_dir)
+        )
+      end
+
       local servers = {
         ansiblels = {},
         bashls = {},
@@ -48,20 +57,28 @@ return {
         },
         marksman = {},
         pyright = {
-          settings = {
-            python = {
-              analysis = {
-                autoSearchPaths = true,
-                diagnosticMode = "workspace",
-                exclude = {
-                  "**/.mypy_cache",
-                  "**/.pytest_cache",
-                  "**/veritas-config/**",
-                },
-                useLibraryCodeForTypes = true,
-              },
-            },
-          },
+          before_init = function(_, new_config)
+            refresh_pyright_config(new_config, new_config.root_dir)
+          end,
+          on_attach = function(client, bufnr)
+            vim.api.nvim_buf_create_user_command(bufnr, "LspPyrightSetPythonPath", function(command)
+              local path = command.args
+              client.settings = vim.tbl_deep_extend("force", client.settings or {}, {
+                python = { pythonPath = path },
+              })
+              client:notify("workspace/didChangeConfiguration", {
+                settings = client.settings,
+              })
+            end, {
+              complete = "file",
+              desc = "Reconfigure pyright with the provided python path",
+              nargs = 1,
+            })
+          end,
+          on_new_config = function(new_config, root_dir)
+            refresh_pyright_config(new_config, root_dir)
+          end,
+          settings = python_env.pyright_settings(),
         },
         rust_analyzer = {
           settings = {
@@ -110,10 +127,13 @@ return {
             })
           end
 
-          map("gd", vim.lsp.buf.definition, "Go to definition")
+          map("gd", function()
+            builtin.lsp_definitions({ reuse_win = true })
+          end, "Go to definition")
           map("gD", vim.lsp.buf.declaration, "Go to declaration")
-          map("gi", vim.lsp.buf.implementation, "Go to implementation")
+          map("gi", builtin.lsp_implementations, "Go to implementation")
           map("gr", builtin.lsp_references, "References")
+          map("gy", builtin.lsp_type_definitions, "Type definitions")
           map("K", vim.lsp.buf.hover, "Hover")
           map("<leader>ca", vim.lsp.buf.code_action, "Code action")
           map("<leader>cr", vim.lsp.buf.rename, "Rename symbol")
@@ -122,6 +142,9 @@ return {
           end, "Buffer diagnostics")
           map("<leader>cs", builtin.lsp_document_symbols, "Document symbols")
           map("<leader>cS", builtin.lsp_dynamic_workspace_symbols, "Workspace symbols")
+          map("<leader>ci", builtin.lsp_implementations, "Implementations")
+          map("<leader>cR", builtin.lsp_references, "References")
+          map("<leader>cy", builtin.lsp_type_definitions, "Type definitions")
 
           if vim.lsp.inlay_hint then
             map("<leader>ch", function()
@@ -140,7 +163,6 @@ return {
 
       require("mason-lspconfig").setup({
         automatic_enable = false,
-        ensure_installed = vim.tbl_keys(servers),
       })
     end,
   },
