@@ -6,7 +6,7 @@ return {
     opts = {},
     config = function(_, opts)
       require("cyberdream").setup(opts)
-      vim.cmd.colorscheme("cyberdream")
+      vim.cmd.colorscheme("cyberpunk")
     end,
   },
   {
