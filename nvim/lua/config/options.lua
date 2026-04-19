@@ -19,10 +19,11 @@ opt.cursorline = true
 opt.wrap = false
 opt.linebreak = false
 opt.breakindent = true
+opt.showbreak = "+++ "
 opt.expandtab = true
-opt.shiftwidth = 2
-opt.tabstop = 2
-opt.softtabstop = 2
+opt.shiftwidth = 4
+opt.tabstop = 4
+opt.softtabstop = 4
 opt.autoindent = true
 opt.shiftround = true
 opt.updatetime = 200
@@ -38,10 +39,12 @@ opt.laststatus = 3
 opt.colorcolumn = "80"
 opt.virtualedit = "block"
 opt.joinspaces = true
+opt.autoread = true
 opt.spelllang = { "en_us" }
+opt.spellsuggest = "best,8"
 opt.modeline = true
 opt.wildmode = { "longest:full", "full" }
-opt.list = false
+opt.list = true
 opt.listchars = {
   tab = "» ",
   trail = "·",
@@ -72,6 +75,14 @@ opt.sessionoptions = {
 
 opt.shortmess:append("c")
 opt.diffopt:append("linematch:60")
+
+local dictionary = "/usr/share/dict/words"
+if vim.fn.filereadable(dictionary) == 1 then
+  opt.dictionary:append(dictionary)
+end
+
+-- Legacy Vim terminal tweak kept disabled for reference:
+-- vim.o.t_BE = ""
 
 if tools.available("rg") then
   opt.grepprg = "rg --vimgrep --smart-case --hidden"

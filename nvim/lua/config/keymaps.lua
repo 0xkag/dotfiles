@@ -12,6 +12,13 @@ local function edit_path(path)
 end
 
 map("i", "fd", "<Esc>", { desc = "Escape insert", silent = true })
+map("i", "<C-a>", "<Home>", { desc = "Line start", silent = true })
+map("i", "<C-e>", "<End>", { desc = "Line end", silent = true })
+map("i", "<C-w>", "<C-o>daW", { desc = "Delete word forward", silent = true })
+map("i", "<C-k>", "<C-o>D", { desc = "Delete to end of line", silent = true })
+map("i", "<C-h>", "<C-o>h", { desc = "Cursor left", silent = true })
+map("i", "<C-j>", "<C-o>j", { desc = "Cursor down", silent = true })
+map("i", "<C-l>", "<C-o>l", { desc = "Cursor right", silent = true })
 map("n", "Y", "y$", { desc = "Yank to end of line", silent = true })
 map("n", "gV", "`[v`]", { desc = "Select last changed text", silent = true })
 
@@ -23,6 +30,7 @@ map("n", "$", "g$", { silent = true })
 
 map("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move lines down", silent = true })
 map("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move lines up", silent = true })
+map("x", ".", ":normal .<CR>", { desc = "Repeat over selection", silent = true })
 
 map({ "n", "t" }, "<C-h>", "<Cmd>wincmd h<CR>", { silent = true })
 map({ "n", "t" }, "<C-j>", "<Cmd>wincmd j<CR>", { silent = true })
@@ -60,6 +68,7 @@ end, { desc = "Search selection forward", silent = true })
 map("x", "#", function()
   util.search_visual(false)
 end, { desc = "Search selection backward", silent = true })
+map("x", "<leader>%", util.substitute_visual, { desc = "Replace selection in buffer", silent = true })
 map("n", "<localleader>gg", util.global_definitions, { desc = "Go to definition", silent = true })
 map("n", "<localleader>gr", util.global_references, { desc = "References", silent = true })
 map("n", "<localleader>gs", util.global_prompt, { desc = "Project symbols", silent = true })
@@ -78,6 +87,12 @@ map({ "n", "x" }, "<leader>yp", '"+p', { desc = "Paste after" })
 map({ "n", "x" }, "<leader>yP", '"+P', { desc = "Paste before" })
 map("n", "<leader><space>", '"+yy', { desc = "Copy current line" })
 map("x", "<leader><space>", '"+y', { desc = "Copy selection" })
+
+-- Disabled Vim-era clipboard fallback for hosts without unnamedplus/clipboard:
+-- map("x", "<leader>yy", "<Cmd>w !clip-in<CR>", { desc = "Yank to clipboard fallback", silent = true })
+-- map("n", "<leader>yY", "<Cmd>.w !clip-in<CR>", { desc = "Yank line to clipboard fallback", silent = true })
+-- map("n", "<leader>yp", "<Cmd>r !clip-out<CR>", { desc = "Paste after fallback", silent = true })
+-- map("n", "<leader>yP", "<Cmd>.-1r !clip-out<CR>", { desc = "Paste before fallback", silent = true })
 
 map("n", "<leader>wv", "<C-w>v", { desc = "Vertical split" })
 map("n", "<leader>ws", "<C-w>s", { desc = "Horizontal split" })

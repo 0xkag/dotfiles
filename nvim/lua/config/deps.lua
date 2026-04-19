@@ -14,6 +14,11 @@ local features = {
     mode = "all",
     bins = { "rg" },
   },
+  binary_edit = {
+    label = "Binary editing",
+    mode = "all",
+    bins = { "xxd" },
+  },
   gnu_global = {
     label = "GNU Global fallback navigation",
     mode = "all",
@@ -159,6 +164,7 @@ local features = {
 local core_features = {
   "core_git",
   "core_search",
+  "binary_edit",
 }
 
 local filetype_features = {
@@ -187,6 +193,7 @@ local filetype_features = {
 local all_features = {
   "core_git",
   "core_search",
+  "binary_edit",
   "gnu_global",
   "pyenv",
   "python_lsp",
@@ -220,6 +227,7 @@ local all_features = {
 local startup_features = {
   "core_git",
   "core_search",
+  "binary_edit",
   "gnu_global",
   "go_lsp",
   "go_format",
