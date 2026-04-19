@@ -101,6 +101,9 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - restored command-line and normal-mode `Ctrl-a` / `Ctrl-e` home/end behavior
   - restored legacy clipboard yank aliases on `SPC C` and `SPC Y`
   - blended the sign column with the normal background for closer Vim-era visuals
+- Theme review helper added:
+  - `:ThemeReview` opens Python, Markdown, and diff fixtures for interactive review of `cyberdream`, `ron`, and `cyberpunk`
+  - textual comparison found the `ron` and `cyberpunk` ports faithful overall, with `SignColumn` intentionally blended into `Normal` to match the old Vim setup
 
 ## Guardrails
 

@@ -1,0 +1,11 @@
+diff --git a/theme.txt b/theme.txt
+index 1111111..2222222 100644
+--- a/theme.txt
++++ b/theme.txt
+@@ -1,4 +1,5 @@
+-old line
++new line
+ unchanged
+-removed line
++added line
++SearchTarget

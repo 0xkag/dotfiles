@@ -30,6 +30,7 @@ require("config.python")
 require("config.deps")
 require("config.projects").setup()
 require("config.keymaps")
+require("config.theme_review")
 
 require("lazy").setup("plugins", {
   change_detection = { notify = false },
