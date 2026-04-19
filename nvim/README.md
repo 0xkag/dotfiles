@@ -9,16 +9,25 @@ For Python debugging tradeoffs and future DAP notes, see
 For deferred decisions around remote editing and Org-style literal runbooks,
 see [REMOTE_AND_RUNBOOK_NOTES.md](/home/kag/.dotfiles/nvim/REMOTE_AND_RUNBOOK_NOTES.md:1).
 
+For picker-stack and future fzf-integration notes, see
+[PICKER_NOTES.md](/home/kag/.dotfiles/nvim/PICKER_NOTES.md:1).
+
 ## Core keys
 
 - `SPC` is the main leader key
 - `,` is the local leader key
 - `SPC` and `,` both open `which-key` popups for discoverable mappings
+- `SPC SPC` opens searchable commands, similar to a lightweight Spacemacs `SPC SPC`
+- `SPC ?` opens searchable keymaps
 - Global indentation defaults to 4 spaces; common languages override that explicitly
 - `SPC TAB` switches to the alternate buffer
 - `SPC /` runs project grep
 - `SPC *` searches the current word in the project
 - visual `*` and `#` search the current selection forward or backward
+- `Ctrl-Space` opens completion
+- `Tab` / `Shift-Tab` navigate completion or snippets
+- `Enter` confirms completion
+- `Esc` aborts completion when the popup menu is open
 - `fd` exits insert mode
 - `Y` yanks to end of line
 - `gl` and `gL` align text
@@ -65,6 +74,8 @@ see [REMOTE_AND_RUNBOOK_NOTES.md](/home/kag/.dotfiles/nvim/REMOTE_AND_RUNBOOK_NO
 - `:ConformInfo` inspect formatter setup
 - `:Neogit` open the git UI
 - `:Oil` open a dired-style editable directory buffer
+- `:Telescope commands` search commands
+- `:Telescope keymaps` search mappings
 - `:NvimDeps` show missing configured dependencies on `PATH`
 - `:NvimDeps current` show missing dependencies for the current buffer workflow
 - `:PyenvInfo` show the Python environment Neovim resolved for the current buffer
@@ -79,6 +90,7 @@ see [REMOTE_AND_RUNBOOK_NOTES.md](/home/kag/.dotfiles/nvim/REMOTE_AND_RUNBOOK_NO
 - `SPC cL` open diagnostics in the location list
 - Automatic linting is enabled on read and write when a supported linter exists
 - Current machine support includes `shellcheck`, `yamllint`, `ruff`, `mypy`, fallback `pylint` or `flake8`, and `tflint`
+- completion popup navigation also works with the `Up` and `Down` arrow keys
 
 ## Python workflow
 
@@ -111,6 +123,8 @@ see [REMOTE_AND_RUNBOOK_NOTES.md](/home/kag/.dotfiles/nvim/REMOTE_AND_RUNBOOK_NO
 - `SPC pt` opens the project tree
 - `SPC od` opens the current directory in Oil
 - `SPC oD` opens the current project root in Oil
+- `SPC SPC` searches commands
+- `SPC ?` or `SPC s k` searches keymaps
 - `SPC cs` document symbols
 - `SPC os` toggle the outline sidebar
 - Neo-tree remains the tree/sidebar view, while Oil is the dired-style directory editor
@@ -197,8 +211,7 @@ see [REMOTE_AND_RUNBOOK_NOTES.md](/home/kag/.dotfiles/nvim/REMOTE_AND_RUNBOOK_NO
   - `Ctrl-a` line start
   - `Ctrl-e` line end
   - `Ctrl-w` delete word forward
-  - `Ctrl-k` delete to end of line
-  - `Ctrl-h`, `Ctrl-j`, `Ctrl-l` move left, down, and right
+  - `Ctrl-h`, `Ctrl-l` move left and right
 - command-line mode restores `Ctrl-a` and `Ctrl-e`
 - normal mode keeps the old Vim `Ctrl-a` / `Ctrl-e` home/end remaps
 - visual `.` repeats the last change across the selection

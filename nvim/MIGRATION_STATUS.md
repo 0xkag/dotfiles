@@ -115,6 +115,17 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - `SPC o d` opens the current directory as an editable directory buffer
   - `SPC o D` opens the current project root the same way
   - Neo-tree remains the tree/sidebar workflow, while Oil covers the Dired-style editing workflow
+- Searchable command and keybinding discovery completed:
+  - `SPC SPC` opens searchable commands through Telescope
+  - `SPC ?` and `SPC s k` open searchable keymaps
+  - `which-key` still covers transient leader and localleader discovery
+- Completion and command-line cleanup completed:
+  - command-line completion now uses the classic `wildmenu` style instead of the popup-menu `wildoptions=pum` behavior
+  - insert completion keeps `Ctrl-a` / `Ctrl-e` for line start/end
+  - completion trigger/accept/abort are centered on `Ctrl-Space`, `Enter`, `Esc`, `Tab`, and `Shift-Tab`
+- Picker and future fzf options documented:
+  - Telescope remains the current picker stack
+  - low-risk `telescope-fzf-native.nvim` and stronger `fzf-lua` options are written down in `~/.dotfiles/nvim/PICKER_NOTES.md`
 
 ## Guardrails
 

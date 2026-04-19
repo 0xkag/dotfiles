@@ -9,6 +9,20 @@ return {
   },
   keys = {
     {
+      "<leader><leader>",
+      function()
+        require("telescope.builtin").commands()
+      end,
+      desc = "Commands",
+    },
+    {
+      "<leader>?",
+      function()
+        require("telescope.builtin").keymaps()
+      end,
+      desc = "Keymaps",
+    },
+    {
       "<leader>bb",
       function()
         require("telescope.builtin").buffers()
@@ -88,6 +102,13 @@ return {
         require("telescope.builtin").diagnostics()
       end,
       desc = "Search diagnostics",
+    },
+    {
+      "<leader>sk",
+      function()
+        require("telescope.builtin").keymaps()
+      end,
+      desc = "Search keymaps",
     },
   },
   opts = function()
