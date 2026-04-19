@@ -54,6 +54,7 @@ For Python debugging tradeoffs and future DAP notes, see
 ## Useful commands
 
 - `:colorscheme cyberdream`, `:colorscheme ron`, or `:colorscheme cyberpunk`
+- `:ThemeReview` opens a Python/Markdown/diff fixture for side-by-side theme checks
 - `:Mason` manage language servers
 - `:ConformInfo` inspect formatter setup
 - `:Neogit` open the git UI
