@@ -58,6 +58,7 @@ return {
   },
   {
     "nvim-neotest/neotest",
+    ft = "python",
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-neotest/nvim-nio",
@@ -134,6 +135,43 @@ return {
             end,
           }),
         },
+      })
+
+      local group = vim.api.nvim_create_augroup("python_test_keymaps", { clear = true })
+      vim.api.nvim_create_autocmd("FileType", {
+        group = group,
+        pattern = "python",
+        callback = function(event)
+          local map = function(lhs, rhs, desc)
+            vim.keymap.set("n", lhs, rhs, {
+              buffer = event.buf,
+              desc = desc,
+              silent = true,
+            })
+          end
+
+          map("<localleader>tt", function()
+            require("neotest").run.run()
+          end, "Run nearest test")
+          map("<localleader>tf", function()
+            require("neotest").run.run(vim.fn.expand("%"))
+          end, "Run file tests")
+          map("<localleader>tl", function()
+            require("neotest").run.run_last()
+          end, "Run last test")
+          map("<localleader>ts", function()
+            require("neotest").summary.toggle()
+          end, "Toggle test summary")
+          map("<localleader>to", function()
+            require("neotest").output.open({ enter = true })
+          end, "Open test output")
+          map("<localleader>tO", function()
+            require("neotest").output_panel.toggle()
+          end, "Toggle output panel")
+          map("<localleader>tx", function()
+            require("neotest").run.stop()
+          end, "Stop test run")
+        end,
       })
     end,
   },

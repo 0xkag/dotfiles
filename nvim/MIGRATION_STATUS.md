@@ -18,6 +18,9 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - `5fc01c5` `Tighten Neovim keybindings and tool setup`
   - `fdef8bc` `Add Neovim migration status file`
   - `cebe770` `Add Evil-style jump and surround behavior`
+  - `215d3d0` `Add project switching and localleader parity`
+  - `0bbd3cc` `Port Vim behavior and themes to Neovim`
+  - `e87d67e` `Finish Vim cleanup mappings`
 
 ## Completed
 
@@ -72,6 +75,12 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - legacy clipboard fallback shell commands ported as disabled comments
   - legacy `t_BE` tweak ported as a disabled comment
   - `ron` and `cyberpunk` colorschemes ported as selectable Neovim themes
+- Spacemacs code-mode parity first pass completed for primary coding workflows:
+  - shared LSP localleader prefixes expanded under `,g`, `,F`, `,a`, `,b`, `,=`, `,x`, and `,T`
+  - Python test aliases added under `,t`
+  - Go localleader helpers added for alternate test/source, imports, tests, run, and generate
+  - Java localleader helpers added for alternate test/source, build, tests, task execution, and imports
+  - shell-script helpers added for shebang/template insertion and line-continuation backslashes
 
 ## Guardrails
 
@@ -89,9 +98,14 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 
 ## Missing Or Partial
 
-- Native Vim-to-Neovim parity is still not fully reviewed end-to-end:
+- Native Vim-to-Neovim parity still needs a final visual review:
   - old clipboard fallback aliases are preserved only as disabled reference comments
   - exact theme parity still needs a visual review of `ron` and `cyberpunk` inside Neovim
+- Spacemacs code-mode parity is still partial:
+  - advanced Go helpers like go-play, coverage views, test generation, and deeper refactors are still missing
+  - advanced Java generator/refactor actions from the old Java layer are only loosely approximated through LSP actions
+  - markdown, terraform, and other secondary major-mode actions are only partially mirrored
+  - some `lsp-ui`/peek-style overlays are approximated with Telescope rather than recreated exactly
 - Emacs-native long tail is still unported:
   - heavy Org integrations
   - Elfeed
@@ -101,11 +115,11 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 
 ## Next Milestones
 
-- Milestone 3: continue Spacemacs parity audit
-  - review remaining code-mode localleader bindings
-  - keep localleader `which-key` coverage consistent across filetypes
-  - decide which Emacs-native long-tail layers matter enough to port
-- Milestone 4: finish Vim parity cleanup
+- Milestone 3: continue secondary Spacemacs code-mode parity
+  - port the highest-value Markdown and Terraform major-mode actions that still matter
+  - decide which advanced Go and Java helpers are worth implementing versus leaving behind
+  - keep auditing `,` menus for gaps in daily Python, Go, Java, shell, and mixed-language workflows
+- Milestone 4: finish Vim parity review
   - visually verify the `ron` and `cyberpunk` ports in Neovim
   - decide whether any remaining old Vim aliases should come back as active mappings
 

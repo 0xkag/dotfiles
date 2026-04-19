@@ -99,14 +99,53 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 - `SPC pu` updates the GNU Global database for the current project
 - In LSP/code buffers, localleader mirrors Spacemacs major-mode navigation:
   - `,gg` definition
+  - `,gD` declaration
   - `,gb` jump back
+  - `,gp` jump back
+  - `,gn` jump forward
+  - `,ge` buffer diagnostics
+  - `,gM` document symbols
   - `,gi` implementation
   - `,gr` references
   - `,gs` workspace symbols
+  - `,gS` all workspace symbols
+  - `,Fa`, `,Fr`, `,Fs` manage and browse LSP workspace folders
   - `,hh` hover/docs
+  - `,bd` LSP session info
+  - `,br`, `,bs`, `,bv` restart, stop, or inspect active LSP clients
   - `,rr` rename
   - `,aa` code action
+  - `,af` fix action
+  - `,ar` refactor action
+  - `,as` source action
   - `,=b` format buffer manually
+  - visual `,=r` format selection
+  - `,=o` organize imports
+  - `,xh`, `,xl`, `,xL` highlight references and refresh/run code lenses
+  - `,Tl` toggles inlay hints when the server supports them
+  - in Python buffers, `,tt`, `,tf`, `,tl`, `,ts`, `,to`, `,tO`, `,tx` mirror the test workflow under localleader
+
+## Language localleader
+
+- Python:
+  - `,tt`, `,tf`, `,tl`, `,ts`, `,to`, `,tO`, `,tx` run and inspect tests
+- Go:
+  - `,ga` alternate between source and test
+  - `,ig` jump to imports
+  - `,ir` or `,ri` organize imports
+  - `,tp`, `,tP`, `,tt`, `,tl` run package, project, nearest, or last tests
+  - `,xx` run the current package
+  - `,xg`, `,xG` run `go generate` for the file or project
+- Java:
+  - `,ga` alternate between source and test
+  - `,cc` build the project
+  - `,ta`, `,tc`, `,tt`, `,tl` run all, class, nearest, or last tests
+  - `,x:` runs a Maven or Gradle task
+  - `,ri` organizes imports
+- Shell:
+  - `,i!` inserts a shebang
+  - `,ic`, `,ii`, `,if`, `,io`, `,ie`, `,iw`, `,ir`, `,is`, `,iu`, `,ig` insert common shell templates
+  - `,\` appends line-continuation backslashes to the current line or visual selection
 
 ## Vim-style editing helpers
 
