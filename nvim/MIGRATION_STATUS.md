@@ -104,6 +104,8 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 - Theme review helper added:
   - `:ThemeReview` opens Python, Markdown, and diff fixtures for interactive review of `cyberdream`, `ron`, and `cyberpunk`
   - textual comparison found the `ron` and `cyberpunk` ports faithful overall, with `SignColumn` intentionally blended into `Normal` to match the old Vim setup
+- Interactive theme review completed:
+  - `ron` and `cyberpunk` were checked in the real terminal and look good enough to keep as-is
 
 ## Guardrails
 
@@ -123,7 +125,6 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 
 - Native Vim-to-Neovim parity still needs a final visual review:
   - old clipboard fallback aliases are preserved only as disabled reference comments
-  - exact theme parity still needs a real interactive visual review of `ron` and `cyberpunk` inside Neovim
   - Neovim intentionally leaves global `textwidth` unset, unlike the old Vim `textwidth=78`, to avoid surprise wrapping in code buffers
 - Spacemacs code-mode parity is still partial:
   - advanced Go helpers like go-play, graphical coverage views, test generation, and deeper refactors are still missing
@@ -148,7 +149,6 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - keep the dependency reporting explicit either way
   - only add a DAP stack if you decide the extra UI and moving parts are worth it
 - Milestone 4: finish Vim parity review
-  - interactively inspect `ron` and `cyberpunk` in your real terminal
   - decide whether the old clipboard fallback aliases should remain comments or become an optional toggle
   - decide whether any remaining old Vim aliases should come back as active mappings
 
