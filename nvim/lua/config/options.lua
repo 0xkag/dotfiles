@@ -3,6 +3,8 @@ local tools = require("config.tools")
 
 opt.number = true
 opt.relativenumber = true
+opt.background = "dark"
+opt.lazyredraw = true
 opt.mouse = "a"
 opt.clipboard = "unnamedplus"
 opt.ignorecase = true
@@ -20,6 +22,7 @@ opt.wrap = false
 opt.linebreak = false
 opt.breakindent = true
 opt.showbreak = "+++ "
+opt.showmatch = true
 opt.expandtab = true
 opt.shiftwidth = 4
 opt.tabstop = 4
@@ -27,7 +30,7 @@ opt.softtabstop = 4
 opt.autoindent = true
 opt.shiftround = true
 opt.updatetime = 200
-opt.timeoutlen = 400
+opt.timeoutlen = 500
 opt.completeopt = { "menu", "menuone", "noselect" }
 opt.undofile = true
 opt.backup = false
@@ -43,6 +46,7 @@ opt.autoread = true
 opt.spelllang = { "en_us" }
 opt.spellsuggest = "best,8"
 opt.modeline = true
+opt.wildmenu = true
 opt.wildmode = { "longest:full", "full" }
 opt.list = true
 opt.listchars = {
@@ -57,6 +61,8 @@ opt.fillchars = {
   foldclose = "▸",
   foldsep = " ",
 }
+-- Old Vim used a global textwidth of 78. Leave that unset here to avoid
+-- surprise automatic wrapping in code buffers; keep formatting explicit.
 opt.foldmethod = "expr"
 opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldenable = true

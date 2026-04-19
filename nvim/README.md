@@ -3,6 +3,9 @@
 This configuration is a Spacemacs-style Neovim setup centered on modal editing,
 leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 
+For Python debugging tradeoffs and future DAP notes, see
+[DEBUGGING_NOTES.md](/home/kag/.dotfiles/nvim/DEBUGGING_NOTES.md:1).
+
 ## Core keys
 
 - `SPC` is the main leader key
@@ -185,11 +188,14 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
   - `Ctrl-w` delete word forward
   - `Ctrl-k` delete to end of line
   - `Ctrl-h`, `Ctrl-j`, `Ctrl-l` move left, down, and right
+- command-line mode restores `Ctrl-a` and `Ctrl-e`
+- normal mode keeps the old Vim `Ctrl-a` / `Ctrl-e` home/end remaps
 - visual `.` repeats the last change across the selection
 - visual `<leader>%` seeds a whole-buffer substitute using the selected text
 - `autoread` is enabled
 - dictionary/spelling helpers use `/usr/share/dict/words` when present and `spellsuggest=best,8`
 - opening `*.bin` uses the old `xxd` round-trip workflow when `xxd` is installed
+- `SPC C` and `SPC Y` provide legacy clipboard yank aliases from the old Vim setup
 
 ## Evil Feel
 
