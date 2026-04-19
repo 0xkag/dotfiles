@@ -19,6 +19,15 @@ local function set_indent(width, opts)
   end
 end
 
+local function blend_signcolumn()
+  vim.api.nvim_set_hl(0, "SignColumn", { link = "Normal" })
+end
+
+autocmd("ColorScheme", {
+  group = general,
+  callback = blend_signcolumn,
+})
+
 autocmd("TextYankPost", {
   group = general,
   callback = function()
@@ -32,6 +41,11 @@ autocmd({ "BufRead", "BufNewFile" }, {
   callback = function()
     vim.bo.filetype = "java"
   end,
+})
+
+autocmd("VimEnter", {
+  group = general,
+  callback = blend_signcolumn,
 })
 
 autocmd({ "BufRead", "BufNewFile" }, {

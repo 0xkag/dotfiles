@@ -94,6 +94,13 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - Python debug commands now use the resolved pyenv interpreter instead of assuming a global Python
   - missing `ipdb` now shows up explicitly in dependency checks for Python buffers
   - leader and localleader debug commands are available for file-level and pytest-based debugging
+- Python debugging options documented:
+  - current terminal/ipdb flow, lightweight gutter-breakpoint option, and full DAP tradeoffs are written down in `~/.dotfiles/nvim/DEBUGGING_NOTES.md`
+- Vim parity follow-up completed:
+  - restored `showmatch`, `lazyredraw`, and the old `timeoutlen`
+  - restored command-line and normal-mode `Ctrl-a` / `Ctrl-e` home/end behavior
+  - restored legacy clipboard yank aliases on `SPC C` and `SPC Y`
+  - blended the sign column with the normal background for closer Vim-era visuals
 
 ## Guardrails
 
@@ -113,7 +120,8 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 
 - Native Vim-to-Neovim parity still needs a final visual review:
   - old clipboard fallback aliases are preserved only as disabled reference comments
-  - exact theme parity still needs a visual review of `ron` and `cyberpunk` inside Neovim
+  - exact theme parity still needs a real interactive visual review of `ron` and `cyberpunk` inside Neovim
+  - Neovim intentionally leaves global `textwidth` unset, unlike the old Vim `textwidth=78`, to avoid surprise wrapping in code buffers
 - Spacemacs code-mode parity is still partial:
   - advanced Go helpers like go-play, graphical coverage views, test generation, and deeper refactors are still missing
   - advanced Java generator/refactor actions from the old Java layer are only loosely approximated through LSP actions
@@ -137,7 +145,8 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - keep the dependency reporting explicit either way
   - only add a DAP stack if you decide the extra UI and moving parts are worth it
 - Milestone 4: finish Vim parity review
-  - visually verify the `ron` and `cyberpunk` ports in Neovim
+  - interactively inspect `ron` and `cyberpunk` in your real terminal
+  - decide whether the old clipboard fallback aliases should remain comments or become an optional toggle
   - decide whether any remaining old Vim aliases should come back as active mappings
 
 ## Validation Baseline
