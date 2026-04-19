@@ -1,4 +1,5 @@
 local opt = vim.opt
+local tools = require("config.tools")
 
 opt.number = true
 opt.relativenumber = true
@@ -72,10 +73,10 @@ opt.sessionoptions = {
 opt.shortmess:append("c")
 opt.diffopt:append("linematch:60")
 
-if vim.fn.executable("rg") == 1 then
+if tools.available("rg") then
   opt.grepprg = "rg --vimgrep --smart-case --hidden"
   opt.grepformat = "%f:%l:%c:%m"
-elseif vim.fn.executable("grep") == 1 then
+elseif tools.available("grep") then
   opt.grepprg = "grep -RIn"
   opt.grepformat = "%f:%l:%m"
 end

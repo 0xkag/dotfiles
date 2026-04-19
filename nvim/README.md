@@ -7,6 +7,9 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 
 - `SPC` is the main leader key
 - `,` is the local leader key
+- `SPC TAB` switches to the alternate buffer
+- `SPC /` runs project grep
+- `SPC *` searches the current word in the project
 - `fd` exits insert mode
 - `Y` yanks to end of line
 - `gl` and `gL` align text
@@ -17,6 +20,7 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 - `SPC c` code and LSP
 - `SPC e` edit and multiple cursors
 - `SPC f` files
+- `SPC f e` config files
 - `SPC g` git
 - `SPC o` open, org, outline, and terminals
 - `SPC p` project
@@ -62,6 +66,8 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 - `gi` open implementations through Telescope
 - `gr` open references through Telescope
 - `gy` open type definitions through Telescope
+- `SPC ft` toggles the file tree
+- `SPC pt` opens the project tree
 - `SPC cs` document symbols
 - `SPC os` toggle the outline sidebar
 - Without LSP, `gd` and `gr` fall back to GNU Global when a GTAGS database exists
@@ -81,6 +87,7 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 - Language servers are not auto-installed by this config
 - Missing servers are reported through dependency checks instead of background installation attempts
 - Use `:Mason` only when you want Neovim-managed installs, or install servers on your normal `PATH`
+- `:MasonInstall` and related Mason commands are available directly even in a fresh lazy-loaded session
 
 ## Org defaults
 

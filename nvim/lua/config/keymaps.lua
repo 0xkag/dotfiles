@@ -7,6 +7,10 @@ local function toggle_window_option(name)
   vim.wo[name] = not vim.wo[name]
 end
 
+local function edit_path(path)
+  vim.cmd.edit(vim.fn.fnameescape(path))
+end
+
 map("i", "fd", "<Esc>", { desc = "Escape insert", silent = true })
 map("n", "Y", "y$", { desc = "Yank to end of line", silent = true })
 map("n", "gV", "`[v`]", { desc = "Select last changed text", silent = true })
@@ -32,9 +36,14 @@ map("i", "<C-x><C-s>", "<C-o>:write<CR>", { desc = "Save file", silent = true })
 
 map("n", "<leader>fs", "<Cmd>write<CR>", { desc = "Save file", silent = true })
 map("n", "<leader>fS", "<Cmd>wall<CR>", { desc = "Save all files", silent = true })
+map("n", "<leader>fev", function()
+  edit_path(vim.fs.joinpath(vim.env.HOME, ".dotfiles", "nvim", "init.lua"))
+end, { desc = "Edit init.lua", silent = true })
+map("n", "<leader>fed", util.dotfiles, { desc = "Edit dotfiles", silent = true })
 
 map("n", "<leader>bn", "<Cmd>bnext<CR>", { desc = "Next buffer", silent = true })
 map("n", "<leader>bp", "<Cmd>bprevious<CR>", { desc = "Previous buffer", silent = true })
+map("n", "<leader><Tab>", "<C-^>", { desc = "Alternate buffer", silent = true })
 map("n", "<leader>bd", function()
   require("mini.bufremove").delete(0, false)
 end, { desc = "Delete buffer" })
@@ -62,10 +71,16 @@ map("x", "<leader><space>", '"+y', { desc = "Copy selection" })
 
 map("n", "<leader>wv", "<C-w>v", { desc = "Vertical split" })
 map("n", "<leader>ws", "<C-w>s", { desc = "Horizontal split" })
+map("n", "<leader>w/", "<C-w>v", { desc = "Vertical split", silent = true })
+map("n", "<leader>w-", "<C-w>s", { desc = "Horizontal split", silent = true })
 map("n", "<leader>wd", "<Cmd>close<CR>", { desc = "Close window", silent = true })
 map("n", "<leader>wo", "<Cmd>only<CR>", { desc = "Only window", silent = true })
 map("n", "<leader>w=", "<C-w>=", { desc = "Balance windows" })
 map("n", "<leader>wm", "<Cmd>wincmd _<Bar>wincmd |<CR>", { desc = "Maximize window", silent = true })
+map("n", "<leader>wh", "<Cmd>wincmd h<CR>", { desc = "Window left", silent = true })
+map("n", "<leader>wj", "<Cmd>wincmd j<CR>", { desc = "Window down", silent = true })
+map("n", "<leader>wk", "<Cmd>wincmd k<CR>", { desc = "Window up", silent = true })
+map("n", "<leader>wl", "<Cmd>wincmd l<CR>", { desc = "Window right", silent = true })
 
 map("n", "<leader>tn", function()
   if vim.wo.number and vim.wo.relativenumber then

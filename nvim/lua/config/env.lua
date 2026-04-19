@@ -29,3 +29,8 @@ end
 -- when an interactive shell has them. Prepend the shims directory here so PATH
 -- resolution inside Neovim stays consistent with the rest of the system.
 prepend_path(vim.fs.joinpath(vim.env.HOME, ".local", "share", "mise", "shims"))
+
+-- Mason-managed tools live under Neovim's data directory rather than the shell
+-- PATH. Prepend that bin directory as well so dependency checks and runtime
+-- tool resolution agree about what Neovim can actually execute.
+prepend_path(vim.fs.joinpath(vim.fn.stdpath("data"), "mason", "bin"))
