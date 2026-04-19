@@ -101,6 +101,7 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
   - restored command-line and normal-mode `Ctrl-a` / `Ctrl-e` home/end behavior
   - restored legacy clipboard yank aliases on `SPC C` and `SPC Y`
   - blended the sign column with the normal background for closer Vim-era visuals
+  - restored global `textwidth=78` and the old `formatoptions` additions
 - Theme review helper added:
   - `:ThemeReview` opens Python, Markdown, and diff fixtures for interactive review of `cyberdream`, `ron`, and `cyberpunk`
   - textual comparison found the `ron` and `cyberpunk` ports faithful overall, with `SignColumn` intentionally blended into `Normal` to match the old Vim setup
@@ -125,7 +126,6 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 
 - Native Vim-to-Neovim parity still needs a final visual review:
   - old clipboard fallback aliases are preserved only as disabled reference comments
-  - Neovim intentionally leaves global `textwidth` unset, unlike the old Vim `textwidth=78`, to avoid surprise wrapping in code buffers
 - Spacemacs code-mode parity is still partial:
   - advanced Go helpers like go-play, graphical coverage views, test generation, and deeper refactors are still missing
   - advanced Java generator/refactor actions from the old Java layer are only loosely approximated through LSP actions
