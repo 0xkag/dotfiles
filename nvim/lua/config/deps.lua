@@ -1,6 +1,7 @@
 local M = {}
 
 local notified = {}
+local python_env = require("config.python")
 local tools = require("config.tools")
 
 local features = {
@@ -53,6 +54,17 @@ local features = {
     label = "Python tests",
     mode = "all",
     bins = { "pytest" },
+  },
+  python_debug = {
+    label = "Python debugging",
+    check = function(bufnr)
+      local status = python_env.module_status("ipdb", bufnr)
+      if status.available then
+        return true, {}
+      end
+
+      return false, { status.detail }
+    end,
   },
   go_lsp = {
     label = "Go LSP",
@@ -185,7 +197,7 @@ local filetype_features = {
   jsonc = { "json_lsp", "js_format" },
   lua = { "lua_lsp", "lua_format" },
   markdown = { "markdown_lsp" },
-  python = { "pyenv", "python_lsp", "python_format", "python_lint", "python_types", "python_test" },
+  python = { "pyenv", "python_lsp", "python_format", "python_lint", "python_types", "python_test", "python_debug" },
   rust = { "rust_lsp", "rust_format" },
   sh = { "shell_lsp", "shell_format", "shell_lint" },
   terraform = { "terraform_lsp", "terraform_format", "terraform_lint" },
@@ -206,6 +218,7 @@ local all_features = {
   "python_lint",
   "python_types",
   "python_test",
+  "python_debug",
   "go_lsp",
   "go_runtime",
   "go_format",
@@ -263,7 +276,11 @@ local function executable(bin)
   return bin ~= nil and bin ~= "" and tools.available(bin)
 end
 
-local function check_feature(feature)
+local function check_feature(feature, bufnr)
+  if type(feature.check) == "function" then
+    return feature.check(bufnr)
+  end
+
   if feature.mode == "any" then
     for _, bin in ipairs(feature.bins) do
       if executable(bin) then
@@ -288,13 +305,13 @@ local function check_feature(feature)
   return #missing == 0, missing
 end
 
-local function collect_lines(feature_ids)
+local function collect_lines(feature_ids, bufnr)
   local lines = {}
 
   for _, id in ipairs(feature_ids) do
     local feature = features[id]
     if feature then
-      local ok, missing = check_feature(feature)
+      local ok, missing = check_feature(feature, bufnr)
       if not ok then
         local prefix = feature.label .. ": "
         if feature.mode == "any" then
@@ -309,7 +326,7 @@ local function collect_lines(feature_ids)
   return lines
 end
 
-local function notify_once(feature_ids, title, key)
+local function notify_once(feature_ids, title, key, bufnr)
   if #vim.api.nvim_list_uis() == 0 then
     return
   end
@@ -318,7 +335,7 @@ local function notify_once(feature_ids, title, key)
     return
   end
 
-  local lines = collect_lines(feature_ids)
+  local lines = collect_lines(feature_ids, bufnr)
   if #lines == 0 then
     return
   end
@@ -337,7 +354,7 @@ function M.check_current_buffer(bufnr)
     return
   end
 
-  notify_once(feature_ids, "Missing " .. ft .. " dependencies", "ft:" .. ft)
+  notify_once(feature_ids, "Missing " .. ft .. " dependencies", "ft:" .. ft, bufnr)
 end
 
 function M.command(scope)
@@ -349,7 +366,7 @@ function M.command(scope)
     title = "Missing current-buffer dependencies"
   end
 
-  local lines = collect_lines(feature_ids)
+  local lines = collect_lines(feature_ids, scope == "current" and 0 or nil)
   if #lines == 0 then
     vim.notify("All checked dependencies are installed.", vim.log.levels.INFO, {
       title = title,

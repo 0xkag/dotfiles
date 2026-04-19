@@ -21,6 +21,7 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 
 - `SPC b` buffers
 - `SPC c` code and LSP
+- `SPC d` debugging
 - `SPC e` edit and multiple cursors
 - `SPC f` files
 - `SPC f e` config files
@@ -78,6 +79,11 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 - Python linting prefers `ruff` plus `mypy`, then falls back to `pylint`, then `flake8`
 - Python formatting prefers `ruff_organize_imports` plus `ruff_format`, then falls back to `black`, then `yapf`
 - Python tests run through the same interpreter Neovim resolves for the current project
+- Python debugging expects `ipdb` in that same interpreter and reports it through `:NvimDeps current` if it is missing
+- `SPC dd` or `,dd` debugs the current file with `python -m ipdb`
+- `SPC dt` or `,dt` debugs the nearest pytest test with `pytest --trace`
+- `SPC dT` or `,dT` debugs the current test file with `pytest --trace`
+- `SPC dl` or `,dl` reruns the last Python debug command
 
 ## Navigation
 

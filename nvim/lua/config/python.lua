@@ -3,6 +3,7 @@ local M = {}
 local uv = vim.uv or vim.loop
 
 local cached_prefixes = {}
+local cached_modules = {}
 local active_prefix = nil
 
 local function start_dir_for_buffer(bufnr)
@@ -168,6 +169,47 @@ function M.python_bin(target)
   end
 
   return nil
+end
+
+function M.module_status(module, target)
+  local python = M.python_bin(target)
+  if not python then
+    return {
+      available = false,
+      detail = module .. " (no python interpreter)",
+      module = module,
+    }
+  end
+
+  local cache_key = python .. "::" .. module
+  if cached_modules[cache_key] then
+    return vim.deepcopy(cached_modules[cache_key])
+  end
+
+  local result = vim.system({ python, "-c", "import " .. module }, { text = true }):wait()
+  local status
+
+  if result.code == 0 then
+    status = {
+      available = true,
+      module = module,
+      python = python,
+    }
+  else
+    status = {
+      available = false,
+      detail = module .. " (missing in " .. python .. ")",
+      module = module,
+      python = python,
+    }
+  end
+
+  cached_modules[cache_key] = status
+  return vim.deepcopy(status)
+end
+
+function M.module_available(module, target)
+  return M.module_status(module, target).available
 end
 
 function M.pyright_settings(root_dir)
