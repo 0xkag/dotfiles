@@ -24,7 +24,7 @@ def relink(target, linkname):
 
 def unlink(p):
     try:
-        os.unlink(os.path.expanuser(p))
+        os.unlink(os.path.expanduser(p))
     except:
         pass
 
@@ -57,6 +57,8 @@ def main():
     heading('<fonts>')
     mkdir('~/.fonts/adobe-fonts')
     relink('~/.dotfiles/_lib/source-code-pro', '~/.fonts/adobe-fonts/source-code-pro')
+    step('(optional) remember to run nerdfonts/install')
+    os.system('fc-cache -f -v ~/.fonts/nerd-fonts/sauce-code-pro > /dev/null 2>&1')
     os.system('fc-cache -f -v ~/.fonts/adobe-fonts/source-code-pro > /dev/null 2>&1')
 
     # mise
