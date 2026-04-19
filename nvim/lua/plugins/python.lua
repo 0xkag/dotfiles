@@ -18,6 +18,43 @@ return {
       },
     },
     opts = {
+      formatters_by_ft = {
+        bash = { "shfmt" },
+        go = { "gofmt", "goimports" },
+        javascript = { "prettierd", "prettier", stop_after_first = true },
+        json = { "prettier", stop_after_first = true },
+        jsonc = { "prettier", stop_after_first = true },
+        lua = { "stylua" },
+        markdown = { "prettier", stop_after_first = true },
+        python = function(bufnr)
+          local conform = require("conform")
+          local formatters = {}
+
+          if conform.get_formatter_info("ruff_format", bufnr).available then
+            if conform.get_formatter_info("ruff_organize_imports", bufnr).available then
+              table.insert(formatters, "ruff_organize_imports")
+            end
+
+            table.insert(formatters, "ruff_format")
+            return formatters
+          end
+
+          for _, formatter in ipairs({ "black", "yapf" }) do
+            if conform.get_formatter_info(formatter, bufnr).available then
+              return { formatter }
+            end
+          end
+
+          return {}
+        end,
+        rust = { "rustfmt" },
+        sh = { "shfmt" },
+        terraform = { "terraform_fmt" },
+        toml = { "taplo" },
+        typescript = { "prettierd", "prettier", stop_after_first = true },
+        yaml = { "prettier", stop_after_first = true },
+        zsh = { "shfmt" },
+      },
       format_on_save = function(bufnr)
         if vim.bo[bufnr].buftype ~= "" then
           return nil
@@ -27,23 +64,6 @@ return {
           timeout_ms = 500,
         }
       end,
-      formatters_by_ft = {
-        bash = { "shfmt" },
-        go = { "gofmt", "goimports" },
-        javascript = { "prettierd", "prettier", stop_after_first = true },
-        json = { "prettier", stop_after_first = true },
-        jsonc = { "prettier", stop_after_first = true },
-        lua = { "stylua" },
-        markdown = { "prettier", stop_after_first = true },
-        python = { "yapf" },
-        rust = { "rustfmt" },
-        sh = { "shfmt" },
-        terraform = { "terraform_fmt" },
-        toml = { "taplo" },
-        typescript = { "prettierd", "prettier", stop_after_first = true },
-        yaml = { "prettier", stop_after_first = true },
-        zsh = { "shfmt" },
-      },
     },
   },
   {
@@ -106,10 +126,22 @@ return {
       },
     },
     config = function()
+      local python_env = require("config.python")
+      local tools = require("config.tools")
+
       require("neotest").setup({
         adapters = {
           require("neotest-python")({
-            runner = "pytest",
+            python = function()
+              return python_env.python_bin(0)
+            end,
+            runner = function()
+              if tools.available("pytest") then
+                return "pytest"
+              end
+
+              return "unittest"
+            end,
           }),
         },
       })
