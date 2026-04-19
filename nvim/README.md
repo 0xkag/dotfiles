@@ -32,9 +32,55 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 - `:Mason` manage language servers
 - `:ConformInfo` inspect formatter setup
 - `:Neogit` open the git UI
+- `:NvimDeps` show missing configured dependencies on `PATH`
+- `:NvimDeps current` show missing dependencies for the current buffer workflow
+- `:PyenvInfo` show the Python environment Neovim resolved for the current buffer
 - `:Org help` view orgmode help
-- `:TSInstall lua python markdown markdown_inline org http` install parsers you want
+- `:TSInstall lua python markdown markdown_inline org kulala_http` install parsers you want
 - `:checkhealth` inspect Neovim health
+
+## Syntax checking
+
+- `SPC cl` lint the current buffer
+- `SPC cL` open diagnostics in the location list
+- Automatic linting is enabled on read and write when a supported linter exists
+- Current machine support includes `shellcheck`, `yamllint`, `ruff`, `mypy`, fallback `pylint` or `flake8`, and `tflint`
+
+## Python workflow
+
+- Python files automatically honor a project `.python-version` when `pyenv` is installed
+- Pyright is configured with the resolved project interpreter when a `.python-version` is present
+- `SPC cp` or `:PyenvInfo` shows the Python environment Neovim is using for the current buffer
+- The activated `pyenv` environment is used for Python linting, formatting, and test tools spawned by Neovim
+- Python linting prefers `ruff` plus `mypy`, then falls back to `pylint`, then `flake8`
+- Python formatting prefers `ruff_organize_imports` plus `ruff_format`, then falls back to `black`, then `yapf`
+- Python tests run through the same interpreter Neovim resolves for the current project
+
+## Navigation
+
+- `gd` open definitions through Telescope
+- `gi` open implementations through Telescope
+- `gr` open references through Telescope
+- `gy` open type definitions through Telescope
+- `SPC cs` document symbols
+- `SPC os` toggle the outline sidebar
+- Without LSP, `gd` and `gr` fall back to GNU Global when a GTAGS database exists
+- `SPC cg` prompts for a GNU Global symbol search
+- `SPC pu` updates the GNU Global database for the current project
+
+## Dependency checks
+
+- On startup, Neovim warns once about missing non-Python tools referenced by this config
+- On the first buffer for a supported filetype, Neovim warns once about missing tools for that workflow
+- Tool checks treat inactive `mise` shims as missing so false positives do not hide broken commands
+- `SPC cm` checks dependencies for the current buffer
+- `SPC cM` runs the full configured dependency audit
+
+## LSP installs
+
+- Language servers are not auto-installed by this config
+- Missing servers are reported through dependency checks instead of background installation attempts
+- Use `:Mason` only when you want Neovim-managed installs, or install servers on your normal `PATH`
 
 ## Org defaults
 

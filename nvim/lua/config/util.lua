@@ -1,9 +1,15 @@
 local M = {}
 
 local uv = vim.uv or vim.loop
+local tools = require("config.tools")
 local root_markers = {
   ".git",
+  ".python-version",
   "pyproject.toml",
+  "setup.py",
+  "setup.cfg",
+  "requirements.txt",
+  "Pipfile",
   "package.json",
   "tsconfig.json",
   "Cargo.toml",
@@ -130,13 +136,26 @@ local function parse_grep(line)
   }
 end
 
+local function parse_global(line, cwd)
+  local item = parse_grep(line)
+  if not item then
+    return nil
+  end
+
+  if cwd then
+    item.filename = to_absolute(item.filename, cwd)
+  end
+
+  return item
+end
+
 function M.grep_prompt(opts)
   opts = opts or {}
 
   local cwd = opts.cwd or M.cwd()
   local title = opts.title or "Search"
 
-  if vim.fn.executable("rg") == 1 then
+  if tools.available("rg") then
     require("telescope.builtin").live_grep({
       cwd = cwd,
       prompt_title = title,
@@ -149,7 +168,7 @@ function M.grep_prompt(opts)
       return
     end
 
-    if vim.fn.executable("git") == 1 and M.is_git_repo(cwd) then
+    if tools.available("git") and M.is_git_repo(cwd) then
       run_search({
         "git",
         "grep",
@@ -162,7 +181,7 @@ function M.grep_prompt(opts)
       return
     end
 
-    if vim.fn.executable("grep") == 1 then
+    if tools.available("grep") then
       run_search({
         "grep",
         "-RIn",
@@ -193,6 +212,166 @@ function M.project_grep()
     cwd = M.project_root(0),
     title = "Project Grep",
   })
+end
+
+function M.global_root(bufnr)
+  if not tools.available("global") then
+    return nil
+  end
+
+  bufnr = bufnr or 0
+  local name = vim.api.nvim_buf_get_name(bufnr)
+  local start_dir = name ~= "" and vim.fs.dirname(name) or M.project_root(bufnr)
+  local result = vim.system({ "global", "--print", "root" }, {
+    cwd = start_dir,
+    text = true,
+  }):wait()
+
+  if result.code ~= 0 then
+    return nil
+  end
+
+  local root = vim.trim(result.stdout or "")
+  if root == "" then
+    return nil
+  end
+
+  return root
+end
+
+local function global_items(root, mode, symbol)
+  local command = { "global", "--result=grep" }
+
+  if mode == "definition" then
+    table.insert(command, "-d")
+  elseif mode == "reference" then
+    table.insert(command, "-r")
+  elseif mode == "symbol" then
+    table.insert(command, "-s")
+  end
+
+  table.insert(command, symbol)
+
+  local result = vim.system(command, {
+    cwd = root,
+    text = true,
+  }):wait()
+
+  local items = {}
+  for _, line in ipairs(vim.split(result.stdout or "", "\n", { trimempty = true })) do
+    local item = parse_global(line, root)
+    if item then
+      table.insert(items, item)
+    end
+  end
+
+  return items
+end
+
+local function jump_to_item(item)
+  vim.cmd.edit(vim.fn.fnameescape(item.filename))
+  vim.api.nvim_win_set_cursor(0, {
+    item.lnum,
+    math.max((item.col or 1) - 1, 0),
+  })
+end
+
+local function show_global_items(title, items)
+  if #items == 0 then
+    vim.notify("No matches found for " .. title, vim.log.levels.INFO)
+    return
+  end
+
+  if #items == 1 then
+    jump_to_item(items[1])
+    return
+  end
+
+  set_quickfix(title, items)
+end
+
+function M.global_definitions(symbol)
+  local root = M.global_root(0)
+  if not root then
+    vim.notify("GNU Global database not found for this project.", vim.log.levels.INFO)
+    return
+  end
+
+  symbol = symbol or vim.fn.expand("<cword>")
+  if symbol == "" then
+    return
+  end
+
+  local items = global_items(root, "definition", symbol)
+  if #items == 0 then
+    items = global_items(root, "symbol", symbol)
+  end
+
+  show_global_items("Global definitions: " .. symbol, items)
+end
+
+function M.global_references(symbol)
+  local root = M.global_root(0)
+  if not root then
+    vim.notify("GNU Global database not found for this project.", vim.log.levels.INFO)
+    return
+  end
+
+  symbol = symbol or vim.fn.expand("<cword>")
+  if symbol == "" then
+    return
+  end
+
+  show_global_items("Global references: " .. symbol, global_items(root, "reference", symbol))
+end
+
+function M.global_symbols(symbol)
+  local root = M.global_root(0)
+  if not root then
+    vim.notify("GNU Global database not found for this project.", vim.log.levels.INFO)
+    return
+  end
+
+  symbol = symbol or vim.fn.expand("<cword>")
+  if symbol == "" then
+    return
+  end
+
+  show_global_items("Global symbols: " .. symbol, global_items(root, "symbol", symbol))
+end
+
+function M.global_prompt()
+  vim.ui.input({
+    prompt = "Global symbol > ",
+    default = vim.fn.expand("<cword>"),
+  }, function(input)
+    if not input or input == "" then
+      return
+    end
+
+    M.global_symbols(input)
+  end)
+end
+
+function M.global_update()
+  local root = M.global_root(0)
+  if not root then
+    vim.notify("GNU Global database not found for this project.", vim.log.levels.INFO)
+    return
+  end
+
+  vim.system({ "global", "-u" }, {
+    cwd = root,
+    text = true,
+  }, function(result)
+    vim.schedule(function()
+      if result.code == 0 then
+        vim.notify("Updated GNU Global tags.", vim.log.levels.INFO)
+      else
+        vim.notify("Failed to update GNU Global tags.", vim.log.levels.ERROR)
+      end
+    end)
+  end)
 end
 
 local function squeeze_line(line)
