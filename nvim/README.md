@@ -10,6 +10,7 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 - `SPC TAB` switches to the alternate buffer
 - `SPC /` runs project grep
 - `SPC *` searches the current word in the project
+- visual `*` and `#` search the current selection forward or backward
 - `fd` exits insert mode
 - `Y` yanks to end of line
 - `gl` and `gL` align text
@@ -22,6 +23,7 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 - `SPC f` files
 - `SPC f e` config files
 - `SPC g` git
+- `SPC j` jump
 - `SPC o` open, org, outline, and terminals
 - `SPC p` project
 - `SPC q` quit and sessions
@@ -45,6 +47,7 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 
 ## Syntax checking
 
+- `SPC cf` formats the current buffer on demand
 - `SPC cl` lint the current buffer
 - `SPC cL` open diagnostics in the location list
 - Automatic linting is enabled on read and write when a supported linter exists
@@ -56,12 +59,18 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 - Pyright is configured with the resolved project interpreter when a `.python-version` is present
 - `SPC cp` or `:PyenvInfo` shows the Python environment Neovim is using for the current buffer
 - The activated `pyenv` environment is used for Python linting, formatting, and test tools spawned by Neovim
+- Formatting is manual only; nothing autoformats on save
 - Python linting prefers `ruff` plus `mypy`, then falls back to `pylint`, then `flake8`
 - Python formatting prefers `ruff_organize_imports` plus `ruff_format`, then falls back to `black`, then `yapf`
 - Python tests run through the same interpreter Neovim resolves for the current project
 
 ## Navigation
 
+- `s` triggers labeled jump mode
+- `S` jumps by Treesitter nodes
+- `SPC jj` jumps across visible text
+- `SPC jt` jumps by Treesitter nodes
+- `SPC jr` performs a remote jump
 - `gd` open definitions through Telescope
 - `gi` open implementations through Telescope
 - `gr` open references through Telescope
@@ -73,6 +82,12 @@ leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 - Without LSP, `gd` and `gr` fall back to GNU Global when a GTAGS database exists
 - `SPC cg` prompts for a GNU Global symbol search
 - `SPC pu` updates the GNU Global database for the current project
+
+## Evil Feel
+
+- Surround operations use `nvim-surround`, so `ys`, `cs`, and `ds` work like vim-surround and evil-surround muscle memory
+- Visual `*` and `#` search the selected text directly
+- Common special buffers now accept both `q` and `<Esc>` to close
 
 ## Dependency checks
 
