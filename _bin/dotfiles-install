@@ -176,11 +176,6 @@ def main():
     heading('less')
     # ... sourced in _shell/shellinteractive
 
-    # maven
-
-    heading('maven')
-    step('(optional) remember to run maven/install')
-
     # mosh
 
     heading('mosh')
@@ -248,13 +243,6 @@ def main():
 
     heading('ssh')
     relink('~/.dotfiles/ssh/config', '~/.ssh/config')
-
-    # stack
-
-    heading('stack')
-    mkdir('~/.stack')
-    unlink('~/.stack/config.yaml')
-    step('(optional) remember to run stack/install or install from binary')
 
     # tarsnap
 
