@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -x
+set -o pipefail
+
+TMPDIR=$(mktemp -d)
+
+cd $TMPDIR
+
+cleanup () {
+    rm -rf $TMPDIR
+}
+
+trap cleanup EXIT
+
+VERSION=v3.4.0
+DESTDIR=~/.fonts/nerd-fonts/sauce-code-pro
+
+curl -O -L https://github.com/ryanoasis/nerd-fonts/releases/download/${VERSION}/SourceCodePro.zip
+mkdir -p ${DESTDIR}
+unzip SourceCodePro.zip -d ${DESTDIR}
+
