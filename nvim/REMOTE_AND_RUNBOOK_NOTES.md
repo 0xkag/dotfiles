@@ -5,7 +5,7 @@
 - Local directory editing is handled by `oil.nvim`.
 - Tree/sidebar browsing is handled by Neo-tree.
 - Builtin `netrw` is intentionally disabled in
-  [init.lua](/home/kag/.dotfiles/nvim/init.lua:1) so it does not compete with
+  [init.lua](./init.lua:1) so it does not compete with
   Oil and Neo-tree for directory buffers.
 - Org support currently comes from `nvim-orgmode/orgmode` with agenda/capture
   basics and Org file editing.

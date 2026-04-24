@@ -4,13 +4,13 @@ This configuration is a Spacemacs-style Neovim setup centered on modal editing,
 leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 
 For Python debugging tradeoffs and future DAP notes, see
-[DEBUGGING_NOTES.md](/home/kag/.dotfiles/nvim/DEBUGGING_NOTES.md:1).
+[DEBUGGING_NOTES.md](./DEBUGGING_NOTES.md:1).
 
 For deferred decisions around remote editing and Org-style literal runbooks,
-see [REMOTE_AND_RUNBOOK_NOTES.md](/home/kag/.dotfiles/nvim/REMOTE_AND_RUNBOOK_NOTES.md:1).
+see [REMOTE_AND_RUNBOOK_NOTES.md](./REMOTE_AND_RUNBOOK_NOTES.md:1).
 
 For picker-stack and future fzf-integration notes, see
-[PICKER_NOTES.md](/home/kag/.dotfiles/nvim/PICKER_NOTES.md:1).
+[PICKER_NOTES.md](./PICKER_NOTES.md:1).
 
 ## Core keys
 
