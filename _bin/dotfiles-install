@@ -61,6 +61,22 @@ def main():
     os.system('fc-cache -f -v ~/.fonts/nerd-fonts/sauce-code-pro > /dev/null 2>&1')
     os.system('fc-cache -f -v ~/.fonts/adobe-fonts/source-code-pro > /dev/null 2>&1')
 
+    # pip (before mise, which uses pipx/pip for some tools)
+
+    heading('pip')
+    mkdir('~/.config/pip')
+    relink('~/.dotfiles/pip/pip.conf', '~/.config/pip/pip.conf')
+
+    # _sites/current (before mise, so site-specific overrides like pip proxy are in place)
+
+    heading('_sites/current')
+    p = os.path.expanduser('~/.dotfiles/_sites/current/_bin/dotfiles-install-site')
+    if os.path.exists(p):
+        step('running site-specific dotfiles-install-site')
+        run(p)
+    else:
+        step('no site-specific dotfiles-install-site')
+
     # mise
 
     heading('mise')
@@ -68,7 +84,6 @@ def main():
     relink('~/.dotfiles/mise/config.toml', '~/.config/mise/config.toml')
     relink('~/.dotfiles/mise/mise.lock', '~/.config/mise/mise.lock')
     run('~/.dotfiles/mise/install')
-    run('mise trust ~/.config/mise/config.toml')
 
     # alpine
 
@@ -192,12 +207,6 @@ def main():
     heading('pandoc')
     step('(optional) remember to run pandoc/install or install from binary')
 
-    # pip
-
-    heading('pip')
-    mkdir('~/.config/pip')
-    relink('~/.dotfiles/pip/pip.conf', '~/.config/pip/pip.conf')
-
     # pipx
 
     heading('pipx')
@@ -304,7 +313,7 @@ def main():
     heading('zsh')
     relink('.dotfiles/zsh/zshrc', '~/.zshrc')
 
-    # _sites/current
+    # _sites/current (again, to re-apply any overrides clobbered above)
 
     heading('_sites/current')
     p = os.path.expanduser('~/.dotfiles/_sites/current/_bin/dotfiles-install-site')
