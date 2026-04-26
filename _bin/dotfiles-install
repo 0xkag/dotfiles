@@ -22,6 +22,16 @@ def relink(target, linkname):
             raise Exception('%s is not a symlink' % linkname)
     os.symlink(target, linkname)
 
+def relink_relative(target, linkname):
+    target = os.path.expanduser(target)
+    linkname = os.path.expanduser(linkname)
+    if os.path.lexists(linkname):
+        if os.path.islink(linkname):
+            os.unlink(linkname)
+        else:
+            raise Exception('%s is not a symlink' % linkname)
+    os.symlink(os.path.relpath(target, os.path.dirname(linkname)), linkname)
+
 def unlink(p):
     try:
         os.unlink(os.path.expanduser(p))
@@ -203,6 +213,11 @@ def main():
     relink('.dotfiles/nodejs/npmrc', '~/.npmrc')
     step('remember to run nodejs/install')
 
+    # nvim
+
+    heading('nvim')
+    relink_relative('~/.dotfiles/nvim', '~/.config/nvim')
+
     # pandoc
 
     heading('pandoc')
@@ -326,4 +341,3 @@ def main():
 
 if __name__ == '__main__':
     sys.exit(main())
-
