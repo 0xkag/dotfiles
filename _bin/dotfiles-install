@@ -116,7 +116,8 @@ def main():
     heading('claude')
     mkdir('~/.claude')
     step('(optional) remember to run claude/install')
-    relink('.dotfiles/claude/settings.json', '~/.claude/settings.json')
+    relink('../.dotfiles/claude/settings.json', '~/.claude/settings.json')
+    relink('../../.dotfiles/_ai/skills/transcript', '~/.claude/skills/transcript')
 
     # cmake
 
