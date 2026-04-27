@@ -148,7 +148,7 @@
 	branch = master
 [submodule "ranger"]
 	path = _lib/_todo/ranger
-	url = git://git.savannah.nongnu.org/ranger.git
+	url = https://github.com/ranger/ranger.git
 	branch = master
 [submodule "recordmydesktop"]
 	path = _lib/_todo/recordmydesktop
