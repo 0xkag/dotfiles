@@ -16,7 +16,12 @@ cleanup () {
 trap cleanup EXIT
 
 VERSION=v3.4.0
-DESTDIR=~/.fonts/nerd-fonts/sauce-code-pro
+
+if [[ "$(uname)" == "Darwin" ]]; then
+    DESTDIR=~/Library/Fonts/nerd-fonts/sauce-code-pro
+else
+    DESTDIR=~/.fonts/nerd-fonts/sauce-code-pro
+fi
 
 curl -O -L https://github.com/ryanoasis/nerd-fonts/releases/download/${VERSION}/SourceCodePro.zip
 mkdir -p ${DESTDIR}
