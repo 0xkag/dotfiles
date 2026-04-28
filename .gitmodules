@@ -145,7 +145,7 @@
 [submodule "ralph-claude-code"]
 	path = _lib/_opt/ralph-claude-code
 	url = https://github.com/frankbria/ralph-claude-code.git
-	branch = master
+	branch = main
 [submodule "ranger"]
 	path = _lib/_todo/ranger
 	url = https://github.com/ranger/ranger.git
