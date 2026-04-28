@@ -80,36 +80,36 @@ checksum = "sha256:03a610be931546474e46a442d171ef10532f4fc847de9cf76b7a8065bbef6
 url = "https://github.com/Kitware/CMake/releases/download/v4.3.1/cmake-4.3.1-windows-x86_64.zip"
 
 [[tools.codex]]
-version = "0.121.0"
+version = "0.125.0"
 backend = "aqua:openai/codex"
 
 [tools.codex."platforms.linux-arm64"]
-checksum = "sha256:a153e420cd50afb6b257a7033b719e638902b6d96e3a59de8c2ff948e380943c"
-url = "https://github.com/openai/codex/releases/download/rust-v0.121.0/codex-aarch64-unknown-linux-musl.zst"
+checksum = "sha256:30dd06c3d9b86785100ad78c9d468b60dee11968eee8c5dfdbf72a3c7d5457b5"
+url = "https://github.com/openai/codex/releases/download/rust-v0.125.0/codex-aarch64-unknown-linux-musl.zst"
 
 [tools.codex."platforms.linux-arm64-musl"]
-checksum = "sha256:a153e420cd50afb6b257a7033b719e638902b6d96e3a59de8c2ff948e380943c"
-url = "https://github.com/openai/codex/releases/download/rust-v0.121.0/codex-aarch64-unknown-linux-musl.zst"
+checksum = "sha256:30dd06c3d9b86785100ad78c9d468b60dee11968eee8c5dfdbf72a3c7d5457b5"
+url = "https://github.com/openai/codex/releases/download/rust-v0.125.0/codex-aarch64-unknown-linux-musl.zst"
 
 [tools.codex."platforms.linux-x64"]
-checksum = "sha256:96b299631c87597b744efc6fcd6e3c6cfc0b4ec2ed897638cf1d505c08c4d3ee"
-url = "https://github.com/openai/codex/releases/download/rust-v0.121.0/codex-x86_64-unknown-linux-musl.zst"
+checksum = "sha256:6b3a751d554197f163a57a440aba86aa4960a1457802a3efaa81e00dca9df6db"
+url = "https://github.com/openai/codex/releases/download/rust-v0.125.0/codex-x86_64-unknown-linux-musl.zst"
 
 [tools.codex."platforms.linux-x64-musl"]
-checksum = "sha256:96b299631c87597b744efc6fcd6e3c6cfc0b4ec2ed897638cf1d505c08c4d3ee"
-url = "https://github.com/openai/codex/releases/download/rust-v0.121.0/codex-x86_64-unknown-linux-musl.zst"
+checksum = "sha256:6b3a751d554197f163a57a440aba86aa4960a1457802a3efaa81e00dca9df6db"
+url = "https://github.com/openai/codex/releases/download/rust-v0.125.0/codex-x86_64-unknown-linux-musl.zst"
 
 [tools.codex."platforms.macos-arm64"]
-checksum = "sha256:89ec504ef15a03bbb2a90dd90bb587a9d2ac3bef9462088a97b7c01dffc10b31"
-url = "https://github.com/openai/codex/releases/download/rust-v0.121.0/codex-aarch64-apple-darwin.zst"
+checksum = "sha256:41703b1ae133ddd15d9491b21a2cefdbb248b5fffd6322e835f0b846b6f577ba"
+url = "https://github.com/openai/codex/releases/download/rust-v0.125.0/codex-aarch64-apple-darwin.zst"
 
 [tools.codex."platforms.macos-x64"]
-checksum = "sha256:6e27ab0671fa973a4a112acce7849c748651301e8ab4f58ae2c02c41581f135d"
-url = "https://github.com/openai/codex/releases/download/rust-v0.121.0/codex-x86_64-apple-darwin.zst"
+checksum = "sha256:1e93c0cb1f07dcc08da8982bfc4393453a6327328f9ba8cbef52821c69bc1649"
+url = "https://github.com/openai/codex/releases/download/rust-v0.125.0/codex-x86_64-apple-darwin.zst"
 
 [tools.codex."platforms.windows-x64"]
-checksum = "sha256:92c0938d13e9e06e2844be1e50bfa2d246e295185aabe055a92d42fcdeb0b26d"
-url = "https://github.com/openai/codex/releases/download/rust-v0.121.0/codex-x86_64-pc-windows-msvc.exe.zst"
+checksum = "sha256:61f928fca43b1d213ebd01827068e9805be7409d5a917471ae8af4200433c0a8"
+url = "https://github.com/openai/codex/releases/download/rust-v0.125.0/codex-x86_64-pc-windows-msvc.exe.zst"
 
 [[tools.fzf]]
 version = "0.71.0"
@@ -169,29 +169,29 @@ url = "https://archive.apache.org/dist/maven/maven-3/3.9.15/binaries/apache-mave
 url = "https://archive.apache.org/dist/maven/maven-3/3.9.15/binaries/apache-maven-3.9.15-bin.tar.gz"
 
 [[tools.neovim]]
-version = "0.12.1"
+version = "0.12.2"
 backend = "vfox:mise-plugins/vfox-neovim"
 
 [tools.neovim."platforms.linux-arm64"]
-url = "https://github.com/neovim/neovim/releases/download/v0.12.1/nvim-linux-arm64.tar.gz"
+url = "https://github.com/neovim/neovim/releases/download/v0.12.2/nvim-linux-arm64.tar.gz"
 
 [tools.neovim."platforms.linux-arm64-musl"]
-url = "https://github.com/neovim/neovim/releases/download/v0.12.1/nvim-linux-arm64.tar.gz"
+url = "https://github.com/neovim/neovim/releases/download/v0.12.2/nvim-linux-arm64.tar.gz"
 
 [tools.neovim."platforms.linux-x64"]
-url = "https://github.com/neovim/neovim/releases/download/v0.12.1/nvim-linux-x86_64.tar.gz"
+url = "https://github.com/neovim/neovim/releases/download/v0.12.2/nvim-linux-x86_64.tar.gz"
 
 [tools.neovim."platforms.linux-x64-musl"]
-url = "https://github.com/neovim/neovim/releases/download/v0.12.1/nvim-linux-x86_64.tar.gz"
+url = "https://github.com/neovim/neovim/releases/download/v0.12.2/nvim-linux-x86_64.tar.gz"
 
 [tools.neovim."platforms.macos-arm64"]
-url = "https://github.com/neovim/neovim/releases/download/v0.12.1/nvim-macos-arm64.tar.gz"
+url = "https://github.com/neovim/neovim/releases/download/v0.12.2/nvim-macos-arm64.tar.gz"
 
 [tools.neovim."platforms.macos-x64"]
-url = "https://github.com/neovim/neovim/releases/download/v0.12.1/nvim-macos-x86_64.tar.gz"
+url = "https://github.com/neovim/neovim/releases/download/v0.12.2/nvim-macos-x86_64.tar.gz"
 
 [tools.neovim."platforms.windows-x64"]
-url = "https://github.com/neovim/neovim/releases/download/v0.12.1/nvim-win64.zip"
+url = "https://github.com/neovim/neovim/releases/download/v0.12.2/nvim-win64.zip"
 
 [[tools.ninja]]
 version = "1.13.2"
@@ -226,36 +226,36 @@ checksum = "sha256:07fc8261b42b20e71d1720b39068c2e14ffcee6396b76fb7a795fb460b78d
 url = "https://github.com/ninja-build/ninja/releases/download/v1.13.2/ninja-win.zip"
 
 [[tools.ollama]]
-version = "0.20.4"
+version = "0.21.2"
 backend = "aqua:ollama/ollama"
 
 [tools.ollama."platforms.linux-arm64"]
-checksum = "sha256:b870e56b1aebf1896ca740189cb8c2c601a2a43a6d4593c1d7d5dd9ddae74163"
-url = "https://github.com/ollama/ollama/releases/download/v0.20.4/ollama-linux-arm64.tar.zst"
+checksum = "sha256:d97ab6f40e9f5123e9361bc279b36dd5413257bc54f58b2f58419b33ab7a1eb0"
+url = "https://github.com/ollama/ollama/releases/download/v0.21.2/ollama-linux-arm64.tar.zst"
 
 [tools.ollama."platforms.linux-arm64-musl"]
-checksum = "sha256:b870e56b1aebf1896ca740189cb8c2c601a2a43a6d4593c1d7d5dd9ddae74163"
-url = "https://github.com/ollama/ollama/releases/download/v0.20.4/ollama-linux-arm64.tar.zst"
+checksum = "sha256:d97ab6f40e9f5123e9361bc279b36dd5413257bc54f58b2f58419b33ab7a1eb0"
+url = "https://github.com/ollama/ollama/releases/download/v0.21.2/ollama-linux-arm64.tar.zst"
 
 [tools.ollama."platforms.linux-x64"]
-checksum = "sha256:5a6894c78cf801ef842949ff5cf986024df5e12ae0715f6c4cf49b1f28dbe052"
-url = "https://github.com/ollama/ollama/releases/download/v0.20.4/ollama-linux-amd64.tar.zst"
+checksum = "sha256:58ebee40083b53afc91e14fdc7bcdae4023f0c773c2358411f104f9bed2b739e"
+url = "https://github.com/ollama/ollama/releases/download/v0.21.2/ollama-linux-amd64.tar.zst"
 
 [tools.ollama."platforms.linux-x64-musl"]
-checksum = "sha256:5a6894c78cf801ef842949ff5cf986024df5e12ae0715f6c4cf49b1f28dbe052"
-url = "https://github.com/ollama/ollama/releases/download/v0.20.4/ollama-linux-amd64.tar.zst"
+checksum = "sha256:58ebee40083b53afc91e14fdc7bcdae4023f0c773c2358411f104f9bed2b739e"
+url = "https://github.com/ollama/ollama/releases/download/v0.21.2/ollama-linux-amd64.tar.zst"
 
 [tools.ollama."platforms.macos-arm64"]
-checksum = "sha256:e7f2fb677d283687e6334cc0f039445b61eb8dd08b1cd295be02d195a3d3a75b"
-url = "https://github.com/ollama/ollama/releases/download/v0.20.4/ollama-darwin.tgz"
+checksum = "sha256:f14bb761dc3ef251a68081b4888920c187abe3ed53483db813ee8fb9c0a1af3e"
+url = "https://github.com/ollama/ollama/releases/download/v0.21.2/ollama-darwin.tgz"
 
 [tools.ollama."platforms.macos-x64"]
-checksum = "sha256:e7f2fb677d283687e6334cc0f039445b61eb8dd08b1cd295be02d195a3d3a75b"
-url = "https://github.com/ollama/ollama/releases/download/v0.20.4/ollama-darwin.tgz"
+checksum = "sha256:f14bb761dc3ef251a68081b4888920c187abe3ed53483db813ee8fb9c0a1af3e"
+url = "https://github.com/ollama/ollama/releases/download/v0.21.2/ollama-darwin.tgz"
 
 [tools.ollama."platforms.windows-x64"]
-checksum = "sha256:c2b6f6afa3af22a8249e5cee838c1c62b94098fcc29ee3d9fda398d82b345cd4"
-url = "https://github.com/ollama/ollama/releases/download/v0.20.4/ollama-windows-amd64.zip"
+checksum = "sha256:624caabca19a27168dd2b165ac538a0c6f2c6bcc94098439944fa351ff7b11e2"
+url = "https://github.com/ollama/ollama/releases/download/v0.21.2/ollama-windows-amd64.zip"
 
 [[tools.pandoc]]
 version = "3.9.0.2"
@@ -421,36 +421,36 @@ checksum = "sha256:8a4e35ab0b331c85d73567b12f2a444df187f483e5079ceffa6bda1faa2e7
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.zip"
 
 [[tools.terraform]]
-version = "1.7.4"
+version = "1.13.2"
 backend = "aqua:hashicorp/terraform"
 
 [tools.terraform."platforms.linux-arm64"]
-checksum = "sha256:36680616b54c5ce8c8222c7bf81c187727b3c5c1a3a6e3af5b5372caa28697b7"
-url = "https://releases.hashicorp.com/terraform/1.7.4/terraform_1.7.4_linux_arm64.zip"
+checksum = "sha256:9b3814d36b5b22d9bc7a2856a676770c7b2597b8df025004054354226865ced6"
+url = "https://releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_linux_arm64.zip"
 
 [tools.terraform."platforms.linux-arm64-musl"]
-checksum = "sha256:36680616b54c5ce8c8222c7bf81c187727b3c5c1a3a6e3af5b5372caa28697b7"
-url = "https://releases.hashicorp.com/terraform/1.7.4/terraform_1.7.4_linux_arm64.zip"
+checksum = "sha256:9b3814d36b5b22d9bc7a2856a676770c7b2597b8df025004054354226865ced6"
+url = "https://releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_linux_arm64.zip"
 
 [tools.terraform."platforms.linux-x64"]
-checksum = "sha256:285539a6fd62fb79f05edc15cc207ca90f282901c32261085ea0642a0d638dfd"
-url = "https://releases.hashicorp.com/terraform/1.7.4/terraform_1.7.4_linux_amd64.zip"
+checksum = "sha256:b7554c87f36dbb2231d54c4277cbbddf58ae8ba916fa97461564836a2c4954c0"
+url = "https://releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_linux_amd64.zip"
 
 [tools.terraform."platforms.linux-x64-musl"]
-checksum = "sha256:285539a6fd62fb79f05edc15cc207ca90f282901c32261085ea0642a0d638dfd"
-url = "https://releases.hashicorp.com/terraform/1.7.4/terraform_1.7.4_linux_amd64.zip"
+checksum = "sha256:b7554c87f36dbb2231d54c4277cbbddf58ae8ba916fa97461564836a2c4954c0"
+url = "https://releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_linux_amd64.zip"
 
 [tools.terraform."platforms.macos-arm64"]
-checksum = "sha256:3f25268a5d7677cc89d39a505362979acfb02f19ddb965d7ec0b33a6d9e64075"
-url = "https://releases.hashicorp.com/terraform/1.7.4/terraform_1.7.4_darwin_arm64.zip"
+checksum = "sha256:150c55bd7459ee1216d994307b3b84b3e44ad57354f62357d792e4cbb8b2f64b"
+url = "https://releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_darwin_arm64.zip"
 
 [tools.terraform."platforms.macos-x64"]
-checksum = "sha256:fcf35c8b1d3f46fb84f688312ef5f829081d2d56c10444b9f6e290e21e68871c"
-url = "https://releases.hashicorp.com/terraform/1.7.4/terraform_1.7.4_darwin_amd64.zip"
+checksum = "sha256:6eab5472d9afd510b6f4fb43ebe74e098821dfaab50cf5fcfb696082f73f5328"
+url = "https://releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_darwin_amd64.zip"
 
 [tools.terraform."platforms.windows-x64"]
-checksum = "sha256:2970fbb5eddcabe85b546a88ffcfc34c5fa2881379dac637af5e08e577fc0bee"
-url = "https://releases.hashicorp.com/terraform/1.7.4/terraform_1.7.4_windows_amd64.zip"
+checksum = "sha256:d4b15db71c7f597291fbc7c7e61ed213dd6fe34ab8971d12a93bf9bb66b340e9"
+url = "https://releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_windows_amd64.zip"
 
 [[tools.tflint]]
 version = "0.61.0"

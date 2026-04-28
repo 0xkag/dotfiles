@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+# Outputs a JSON array of tools to disable (already present on system at
+# acceptable versions)
+
+disable=("poetry" "python")
+
+# ag (any version)
+
+if command -v ag > /dev/null 2>&1; then
+    disable+=("ag")
+fi
+
+# neovim > 0.12.x
+
+if command -v nvim > /dev/null 2>&1; then
+    ver=$(nvim --version | head -1 | grep -oP '\d+\.\d+')
+    if awk "BEGIN {exit !($ver >= 0.12)}"; then
+        disable+=("neovim")
+    fi
+fi
+
+# node >= 20
+
+if command -v node > /dev/null 2>&1; then
+    ver=$(node --version | grep -oP '\d+' | head -1)
+    if [ "$ver" -ge 20 ] 2>/dev/null; then
+        disable+=("node")
+    fi
+fi
+
+# pandoc > 3.1
+
+if command -v pandoc > /dev/null 2>&1; then
+    ver=$(pandoc --version | head -1 | grep -oP '\d+\.\d+' | head -1)
+    if awk "BEGIN {exit !($ver >= 3.1)}"; then
+        disable+=("pandoc")
+    fi
+fi
+
+# ripgrep (any version)
+
+if command -v rg > /dev/null 2>&1; then
+    disable+=("ripgrep")
+fi
+
+# shellcheck (any version)
+
+if command -v shellcheck > /dev/null 2>&1; then
+    disable+=("shellcheck")
+fi
+
+# vim > 9.2
+
+if command -v vim > /dev/null 2>&1; then
+    ver=$(vim --version | head -1 | grep -oP '\d+\.\d+')
+    if awk "BEGIN {exit !($ver >= 9.2)}"; then
+        disable+=("vim")
+    fi
+fi
+
+# yamllint (any version)
+
+if command -v yamllint > /dev/null 2>&1; then
+    disable+=("yamllint")
+fi
+
+# output for MISE_DISABLE_TOOLS consumption
+
+IFS=','; echo "${disable[*]}"

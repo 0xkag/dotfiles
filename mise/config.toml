@@ -1,10 +1,12 @@
 [settings]
 auto_install = false
-disable_tools = ["poetry", "python"]
 experimental = false
 locked = false
 lockfile = true
 paranoid = true
+
+[env]
+MISE_DISABLE_TOOLS = "{{ exec(command='bash ~/.dotfiles/mise/check-tools', cache_key='check-tools', cache_duration='1 minute') | trim }}"
 
 [tools]
 ag = "2.2.0"
@@ -13,7 +15,7 @@ cmake = "4.3.1"
 codex = "latest"
 fzf = "0.71.0"
 maven = "3.9.15"
-neovim = "0.12.1"
+neovim = "0.12.2"
 ninja = "1.13.2"
 ollama = "latest"
 pandoc = "3.9.0.2"
@@ -22,12 +24,12 @@ pre-commit = "4.5.1"
 ripgrep = "15.1.0"
 rust = "latest"
 shellcheck = "0.11.0"
-terraform = "1.7.4"
+terraform = "1.13.2"
 tflint = "0.61.0"
-vim = "9.2.0361"
 #terraform-docs = "system"
 #terraformer = "system"
 #terragrunt = "system"
 #tflint = "system"
 #tfupdate = "system"
+vim = "9.2.0361"
 yamllint = "1.38.0"
