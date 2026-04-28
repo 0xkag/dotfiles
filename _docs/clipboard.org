@@ -197,14 +197,15 @@ priority order:
 | Priority | Condition                         | Copy                | Paste                          |
 |----------+-----------------------------------+---------------------+--------------------------------|
 |        1 | =$WAYLAND_DISPLAY= + =wl-copy=    | =wl-copy=           | =wl-paste --no-newline=        |
-|        2 | =$DISPLAY= + =xclip=              | =xclip -sel clip=   | =xclip -sel clip -o=           |
-|        3 | =$DISPLAY= + =xsel=               | =xsel --clip -i=    | =xsel --clip -o=               |
-|        4 | WSL (=/proc/version= ~ Microsoft) | =clip.exe=          | =powershell.exe Get-Clipboard= |
-|        5 | =$TMUX= set                       | =tmux load-buffer -w= | =tmux save-buffer=           |
-|        6 | =/dev/tty= exists                 | OSC 52 via =/dev/tty= | (not supported)              |
-|        7 | (none)                            | error to stderr     | error to stderr                |
+|        2 | macOS (=pbcopy=/=pbpaste=)         | =pbcopy=            | =pbpaste=                      |
+|        3 | =$DISPLAY= + =xclip=              | =xclip -sel clip=   | =xclip -sel clip -o=           |
+|        4 | =$DISPLAY= + =xsel=               | =xsel --clip -i=    | =xsel --clip -o=               |
+|        5 | WSL (=/proc/version= ~ Microsoft) | =clip.exe=          | =powershell.exe Get-Clipboard= |
+|        6 | =$TMUX= set                       | =tmux load-buffer -w= | =tmux save-buffer=           |
+|        7 | =/dev/tty= exists                 | OSC 52 via =/dev/tty= | (not supported)              |
+|        8 | (none)                            | error to stderr     | error to stderr                |
 
-Priority 5 uses =-w= to also emit OSC 52 through tmux.  Priority 6 is the
+Priority 6 uses =-w= to also emit OSC 52 through tmux.  Priority 7 is the
 bare OSC 52 fallback for SSH without tmux -- copy works but paste does not
 (OSC 52 read is blocked by most terminals for security).
 
@@ -224,6 +225,13 @@ and sets the X clipboard.  Everything is seamless.
 Vim's ="+= register may or may not work depending on build (some builds use
 xwayland).  The =clip-in= fallback covers this regardless.  OSC 52 works in
 terminals that support it (gnome-terminal, foot).
+
+** macOS -- e.g. Terminal.app, iTerm2, Ghostty
+
+=clip-in=/=clip-out= use =pbcopy=/=pbpaste= (built-in on macOS).  Vim's
+="+= register works via OSC 52 passthrough through tmux.  tmux =set-clipboard
+on= enables OSC 52 passthrough; both Terminal.app and iTerm2 support it
+natively.  Everything is seamless with no extra dependencies.
 
 ** Windows via PuTTY (SSH to Linux/FreeBSD/OpenBSD)
 

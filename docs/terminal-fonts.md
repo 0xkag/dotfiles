@@ -133,3 +133,45 @@ The current dotfiles workflow expects the Nerd Font payload under:
 
 with [nerdfonts/install](/home/kag/.dotfiles/nerdfonts/install:1) managing the
 download into that directory.
+
+## macOS
+
+### Install Nerd Font
+
+Run the same installer; it detects Darwin and places fonts under
+`~/Library/Fonts/nerd-fonts/sauce-code-pro/`. macOS auto-discovers fonts
+there — no fontconfig refresh needed.
+
+### Terminal.app
+
+1. **Terminal > Settings > Profiles > Text > Font > Change**
+2. Select `SauceCodePro Nerd Font Mono`, size **12**
+
+### iTerm2
+
+1. **iTerm2 > Settings > Profiles > Text > Font > Change Font**
+2. Select `SauceCodePro Nerd Font Mono`, size **12**
+
+### Ghostty
+
+Add to `~/.config/ghostty/config`:
+
+```
+font-family = SauceCodePro Nerd Font Mono
+```
+
+### Linux fontconfig path
+
+On Linux, `nerdfonts/install` still places fonts under
+`~/.fonts/nerd-fonts/sauce-code-pro/` with a fontconfig refresh.
+
+### tmux-yank
+
+tmux-yank is included as a TPM plugin for macOS clipboard integration. On some
+macOS versions it requires `reattach-to-user-namespace`:
+
+```sh
+brew install reattach-to-user-namespace
+```
+
+After installation, run `prefix + I` in tmux to install via TPM.

@@ -186,6 +186,17 @@ No special handling needed.  Works the same as Linux.
 OpenBSD's console uses =vt220= which has no 256color variant, so no stripping
 is needed and =COLORTERM= is never set.  Basic ANSI colors only.
 
+** macOS
+
+| Variable     | Value              | Source                |
+|--------------+----------+---------+--------|
+| =TERM=       | =xterm-256color=   | Terminal.app, iTerm2  |
+| =COLORTERM=  | =truecolor=        | Terminal.app, iTerm2  |
+
+macOS terminals set =COLORTERM=truecolor= natively.  The shell fallback in
+=_shell/shellinteractive= never fires on macOS.  Truecolor works end-to-end
+through tmux via the =Tc= terminal-override flag.
+
 * Custom Terminfo (=terminfo/xterm-24bit.src=)
 
 The file defines =xterm-24bit= and =xterm-24bits= terminfo entries with
