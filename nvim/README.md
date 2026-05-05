@@ -241,8 +241,57 @@ For picker-stack and future fzf-integration notes, see
 
 - Language servers are not auto-installed by this config
 - Missing servers are reported through dependency checks instead of background installation attempts
-- Use `:Mason` only when you want Neovim-managed installs, or install servers on your normal `PATH`
+- Prefer installing tools on your normal `PATH` (flox, system package manager, language toolchains) so other tools can use them too
+- Use `:Mason` only when you want Neovim-managed installs, isolated to `~/.local/share/nvim/mason/`
 - `:MasonInstall` and related Mason commands are available directly even in a fresh lazy-loaded session
+
+### Using Mason
+
+- `:Mason` opens the UI; inside:
+  - `i` install the package under the cursor
+  - `X` uninstall
+  - `u` update the package under the cursor, `U` update all
+  - `/` filter, `1`-`7` switch category tabs (LSP / DAP / Linter / Formatter)
+  - `g?` shows the full keymap
+- `:MasonInstall <pkg1> <pkg2> ...` installs non-interactively
+- `:MasonUpdate` refreshes the package registry
+- `:checkhealth mason` validates the install
+- Mason downloads prebuilt binaries; on systems with an old glibc (e.g. Amazon Linux 2), some binaries fail to load — fall back to flox or source builds
+
+### Common dependency check warnings
+
+The warnings shown on startup come from `lua/config/deps.lua`. The binary names in the warning map to these Mason packages:
+
+| Warning (binary)                 | Mason package                  |
+|----------------------------------|--------------------------------|
+| `clangd`                         | `clangd`                       |
+| `jdtls`                          | `jdtls`                        |
+| `typescript-language-server`     | `typescript-language-server`   |
+| `prettierd` / `prettier`         | `prettierd` / `prettier`       |
+| `vscode-html-language-server`    | `html-lsp`                     |
+| `vscode-json-language-server`    | `json-lsp`                     |
+| `vscode-css-language-server`     | `css-lsp`                      |
+| `bash-language-server`           | `bash-language-server`         |
+| `yaml-language-server`           | `yaml-language-server`         |
+| `marksman`                       | `marksman`                     |
+| `lua-language-server`            | `lua-language-server`          |
+| `stylua`                         | `stylua`                       |
+| `shfmt` / `shellcheck`           | `shfmt` / `shellcheck`         |
+| `terraform-ls` / `tflint`        | `terraform-ls` / `tflint`      |
+| `rust-analyzer` / `rustfmt`      | `rust-analyzer` (rustfmt via rustup) |
+| `gopls` / `goimports`            | `gopls` / `goimports`          |
+
+Bulk install example for a typical frontend + backend workstation:
+
+```
+:MasonInstall html-lsp json-lsp css-lsp typescript-language-server prettierd clangd gopls goimports
+```
+
+### Trimming startup warnings
+
+- `startup_features` in `lua/config/deps.lua` controls which checks fire on Neovim startup
+- Remove entries for languages you never use to silence their warnings; per-filetype checks still fire when opening a matching file
+- `filetype_features` in the same file maps filetype to the checks that run on first buffer open
 
 ## Org defaults
 
