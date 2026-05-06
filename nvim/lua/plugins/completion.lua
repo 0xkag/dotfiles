@@ -84,7 +84,21 @@ return {
       }, {
         { name = "buffer" },
       }),
+      formatting = {
+        fields = { "kind", "abbr", "menu" },
+        format = function(entry, item)
+          item.menu = ({
+            nvim_lsp = "[LSP]",
+            luasnip = "[Snip]",
+            buffer = "[Buf]",
+            path = "[Path]",
+          })[entry.source.name] or ("[" .. entry.source.name .. "]")
+          item.kind = string.format(" %s ", item.kind)
+          return item
+        end,
+      },
       window = {
+        completion = cmp.config.window.bordered(),
         documentation = cmp.config.window.bordered(),
       },
     })

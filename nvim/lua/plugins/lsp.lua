@@ -319,6 +319,9 @@ return {
           map("n", "gr", builtin.lsp_references, "References")
           map("n", "gy", builtin.lsp_type_definitions, "Type definitions")
           map("n", "K", vim.lsp.buf.hover, "Hover")
+          map("n", "<C-k>", vim.lsp.buf.signature_help, "Signature help")
+          map("i", "<C-k>", vim.lsp.buf.signature_help, "Signature help")
+          map("n", "<localleader>hs", vim.lsp.buf.signature_help, "Signature help")
           map("n", "<leader>ca", vim.lsp.buf.code_action, "Code action")
           map("n", "<leader>cr", vim.lsp.buf.rename, "Rename symbol")
           map("n", "<leader>cd", function()
@@ -412,6 +415,22 @@ return {
             map("n", "<localleader>Tl", function()
               toggle_inlay_hints(bufnr)
             end, "Toggle inlay hints")
+          end
+
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client and client.server_capabilities.signatureHelpProvider then
+            vim.api.nvim_create_autocmd("InsertCharPre", {
+              buffer = bufnr,
+              callback = function()
+                if vim.v.char == "(" or vim.v.char == "," then
+                  vim.schedule(function()
+                    if vim.api.nvim_get_current_buf() == bufnr then
+                      vim.lsp.buf.signature_help()
+                    end
+                  end)
+                end
+              end,
+            })
           end
         end,
       })

@@ -95,6 +95,21 @@ For FreeBSD-specific Neovim install notes, see
 - Current machine support includes `shellcheck`, `yamllint`, `ruff`, `mypy`, fallback `pylint` or `flake8`, and `tflint`
 - completion popup navigation also works with the `Up` and `Down` arrow keys
 
+## Completion and signature help
+
+- Trigger completion manually with `<C-Space>`; confirm the selection with `<CR>`; navigate with `<Tab>` / `<S-Tab>`
+- `<leader>ta` (Spacemacs `SPC t a`) toggles auto-completion for the current buffer; completion is disabled by default on `gitcommit` buffers so commit-message editing stays clean
+- Argument / signature help uses the native `vim.lsp.buf.signature_help` float, which highlights the active parameter as you type
+  - `<C-k>` opens the signature-help float in both insert and normal mode
+  - `SPC m h s` (`<localleader>hs`) also opens it in normal mode
+  - It fires automatically when you type `(` or `,` inside a function call
+- The completion popup and all floating windows (hover, signature help) use custom highlights under cyberpunk:
+  - Dark `#1a1a1a` panel background with `#d3d3d3` text
+  - Pink `#7f073f` selection bar; matched characters in yellow
+  - Kind column colored per symbol type (functions in pink, types in green, keywords in blue)
+- Other colorschemes get sensible fallbacks automatically via a `ColorScheme` autocmd that links unset `CmpItemKind*` groups to built-in highlights (`Function`, `Identifier`, `Type`, `Keyword`, ...)
+- To tweak the cyberpunk palette edit `colors/cyberpunk.lua`; to change the fallback rules edit `apply_cmp_fallbacks` in `lua/config/autocmds.lua`
+
 ## Python workflow
 
 - Python files automatically honor a project `.python-version` when `pyenv` is installed
