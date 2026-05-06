@@ -393,18 +393,20 @@ end, {
 vim.api.nvim_create_autocmd("VimEnter", {
   once = true,
   callback = function()
-    vim.schedule(function()
+    vim.defer_fn(function()
       notify_once(startup_features, "Missing PATH dependencies", "startup")
-    end)
+    end, 500)
   end,
 })
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = vim.tbl_keys(filetype_features),
   callback = function(event)
-    vim.schedule(function()
-      M.check_current_buffer(event.buf)
-    end)
+    vim.defer_fn(function()
+      if vim.api.nvim_buf_is_valid(event.buf) then
+        M.check_current_buffer(event.buf)
+      end
+    end, 500)
   end,
 })
 

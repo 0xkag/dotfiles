@@ -19,7 +19,7 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" },
+    event = "VeryLazy",
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
       "mason-org/mason-lspconfig.nvim",
@@ -421,6 +421,23 @@ return {
         vim.lsp.config(name, config)
         vim.lsp.enable(name)
       end
+
+      vim.api.nvim_create_user_command("PyrightWorkspaceMode", function()
+        local clients = vim.lsp.get_clients({ name = "pyright" })
+        if #clients == 0 then
+          vim.notify("No active pyright client.", vim.log.levels.WARN)
+          return
+        end
+
+        for _, client in ipairs(clients) do
+          client.settings = vim.tbl_deep_extend("force", client.settings or {}, {
+            python = { analysis = { diagnosticMode = "workspace" } },
+          })
+          client:notify("workspace/didChangeConfiguration", { settings = client.settings })
+        end
+
+        vim.notify("Pyright: workspace diagnostics enabled for this session.", vim.log.levels.INFO)
+      end, { desc = "Enable pyright workspace-wide diagnostics for this session" })
 
       require("mason-lspconfig").setup({
         automatic_enable = false,

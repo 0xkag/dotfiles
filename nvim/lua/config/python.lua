@@ -171,6 +171,50 @@ function M.python_bin(target)
   return nil
 end
 
+local function probe_module_on_disk(python, module)
+  local bin_dir = vim.fs.dirname(python)
+  if not bin_dir or bin_dir == "" then
+    return nil
+  end
+
+  local prefix = vim.fs.dirname(bin_dir)
+  if not prefix or prefix == "" then
+    return nil
+  end
+
+  local lib_dir = vim.fs.joinpath(prefix, "lib")
+  local stat = uv.fs_stat(lib_dir)
+  if not stat or stat.type ~= "directory" then
+    return nil
+  end
+
+  local handle = uv.fs_scandir(lib_dir)
+  if not handle then
+    return nil
+  end
+
+  while true do
+    local name, t = uv.fs_scandir_next(handle)
+    if not name then
+      break
+    end
+
+    if (t == "directory" or t == nil) and name:match("^python%d") then
+      local candidates = {
+        vim.fs.joinpath(lib_dir, name, "site-packages", module),
+        vim.fs.joinpath(lib_dir, name, "site-packages", module .. ".py"),
+      }
+      for _, candidate in ipairs(candidates) do
+        if uv.fs_stat(candidate) then
+          return true
+        end
+      end
+    end
+  end
+
+  return false
+end
+
 function M.module_status(module, target)
   local python = M.python_bin(target)
   if not python then
@@ -186,22 +230,38 @@ function M.module_status(module, target)
     return vim.deepcopy(cached_modules[cache_key])
   end
 
-  local result = vim.system({ python, "-c", "import " .. module }, { text = true }):wait()
+  local found = probe_module_on_disk(python, module)
   local status
 
-  if result.code == 0 then
+  if found == true then
     status = {
       available = true,
       module = module,
       python = python,
     }
-  else
+  elseif found == false then
     status = {
       available = false,
       detail = module .. " (missing in " .. python .. ")",
       module = module,
       python = python,
     }
+  else
+    local result = vim.system({ python, "-c", "import " .. module }, { text = true }):wait()
+    if result.code == 0 then
+      status = {
+        available = true,
+        module = module,
+        python = python,
+      }
+    else
+      status = {
+        available = false,
+        detail = module .. " (missing in " .. python .. ")",
+        module = module,
+        python = python,
+      }
+    end
   end
 
   cached_modules[cache_key] = status
@@ -217,7 +277,7 @@ function M.pyright_settings(root_dir)
     python = {
       analysis = {
         autoSearchPaths = true,
-        diagnosticMode = "workspace",
+        diagnosticMode = "openFilesOnly",
         exclude = {
           "**/.mypy_cache",
           "**/.pytest_cache",
