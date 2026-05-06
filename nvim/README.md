@@ -108,6 +108,23 @@ For picker-stack and future fzf-integration notes, see
 - `SPC dT` or `,dT` debugs the current test file with `pytest --trace`
 - `SPC dl` or `,dl` reruns the last Python debug command
 
+### Pyright diagnostic mode
+
+- Default is `openFilesOnly`: pyright type-checks only buffers you have open
+- Closed files are still parsed for import resolution and cross-file features (go-to-definition, hover, rename, find-references) — only their diagnostics are suppressed
+- `openFilesOnly` is the default so that opening a Python file in a large repo is fast; `workspace` mode forces pyright to index and type-check every `.py` on first attach, which can freeze the UI for 5-10s on large trees
+- Run `:PyrightWorkspaceMode` to flip the active session to `workspace` diagnostics (e.g. before a refactor or pre-commit sweep); it stays until the pyright client restarts
+- To make `workspace` the default, edit `diagnosticMode` in `lua/config/python.lua` `pyright_settings`
+
+### Pyenv activation on buffer open
+
+- Opening a `*.py` or `*.pyi` buffer runs `M.activate` in `lua/config/python.lua`, which:
+  - Walks upward from the buffer directory looking for `.python-version` (stops at `$HOME`)
+  - Calls `pyenv prefix <version>` synchronously via `vim.system():wait()` (roughly 40ms cold, cached per version thereafter)
+  - Prepends the resolved `bin/` to `PATH` and sets `VIRTUAL_ENV`
+- The sync call is deliberate: formatters, linters, and pyright spawned afterward need `PATH` and `VIRTUAL_ENV` correct before they start, and racing makes the first lint/format after open flaky
+- If `pyenv` is not on `PATH` or `.python-version` reads `system`, no activation happens and the system Python is used
+
 ## Navigation
 
 - `s` triggers labeled jump mode

@@ -1,6 +1,6 @@
 return {
   "mfussenegger/nvim-lint",
-  event = { "BufReadPost", "BufWritePost" },
+  event = "VeryLazy",
   config = function()
     local lint = require("lint")
     local tools = require("config.tools")
