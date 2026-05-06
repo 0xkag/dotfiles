@@ -97,17 +97,24 @@ For FreeBSD-specific Neovim install notes, see
 
 ## Completion and signature help
 
-- Trigger completion manually with `<C-Space>`; confirm the selection with `<CR>`; navigate with `<Tab>` / `<S-Tab>`
+- Trigger completion manually with `<C-Space>`
+- Confirm the current selection with `<Tab>` or `<CR>`; if nothing is highlighted yet, confirming picks the first item
+- Navigate candidates with `<Down>` / `<Up>` or `<C-n>` / `<C-p>`
+- `<CR>` inserts a newline normally when no completion popup is visible
+- `<S-Tab>` jumps back through snippet placeholders (no item navigation)
 - `<leader>ta` (Spacemacs `SPC t a`) toggles auto-completion for the current buffer; completion is disabled by default on `gitcommit` buffers so commit-message editing stays clean
 - Argument / signature help uses the native `vim.lsp.buf.signature_help` float, which highlights the active parameter as you type
   - `<C-k>` opens the signature-help float in both insert and normal mode
   - `SPC m h s` (`<localleader>hs`) also opens it in normal mode
   - It fires automatically when you type `(` or `,` inside a function call
+  - Signature help and hover floats use rounded borders
 - The completion popup and all floating windows (hover, signature help) use custom highlights under cyberpunk:
   - Dark `#1a1a1a` panel background with `#d3d3d3` text
   - Pink `#7f073f` selection bar; matched characters in yellow
   - Kind column colored per symbol type (functions in pink, types in green, keywords in blue)
-- Other colorschemes get sensible fallbacks automatically via a `ColorScheme` autocmd that links unset `CmpItemKind*` groups to built-in highlights (`Function`, `Identifier`, `Type`, `Keyword`, ...)
+  - Active signature parameter highlighted in yellow bold underline
+- The statusline is pinned to a cyberpunk-matched palette in `lua/plugins/ui.lua`; switching to another colorscheme leaves it looking cyberpunk — adjust there if that ever matters
+- Other colorschemes get sensible fallbacks for Cmp groups automatically via a `ColorScheme` autocmd that links unset `CmpItemKind*` and `LspSignatureActiveParameter` to built-in highlights (`Function`, `Identifier`, `Type`, `Keyword`, `Search`, ...)
 - To tweak the cyberpunk palette edit `colors/cyberpunk.lua`; to change the fallback rules edit `apply_cmp_fallbacks` in `lua/config/autocmds.lua`
 
 ## Python workflow

@@ -62,6 +62,8 @@ hl("CmpItemKindText",       { fg = "#d3d3d3" })
 hl("CmpItemKindProperty",   { fg = "#96cbfe" })
 hl("CmpItemKindConstant",   { fg = "#96cbfe" })
 
+hl("LspSignatureActiveParameter", { fg = "#ffff00", bold = true, underline = true })
+
 hl("Visual", { bg = "#7f073f" })
 hl("VisualNOS", { bg = "#7f073f" })
 hl("Search", { fg = "#000000", bg = "#ffff00" })

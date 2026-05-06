@@ -54,6 +54,7 @@ local function apply_cmp_fallbacks()
   link_if_unset("CmpItemKindText", "Normal")
   link_if_unset("CmpItemKindProperty", "Constant")
   link_if_unset("CmpItemKindConstant", "Constant")
+  link_if_unset("LspSignatureActiveParameter", "Search")
 end
 
 autocmd("ColorScheme", {
