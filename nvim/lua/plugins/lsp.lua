@@ -295,14 +295,12 @@ return {
         virtual_text = false,
       })
 
-      vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
-        vim.lsp.handlers.signature_help,
-        { border = "rounded" }
-      )
-      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
-        vim.lsp.handlers.hover,
-        { border = "rounded" }
-      )
+      local function signature_help()
+        vim.lsp.buf.signature_help({ border = "rounded" })
+      end
+      local function hover()
+        vim.lsp.buf.hover({ border = "rounded" })
+      end
 
       vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
       vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
@@ -327,10 +325,10 @@ return {
           map("n", "gi", builtin.lsp_implementations, "Go to implementation")
           map("n", "gr", builtin.lsp_references, "References")
           map("n", "gy", builtin.lsp_type_definitions, "Type definitions")
-          map("n", "K", vim.lsp.buf.hover, "Hover")
-          map("n", "<C-k>", vim.lsp.buf.signature_help, "Signature help")
-          map("i", "<C-k>", vim.lsp.buf.signature_help, "Signature help")
-          map("n", "<localleader>hs", vim.lsp.buf.signature_help, "Signature help")
+          map("n", "K", hover, "Hover")
+          map("n", "<C-k>", signature_help, "Signature help")
+          map("i", "<C-k>", signature_help, "Signature help")
+          map("n", "<localleader>hs", signature_help, "Signature help")
           map("n", "<leader>ca", vim.lsp.buf.code_action, "Code action")
           map("n", "<leader>cr", vim.lsp.buf.rename, "Rename symbol")
           map("n", "<leader>cd", function()
@@ -374,7 +372,7 @@ return {
           map("n", "<localleader>Fa", vim.lsp.buf.add_workspace_folder, "Add workspace folder")
           map("n", "<localleader>Fr", remove_workspace_folder, "Remove workspace folder")
           map("n", "<localleader>Fs", browse_workspace_folder, "Browse workspace folder")
-          map("n", "<localleader>hh", vim.lsp.buf.hover, "Hover")
+          map("n", "<localleader>hh", hover, "Hover")
           map("n", "<localleader>bd", "<Cmd>checkhealth vim.lsp<CR>", "LSP session info")
           map("n", "<localleader>ea", vim.lsp.buf.code_action, "Execute code action")
           map("n", "<localleader>el", builtin.diagnostics, "List project diagnostics")
@@ -434,7 +432,7 @@ return {
                 if vim.v.char == "(" or vim.v.char == "," then
                   vim.schedule(function()
                     if vim.api.nvim_get_current_buf() == bufnr then
-                      vim.lsp.buf.signature_help()
+                      signature_help()
                     end
                   end)
                 end
