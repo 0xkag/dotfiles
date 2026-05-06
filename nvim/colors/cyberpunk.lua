@@ -64,6 +64,10 @@ hl("CmpItemKindConstant",   { fg = "#96cbfe" })
 
 hl("LspSignatureActiveParameter", { fg = "#ffff00", bold = true, underline = true })
 
+hl("@markup.raw.markdown",           { link = "NormalFloat" })
+hl("@markup.raw.block.markdown",     { link = "NormalFloat" })
+hl("@markup.raw.delimiter.markdown", { link = "NormalFloat" })
+
 hl("Visual", { bg = "#7f073f" })
 hl("VisualNOS", { bg = "#7f073f" })
 hl("Search", { fg = "#000000", bg = "#ffff00" })

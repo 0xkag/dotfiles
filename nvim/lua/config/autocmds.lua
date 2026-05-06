@@ -55,6 +55,9 @@ local function apply_cmp_fallbacks()
   link_if_unset("CmpItemKindProperty", "Constant")
   link_if_unset("CmpItemKindConstant", "Constant")
   link_if_unset("LspSignatureActiveParameter", "Search")
+  link_if_unset("@markup.raw.markdown", "NormalFloat")
+  link_if_unset("@markup.raw.block.markdown", "NormalFloat")
+  link_if_unset("@markup.raw.delimiter.markdown", "NormalFloat")
 end
 
 autocmd("ColorScheme", {
