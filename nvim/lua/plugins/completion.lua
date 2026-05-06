@@ -1,3 +1,20 @@
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("user_cmp_disable", { clear = true }),
+  pattern = { "gitcommit" },
+  callback = function(event)
+    vim.b[event.buf].cmp_disabled = true
+  end,
+})
+
+vim.keymap.set("n", "<leader>ta", function()
+  local buf = vim.api.nvim_get_current_buf()
+  vim.b[buf].cmp_disabled = not vim.b[buf].cmp_disabled
+  vim.notify(
+    "Auto-completion " .. (vim.b[buf].cmp_disabled and "disabled" or "enabled") .. " for this buffer.",
+    vim.log.levels.INFO
+  )
+end, { desc = "Toggle auto-completion (buffer)" })
+
 return {
   "hrsh7th/nvim-cmp",
   event = "InsertEnter",
@@ -13,6 +30,13 @@ return {
     local luasnip = require("luasnip")
 
     cmp.setup({
+      enabled = function()
+        local buf = vim.api.nvim_get_current_buf()
+        if vim.b[buf].cmp_disabled then
+          return false
+        end
+        return vim.bo[buf].buftype ~= "prompt"
+      end,
       completion = {
         completeopt = "menu,menuone,noselect",
       },
