@@ -140,6 +140,12 @@ man() {
             man "$@"
 }
 
+# flox
+
+if command -v flox &> /dev/null; then
+    eval "$(flox activate)" 2> /dev/null || true
+fi
+
 # mise
 
 if command -v mise &> /dev/null; then
