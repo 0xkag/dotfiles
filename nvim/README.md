@@ -112,8 +112,49 @@ For FreeBSD-specific Neovim install notes, see
 - `<leader>ca` / `<localleader>aa` opens the full LSP code action menu
 - `<localleader>ar` restricts the menu to `refactor` actions; `<localleader>af` to `quickfix`; `<localleader>as` to `source`
 - `<localleader>=o` invokes `source.organizeImports` directly
-- Current coverage is LSP-driven. Pyright contributes cross-file rename and a handful of quick-fixes (e.g. "add import"); most general-purpose Python refactorings (extract method, inline variable, move to module, change signature) are **not** available. Pyright is a type checker, not a refactoring engine
-- See `TODO.md` for a planned upgrade path (pylsp-rope alongside pyright, `nvim-treesitter-refactor`, or `ruff-lsp` quick-fixes)
+
+### Python refactoring stack
+
+Python buffers attach three LSPs with a clear division of labor. Overlapping features are disabled so each server owns exactly one responsibility:
+
+| Server | Role | Disabled features |
+|---|---|---|
+| pyright | types, hover, completion, go-to-def, rename | — |
+| pylsp | rope refactoring code actions only | diagnostics, completion, hover, signatureHelp, references, symbols, jedi_rename, rope_rename, rope_autoimport |
+| ruff (server) | lint autofixes + `source.organizeImports` / `source.fixAll` | autoconfig defaults |
+
+**Scope-aware rename of a local**: pyright's LSP rename is AST-aware. Renaming a variable bound only inside one function does not touch same-name identifiers in other scopes. Use `<leader>cr`.
+
+**Rope refactorings** (surfaced under `<localleader>ar`): extract method, extract variable, inline method, inline variable, inline parameter, introduce parameter, move to module, use function, method-to-method-object, local-to-field, generate (variable / function / class / module / package). First rope code action in a session is slow because rope builds the project index; subsequent calls are fast.
+
+**Ruff server code actions** (surfaced under `<localleader>af`): remove unused import, convert to f-string, and any other ruff auto-fix. `source.fixAll` is also available in the full `<leader>ca` menu, and ruff provides `source.organizeImports` under `<localleader>=o`.
+
+### Installing pylsp + pylsp-rope
+
+Not auto-installed. Recommended path:
+
+```
+pipx install python-lsp-server
+pipx inject python-lsp-server pylsp-rope
+```
+
+If a project's pyenv already has `python-lsp-server` + `pylsp-rope` installed, Neovim's `.py` buffer activation prepends the project's `bin/` to `PATH`, so the per-project `pylsp` is used instead of the pipx one. Rope then sees the project's installed deps, which can improve cross-file refactoring accuracy. To set this up inside a project venv: `pip install python-lsp-server pylsp-rope`.
+
+`:NvimDeps current` warns if either piece is missing; the warning includes the exact `pipx` command to run. Ruff is already on PATH via flox.
+
+### Python LSP footprint
+
+Steady-state RAM per Python buffer is roughly:
+
+- pyright: 200-400 MB (TypeScript, Node.js)
+- pylsp: 100-200 MB (Python; rope index builds lazily on first code action)
+- ruff server: 30-50 MB (Rust)
+
+About **350-650 MB total** for the LSP stack. Subprocess spawns per save/read: mypy via `nvim-lint` (1-3 s, independent of LSPs); conform runs `ruff_format` + `ruff_organize_imports` on `<SPC cf>` (50-100 ms each). Ruff diagnostics are **not** spawned per save anymore — they come from the ruff LSP server.
+
+First-attach latency is ~1-2 s to warm all three LSPs in the background; the cursor is never blocked (thanks to the earlier `ipdb` probe fix). Rope's project index builds on first code action per session, not per attach.
+
+If memory pressure becomes a concern, drop pylsp first — it is only required for refactoring and can be disabled in `lua/plugins/lsp.lua` until needed. Pyright's `diagnosticMode = "openFilesOnly"` is already set to limit its workspace scan, which helps on NFS homedirs.
 
 ## Completion and signature help
 

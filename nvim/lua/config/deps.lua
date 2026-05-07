@@ -66,6 +66,58 @@ local features = {
       return false, { status.detail }
     end,
   },
+  python_refactor = {
+    label = "Python refactoring (pylsp + pylsp-rope)",
+    check = function(_bufnr)
+      local pylsp = vim.fn.exepath("pylsp")
+      if pylsp == "" then
+        return false, { "pylsp (pipx install python-lsp-server)" }
+      end
+
+      local function has_rope_in(prefix)
+        if not prefix then
+          return false
+        end
+        local lib = vim.fs.joinpath(prefix, "lib")
+        local handle = vim.uv.fs_scandir(lib)
+        if not handle then
+          return false
+        end
+        while true do
+          local name = vim.uv.fs_scandir_next(handle)
+          if not name then
+            break
+          end
+          if name:match("^python%d") and vim.uv.fs_stat(vim.fs.joinpath(lib, name, "site-packages", "pylsp_rope")) then
+            return true
+          end
+        end
+        return false
+      end
+
+      -- Candidate 1: shebang of pylsp (works when pylsp is the real script, not a shim)
+      local shebang_python
+      local f = io.open(pylsp, "r")
+      if f then
+        local first = f:read("*l") or ""
+        f:close()
+        shebang_python = first:match("^#!%s*(%S+)")
+      end
+      if shebang_python and shebang_python:match("python") and vim.fn.executable(shebang_python) == 1 then
+        if has_rope_in(vim.fs.dirname(vim.fs.dirname(shebang_python))) then
+          return true, {}
+        end
+      end
+
+      -- Candidate 2: canonical pipx venv
+      local pipx_prefix = vim.fn.expand("~/.local/share/pipx/venvs/python-lsp-server")
+      if vim.uv.fs_stat(pipx_prefix) and has_rope_in(pipx_prefix) then
+        return true, {}
+      end
+
+      return false, { "pylsp-rope (pipx inject python-lsp-server pylsp-rope)" }
+    end,
+  },
   go_lsp = {
     label = "Go LSP",
     mode = "all",
@@ -197,7 +249,7 @@ local filetype_features = {
   jsonc = { "json_lsp", "js_format" },
   lua = { "lua_lsp", "lua_format" },
   markdown = { "markdown_lsp" },
-  python = { "pyenv", "python_lsp", "python_format", "python_lint", "python_types", "python_test", "python_debug" },
+  python = { "pyenv", "python_lsp", "python_format", "python_lint", "python_types", "python_test", "python_debug", "python_refactor" },
   rust = { "rust_lsp", "rust_format" },
   sh = { "shell_lsp", "shell_format", "shell_lint" },
   terraform = { "terraform_lsp", "terraform_format", "terraform_lint" },
@@ -219,6 +271,7 @@ local all_features = {
   "python_types",
   "python_test",
   "python_debug",
+  "python_refactor",
   "go_lsp",
   "go_runtime",
   "go_format",

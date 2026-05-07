@@ -237,6 +237,36 @@ return {
           },
         },
         marksman = {},
+        pylsp = {
+          cmd = (function()
+            local pipx_bin = vim.fn.expand("~/.local/share/pipx/venvs/python-lsp-server/bin/pylsp")
+            if vim.uv.fs_stat(pipx_bin) then
+              return { pipx_bin }
+            end
+            return { "pylsp" }
+          end)(),
+          settings = {
+            pylsp = {
+              plugins = {
+                pyflakes = { enabled = false },
+                pycodestyle = { enabled = false },
+                mccabe = { enabled = false },
+                pylint = { enabled = false },
+                flake8 = { enabled = false },
+                jedi_completion = { enabled = false },
+                jedi_hover = { enabled = false },
+                jedi_signature_help = { enabled = false },
+                jedi_definition = { enabled = false },
+                jedi_references = { enabled = false },
+                jedi_symbols = { enabled = false },
+                jedi_rename = { enabled = false },
+                rope_rename = { enabled = false },
+                pylsp_rope = { enabled = true, rename = false },
+                rope_autoimport = { enabled = false },
+              },
+            },
+          },
+        },
         pyright = {
           before_init = function(_, new_config)
             refresh_pyright_config(new_config, new_config.root_dir)
@@ -261,6 +291,7 @@ return {
           end,
           settings = python_env.pyright_settings(),
         },
+        ruff = {},
         rust_analyzer = {
           settings = {
             ["rust-analyzer"] = {
