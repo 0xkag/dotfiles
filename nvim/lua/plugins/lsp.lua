@@ -438,6 +438,141 @@ return {
                 end
               end,
             })
+
+            local function clean_label(raw)
+              local name, default = raw:match("^%s*([^:=]-)%s*:.-=%s*(.*)$")
+              if name and name ~= "" then
+                return name .. "=" .. default
+              end
+              name, default = raw:match("^%s*([^:=]-)%s*=%s*(.*)$")
+              if name and name ~= "" then
+                return name .. "=" .. default
+              end
+              local no_type = raw:match("^%s*([^:]+)%s*:")
+              if no_type then
+                return vim.trim(no_type)
+              end
+              return vim.trim(raw)
+            end
+
+            local function bare_name(raw)
+              local stripped = raw:match("^%s*%*?%*?([%w_]+)")
+              return stripped or vim.trim(raw)
+            end
+
+            local function is_kwargable(raw)
+              local trimmed = vim.trim(raw)
+              return trimmed ~= "*" and trimmed ~= "/" and not trimmed:match("^%*")
+            end
+
+            local function prepare_for_expand()
+              -- Ensures there is a ( immediately before cursor and ) immediately after,
+              -- so signatureHelp returns real data and lsp_expand inserts between them.
+              -- Returns the row/col (0-indexed) where expansion should happen.
+              local line = vim.api.nvim_get_current_line()
+              local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+              local before = line:sub(1, col)
+              local after = line:sub(col + 1)
+
+              if before:match("%($") and after:match("^%s*%)") then
+                return row, col
+              elseif before:match("%($") then
+                vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { ")" })
+                return row, col
+              else
+                local word_end = col
+                while word_end < #line and line:sub(word_end + 1, word_end + 1):match("[%w_]") do
+                  word_end = word_end + 1
+                end
+                vim.api.nvim_buf_set_text(0, row - 1, word_end, row - 1, word_end, { "()" })
+                vim.api.nvim_win_set_cursor(0, { row, word_end + 1 })
+                return row, word_end + 1
+              end
+            end
+
+            local function fetch_signature(callback)
+              local params = vim.lsp.util.make_position_params(0, "utf-8")
+              vim.lsp.buf_request(bufnr, "textDocument/signatureHelp", params, function(err, result)
+                if err or not result or not result.signatures or #result.signatures == 0 then
+                  vim.notify("No signature help available.", vim.log.levels.INFO)
+                  return
+                end
+                if #result.signatures == 1 then
+                  callback(result.signatures[1])
+                  return
+                end
+                vim.schedule(function()
+                  vim.ui.select(result.signatures, {
+                    prompt = "Signature:",
+                    format_item = function(s)
+                      return s.label
+                    end,
+                  }, function(choice)
+                    if choice then
+                      callback(choice)
+                    end
+                  end)
+                end)
+              end)
+            end
+
+            local function param_label(sig, param)
+              if type(param.label) == "table" then
+                return sig.label:sub(param.label[1] + 1, param.label[2])
+              end
+              return param.label
+            end
+
+            local function do_expand(parts, row, col)
+              vim.api.nvim_win_set_cursor(0, { row, col })
+              require("luasnip").lsp_expand(table.concat(parts, ", "))
+            end
+
+            local function expand_call_template()
+              local row, col = prepare_for_expand()
+              fetch_signature(function(sig)
+                local parts = {}
+                for i, p in ipairs(sig.parameters or {}) do
+                  local label = param_label(sig, p)
+                  table.insert(parts, string.format("${%d:%s}", i, clean_label(label)))
+                end
+                if #parts == 0 then
+                  vim.notify("No parameters.", vim.log.levels.INFO)
+                  return
+                end
+                vim.schedule(function()
+                  do_expand(parts, row, col)
+                end)
+              end)
+            end
+
+            local function expand_kwargs_template()
+              local row, col = prepare_for_expand()
+              fetch_signature(function(sig)
+                local parts = {}
+                local idx = 1
+                for _, p in ipairs(sig.parameters or {}) do
+                  local label = param_label(sig, p)
+                  if is_kwargable(label) then
+                    local name = bare_name(label)
+                    table.insert(parts, string.format("%s=${%d:%s}", name, idx, name))
+                    idx = idx + 1
+                  end
+                end
+                if #parts == 0 then
+                  vim.notify("No keyword-passable parameters.", vim.log.levels.INFO)
+                  return
+                end
+                vim.schedule(function()
+                  do_expand(parts, row, col)
+                end)
+              end)
+            end
+
+            map("i", "<C-l>", expand_call_template, "Expand call template")
+            map("n", "<localleader>ia", expand_call_template, "Insert call arguments")
+            map("i", "<C-y>", expand_kwargs_template, "Expand call with kwargs")
+            map("n", "<localleader>ik", expand_kwargs_template, "Insert call kwargs")
           end
         end,
       })

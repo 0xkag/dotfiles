@@ -6,6 +6,10 @@
   and arm64); this is a problem for things like ~/.local, pyenv, pipx, and
   mise
 - editor: vim git commit message fill column at 75
+- editor: Wire up real Python refactoring (pylsp-rope alongside pyright
+  disabled-for-diagnostics, nvim-treesitter-refactor for local renames,
+  and/or ruff-lsp for its quick-fix code actions); pyright currently only
+  supports rename, no extract-method / inline / move-to-module
 - fzf: Better integration of vim and fzf
 - fzf: Better use of fzf
 - keybindings: Re-rationalize keybindings across tools

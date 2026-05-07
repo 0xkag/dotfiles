@@ -95,6 +95,26 @@ For FreeBSD-specific Neovim install notes, see
 - Current machine support includes `shellcheck`, `yamllint`, `ruff`, `mypy`, fallback `pylint` or `flake8`, and `tflint`
 - completion popup navigation also works with the `Up` and `Down` arrow keys
 
+## Formatting
+
+- `<leader>cf` / `SPC c f` formats the current buffer via conform.nvim
+- `<localleader>=b` / `,=b` is the same format-buffer action in the major-mode map
+- `<localleader>=r` / `,=r` formats the current visual selection
+- Nothing auto-formats on save; formatting is always explicit
+- Formatter selection is per-filetype in `lua/plugins/python.lua` `formatters_by_ft`:
+  - Python is a function that probes availability at call time: `ruff_organize_imports` + `ruff_format` when ruff is on `PATH`, falling back to `black` then `yapf`
+  - Shell uses `shfmt`; Go uses `gofmt` + `goimports`; JavaScript/TypeScript/JSON/Markdown/YAML use `prettierd` then `prettier`; Lua uses `stylua`; Rust uses `rustfmt`; Terraform uses `terraform_fmt`; TOML uses `taplo`
+- `:ConformInfo` shows which formatters conform sees for the current buffer
+
+## Refactoring
+
+- `<leader>cr` / `<localleader>rr` / `SPC c r` renames the symbol under the cursor via the LSP
+- `<leader>ca` / `<localleader>aa` opens the full LSP code action menu
+- `<localleader>ar` restricts the menu to `refactor` actions; `<localleader>af` to `quickfix`; `<localleader>as` to `source`
+- `<localleader>=o` invokes `source.organizeImports` directly
+- Current coverage is LSP-driven. Pyright contributes cross-file rename and a handful of quick-fixes (e.g. "add import"); most general-purpose Python refactorings (extract method, inline variable, move to module, change signature) are **not** available. Pyright is a type checker, not a refactoring engine
+- See `TODO.md` for a planned upgrade path (pylsp-rope alongside pyright, `nvim-treesitter-refactor`, or `ruff-lsp` quick-fixes)
+
 ## Completion and signature help
 
 - Trigger completion manually with `<C-Space>`
@@ -108,6 +128,11 @@ For FreeBSD-specific Neovim install notes, see
   - `SPC m h s` (`<localleader>hs`) also opens it in normal mode
   - It fires automatically when you type `(` or `,` inside a function call
   - Signature help and hover floats use rounded borders
+- Expand a function call with placeholders using LSP signature data; Tab jumps through placeholders:
+  - Positional form, `<C-l>` (insert) or `<localleader>ia` (normal), yields `foo(arg1, arg2='default', ...)` using each parameter's name plus default value (type annotations stripped)
+  - Kwargs form, `<C-y>` (insert) or `<localleader>ik` (normal), yields `foo(arg1=arg1, arg2=arg2, ...)` for passing matching local variables by keyword. Skips positional-only params and `*args`/`**kwargs`
+  - If the cursor is inside empty `()` the placeholders fill in between the parens; otherwise they are wrapped in a new `(...)`
+  - Overloaded functions prompt via `vim.ui.select` to pick a signature
 - The completion popup and all floating windows (hover, signature help) use custom highlights under cyberpunk:
   - Dark `#1a1a1a` panel background with `#d3d3d3` text
   - Pink `#7f073f` selection bar; matched characters in yellow
