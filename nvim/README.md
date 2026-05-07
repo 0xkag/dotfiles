@@ -133,6 +133,7 @@ For FreeBSD-specific Neovim install notes, see
   - Kwargs form, `<C-y>` (insert) or `<localleader>ik` (normal), yields `foo(arg1=arg1, arg2=arg2, ...)` for passing matching local variables by keyword. Skips positional-only params and `*args`/`**kwargs`
   - If the cursor is inside empty `()` the placeholders fill in between the parens; otherwise they are wrapped in a new `(...)`
   - Overloaded functions prompt via `vim.ui.select` to pick a signature
+  - After expansion Neovim enters SELECT mode (`-- SELECT --` in the mode line) on the first placeholder; this is LuaSnip default IDE-style behavior. Type any character to replace the placeholder, `<Tab>` to keep the default and jump to the next, `<S-Tab>` for previous, `<Esc>` to exit the snippet session
 - The completion popup and all floating windows (hover, signature help) use custom highlights under cyberpunk:
   - Dark `#1a1a1a` panel background with `#d3d3d3` text
   - Pink `#7f073f` selection bar; matched characters in yellow
