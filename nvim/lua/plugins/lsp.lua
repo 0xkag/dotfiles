@@ -2,6 +2,16 @@
 
 return {
   {
+    "smjonas/inc-rename.nvim",
+    event = "LspAttach",
+    opts = {
+      cmd_name = "IncRename",
+      hl_group = "Substitute",
+      preview_empty_name = false,
+      show_message = true,
+    },
+  },
+  {
     "mason-org/mason.nvim",
     cmd = {
       "Mason",
@@ -245,6 +255,24 @@ return {
             end
             return { "pylsp" }
           end)(),
+          -- pylsp advertises capabilities for every plugin even when disabled via
+          -- settings. Strip the ones pyright/ruff own so other clients win rename,
+          -- hover, definitions, etc. Leaves codeActionProvider (rope refactors).
+          on_attach = function(client, _)
+            local caps = client.server_capabilities
+            caps.renameProvider = false
+            caps.hoverProvider = false
+            caps.completionProvider = nil
+            caps.signatureHelpProvider = nil
+            caps.definitionProvider = false
+            caps.declarationProvider = false
+            caps.typeDefinitionProvider = false
+            caps.implementationProvider = false
+            caps.referencesProvider = false
+            caps.documentSymbolProvider = false
+            caps.workspaceSymbolProvider = false
+            caps.documentHighlightProvider = false
+          end,
           settings = {
             pylsp = {
               plugins = {
@@ -333,6 +361,196 @@ return {
         vim.lsp.buf.hover({ border = "rounded" })
       end
 
+      local function place_cursors_in_range(bufnr, ident, start_row, end_row, start_col, end_col)
+        local mc = require("multicursor-nvim")
+        local pat = vim.regex([[\V\<]] .. vim.fn.escape(ident, [[\]]) .. [[\>]])
+        mc.action(function(ctx)
+          local first = true
+          local main = ctx:mainCursor()
+          for lnum = start_row, end_row do
+            local line = vim.api.nvim_buf_get_lines(bufnr, lnum, lnum + 1, false)[1] or ""
+            local cstart = (lnum == start_row) and (start_col or 0) or 0
+            local cend = (lnum == end_row) and (end_col or #line) or #line
+            local offset = cstart
+            while offset < cend do
+              local ms, me = pat:match_str(line:sub(offset + 1, cend))
+              if not ms then
+                break
+              end
+              local col = offset + ms
+              if first then
+                main:setPos({ lnum + 1, col })
+                first = false
+              else
+                ctx:addCursor():setPos({ lnum + 1, col })
+              end
+              offset = offset + me
+            end
+          end
+        end)
+      end
+
+      local function rename_multicursor(scope)
+        local ident = vim.fn.expand("<cword>")
+        if ident == "" then
+          vim.notify("No symbol under cursor.", vim.log.levels.INFO)
+          return
+        end
+
+        local bufnr = 0
+        if scope == "buffer" then
+          place_cursors_in_range(bufnr, ident, 0, vim.api.nvim_buf_line_count(bufnr) - 1)
+        elseif scope == "line" then
+          local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+          place_cursors_in_range(bufnr, ident, row, row)
+        elseif scope == "function" then
+          local node = vim.treesitter.get_node()
+          while node and node:type() ~= "function_definition" and node:type() ~= "function_declaration" do
+            node = node:parent()
+          end
+          if not node then
+            vim.notify("No enclosing function.", vim.log.levels.WARN)
+            return
+          end
+          local srow, scol, erow, ecol = node:range()
+          place_cursors_in_range(bufnr, ident, srow, erow, scol, ecol)
+        end
+      end
+
+      local function pick_rename_client(bufnr)
+        local clients = vim.lsp.get_clients({ bufnr = bufnr, method = "textDocument/rename" })
+        if #clients == 0 then
+          return nil
+        end
+        -- Prefer pyright over pylsp for Python; otherwise take first real provider.
+        for _, c in ipairs(clients) do
+          if c.name == "pyright" then
+            return c
+          end
+        end
+        return clients[1]
+      end
+
+      local function count_edits(result)
+        local files, total = {}, 0
+        for uri, edits in pairs(result.changes or {}) do
+          table.insert(files, vim.uri_to_fname(uri))
+          total = total + #edits
+        end
+        for _, c in ipairs(result.documentChanges or {}) do
+          if c.textDocument then
+            table.insert(files, vim.uri_to_fname(c.textDocument.uri))
+            total = total + #(c.edits or {})
+          end
+        end
+        return files, total
+      end
+
+      local function rename_with_preview()
+        vim.ui.input({
+          prompt = "New name: ",
+          default = vim.fn.expand("<cword>"),
+        }, function(new_name)
+          if not new_name or new_name == "" then
+            return
+          end
+
+          local bufnr = 0
+          local client = pick_rename_client(bufnr)
+          if not client then
+            vim.notify("No LSP supports rename for this buffer.", vim.log.levels.WARN)
+            return
+          end
+          local params = vim.lsp.util.make_position_params(0, client.offset_encoding)
+          params.newName = new_name
+
+          client:request("textDocument/rename", params, function(err, result)
+            if err then
+              vim.notify("Rename failed: " .. err.message, vim.log.levels.ERROR)
+              return
+            end
+            if
+              not result
+              or (not result.changes and not result.documentChanges)
+              or (
+                result.changes
+                and vim.tbl_isempty(result.changes)
+                and (not result.documentChanges or vim.tbl_isempty(result.documentChanges))
+              )
+            then
+              vim.notify(
+                "Rename failed: no edits returned (symbol may not be renamable here).",
+                vim.log.levels.WARN
+              )
+              return
+            end
+            local files, total = count_edits(result)
+            vim.ui.select({ "Apply", "Cancel" }, {
+              prompt = string.format(
+                "Rename to '%s': %d edits across %d files\n  %s",
+                new_name,
+                total,
+                #files,
+                table.concat(files, "\n  ")
+              ),
+            }, function(choice)
+              if choice == "Apply" then
+                vim.lsp.util.apply_workspace_edit(result, client.offset_encoding)
+                vim.notify(
+                  string.format("Renamed %d references in %d files.", total, #files),
+                  vim.log.levels.INFO
+                )
+              end
+            end)
+          end, bufnr)
+        end)
+      end
+
+      local function rename_workspace()
+        if vim.g.rename_inc_preview ~= false and pcall(require, "inc_rename") then
+          local cword = vim.fn.expand("<cword>")
+          -- Deferred feedkeys: the ui.select float needs to close before cmdline
+          -- mode takes over, otherwise the keys land in the picker.
+          vim.schedule(function()
+            vim.api.nvim_feedkeys(":IncRename " .. cword, "n", false)
+          end)
+        else
+          rename_with_preview()
+        end
+      end
+
+      local function rename_dispatch()
+        vim.ui.select({
+          "Line (multicursor)",
+          "Function (multicursor)",
+          "Buffer (multicursor)",
+          "Workspace (LSP)",
+        }, { prompt = "Rename scope:" }, function(choice)
+          if not choice then
+            return
+          end
+          if choice:find("^Workspace") then
+            rename_workspace()
+          elseif choice:find("^Line") then
+            rename_multicursor("line")
+          elseif choice:find("^Function") then
+            rename_multicursor("function")
+          elseif choice:find("^Buffer") then
+            rename_multicursor("buffer")
+          end
+        end)
+      end
+
+      vim.g.rename_inc_preview = (vim.g.rename_inc_preview ~= false)
+
+      vim.keymap.set("n", "<leader>tR", function()
+        vim.g.rename_inc_preview = not vim.g.rename_inc_preview
+        vim.notify(
+          "inc-rename live preview " .. (vim.g.rename_inc_preview and "enabled" or "disabled"),
+          vim.log.levels.INFO
+        )
+      end, { desc = "Toggle inc-rename live preview" })
+
       vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
       vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
       vim.keymap.set("n", "<leader>ce", vim.diagnostic.open_float, { desc = "Line diagnostics" })
@@ -361,7 +579,7 @@ return {
           map("i", "<C-k>", signature_help, "Signature help")
           map("n", "<localleader>hs", signature_help, "Signature help")
           map("n", "<leader>ca", vim.lsp.buf.code_action, "Code action")
-          map("n", "<leader>cr", vim.lsp.buf.rename, "Rename symbol")
+          map("n", "<leader>cr", rename_dispatch, "Rename symbol (scoped)")
           map("n", "<leader>cd", function()
             builtin.diagnostics({ bufnr = 0 })
           end, "Buffer diagnostics")
@@ -419,7 +637,7 @@ return {
           map("n", "<localleader>qr", function()
             restart_clients(bufnr)
           end, "Restart workspace")
-          map("n", "<localleader>rr", vim.lsp.buf.rename, "Rename symbol")
+          map("n", "<localleader>rr", rename_dispatch, "Rename symbol (scoped)")
           map({ "n", "x" }, "<localleader>aa", vim.lsp.buf.code_action, "Code action")
           map("n", "<localleader>af", code_action_only("quickfix"), "Fix action")
           map("n", "<localleader>ar", code_action_only("refactor"), "Refactor action")

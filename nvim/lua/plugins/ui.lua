@@ -1,5 +1,20 @@
 return {
   {
+    "folke/snacks.nvim",
+    lazy = false,
+    priority = 900,
+    opts = {
+      input = { enabled = true },
+      bigfile = { enabled = false },
+      dashboard = { enabled = false },
+      notifier = { enabled = false },
+      quickfile = { enabled = false },
+      scroll = { enabled = false },
+      statuscolumn = { enabled = false },
+      words = { enabled = false },
+    },
+  },
+  {
     "scottmckendry/cyberdream.nvim",
     lazy = false,
     priority = 1000,

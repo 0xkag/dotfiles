@@ -108,10 +108,42 @@ For FreeBSD-specific Neovim install notes, see
 
 ## Refactoring
 
-- `<leader>cr` / `<localleader>rr` / `SPC c r` renames the symbol under the cursor via the LSP
+- `<leader>cr` / `<localleader>rr` / `SPC c r` opens a scope picker for renaming the symbol under the cursor
 - `<leader>ca` / `<localleader>aa` opens the full LSP code action menu
 - `<localleader>ar` restricts the menu to `refactor` actions; `<localleader>af` to `quickfix`; `<localleader>as` to `source`
 - `<localleader>=o` invokes `source.organizeImports` directly
+
+### Rename scopes
+
+The rename dispatcher offers four scopes via `vim.ui.select`:
+
+| Scope | Backend | Behavior |
+|---|---|---|
+| Line (multicursor) | multicursor.nvim | Cursors on every matching identifier on the current line; type to edit all at once |
+| Function (multicursor) | multicursor.nvim + Treesitter | Cursors on matches inside the enclosing `function_definition` / `function_declaration` node |
+| Buffer (multicursor) | multicursor.nvim | Cursors on every match in the whole buffer |
+| Workspace (LSP) | `textDocument/rename` | AST-aware rename across all files the LSP knows about |
+
+Multicursor scopes match by identifier string (not AST). A `foo` inside a comment within the same function still gets a cursor. For true AST-local rename use the Workspace scope — pyright is AST-aware even for locals inside one function.
+
+Workspace mode has two UX variants controlled by `vim.g.rename_inc_preview` (default `true`):
+
+- `true` — inc-rename.nvim primes the cmdline with `:IncRename <cword>`; edit the name and watch live substitution highlight every reference in the visible buffer as you type, then `<CR>` applies across the workspace. The dispatcher uses `nvim_feedkeys` (not `vim.cmd`) so the command is editable — calling `vim.cmd("IncRename foo")` would execute immediately and rename the symbol to itself
+- `false` — snacks.nvim input float prompts for the new name; a confirm-list (`Apply N edits across M files: [list]`) requires explicit approval before edits land
+
+Toggle with `<leader>tR`. Matches spacemacs `SPC s e` iedit feel for the in-buffer scopes.
+
+Workspace rename routes to pyright even though pylsp is also attached. pylsp advertises `renameProvider` for every plugin slot regardless of whether the plugin is enabled in settings, so a naive `vim.lsp.get_clients({ method = "textDocument/rename" })` would hand the request to pylsp, which then returns nil (no rename plugin is actually wired up). Two things prevent this:
+
+- pylsp's `on_attach` in `lua/plugins/lsp.lua` strips `renameProvider`, `hoverProvider`, `definitionProvider`, `referencesProvider`, `documentSymbolProvider`, `workspaceSymbolProvider`, `completionProvider`, `signatureHelpProvider`, `declarationProvider`, `typeDefinitionProvider`, `implementationProvider`, and `documentHighlightProvider` from `client.server_capabilities` after attach. Only `codeActionProvider` is left, matching pylsp's actual job (rope refactors)
+- `rename_with_preview` additionally prefers a client named `pyright` when multiple rename-capable clients remain, as belt-and-suspenders for non-Python stacks that might add another rename provider
+
+If you add a new pylsp plugin that provides one of the stripped capabilities, remove the matching line from `on_attach` and restart the LSP.
+
+### UI
+
+- snacks.nvim `input` module replaces `vim.ui.input` (styled float, no lingering cmdline prompt)
+- telescope-ui-select still owns `vim.ui.select`, so the scope picker and confirm-list use telescope
 
 ### Python refactoring stack
 
@@ -120,7 +152,7 @@ Python buffers attach three LSPs with a clear division of labor. Overlapping fea
 | Server | Role | Disabled features |
 |---|---|---|
 | pyright | types, hover, completion, go-to-def, rename | — |
-| pylsp | rope refactoring code actions only | diagnostics, completion, hover, signatureHelp, references, symbols, jedi_rename, rope_rename, rope_autoimport |
+| pylsp | rope refactoring code actions only | diagnostics, completion, hover, signatureHelp, references, symbols, jedi_rename, rope_rename, rope_autoimport (server-side settings) + renameProvider/hoverProvider/definitionProvider/referencesProvider/documentSymbolProvider/workspaceSymbolProvider/completionProvider/signatureHelpProvider/declarationProvider/typeDefinitionProvider/implementationProvider/documentHighlightProvider stripped client-side on attach |
 | ruff (server) | lint autofixes + `source.organizeImports` / `source.fixAll` | autoconfig defaults |
 
 **Scope-aware rename of a local**: pyright's LSP rename is AST-aware. Renaming a variable bound only inside one function does not touch same-name identifiers in other scopes. Use `<leader>cr`.
