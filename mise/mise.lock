@@ -226,36 +226,36 @@ checksum = "sha256:07fc8261b42b20e71d1720b39068c2e14ffcee6396b76fb7a795fb460b78d
 url = "https://github.com/ninja-build/ninja/releases/download/v1.13.2/ninja-win.zip"
 
 [[tools.ollama]]
-version = "0.21.2"
+version = "0.24.0"
 backend = "aqua:ollama/ollama"
 
 [tools.ollama."platforms.linux-arm64"]
-checksum = "sha256:d97ab6f40e9f5123e9361bc279b36dd5413257bc54f58b2f58419b33ab7a1eb0"
-url = "https://github.com/ollama/ollama/releases/download/v0.21.2/ollama-linux-arm64.tar.zst"
+checksum = "sha256:6e9a3ce5f64e93312902e39c420ec336255f078a368ca25e99b339d08a6dfa4b"
+url = "https://github.com/ollama/ollama/releases/download/v0.24.0/ollama-linux-arm64.tar.zst"
 
 [tools.ollama."platforms.linux-arm64-musl"]
-checksum = "sha256:d97ab6f40e9f5123e9361bc279b36dd5413257bc54f58b2f58419b33ab7a1eb0"
-url = "https://github.com/ollama/ollama/releases/download/v0.21.2/ollama-linux-arm64.tar.zst"
+checksum = "sha256:6e9a3ce5f64e93312902e39c420ec336255f078a368ca25e99b339d08a6dfa4b"
+url = "https://github.com/ollama/ollama/releases/download/v0.24.0/ollama-linux-arm64.tar.zst"
 
 [tools.ollama."platforms.linux-x64"]
-checksum = "sha256:58ebee40083b53afc91e14fdc7bcdae4023f0c773c2358411f104f9bed2b739e"
-url = "https://github.com/ollama/ollama/releases/download/v0.21.2/ollama-linux-amd64.tar.zst"
+checksum = "sha256:15c5f8d66ba06e0d3b4719df8868612dbd66e14e82760929bb3552e1657cdcdb"
+url = "https://github.com/ollama/ollama/releases/download/v0.24.0/ollama-linux-amd64.tar.zst"
 
 [tools.ollama."platforms.linux-x64-musl"]
-checksum = "sha256:58ebee40083b53afc91e14fdc7bcdae4023f0c773c2358411f104f9bed2b739e"
-url = "https://github.com/ollama/ollama/releases/download/v0.21.2/ollama-linux-amd64.tar.zst"
+checksum = "sha256:15c5f8d66ba06e0d3b4719df8868612dbd66e14e82760929bb3552e1657cdcdb"
+url = "https://github.com/ollama/ollama/releases/download/v0.24.0/ollama-linux-amd64.tar.zst"
 
 [tools.ollama."platforms.macos-arm64"]
-checksum = "sha256:f14bb761dc3ef251a68081b4888920c187abe3ed53483db813ee8fb9c0a1af3e"
-url = "https://github.com/ollama/ollama/releases/download/v0.21.2/ollama-darwin.tgz"
+checksum = "sha256:e6d5e8b4bc0cb2a35ff7901c58d81ca2170403a819c4726f58798155fa682e38"
+url = "https://github.com/ollama/ollama/releases/download/v0.24.0/ollama-darwin.tgz"
 
 [tools.ollama."platforms.macos-x64"]
-checksum = "sha256:f14bb761dc3ef251a68081b4888920c187abe3ed53483db813ee8fb9c0a1af3e"
-url = "https://github.com/ollama/ollama/releases/download/v0.21.2/ollama-darwin.tgz"
+checksum = "sha256:e6d5e8b4bc0cb2a35ff7901c58d81ca2170403a819c4726f58798155fa682e38"
+url = "https://github.com/ollama/ollama/releases/download/v0.24.0/ollama-darwin.tgz"
 
 [tools.ollama."platforms.windows-x64"]
-checksum = "sha256:624caabca19a27168dd2b165ac538a0c6f2c6bcc94098439944fa351ff7b11e2"
-url = "https://github.com/ollama/ollama/releases/download/v0.21.2/ollama-windows-amd64.zip"
+checksum = "sha256:40c523d3eeba6f4647c5ca58fe47f15b8dee79f7675ebf573458890064f424c7"
+url = "https://github.com/ollama/ollama/releases/download/v0.24.0/ollama-windows-amd64.zip"
 
 [[tools.pandoc]]
 version = "3.9.0.2"
