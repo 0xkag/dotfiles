@@ -80,6 +80,7 @@ manpath=(
     $HOME/.root/man
     $HOME/.root/share/man
     $NPM_PACKAGES/share/man
+    $HOME/.flox/run/x86_64-linux.default.dev/share/man
     /usr/local/man
     /usr/local/share/man
     /usr/share/man
@@ -100,6 +101,8 @@ path=(
     $PYENV_ROOT/bin
     $GOPATH/bin
     $NPM_PACKAGES/bin
+    $HOME/.flox/run/x86_64-linux.default.dev/bin
+    $HOME/.flox/run/x86_64-linux.default.dev/sbin
     /opt/homebrew/bin
     /opt/homebrew/sbin
     /usr/local/bin
@@ -119,6 +122,8 @@ pkg_config_path=(
     $HOME/.local/lib/pkgconfig
     $HOME/.root/lib64/pkgconfig
     $HOME/.root/lib/pkgconfig
+    $HOME/.flox/run/x86_64-linux.default.dev/lib/pkgconfig
+    $HOME/.flox/run/x86_64-linux.default.dev/share/pkgconfig
     /usr/lib64/pkgconfig
     /usr/lib/pkgconfig
     /usr/share/pkgconfig
@@ -139,6 +144,7 @@ fi
 xdg_data_dirs=(
     $HOME/.local/share
     $HOME/.root/share
+    $HOME/.flox/run/x86_64-linux.default.dev/share
     ${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}
 )
 

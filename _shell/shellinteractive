@@ -140,21 +140,22 @@ man() {
             man "$@"
 }
 
-# flox
+# flox -- deactivated for now in favor of (unsupported) direct environment
+# injection in shellenv (so that tool hierarchy can be controlled)
 
-if command -v flox &> /dev/null; then
-    eval "$(flox activate)" 2> /dev/null || true
-fi
+#if command -v flox &> /dev/null; then
+#    eval "$(flox activate)" 2> /dev/null || true
+#fi
 
-# mise
+# mise -- deactivated for now in favor of shims
 
-if command -v mise &> /dev/null; then
-    if $IS_BASH; then
-        eval "$(mise activate bash)" 2> /dev/null || true
-    elif $IS_ZSH; then
-        eval "$(mise activate zsh)" 2> /dev/null || true
-    fi
-fi
+#if command -v mise &> /dev/null; then
+#    if $IS_BASH; then
+#        eval "$(mise activate bash)" 2> /dev/null || true
+#    elif $IS_ZSH; then
+#        eval "$(mise activate zsh)" 2> /dev/null || true
+#    fi
+#fi
 
 # awscli
 
