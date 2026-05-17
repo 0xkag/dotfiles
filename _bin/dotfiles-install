@@ -217,6 +217,8 @@ def main():
 
     heading('nvim')
     relink_relative('~/.dotfiles/nvim', '~/.config/nvim')
+    if os.uname().sysname == 'FreeBSD':
+        step('install neovim with: sudo pkg install neovim')
 
     # pandoc
 
