@@ -5,6 +5,11 @@
 
 disable=("poetry" "python")
 
+if [[ -n $MISE_LOCKING ]]; then
+    IFS=','; echo "${disable[*]}"
+    exit 0
+fi
+
 # ag (any version)
 
 if command -v ag > /dev/null 2>&1; then
