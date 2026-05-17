@@ -12,6 +12,9 @@ see [REMOTE_AND_RUNBOOK_NOTES.md](./REMOTE_AND_RUNBOOK_NOTES.md:1).
 For picker-stack and future fzf-integration notes, see
 [PICKER_NOTES.md](./PICKER_NOTES.md:1).
 
+For FreeBSD-specific Neovim install notes, see
+[FREEBSD_NOTES.md](./FREEBSD_NOTES.md:1).
+
 ## Core keys
 
 - `SPC` is the main leader key
