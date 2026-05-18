@@ -2,6 +2,7 @@ local M = {}
 
 local notified = {}
 local python_env = require("config.python")
+local treesitter = require("config.treesitter")
 local tools = require("config.tools")
 
 local features = {
@@ -68,54 +69,40 @@ local features = {
   },
   python_refactor = {
     label = "Python refactoring (pylsp + pylsp-rope)",
-    check = function(_bufnr)
-      local pylsp = vim.fn.exepath("pylsp")
-      if pylsp == "" then
-        return false, { "pylsp (pipx install python-lsp-server)" }
-      end
-
-      local function has_rope_in(prefix)
-        if not prefix then
-          return false
-        end
-        local lib = vim.fs.joinpath(prefix, "lib")
-        local handle = vim.uv.fs_scandir(lib)
-        if not handle then
-          return false
-        end
-        while true do
-          local name = vim.uv.fs_scandir_next(handle)
-          if not name then
-            break
-          end
-          if name:match("^python%d") and vim.uv.fs_stat(vim.fs.joinpath(lib, name, "site-packages", "pylsp_rope")) then
-            return true
-          end
-        end
-        return false
-      end
-
-      -- Candidate 1: shebang of pylsp (works when pylsp is the real script, not a shim)
-      local shebang_python
-      local f = io.open(pylsp, "r")
-      if f then
-        local first = f:read("*l") or ""
-        f:close()
-        shebang_python = first:match("^#!%s*(%S+)")
-      end
-      if shebang_python and shebang_python:match("python") and vim.fn.executable(shebang_python) == 1 then
-        if has_rope_in(vim.fs.dirname(vim.fs.dirname(shebang_python))) then
-          return true, {}
-        end
-      end
-
-      -- Candidate 2: canonical pipx venv
-      local pipx_prefix = vim.fn.expand("~/.local/share/pipx/venvs/python-lsp-server")
-      if vim.uv.fs_stat(pipx_prefix) and has_rope_in(pipx_prefix) then
+    check = function(bufnr)
+      local status = python_env.pylsp_status(bufnr)
+      if status.available then
         return true, {}
       end
 
-      return false, { "pylsp-rope (pipx inject python-lsp-server pylsp-rope)" }
+      return false, { status.detail }
+    end,
+  },
+  treesitter_parser = {
+    label = "Treesitter parser",
+    check = function(bufnr)
+      local ft = bufnr and vim.bo[bufnr].filetype or vim.bo.filetype
+      local missing = treesitter.missing_for_filetype(ft)
+      if #missing == 0 then
+        return true, {}
+      end
+
+      return false, vim.tbl_map(function(lang)
+        return lang .. " (:TSInstall " .. lang .. ")"
+      end, missing)
+    end,
+  },
+  treesitter_parsers = {
+    label = "Treesitter parsers",
+    check = function()
+      local missing = treesitter.missing_configured()
+      if #missing == 0 then
+        return true, {}
+      end
+
+      return false, {
+        table.concat(missing, ", ") .. " (:TSInstall " .. table.concat(missing, " ") .. ")",
+      }
     end,
   },
   go_lsp = {
@@ -272,6 +259,7 @@ local all_features = {
   "python_test",
   "python_debug",
   "python_refactor",
+  "treesitter_parsers",
   "go_lsp",
   "go_runtime",
   "go_format",
@@ -407,6 +395,7 @@ function M.check_current_buffer(bufnr)
     return
   end
 
+  feature_ids = vim.list_extend(vim.deepcopy(feature_ids), { "treesitter_parser" })
   notify_once(feature_ids, "Missing " .. ft .. " dependencies", "ft:" .. ft, bufnr)
 end
 
@@ -416,6 +405,7 @@ function M.command(scope)
 
   if scope == "current" then
     feature_ids = vim.list_extend(vim.deepcopy(core_features), filetype_features[vim.bo.filetype] or {})
+    table.insert(feature_ids, "treesitter_parser")
     title = "Missing current-buffer dependencies"
   end
 

@@ -5,14 +5,7 @@ return {
   build = ":TSUpdate",
   config = function()
     local treesitter = require("nvim-treesitter")
-
-    local parsers = {
-      "bash", "c", "cpp", "css", "diff", "dockerfile", "go", "gomod",
-      "gosum", "html", "javascript", "json", "lua", "luadoc",
-      "luap", "make", "markdown", "markdown_inline", "python",
-      "query", "regex", "rust", "sql", "terraform", "toml", "tsx",
-      "typescript", "vim", "vimdoc", "yaml",
-    }
+    local parser_config = require("config.treesitter")
     local auto_install = vim.g.nvim_treesitter_auto_install == true
 
     if type(treesitter.install) == "function" then
@@ -20,7 +13,7 @@ return {
         install_dir = vim.fn.stdpath("data") .. "/site",
       })
       if auto_install then
-        treesitter.install(parsers)
+        treesitter.install(parser_config.parsers)
       end
 
       vim.api.nvim_create_autocmd("FileType", {
@@ -37,7 +30,7 @@ return {
 
     require("nvim-treesitter.configs").setup({
       auto_install = false,
-      ensure_installed = auto_install and parsers or {},
+      ensure_installed = auto_install and parser_config.parsers or {},
       highlight = { enable = true },
       indent = { enable = true },
     })

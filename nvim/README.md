@@ -82,6 +82,7 @@ For FreeBSD-specific Neovim install notes, see
 - `:Telescope keymaps` search mappings
 - `:NvimDeps` show missing configured dependencies on `PATH`
 - `:NvimDeps current` show missing dependencies for the current buffer workflow
+- `:NvimDeps current` also reports the current buffer's missing Treesitter parser
 - `:PyenvInfo` show the Python environment Neovim resolved for the current buffer
 - `:Org help` view orgmode help
 - `:TSInstall lua python markdown markdown_inline org kulala_http` install parsers you want
@@ -112,8 +113,8 @@ For FreeBSD-specific Neovim install notes, see
 
 - `<leader>cr` / `<localleader>rr` / `SPC c r` opens a scope picker for renaming the symbol under the cursor
 - `<leader>ca` / `<localleader>aa` opens the full LSP code action menu
-- `<localleader>ar` restricts the menu to `refactor` actions; `<localleader>af` to `quickfix`; `<localleader>as` to `source`
-- `<localleader>=o` invokes `source.organizeImports` directly
+- `<localleader>ar` opens a filtered `refactor` action menu; `<localleader>af` opens `quickfix`; `<localleader>as` opens `source`
+- `<localleader>=o` explicitly applies `source.organizeImports`
 
 ### Rename scopes
 
@@ -172,9 +173,9 @@ pipx install python-lsp-server
 pipx inject python-lsp-server pylsp-rope
 ```
 
-If a project's pyenv already has `python-lsp-server` + `pylsp-rope` installed, Neovim's `.py` buffer activation prepends the project's `bin/` to `PATH`, so the per-project `pylsp` is used instead of the pipx one. Rope then sees the project's installed deps, which can improve cross-file refactoring accuracy. To set this up inside a project venv: `pip install python-lsp-server pylsp-rope`.
+If a project's pyenv already has `python-lsp-server` + `pylsp-rope` installed, Neovim uses that project's direct `bin/pylsp` before the pipx fallback. Rope then sees the project's installed deps, which can improve cross-file refactoring accuracy. To set this up inside a project venv: `pip install python-lsp-server pylsp-rope`.
 
-`:NvimDeps current` warns if either piece is missing; the warning includes the exact `pipx` command to run. Ruff is already on PATH via flox.
+`:NvimDeps current` checks the same resolved `pylsp` path that LSP startup uses and warns if either piece is missing. Ruff is already on PATH via flox.
 
 ### Python LSP footprint
 
@@ -215,6 +216,7 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
   - Kwargs form, `<localleader>ik` (normal), yields `foo(arg1=arg1, arg2=arg2, ...)` for passing matching local variables by keyword. Skips positional-only params and `*args`/`**kwargs`
   - If the cursor is inside empty `()` the placeholders fill in between the parens; otherwise they are wrapped in a new `(...)`
   - Overloaded functions prompt via `vim.ui.select` to pick a signature
+  - If no signature is available, temporary parens inserted for lookup are rolled back so the buffer is left unchanged
   - After expansion Neovim enters SELECT mode (`-- SELECT --` in the mode line) on the first placeholder; this is LuaSnip default IDE-style behavior. Type any character to replace the placeholder, `<Tab>` to keep the default and jump to the next, `<S-Tab>` for previous, `<Esc>` to exit the snippet session
 - The completion popup and all floating windows (hover, signature help) use custom highlights under cyberpunk:
   - Dark `#1a1a1a` panel background with `#d3d3d3` text

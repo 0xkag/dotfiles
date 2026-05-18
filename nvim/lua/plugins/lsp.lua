@@ -49,7 +49,18 @@ return {
         })
       end
 
-      local function code_action_only(kind)
+      local function code_action_menu(kind)
+        return function()
+          vim.lsp.buf.code_action({
+            context = {
+              only = { kind },
+              diagnostics = vim.diagnostic.get(0),
+            },
+          })
+        end
+      end
+
+      local function apply_code_action(kind)
         return function()
           vim.lsp.buf.code_action({
             apply = true,
@@ -249,13 +260,10 @@ return {
         },
         marksman = {},
         pylsp = {
-          cmd = (function()
-            local pipx_bin = vim.fn.expand("~/.local/share/pipx/venvs/python-lsp-server/bin/pylsp")
-            if vim.uv.fs_stat(pipx_bin) then
-              return { pipx_bin }
-            end
-            return { "pylsp" }
-          end)(),
+          cmd = python_env.pylsp_cmd(),
+          on_new_config = function(new_config, root_dir)
+            new_config.cmd = python_env.pylsp_cmd(root_dir)
+          end,
           -- pylsp advertises capabilities for every plugin even when disabled via
           -- settings. Strip the ones pyright/ruff own so other clients win rename,
           -- hover, definitions, etc. Leaves codeActionProvider (rope refactors).
@@ -640,9 +648,9 @@ return {
           end, "Restart workspace")
           map("n", "<localleader>rr", rename_dispatch, "Rename symbol (scoped)")
           map({ "n", "x" }, "<localleader>aa", vim.lsp.buf.code_action, "Code action")
-          map("n", "<localleader>af", code_action_only("quickfix"), "Fix action")
-          map("n", "<localleader>ar", code_action_only("refactor"), "Refactor action")
-          map("n", "<localleader>as", code_action_only("source"), "Source action")
+          map("n", "<localleader>af", code_action_menu("quickfix"), "Fix action")
+          map("n", "<localleader>ar", code_action_menu("refactor"), "Refactor action")
+          map("n", "<localleader>as", code_action_menu("source"), "Source action")
           map("n", "<localleader>=b", function()
             format_buffer(bufnr)
           end, "Format buffer")
@@ -654,7 +662,7 @@ return {
               ["end"] = { end_pos[1], end_pos[2] + 1 },
             })
           end, "Format selection")
-          map("n", "<localleader>=o", code_action_only("source.organizeImports"), "Organize imports")
+          map("n", "<localleader>=o", apply_code_action("source.organizeImports"), "Organize imports")
           map("n", "<localleader>xh", function()
             highlight_symbol(bufnr)
           end, "Highlight symbol references")
@@ -718,17 +726,21 @@ return {
             local function prepare_for_expand()
               -- Ensures there is a ( immediately before cursor and ) immediately after,
               -- so signatureHelp returns real data and lsp_expand inserts between them.
-              -- Returns the row/col (0-indexed) where expansion should happen.
+              -- Returns the row/col where expansion should happen plus rollback state.
               local line = vim.api.nvim_get_current_line()
               local row, col = unpack(vim.api.nvim_win_get_cursor(0))
               local before = line:sub(1, col)
               local after = line:sub(col + 1)
 
               if before:match("%($") and after:match("^%s*%)") then
-                return row, col
+                return { row = row, col = col }
               elseif before:match("%($") then
                 vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { ")" })
-                return row, col
+                return {
+                  row = row,
+                  col = col,
+                  inserted = { row = row - 1, start_col = col, end_col = col + 1, text = ")" },
+                }
               else
                 local word_end = col
                 while word_end < #line and line:sub(word_end + 1, word_end + 1):match("[%w_]") do
@@ -736,15 +748,39 @@ return {
                 end
                 vim.api.nvim_buf_set_text(0, row - 1, word_end, row - 1, word_end, { "()" })
                 vim.api.nvim_win_set_cursor(0, { row, word_end + 1 })
-                return row, word_end + 1
+                return {
+                  row = row,
+                  col = word_end + 1,
+                  inserted = { row = row - 1, start_col = word_end, end_col = word_end + 2, text = "()" },
+                }
               end
             end
 
-            local function fetch_signature(callback)
-              local params = vim.lsp.util.make_position_params(0, "utf-8")
+            local function rollback_expand(ctx)
+              if not ctx.inserted or not vim.api.nvim_buf_is_valid(bufnr) then
+                return
+              end
+
+              local inserted = ctx.inserted
+              local line = vim.api.nvim_buf_get_lines(bufnr, inserted.row, inserted.row + 1, false)[1]
+              if not line then
+                return
+              end
+
+              local current = line:sub(inserted.start_col + 1, inserted.end_col)
+              if current == inserted.text then
+                vim.api.nvim_buf_set_text(bufnr, inserted.row, inserted.start_col, inserted.row, inserted.end_col, { "" })
+              end
+            end
+
+            local function fetch_signature(callback, on_fail)
+              local params = vim.lsp.util.make_position_params(0, client.offset_encoding)
               vim.lsp.buf_request(bufnr, "textDocument/signatureHelp", params, function(err, result)
                 if err or not result or not result.signatures or #result.signatures == 0 then
                   vim.notify("No signature help available.", vim.log.levels.INFO)
+                  if on_fail then
+                    on_fail()
+                  end
                   return
                 end
                 if #result.signatures == 1 then
@@ -760,6 +796,8 @@ return {
                   }, function(choice)
                     if choice then
                       callback(choice)
+                    elseif on_fail then
+                      on_fail()
                     end
                   end)
                 end)
@@ -779,7 +817,7 @@ return {
             end
 
             local function expand_call_template()
-              local row, col = prepare_for_expand()
+              local ctx = prepare_for_expand()
               fetch_signature(function(sig)
                 local parts = {}
                 for i, p in ipairs(sig.parameters or {}) do
@@ -787,17 +825,20 @@ return {
                   table.insert(parts, string.format("${%d:%s}", i, clean_label(label)))
                 end
                 if #parts == 0 then
+                  rollback_expand(ctx)
                   vim.notify("No parameters.", vim.log.levels.INFO)
                   return
                 end
                 vim.schedule(function()
-                  do_expand(parts, row, col)
+                  do_expand(parts, ctx.row, ctx.col)
                 end)
+              end, function()
+                rollback_expand(ctx)
               end)
             end
 
             local function expand_kwargs_template()
-              local row, col = prepare_for_expand()
+              local ctx = prepare_for_expand()
               fetch_signature(function(sig)
                 local parts = {}
                 local idx = 1
@@ -810,12 +851,15 @@ return {
                   end
                 end
                 if #parts == 0 then
+                  rollback_expand(ctx)
                   vim.notify("No keyword-passable parameters.", vim.log.levels.INFO)
                   return
                 end
                 vim.schedule(function()
-                  do_expand(parts, row, col)
+                  do_expand(parts, ctx.row, ctx.col)
                 end)
+              end, function()
+                rollback_expand(ctx)
               end)
             end
 

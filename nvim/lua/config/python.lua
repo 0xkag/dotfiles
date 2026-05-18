@@ -132,6 +132,38 @@ local function prefix_for_dir(start_dir)
   return pyenv_prefix(version)
 end
 
+local function prefix_for_target(target)
+  if type(target) == "number" then
+    return M.prefix(target)
+  elseif type(target) == "string" and target ~= "" then
+    return prefix_for_dir(target)
+  end
+
+  return active_prefix
+end
+
+local function executable_in_prefix(prefix, name)
+  if not prefix then
+    return nil
+  end
+
+  local path = vim.fs.joinpath(prefix, "bin", name)
+  if uv.fs_stat(path) then
+    return path
+  end
+
+  return nil
+end
+
+local function pipx_pylsp_prefix()
+  local prefix = vim.fn.expand("~/.local/share/pipx/venvs/python-lsp-server")
+  if uv.fs_stat(vim.fs.joinpath(prefix, "bin", "pylsp")) then
+    return prefix
+  end
+
+  return nil
+end
+
 function M.prefix(bufnr)
   return prefix_for_dir(start_dir_for_buffer(bufnr or 0))
 end
@@ -141,16 +173,7 @@ function M.active_prefix()
 end
 
 function M.python_bin(target)
-  local prefix = nil
-
-  if type(target) == "number" then
-    prefix = M.prefix(target)
-  elseif type(target) == "string" and target ~= "" then
-    prefix = prefix_for_dir(target)
-  else
-    prefix = active_prefix
-  end
-
+  local prefix = prefix_for_target(target)
   if prefix then
     local python = vim.fs.joinpath(prefix, "bin", "python")
     if uv.fs_stat(python) then
@@ -169,6 +192,39 @@ function M.python_bin(target)
   end
 
   return nil
+end
+
+function M.tool_path(name, target)
+  local from_prefix = executable_in_prefix(prefix_for_target(target), name)
+  if from_prefix then
+    return from_prefix
+  end
+
+  local path = vim.fn.exepath(name)
+  if path ~= "" then
+    return path
+  end
+
+  return nil
+end
+
+function M.pylsp_cmd(target)
+  local from_prefix = executable_in_prefix(prefix_for_target(target), "pylsp")
+  if from_prefix then
+    return { from_prefix }
+  end
+
+  local pipx_prefix = pipx_pylsp_prefix()
+  if pipx_prefix then
+    return { vim.fs.joinpath(pipx_prefix, "bin", "pylsp") }
+  end
+
+  local from_path = vim.fn.exepath("pylsp")
+  if from_path ~= "" then
+    return { from_path }
+  end
+
+  return { "pylsp" }
 end
 
 local function probe_module_on_disk(python, module)
@@ -215,8 +271,7 @@ local function probe_module_on_disk(python, module)
   return false
 end
 
-function M.module_status(module, target)
-  local python = M.python_bin(target)
+function M.module_status_for_python(module, python)
   if not python then
     return {
       available = false,
@@ -268,8 +323,80 @@ function M.module_status(module, target)
   return vim.deepcopy(status)
 end
 
+function M.module_status(module, target)
+  return M.module_status_for_python(module, M.python_bin(target))
+end
+
 function M.module_available(module, target)
   return M.module_status(module, target).available
+end
+
+local function shebang_python(path)
+  local f = io.open(path, "r")
+  if not f then
+    return nil
+  end
+
+  local first = f:read("*l") or ""
+  f:close()
+
+  local env_python = first:match("^#!%s*/usr/bin/env%s+([^%s]+)")
+  if env_python and env_python:match("python") then
+    local resolved = vim.fn.exepath(env_python)
+    if resolved ~= "" then
+      return resolved
+    end
+  end
+
+  local python = first:match("^#!%s*(%S+)")
+  if python and python:match("python") and vim.fn.executable(python) == 1 then
+    return python
+  end
+
+  return nil
+end
+
+local function python_for_pylsp(path, target)
+  local prefix = prefix_for_target(target)
+  if prefix and path == vim.fs.joinpath(prefix, "bin", "pylsp") then
+    return vim.fs.joinpath(prefix, "bin", "python")
+  end
+
+  local pipx_prefix = pipx_pylsp_prefix()
+  if pipx_prefix and path == vim.fs.joinpath(pipx_prefix, "bin", "pylsp") then
+    return vim.fs.joinpath(pipx_prefix, "bin", "python")
+  end
+
+  return shebang_python(path)
+end
+
+function M.pylsp_status(target)
+  local cmd = M.pylsp_cmd(target)
+  local pylsp = cmd[1]
+
+  if vim.fn.executable(pylsp) ~= 1 then
+    return {
+      available = false,
+      detail = "pylsp (pipx install python-lsp-server)",
+      path = pylsp,
+    }
+  end
+
+  local python = python_for_pylsp(pylsp, target)
+  if not python or vim.fn.executable(python) ~= 1 then
+    return {
+      available = false,
+      detail = "pylsp-rope (cannot resolve Python for " .. pylsp .. ")",
+      path = pylsp,
+    }
+  end
+
+  local status = M.module_status_for_python("pylsp_rope", python)
+  status.path = pylsp
+  if not status.available then
+    status.detail = "pylsp-rope (missing for " .. pylsp .. "; pipx inject python-lsp-server pylsp-rope)"
+  end
+  return status
 end
 
 function M.pyright_settings(root_dir)
