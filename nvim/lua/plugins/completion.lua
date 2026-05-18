@@ -1,3 +1,5 @@
+local completion = require("config.completion")
+
 vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("user_cmp_disable", { clear = true }),
   pattern = { "gitcommit" },
@@ -5,15 +7,6 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.b[event.buf].cmp_disabled = true
   end,
 })
-
-vim.keymap.set("n", "<leader>ta", function()
-  local buf = vim.api.nvim_get_current_buf()
-  vim.b[buf].cmp_disabled = not vim.b[buf].cmp_disabled
-  vim.notify(
-    "Auto-completion " .. (vim.b[buf].cmp_disabled and "disabled" or "enabled") .. " for this buffer.",
-    vim.log.levels.INFO
-  )
-end, { desc = "Toggle auto-completion (buffer)" })
 
 return {
   "hrsh7th/nvim-cmp",
@@ -29,86 +22,6 @@ return {
     local cmp = require("cmp")
     local luasnip = require("luasnip")
 
-    cmp.setup({
-      enabled = function()
-        local buf = vim.api.nvim_get_current_buf()
-        if vim.b[buf].cmp_disabled then
-          return false
-        end
-        return vim.bo[buf].buftype ~= "prompt"
-      end,
-      completion = {
-        completeopt = "menu,menuone,noselect",
-      },
-      experimental = {
-        ghost_text = true,
-      },
-      snippet = {
-        expand = function(args)
-          luasnip.lsp_expand(args.body)
-        end,
-      },
-      mapping = cmp.mapping.preset.insert({
-        ["<C-Space>"] = cmp.mapping.complete(),
-        ["<C-n>"] = cmp.mapping.select_next_item(),
-        ["<C-p>"] = cmp.mapping.select_prev_item(),
-        ["<Down>"] = cmp.mapping.select_next_item(),
-        ["<Up>"] = cmp.mapping.select_prev_item(),
-        ["<Esc>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.abort()
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
-        ["<CR>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.confirm({ select = true })
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
-        ["<Tab>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.confirm({ select = true })
-          elseif luasnip.expand_or_locally_jumpable() then
-            luasnip.expand_or_jump()
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
-        ["<S-Tab>"] = cmp.mapping(function(fallback)
-          if luasnip.locally_jumpable(-1) then
-            luasnip.jump(-1)
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
-      }),
-      sources = cmp.config.sources({
-        { name = "nvim_lsp" },
-        { name = "luasnip" },
-        { name = "path" },
-      }, {
-        { name = "buffer" },
-      }),
-      formatting = {
-        fields = { "kind", "abbr", "menu" },
-        format = function(entry, item)
-          item.menu = ({
-            nvim_lsp = "[LSP]",
-            luasnip = "[Snip]",
-            buffer = "[Buf]",
-            path = "[Path]",
-          })[entry.source.name] or ("[" .. entry.source.name .. "]")
-          item.kind = string.format(" %s ", item.kind)
-          return item
-        end,
-      },
-      window = {
-        completion = cmp.config.window.bordered({ border = "rounded" }),
-        documentation = cmp.config.window.bordered({ border = "rounded" }),
-      },
-    })
+    completion.configure_cmp(cmp, luasnip)
   end,
 }

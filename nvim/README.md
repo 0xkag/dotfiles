@@ -28,9 +28,10 @@ For FreeBSD-specific Neovim install notes, see
 - `SPC *` searches the current word in the project
 - visual `*` and `#` search the current selection forward or backward
 - `Ctrl-Space` opens completion
-- `Tab` / `Shift-Tab` navigate completion or snippets
-- `Enter` confirms completion
-- `Esc` aborts completion when the popup menu is open
+- completion defaults to quiet auto-popup after a 1 second pause
+- `Tab` / `Shift-Tab` select completion items or move through snippets
+- `Enter` confirms only an explicitly selected completion item
+- `Esc` or `Ctrl-g` aborts completion when the popup menu is open
 - `fd` exits insert mode
 - `Y` yanks to end of line
 - `gl` and `gL` align text
@@ -84,6 +85,7 @@ For FreeBSD-specific Neovim install notes, see
 - `:PyenvInfo` show the Python environment Neovim resolved for the current buffer
 - `:Org help` view orgmode help
 - `:TSInstall lua python markdown markdown_inline org kulala_http` install parsers you want
+- Treesitter parser auto-install is off by default; set `vim.g.nvim_treesitter_auto_install = true` before plugin setup if you want startup to ensure the configured parser list
 - `:checkhealth` inspect Neovim health
 
 ## Syntax checking
@@ -190,20 +192,27 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
 
 ## Completion and signature help
 
-- Trigger completion manually with `<C-Space>`
-- Confirm the current selection with `<Tab>` or `<CR>`; if nothing is highlighted yet, confirming picks the first item
+- Completion defaults to quiet auto mode: no ghost text, no first-item preselect, and a 1 second debounce before the popup opens while typing
+- Trigger completion immediately with `<C-Space>`
+- Confirm the current selection with `<Tab>` or `<CR>` only after you explicitly select an item
 - Navigate candidates with `<Down>` / `<Up>` or `<C-n>` / `<C-p>`
-- `<CR>` inserts a newline normally when no completion popup is visible
-- `<S-Tab>` jumps back through snippet placeholders (no item navigation)
-- `<leader>ta` (Spacemacs `SPC t a`) toggles auto-completion for the current buffer; completion is disabled by default on `gitcommit` buffers so commit-message editing stays clean
+- `<CR>` inserts a newline when no completion item is selected
+- `<S-Tab>` selects the previous completion item when the menu is visible, otherwise it jumps back through snippet placeholders
+- `<Esc>` and `<C-g>` abort the completion popup
+- `<leader>ta` / `SPC t a` toggles between quiet-auto and manual completion
+- `<leader>tA` / `SPC t A` disables or enables completion for the current buffer; completion is disabled by default on `gitcommit` buffers so commit-message editing stays clean
+- `<leader>tC` / `SPC t C` cycles quiet-auto, manual, and full-auto modes. Full-auto restores ghost text and a short popup debounce for temporary aggressive completion
+- `<leader>th` / `SPC t h` toggles automatic signature popups for this session
+- `:NvimCompletionMode quiet|manual|full` sets the session completion mode directly
+- `:NvimCompletionDelay 1.5` sets quiet-auto delay in seconds for this session
 - Argument / signature help uses the native `vim.lsp.buf.signature_help` float, which highlights the active parameter as you type
   - `<C-k>` opens the signature-help float in both insert and normal mode
   - `SPC m h s` (`<localleader>hs`) also opens it in normal mode
-  - It fires automatically when you type `(` or `,` inside a function call
-  - Signature help and hover floats use rounded borders
+  - Automatic signature help is off by default; when enabled, it fires on `(` only, not on every comma
+  - Signature help floats are non-focusable and close on cursor movement, so they should not require `:q`
 - Expand a function call with placeholders using LSP signature data; Tab jumps through placeholders:
-  - Positional form, `<C-l>` (insert) or `<localleader>ia` (normal), yields `foo(arg1, arg2='default', ...)` using each parameter's name plus default value (type annotations stripped)
-  - Kwargs form, `<C-y>` (insert) or `<localleader>ik` (normal), yields `foo(arg1=arg1, arg2=arg2, ...)` for passing matching local variables by keyword. Skips positional-only params and `*args`/`**kwargs`
+  - Positional form, `<localleader>ia` (normal), yields `foo(arg1, arg2='default', ...)` using each parameter's name plus default value (type annotations stripped)
+  - Kwargs form, `<localleader>ik` (normal), yields `foo(arg1=arg1, arg2=arg2, ...)` for passing matching local variables by keyword. Skips positional-only params and `*args`/`**kwargs`
   - If the cursor is inside empty `()` the placeholders fill in between the parens; otherwise they are wrapped in a new `(...)`
   - Overloaded functions prompt via `vim.ui.select` to pick a signature
   - After expansion Neovim enters SELECT mode (`-- SELECT --` in the mode line) on the first placeholder; this is LuaSnip default IDE-style behavior. Type any character to replace the placeholder, `<Tab>` to keep the default and jump to the next, `<S-Tab>` for previous, `<Esc>` to exit the snippet session

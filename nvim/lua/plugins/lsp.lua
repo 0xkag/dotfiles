@@ -37,6 +37,7 @@ return {
     },
     config = function()
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
+      local completion = require("config.completion")
       local python_env = require("config.python")
 
       local function format_buffer(bufnr, range)
@@ -355,10 +356,10 @@ return {
       })
 
       local function signature_help()
-        vim.lsp.buf.signature_help({ border = "rounded" })
+        vim.lsp.buf.signature_help(completion.signature_float_opts())
       end
       local function hover()
-        vim.lsp.buf.hover({ border = "rounded" })
+        vim.lsp.buf.hover({ border = "rounded", close_events = { "CursorMoved", "BufHidden" } })
       end
 
       local function place_cursors_in_range(bufnr, ident, start_row, end_row, start_col, end_col)
@@ -678,7 +679,7 @@ return {
             vim.api.nvim_create_autocmd("InsertCharPre", {
               buffer = bufnr,
               callback = function()
-                if vim.v.char == "(" or vim.v.char == "," then
+                if completion.signature_auto_enabled() and vim.v.char == "(" then
                   vim.schedule(function()
                     if vim.api.nvim_get_current_buf() == bufnr then
                       signature_help()
@@ -818,9 +819,7 @@ return {
               end)
             end
 
-            map("i", "<C-l>", expand_call_template, "Expand call template")
             map("n", "<localleader>ia", expand_call_template, "Insert call arguments")
-            map("i", "<C-y>", expand_kwargs_template, "Expand call with kwargs")
             map("n", "<localleader>ik", expand_kwargs_template, "Insert call kwargs")
           end
         end,
