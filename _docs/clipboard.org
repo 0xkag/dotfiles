@@ -122,7 +122,8 @@ bind-key -T copy-mode-vi MouseDragEnd1Pane \
 
 This means mouse-selected text goes through =clip-in= → system clipboard
 (and also the tmux buffer).  With OSC 52, this reaches the system clipboard
-even over SSH.
+even over SSH -- provided the outer terminal supports OSC 52 (Terminal.app
+and PuTTY do not; see the platform scenarios below).
 
 ** vim handles mouse
 
@@ -194,20 +195,21 @@ day-to-day work inside tmux, the behavior is already identical everywhere:
 the system clipboard and writes to stdout.  They detect the platform in this
 priority order:
 
-| Priority | Condition                         | Copy                | Paste                          |
-|----------+-----------------------------------+---------------------+--------------------------------|
-|        1 | =$WAYLAND_DISPLAY= + =wl-copy=    | =wl-copy=           | =wl-paste --no-newline=        |
-|        2 | macOS (=pbcopy=/=pbpaste=)         | =pbcopy=            | =pbpaste=                      |
-|        3 | =$DISPLAY= + =xclip=              | =xclip -sel clip=   | =xclip -sel clip -o=           |
-|        4 | =$DISPLAY= + =xsel=               | =xsel --clip -i=    | =xsel --clip -o=               |
-|        5 | WSL (=/proc/version= ~ Microsoft) | =clip.exe=          | =powershell.exe Get-Clipboard= |
-|        6 | =$TMUX= set                       | =tmux load-buffer -w= | =tmux save-buffer=           |
-|        7 | =/dev/tty= exists                 | OSC 52 via =/dev/tty= | (not supported)              |
-|        8 | (none)                            | error to stderr     | error to stderr                |
+| Priority | Condition                         | Copy                              | Paste                                                      |
+|----------+-----------------------------------+-----------------------------------+------------------------------------------------------------|
+|        1 | =$WAYLAND_DISPLAY= + =wl-copy=    | =wl-copy=                         | =wl-paste --no-newline=                                    |
+|        2 | macOS (=pbcopy=/=pbpaste=)        | =pbcopy=                          | =pbpaste=                                                  |
+|        3 | =$DISPLAY= + =xclip=              | =xclip -selection clipboard -i=   | =xclip -selection clipboard -o=                            |
+|        4 | =$DISPLAY= + =xsel=               | =xsel --clipboard --input=        | =xsel --clipboard --output=                                |
+|        5 | WSL (=/proc/version= ~ Microsoft) | =clip.exe=                        | =powershell.exe -noprofile -command Get-Clipboard= (+ =tr -d '\r'=) |
+|        6 | =$TMUX= set                       | =tmux load-buffer -w -=           | =tmux save-buffer -=                                       |
+|        7 | =/dev/tty= exists                 | OSC 52 via =/dev/tty=             | (not supported)                                            |
+|        8 | (none)                            | error to stderr                   | error to stderr                                            |
 
 Priority 6 uses =-w= to also emit OSC 52 through tmux.  Priority 7 is the
 bare OSC 52 fallback for SSH without tmux -- copy works but paste does not
-(OSC 52 read is blocked by most terminals for security).
+(OSC 52 read is blocked by most terminals for security).  The WSL paste path
+strips trailing =\r= because PowerShell emits CRLF line endings.
 
 All clipboard operations target the CLIPBOARD selection (not PRIMARY).
 
@@ -226,12 +228,81 @@ Vim's ="+= register may or may not work depending on build (some builds use
 xwayland).  The =clip-in= fallback covers this regardless.  OSC 52 works in
 terminals that support it (gnome-terminal, foot).
 
-** macOS -- e.g. Terminal.app, iTerm2, Ghostty
+** macOS -- iTerm2, Ghostty, kitty, Alacritty, WezTerm (full OSC 52 support)
 
 =clip-in=/=clip-out= use =pbcopy=/=pbpaste= (built-in on macOS).  Vim's
-="+= register works via OSC 52 passthrough through tmux.  tmux =set-clipboard
-on= enables OSC 52 passthrough; both Terminal.app and iTerm2 support it
-natively.  Everything is seamless with no extra dependencies.
+="+= register works directly via =pbcopy=/=pbpaste= when vim is built with
+=+clipboard= (the default on macOS); otherwise it falls back to =clip-in=.
+Over SSH into Linux/BSD, tmux =set-clipboard on= emits OSC 52 sequences that
+these terminals translate to the macOS clipboard.  Seamless once the
+terminal's OSC 52 permission is granted (see below).
+
+*** Per-terminal OSC 52 permission (important!)
+
+All of these terminals support OSC 52 protocol-wise, but most *gate clipboard
+writes behind a setting* by default for security (so a remote process can't
+silently overwrite your local clipboard).  Without granting permission, OSC
+52 writes are dropped (or you'll see a warning overlay) -- the symptom looks
+identical to a terminal that doesn't support OSC 52 at all.
+
+| Terminal   | Setting                                                                |
+|------------+------------------------------------------------------------------------|
+| iTerm2     | Settings → General → Selection → "Applications in terminal may access clipboard" (enable) |
+| Ghostty    | =clipboard-write= defaults to =allow=; set to =ask= or =deny= in =~/.config/ghostty/config= to lock down |
+| kitty      | =clipboard_control write= in =~/.config/kitty/kitty.conf= (default allows write) |
+| Alacritty  | OSC 52 enabled by default                                              |
+| WezTerm    | OSC 52 enabled by default; configurable via =canonicalize_pasted_newlines= and =enable_kitty_keyboard= |
+
+If your test (=printf '\033]52;c;...\a' > /dev/tty; pbpaste=) doesn't return
+the test marker, check the terminal setting *before* concluding OSC 52 is
+unsupported.
+
+** macOS Terminal.app (built-in) -- *NO OSC 52 support*
+
+Apple's Terminal.app does *not* implement OSC 52 (verified through macOS 15
+Sequoia).  Terminal.app silently accepts the escape sequence but never sets
+the system clipboard.  Consequences:
+
+- *Locally* (no SSH): clipboard works fine.  =clip-in= matches the =pbcopy=
+  branch (priority 2) before any OSC 52 fallback could fire, so tmux
+  copy-mode → system clipboard works regardless of Terminal.app's OSC 52
+  gap.
+- *Over SSH into a remote Linux/BSD host*: remote-to-local clipboard sync
+  *is broken*.  On the remote, =clip-in= falls through to =tmux load-buffer
+  -w= (priority 6), which emits OSC 52; Terminal.app drops the sequence and
+  the data never reaches the macOS clipboard.  Local tmux buffer paste
+  (=prefix p=) still works, but =prefix P= / =pbpaste= on the local side do
+  not see the remote selection.
+
+See [[*Terminal.app + SSH workarounds][Terminal.app + SSH workarounds]]
+below for options.
+
+** Terminal.app + SSH workarounds
+
+If you must use Terminal.app and need remote-to-local clipboard, options:
+
+1. *Switch terminal (recommended)*.  iTerm2, Ghostty, kitty, Alacritty, and
+   WezTerm all support OSC 52 and integrate seamlessly with this dotfiles
+   setup -- no config changes needed.  All read the =tmux load-buffer -w=
+   OSC 52 sequence natively and set the macOS clipboard.
+
+2. *=osc52pty= wrapper*.  https://github.com/roy2220/osc52pty is a third-party
+   SSH wrapper that intercepts OSC 52 escape sequences from the remote PTY
+   and translates them to local =pbcopy=.  Not included in this dotfiles
+   setup, but trivial to adopt: =ssh= calls become =osc52pty ssh ...=.
+
+3. *Manual pull for one-off captures*.  =ssh host "cat file" | pbcopy=
+   captures content without any OSC 52 path.  Works for files but not
+   interactive tmux copy-mode.
+
+4. *Local-only fallback*.  Accept that remote-to-local clipboard does not
+   work and rely on tmux buffers + =prefix p= for in-session paste.  Use
+   X11/Wayland forwarding (=ssh -X=) plus =xclip= on the remote if you have
+   an X server locally, though this is clunky on macOS (XQuartz required).
+
+Note: =set-clipboard on= in tmux is safe to leave enabled even under
+Terminal.app -- the OSC 52 sequence is silently dropped, doing no harm, and
+the same config still works correctly when used from iTerm2/Ghostty.
 
 ** Windows via PuTTY (SSH to Linux/FreeBSD/OpenBSD)
 
@@ -283,8 +354,9 @@ packages.  OSC 52 works if the terminal supports it.
 ** FreeBSD / OpenBSD Console (no X11)
 
 No =$DISPLAY=, no Wayland.  If inside tmux, falls back to tmux buffer
-(priority 5).  OSC 52 from tmux may work if the console terminal supports it
-(unlikely on raw console, but works over SSH with a capable client).
+(priority 6).  OSC 52 from tmux may work if the console terminal supports it
+(unlikely on raw console, but works over SSH with a capable client -- not
+Terminal.app, not PuTTY; see the platform-specific scenarios above).
 
 * Tool Integration
 
@@ -309,7 +381,8 @@ OSC 52 (=set-clipboard on=) means tmux also sets the terminal's clipboard
 whenever the tmux buffer is updated via copy-pipe.  This is the mechanism that
 makes clipboard work over SSH without =$DISPLAY= (requires a terminal that
 supports OSC 52 -- Windows Terminal, gnome-terminal, xfce4-terminal, foot,
-kitty, alacritty; *not* PuTTY).
+kitty, Alacritty, iTerm2, Ghostty, WezTerm; *not* PuTTY, *not* macOS
+Terminal.app -- see the Terminal.app scenario above).
 
 =allow-passthrough on= lets nested programs (vim, emacs) send their own OSC 52
 sequences through tmux to the outer terminal.
@@ -384,8 +457,18 @@ Standard Emacs/Evil clipboard interaction also works:
 ** zsh / oh-my-zsh (=_lib/oh-my-zsh/lib/clipboard.zsh=)
 
 oh-my-zsh provides =clipcopy= and =clippaste= functions with their own
-platform detection (similar priority to =clip-in=/=clip-out= but zsh-specific).
-These are available at the shell prompt:
+platform detection -- *independent of* =clip-in=/=clip-out=, with a
+different priority order:
+
+macOS (=pbcopy=) → Cygwin/MSYS (=/dev/clipboard=) → Windows (=clip.exe= +
+=powershell.exe=) → Wayland (=wl-copy=) → X11 with =xsel= → X11 with =xclip=
+→ =lemonade= → =doitclient= → =win32yank= → Termux → tmux buffer.
+
+Notable differences from =clip-in=: oh-my-zsh tries =xsel= before =xclip=,
+prioritizes macOS over Wayland (=clip-in= does the opposite), and has *no*
+OSC 52 fallback.  On most platforms (macOS, single-toolchain Linux) the
+end-user behavior matches, but the two implementations are not the same code
+path.  These are available at the shell prompt:
 
 #+begin_src sh
 echo "hello" | clipcopy      # copy stdin
@@ -410,6 +493,137 @@ clipcmd ls -la    # runs ls -la, copies output to clipboard
 
 Uses =clip-in=/=clip-out= internally.
 
+** clip-test-matrix (=_bin/clip-test-matrix=)
+
+Cross-platform verification script that exercises four clipboard layers in
+the current shell environment and reports PASS/FAIL.  Auto-detects platform
+and uses the appropriate paste-back mechanism for verification:
+
+| Verify mode        | Used when                                        |
+|--------------------+--------------------------------------------------|
+| =pbpaste/pbcopy=     | macOS                                            |
+| =wl-paste/wl-copy=   | Linux Wayland (=$WAYLAND_DISPLAY= set)             |
+| =xclip= or =xsel=      | Linux X11 (=$DISPLAY= set)                         |
+| =tmux save-buffer=   | No local clipboard, but inside tmux (SSH remote) |
+
+Run from each (outer terminal × tmux) cell you want to characterize:
+
+#+begin_src sh
+clip-test-matrix              # core tests
+clip-test-matrix --force-osc52  # also test the editor → OSC 52 → terminal path
+#+end_src
+
+Layers tested:
+
+| # | Test                  | What it exercises                                       |
+|---+-----------------------+---------------------------------------------------------|
+| 1 | =OSC 52 direct=         | Terminal capability only (=printf '\033]52;c;...' > /dev/tty=) |
+| 2 | =clip-in script=        | The =_bin/clip-in= wrapper                               |
+| 3 | =vim "+ register=       | vim's clipboard provider with user's vimrc loaded       |
+| 4 | =nvim "+ register=      | nvim's clipboard provider with user's init.lua loaded   |
+| 5 | =vim OSC 52 forced=     | =packadd osc52 + set clipmethod=osc52= (see caveat)      |
+| 6 | =nvim OSC 52 forced=    | =vim.g.clipboard = osc52 provider= (nvim 0.10+)          |
+
+*** Expected results -- macOS local
+
+| Test                | Term.app no-tmux | Term.app tmux | Ghostty no-tmux | Ghostty tmux |
+|---------------------+------------------+---------------+-----------------+--------------|
+| OSC 52 direct       | FAIL             | FAIL          | PASS            | PASS         |
+| clip-in script      | PASS             | PASS          | PASS            | PASS         |
+| vim "+ register     | PASS             | PASS          | PASS            | PASS         |
+| nvim "+ register    | PASS             | PASS          | PASS            | PASS         |
+| vim OSC 52 forced   | *PASS* (FP)      | *PASS* (FP)   | PASS            | PASS         |
+| nvim OSC 52 forced  | FAIL             | FAIL          | PASS            | PASS         |
+
+iTerm2 cells match Ghostty *if* "Applications in terminal may access
+clipboard" is enabled in iTerm2 settings; otherwise OSC 52 rows FAIL.
+
+*** Expected results -- Linux local (X11 or Wayland)
+
+For Linux desktops where =$DISPLAY= or =$WAYLAND_DISPLAY= is set and
+xclip/xsel/wl-clipboard is installed.  Outer-terminal column names use
+representative terminals; results generalize to anything with the same OSC 52
+behavior (gnome-terminal/foot/kitty/Alacritty/WezTerm all honor OSC 52;
+xterm without =allowSendEvents/disallowedWindowOps= tweaks does not).
+
+| Test                | gnome-terminal no-tmux | gnome-terminal tmux | xterm (default) no-tmux | xterm (default) tmux |
+|---------------------+------------------------+---------------------+-------------------------+----------------------|
+| OSC 52 direct       | PASS                   | PASS                | FAIL                    | FAIL                 |
+| clip-in script      | PASS                   | PASS                | PASS                    | PASS                 |
+| vim "+ register     | PASS                   | PASS                | PASS                    | PASS                 |
+| nvim "+ register    | PASS                   | PASS                | PASS                    | PASS                 |
+| vim OSC 52 forced   | PASS                   | PASS                | *PASS* (FP)             | *PASS* (FP)          |
+| nvim OSC 52 forced  | PASS                   | PASS                | FAIL                    | FAIL                 |
+
+*** Expected results -- tmux-only fallback (SSH remote without X11/Wayland)
+
+When the script can't find a local system clipboard (no pbcopy, no =$DISPLAY=,
+no =$WAYLAND_DISPLAY=) but =$TMUX= is set, it falls back to verifying via
+=tmux save-buffer=.  This is the typical SSH-into-Linux scenario: PuTTY,
+Windows Terminal, iTerm2, Ghostty, Terminal.app -- whatever the outer client
+is, the *Linux remote* has no system clipboard to read.
+
+*Critical caveat*: in this mode, "PASS" means "data reached tmux's buffer",
+*not* "data reached your outer terminal's system clipboard".  tmux intercepts
+OSC 52 internally (because =set-clipboard on=) regardless of whether the outer
+terminal honors it.  To confirm end-to-end, paste manually in a GUI app on
+the real OS after each test.
+
+| Test                | tmux-only verification (any outer terminal) |
+|---------------------+---------------------------------------------|
+| OSC 52 direct       | PASS (tmux buffer received it)              |
+| clip-in script      | PASS (clip-in falls to =tmux load-buffer=)    |
+| vim "+ register     | PASS (vim's clip-in fallback or "+ → tmux)  |
+| nvim "+ register    | PASS                                        |
+| vim OSC 52 forced   | PASS (FP -- via tmux capture, see caveat)   |
+| nvim OSC 52 forced  | PASS (tmux captures OSC 52 emission)        |
+
+Whether the outer terminal *also* received the clipboard data:
+
+| Outer terminal           | Receives OSC 52 from tmux?         |
+|--------------------------+------------------------------------|
+| PuTTY                    | NO -- drops OSC 52 silently        |
+| Terminal.app             | NO -- drops OSC 52 silently        |
+| Windows Terminal         | YES                                |
+| iTerm2                   | YES (if setting enabled)           |
+| Ghostty / kitty / WezTerm | YES                                |
+
+So a "PuTTY + tmux + Linux remote" run will show all PASS in tmux-only
+mode, but the Windows clipboard will be empty -- the script can't see that
+gap.  Test by attempting paste in a Windows app to confirm.
+
+*** Caveats
+
+**** =vim OSC 52 forced= is a false positive when vim has =+clipboard=
+
+On any vim build with =+clipboard= (macOS default, most Linux distros),
+the ="+= register writes through the native clipboard provider (pasteboard
+on macOS, X11/Wayland on Linux) *in addition to* whatever method
+=clipmethod= selects.  Setting =clipmethod=osc52= does emit OSC 52, but the
+native provider is also called and the marker reaches the clipboard either
+way.  So PASS doesn't prove OSC 52 worked -- the native provider may have
+masked an OSC 52 failure.
+
+This is *not* fixable from the test side without disabling =+clipboard= at
+the vim build level.  The script prints a =WARN= after the row to flag it.
+
+Authoritative signals for "does OSC 52 work in this terminal":
+- =OSC 52 direct= row -- pure terminal layer, no editor in the path.
+- =nvim OSC 52 forced= row -- when =vim.g.clipboard= is set to the OSC 52
+  provider, nvim *replaces* its clipboard provider entirely; the native
+  provider is never called.  Genuine OSC 52 emission, accurate result.
+
+If both of those FAIL, OSC 52 is broken for the current terminal regardless
+of what =vim OSC 52 forced= reports.
+
+**** tmux-only mode hides the outer terminal
+
+The script can't introspect what's on the far side of an SSH connection.
+In tmux-only mode, every test that produces an OSC 52 sequence will appear
+to PASS because tmux's interception buffer captures the data before the
+outer terminal even gets a chance to drop it.  Always confirm end-to-end by
+pasting in a real GUI app after the run.
+
 * Dependencies
 
 | Platform     | Required packages             |
@@ -426,8 +640,23 @@ on the remote side.
 * Troubleshooting
 
 - *Clipboard not working over SSH*: Verify your terminal supports OSC 52.
-  *PuTTY does not support OSC 52* (as of 0.83) -- use Windows Terminal instead.
-  Verify tmux has =set-clipboard on= (=tmux show -s set-clipboard=).
+  Known non-supporters: *PuTTY* (as of 0.83) and *macOS Terminal.app* (verified
+  through macOS 15 Sequoia) -- switch to Windows Terminal, iTerm2, Ghostty,
+  kitty, Alacritty, or WezTerm.  Verify tmux has =set-clipboard on=
+  (=tmux show -s set-clipboard=).  Quick local OSC 52 self-test -- copy
+  exactly (the base64 string is =test-marker-1234= pre-encoded):
+  #+begin_example
+  printf '\033]52;c;dGVzdC1tYXJrZXItMTIzNA==\a' > /dev/tty; sleep 0.2; pbpaste
+  #+end_example
+  If =pbpaste= prints =test-marker-1234=, your terminal supports OSC 52 and
+  has clipboard writes enabled.  If it prints something else (or your
+  previous clipboard), either (a) the terminal doesn't support OSC 52 at all
+  (Terminal.app, PuTTY), OR (b) it supports OSC 52 but clipboard writes are
+  gated behind a setting (iTerm2 default, Ghostty default).  Look for a
+  warning overlay -- if one appears mentioning "applications in terminal may
+  access clipboard", you're in case (b); enable the setting and re-test.
+  Run from a fresh terminal (no tmux) for a clean signal; inside tmux, the
+  result also depends on =set-clipboard on= + =allow-passthrough on=.
 - *Clipboard not working on Wayland*: Install =wl-clipboard= package.
   Verify =$WAYLAND_DISPLAY= is set (=echo $WAYLAND_DISPLAY=).
 - *Vim =<leader>y= shells out instead of using register*: Check =vim --version | grep clipboard=.
@@ -442,6 +671,10 @@ on the remote side.
 - https://stackoverflow.com/questions/3261379/getting-html-source-or-rich-text-from-the-x-clipboard
 - OSC 52 spec: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html (Operating System Commands,
   Ps = 52).  There is no separate RFC or formal standard -- xterm's documentation is the de facto
-  spec, and terminal authors (gnome-terminal, foot, iTerm2, Windows Terminal, tmux) all implement
-  against it.  Notable exception: PuTTY does not support OSC 52 (as of 0.83).
+  spec, and terminal authors (gnome-terminal, foot, iTerm2, Ghostty, Windows Terminal, kitty,
+  Alacritty, WezTerm, tmux) all implement against it.  Notable exceptions: PuTTY (as of 0.83) and
+  macOS Terminal.app (verified through macOS 15 Sequoia) do *not* support OSC 52.
+- OSC 52 terminal capability matrix: https://can-i-use-terminal.github.io/features/osc52copy.html
+- osc52pty (Terminal.app SSH wrapper that translates OSC 52 to local pbcopy):
+  https://github.com/roy2220/osc52pty
 - tmux clipboard: https://github.com/tmux/tmux/wiki/Clipboard
