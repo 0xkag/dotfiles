@@ -2,6 +2,7 @@ local M = {}
 
 local notified = {}
 local python_env = require("config.python")
+local treesitter = require("config.treesitter")
 local tools = require("config.tools")
 
 local features = {
@@ -64,6 +65,44 @@ local features = {
       end
 
       return false, { status.detail }
+    end,
+  },
+  python_refactor = {
+    label = "Python refactoring (pylsp + pylsp-rope)",
+    check = function(bufnr)
+      local status = python_env.pylsp_status(bufnr)
+      if status.available then
+        return true, {}
+      end
+
+      return false, { status.detail }
+    end,
+  },
+  treesitter_parser = {
+    label = "Treesitter parser",
+    check = function(bufnr)
+      local ft = bufnr and vim.bo[bufnr].filetype or vim.bo.filetype
+      local missing = treesitter.missing_for_filetype(ft)
+      if #missing == 0 then
+        return true, {}
+      end
+
+      return false, vim.tbl_map(function(lang)
+        return lang .. " (:TSInstall " .. lang .. ")"
+      end, missing)
+    end,
+  },
+  treesitter_parsers = {
+    label = "Treesitter parsers",
+    check = function()
+      local missing = treesitter.missing_configured()
+      if #missing == 0 then
+        return true, {}
+      end
+
+      return false, {
+        table.concat(missing, ", ") .. " (:TSInstall " .. table.concat(missing, " ") .. ")",
+      }
     end,
   },
   go_lsp = {
@@ -197,7 +236,7 @@ local filetype_features = {
   jsonc = { "json_lsp", "js_format" },
   lua = { "lua_lsp", "lua_format" },
   markdown = { "markdown_lsp" },
-  python = { "pyenv", "python_lsp", "python_format", "python_lint", "python_types", "python_test", "python_debug" },
+  python = { "pyenv", "python_lsp", "python_format", "python_lint", "python_types", "python_test", "python_debug", "python_refactor" },
   rust = { "rust_lsp", "rust_format" },
   sh = { "shell_lsp", "shell_format", "shell_lint" },
   terraform = { "terraform_lsp", "terraform_format", "terraform_lint" },
@@ -219,6 +258,8 @@ local all_features = {
   "python_types",
   "python_test",
   "python_debug",
+  "python_refactor",
+  "treesitter_parsers",
   "go_lsp",
   "go_runtime",
   "go_format",
@@ -354,6 +395,7 @@ function M.check_current_buffer(bufnr)
     return
   end
 
+  feature_ids = vim.list_extend(vim.deepcopy(feature_ids), { "treesitter_parser" })
   notify_once(feature_ids, "Missing " .. ft .. " dependencies", "ft:" .. ft, bufnr)
 end
 
@@ -363,6 +405,7 @@ function M.command(scope)
 
   if scope == "current" then
     feature_ids = vim.list_extend(vim.deepcopy(core_features), filetype_features[vim.bo.filetype] or {})
+    table.insert(feature_ids, "treesitter_parser")
     title = "Missing current-buffer dependencies"
   end
 

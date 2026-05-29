@@ -4,8 +4,10 @@ local projects = require("config.projects")
 return {
   "nvim-telescope/telescope.nvim",
   cmd = "Telescope",
+  event = "VeryLazy",
   dependencies = {
     "nvim-lua/plenary.nvim",
+    "nvim-telescope/telescope-ui-select.nvim",
   },
   keys = {
     {
@@ -148,6 +150,16 @@ return {
           hidden = true,
         },
       },
+      extensions = {
+        ["ui-select"] = {
+          require("telescope.themes").get_dropdown({}),
+        },
+      },
     }
+  end,
+  config = function(_, opts)
+    local telescope = require("telescope")
+    telescope.setup(opts)
+    pcall(telescope.load_extension, "ui-select")
   end,
 }

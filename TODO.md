@@ -6,6 +6,10 @@
   and arm64); this is a problem for things like ~/.local, pyenv, pipx, and
   mise
 - editor: vim git commit message fill column at 75
+- editor: Track nvim-treesitter-locals
+  (https://github.com/nvim-treesitter/nvim-treesitter-locals) as a future
+  pure-treesitter alternative for in-buffer local rename; it's a stub as
+  of late 2025
 - fzf: Better integration of vim and fzf
 - fzf: Better use of fzf
 - keybindings: Re-rationalize keybindings across tools

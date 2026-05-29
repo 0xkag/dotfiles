@@ -28,9 +28,10 @@ For FreeBSD-specific Neovim install notes, see
 - `SPC *` searches the current word in the project
 - visual `*` and `#` search the current selection forward or backward
 - `Ctrl-Space` opens completion
-- `Tab` / `Shift-Tab` navigate completion or snippets
-- `Enter` confirms completion
-- `Esc` aborts completion when the popup menu is open
+- completion defaults to quiet auto-popup after a 1 second pause
+- `Tab` / `Shift-Tab` select completion items or move through snippets
+- `Enter` confirms only an explicitly selected completion item
+- `Esc` or `Ctrl-g` aborts completion when the popup menu is open
 - `fd` exits insert mode
 - `Y` yanks to end of line
 - `gl` and `gL` align text
@@ -81,9 +82,11 @@ For FreeBSD-specific Neovim install notes, see
 - `:Telescope keymaps` search mappings
 - `:NvimDeps` show missing configured dependencies on `PATH`
 - `:NvimDeps current` show missing dependencies for the current buffer workflow
+- `:NvimDeps current` also reports the current buffer's missing Treesitter parser
 - `:PyenvInfo` show the Python environment Neovim resolved for the current buffer
 - `:Org help` view orgmode help
 - `:TSInstall lua python markdown markdown_inline org kulala_http` install parsers you want
+- Treesitter parser auto-install is off by default; set `vim.g.nvim_treesitter_auto_install = true` before plugin setup if you want startup to ensure the configured parser list
 - `:checkhealth` inspect Neovim health
 
 ## Syntax checking
@@ -94,6 +97,135 @@ For FreeBSD-specific Neovim install notes, see
 - Automatic linting is enabled on read and write when a supported linter exists
 - Current machine support includes `shellcheck`, `yamllint`, `ruff`, `mypy`, fallback `pylint` or `flake8`, and `tflint`
 - completion popup navigation also works with the `Up` and `Down` arrow keys
+
+## Formatting
+
+- `<leader>cf` / `SPC c f` formats the current buffer via conform.nvim
+- `<localleader>=b` / `,=b` is the same format-buffer action in the major-mode map
+- `<localleader>=r` / `,=r` formats the current visual selection
+- Nothing auto-formats on save; formatting is always explicit
+- Formatter selection is per-filetype in `lua/plugins/python.lua` `formatters_by_ft`:
+  - Python is a function that probes availability at call time: `ruff_organize_imports` + `ruff_format` when ruff is on `PATH`, falling back to `black` then `yapf`
+  - Shell uses `shfmt`; Go uses `gofmt` + `goimports`; JavaScript/TypeScript/JSON/Markdown/YAML use `prettierd` then `prettier`; Lua uses `stylua`; Rust uses `rustfmt`; Terraform uses `terraform_fmt`; TOML uses `taplo`
+- `:ConformInfo` shows which formatters conform sees for the current buffer
+
+## Refactoring
+
+- `<leader>cr` / `<localleader>rr` / `SPC c r` opens a scope picker for renaming the symbol under the cursor
+- `<leader>ca` / `<localleader>aa` opens the full LSP code action menu
+- `<localleader>ar` opens a filtered `refactor` action menu; `<localleader>af` opens `quickfix`; `<localleader>as` opens `source`
+- `<localleader>=o` explicitly applies `source.organizeImports`
+
+### Rename scopes
+
+The rename dispatcher offers four scopes via `vim.ui.select`:
+
+| Scope | Backend | Behavior |
+|---|---|---|
+| Line (multicursor) | multicursor.nvim | Cursors on every matching identifier on the current line; type to edit all at once |
+| Function (multicursor) | multicursor.nvim + Treesitter | Cursors on matches inside the enclosing `function_definition` / `function_declaration` node |
+| Buffer (multicursor) | multicursor.nvim | Cursors on every match in the whole buffer |
+| Workspace (LSP) | `textDocument/rename` | AST-aware rename across all files the LSP knows about |
+
+Multicursor scopes match by identifier string (not AST). A `foo` inside a comment within the same function still gets a cursor. For true AST-local rename use the Workspace scope — pyright is AST-aware even for locals inside one function.
+
+Workspace mode has two UX variants controlled by `vim.g.rename_inc_preview` (default `true`):
+
+- `true` — inc-rename.nvim primes the cmdline with `:IncRename <cword>`; edit the name and watch live substitution highlight every reference in the visible buffer as you type, then `<CR>` applies across the workspace. The dispatcher uses `nvim_feedkeys` (not `vim.cmd`) so the command is editable — calling `vim.cmd("IncRename foo")` would execute immediately and rename the symbol to itself
+- `false` — snacks.nvim input float prompts for the new name; a confirm-list (`Apply N edits across M files: [list]`) requires explicit approval before edits land
+
+Toggle with `<leader>tR`. Matches spacemacs `SPC s e` iedit feel for the in-buffer scopes.
+
+Workspace rename routes to pyright even though pylsp is also attached. pylsp advertises `renameProvider` for every plugin slot regardless of whether the plugin is enabled in settings, so a naive `vim.lsp.get_clients({ method = "textDocument/rename" })` would hand the request to pylsp, which then returns nil (no rename plugin is actually wired up). Two things prevent this:
+
+- pylsp's `on_attach` in `lua/plugins/lsp.lua` strips `renameProvider`, `hoverProvider`, `definitionProvider`, `referencesProvider`, `documentSymbolProvider`, `workspaceSymbolProvider`, `completionProvider`, `signatureHelpProvider`, `declarationProvider`, `typeDefinitionProvider`, `implementationProvider`, and `documentHighlightProvider` from `client.server_capabilities` after attach. Only `codeActionProvider` is left, matching pylsp's actual job (rope refactors)
+- `rename_with_preview` additionally prefers a client named `pyright` when multiple rename-capable clients remain, as belt-and-suspenders for non-Python stacks that might add another rename provider
+
+If you add a new pylsp plugin that provides one of the stripped capabilities, remove the matching line from `on_attach` and restart the LSP.
+
+### UI
+
+- snacks.nvim `input` module replaces `vim.ui.input` (styled float, no lingering cmdline prompt)
+- telescope-ui-select still owns `vim.ui.select`, so the scope picker and confirm-list use telescope
+
+### Python refactoring stack
+
+Python buffers attach three LSPs with a clear division of labor. Overlapping features are disabled so each server owns exactly one responsibility:
+
+| Server | Role | Disabled features |
+|---|---|---|
+| pyright | types, hover, completion, go-to-def, rename | — |
+| pylsp | rope refactoring code actions only | all features except `codeActionProvider` disabled (see `on_attach` in `lua/plugins/lsp.lua`) |
+| ruff (server) | lint autofixes + `source.organizeImports` / `source.fixAll` | autoconfig defaults |
+
+**Scope-aware rename of a local**: pyright's LSP rename is AST-aware. Renaming a variable bound only inside one function does not touch same-name identifiers in other scopes. Use `<leader>cr`.
+
+**Rope refactorings** (surfaced under `<localleader>ar`): extract method, extract variable, inline method, inline variable, inline parameter, introduce parameter, move to module, use function, method-to-method-object, local-to-field, generate (variable / function / class / module / package). First rope code action in a session is slow because rope builds the project index; subsequent calls are fast.
+
+**Ruff server code actions** (surfaced under `<localleader>af`): remove unused import, convert to f-string, and any other ruff auto-fix. `source.fixAll` is also available in the full `<leader>ca` menu, and ruff provides `source.organizeImports` under `<localleader>=o`.
+
+### Installing pylsp + pylsp-rope
+
+Not auto-installed. Recommended path:
+
+```
+pipx install python-lsp-server
+pipx inject python-lsp-server pylsp-rope
+```
+
+If a project's pyenv already has `python-lsp-server` + `pylsp-rope` installed, Neovim uses that project's direct `bin/pylsp` before the pipx fallback. Rope then sees the project's installed deps, which can improve cross-file refactoring accuracy. To set this up inside a project venv: `pip install python-lsp-server pylsp-rope`.
+
+`:NvimDeps current` checks the same resolved `pylsp` path that LSP startup uses and warns if either piece is missing. Ruff is already on PATH via flox.
+
+### Python LSP footprint
+
+Steady-state RAM per Python buffer is roughly:
+
+- pyright: 200-400 MB (TypeScript, Node.js)
+- pylsp: 100-200 MB (Python; rope index builds lazily on first code action)
+- ruff server: 30-50 MB (Rust)
+
+About **350-650 MB total** for the LSP stack. Subprocess spawns per save/read: mypy via `nvim-lint` (1-3 s, independent of LSPs); conform runs `ruff_format` + `ruff_organize_imports` on `<SPC cf>` (50-100 ms each). Ruff diagnostics are **not** spawned per save anymore — they come from the ruff LSP server.
+
+First-attach latency is ~1-2 s to warm all three LSPs in the background; the cursor is never blocked (thanks to the earlier `ipdb` probe fix). Rope's project index builds on first code action per session, not per attach.
+
+If memory pressure becomes a concern, drop pylsp first — it is only required for refactoring and can be disabled in `lua/plugins/lsp.lua` until needed. Pyright's `diagnosticMode = "openFilesOnly"` is already set to limit its workspace scan, which helps on NFS homedirs.
+
+## Completion and signature help
+
+- Completion defaults to quiet auto mode: no ghost text, no first-item preselect, and a 1 second debounce before the popup opens while typing
+- Trigger completion immediately with `<C-Space>`
+- Confirm the current selection with `<Tab>` or `<CR>` only after you explicitly select an item
+- Navigate candidates with `<Down>` / `<Up>` or `<C-n>` / `<C-p>`
+- `<CR>` inserts a newline when no completion item is selected
+- `<S-Tab>` selects the previous completion item when the menu is visible, otherwise it jumps back through snippet placeholders
+- `<Esc>` and `<C-g>` abort the completion popup
+- `<leader>ta` / `SPC t a` toggles between quiet-auto and manual completion
+- `<leader>tA` / `SPC t A` disables or enables completion for the current buffer; completion is disabled by default on `gitcommit` buffers so commit-message editing stays clean
+- `<leader>tC` / `SPC t C` cycles quiet-auto, manual, and full-auto modes. Full-auto restores ghost text and a short popup debounce for temporary aggressive completion
+- `<leader>th` / `SPC t h` toggles automatic signature popups for this session
+- `:NvimCompletionMode quiet|manual|full` sets the session completion mode directly
+- `:NvimCompletionDelay 1.5` sets quiet-auto delay in seconds for this session
+- Argument / signature help uses the native `vim.lsp.buf.signature_help` float, which highlights the active parameter as you type
+  - `<C-k>` opens the signature-help float in both insert and normal mode
+  - `SPC m h s` (`<localleader>hs`) also opens it in normal mode
+  - Automatic signature help is off by default; when enabled, it fires on `(` only, not on every comma
+  - Signature help floats are non-focusable and close on cursor movement, so they should not require `:q`
+- Expand a function call with placeholders using LSP signature data; Tab jumps through placeholders:
+  - Positional form, `<localleader>ia` (normal), yields `foo(arg1, arg2='default', ...)` using each parameter's name plus default value (type annotations stripped)
+  - Kwargs form, `<localleader>ik` (normal), yields `foo(arg1=arg1, arg2=arg2, ...)` for passing matching local variables by keyword. Skips positional-only params and `*args`/`**kwargs`
+  - If the cursor is inside empty `()` the placeholders fill in between the parens; otherwise they are wrapped in a new `(...)`
+  - Overloaded functions prompt via `vim.ui.select` to pick a signature
+  - If no signature is available, temporary parens inserted for lookup are rolled back so the buffer is left unchanged
+  - After expansion Neovim enters SELECT mode (`-- SELECT --` in the mode line) on the first placeholder; this is LuaSnip default IDE-style behavior. Type any character to replace the placeholder, `<Tab>` to keep the default and jump to the next, `<S-Tab>` for previous, `<Esc>` to exit the snippet session
+- The completion popup and all floating windows (hover, signature help) use custom highlights under cyberpunk:
+  - Dark `#1a1a1a` panel background with `#d3d3d3` text
+  - Pink `#7f073f` selection bar; matched characters in yellow
+  - Kind column colored per symbol type (functions in pink, types in green, keywords in blue)
+  - Active signature parameter highlighted in yellow bold underline
+- The statusline is pinned to a cyberpunk-matched palette in `lua/plugins/ui.lua`; switching to another colorscheme leaves it looking cyberpunk — adjust there if that ever matters
+- Other colorschemes get sensible fallbacks for Cmp groups automatically via a `ColorScheme` autocmd that links unset `CmpItemKind*` and `LspSignatureActiveParameter` to built-in highlights (`Function`, `Identifier`, `Type`, `Keyword`, `Search`, ...)
+- To tweak the cyberpunk palette edit `colors/cyberpunk.lua`; to change the fallback rules edit `apply_cmp_fallbacks` in `lua/config/autocmds.lua`
 
 ## Python workflow
 

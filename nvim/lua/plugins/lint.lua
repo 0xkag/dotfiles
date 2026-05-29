@@ -10,11 +10,9 @@ return {
     end
 
     local function python_linters()
+      -- Ruff's diagnostics come from the ruff LSP server (see lsp.lua).
+      -- Keeping ruff here as a linter would duplicate squigglies.
       local linters = {}
-
-      if executable("ruff") then
-        table.insert(linters, "ruff")
-      end
 
       if executable("mypy") then
         table.insert(linters, "mypy")
