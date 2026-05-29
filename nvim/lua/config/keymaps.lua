@@ -61,7 +61,7 @@ map("n", "<leader>bD", function()
   require("mini.bufremove").delete(0, true)
 end, { desc = "Delete buffer force" })
 
-map("n", "<leader>h", "<Cmd>nohlsearch<CR>", { desc = "Clear search highlight", silent = true })
+map("n", "<leader>sc", "<Cmd>nohlsearch<CR>", { desc = "Clear search highlight", silent = true })
 map("n", "g!", util.squeeze_spaces_line, { desc = "Squeeze spaces" })
 map("x", "g!", util.squeeze_spaces_visual, { desc = "Squeeze spaces" })
 map("x", "*", function()
@@ -89,8 +89,6 @@ map("n", "<leader>Y", '"+y$', { desc = "Yank to EOL (legacy)", silent = true })
 map("n", "<leader>yY", '"+yy', { desc = "Yank line to clipboard" })
 map({ "n", "x" }, "<leader>yp", '"+p', { desc = "Paste after" })
 map({ "n", "x" }, "<leader>yP", '"+P', { desc = "Paste before" })
-map("n", "<leader><space>", '"+yy', { desc = "Copy current line" })
-map("x", "<leader><space>", '"+y', { desc = "Copy selection" })
 
 -- Disabled Vim-era clipboard fallback for hosts without unnamedplus/clipboard:
 -- map("x", "<leader>yy", "<Cmd>w !clip-in<CR>", { desc = "Yank to clipboard fallback", silent = true })
