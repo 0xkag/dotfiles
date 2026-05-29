@@ -302,6 +302,7 @@ def main():
     relink('.dotfiles/vim/vimrc', '~/.vimrc')
     relink('~/.dotfiles/vim/ron.vim', '~/.vim/colors/ron.vim')
     step('remember to run vim/install or install from binary')
+    step('remember to install pathogen: mkdir -p ~/.vim/autoload ~/.vim/bundle && curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim')
 
     # wmctrl
 

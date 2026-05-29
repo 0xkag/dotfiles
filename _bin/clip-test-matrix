@@ -1,0 +1,292 @@
+#!/usr/bin/env bash
+# clip-test-matrix -- exercise clipboard paths in the current shell environment.
+#
+# Auto-detects platform and uses the appropriate paste-back mechanism for
+# verification:
+#   - macOS:           pbpaste / pbcopy
+#   - Linux Wayland:   wl-paste / wl-copy
+#   - Linux X11:       xclip (or xsel)
+#   - tmux-only:       tmux save-buffer / tmux load-buffer
+#                      (typical SSH-remote-without-X scenario, e.g. PuTTY+tmux)
+#
+# Run from each (outer terminal × tmux) cell you want to characterize.
+#
+# Each invocation reports PASS/FAIL for four layers:
+#   1. OSC 52 direct    -- pure terminal capability (the differentiator)
+#   2. clip-in           -- the wrapper script
+#   3. vim  "+ register  -- vim's clipboard provider
+#   4. nvim "+ register  -- nvim's clipboard provider
+# Optional --force-osc52 adds two more tests where vim/nvim emit OSC 52
+# directly (the realistic remote-SSH path).
+#
+# IMPORTANT: in tmux-only mode (no local system clipboard available), PASS
+# means data reached tmux's buffer -- NOT that it reached your outer
+# terminal's system clipboard.  Verify the outer terminal manually (paste
+# into a GUI app on the real OS).  See clipboard.org for known terminal
+# behavior (PuTTY drops OSC 52, Windows Terminal/iTerm2/Ghostty honor it).
+
+set -u
+
+FORCE_OSC52=0
+for arg in "$@"; do
+  case "$arg" in
+    --force-osc52) FORCE_OSC52=1 ;;
+    -h|--help)
+      awk 'NR>=2 && NR<=27 { sub(/^# ?/, ""); print }' "$0"
+      exit 0
+      ;;
+  esac
+done
+
+# --- Platform detection: pick paste/copy mechanism for verification ---
+MODE=""
+TMUX_ONLY=0
+if [ "$(uname -s)" = "Darwin" ] && command -v pbpaste >/dev/null 2>&1 && command -v pbcopy >/dev/null 2>&1; then
+  MODE="macOS pasteboard (pbcopy/pbpaste)"
+  PASTE_BIN() { pbpaste; }
+  COPY_BIN()  { pbcopy; }
+elif [ -n "${WAYLAND_DISPLAY:-}" ] && command -v wl-paste >/dev/null 2>&1 && command -v wl-copy >/dev/null 2>&1; then
+  MODE="Wayland (wl-copy/wl-paste)"
+  PASTE_BIN() { wl-paste --no-newline; }
+  COPY_BIN()  { wl-copy; }
+elif [ -n "${DISPLAY:-}" ] && command -v xclip >/dev/null 2>&1; then
+  MODE="X11 CLIPBOARD via xclip"
+  PASTE_BIN() { xclip -selection clipboard -o; }
+  COPY_BIN()  { xclip -selection clipboard -i; }
+elif [ -n "${DISPLAY:-}" ] && command -v xsel >/dev/null 2>&1; then
+  MODE="X11 CLIPBOARD via xsel"
+  PASTE_BIN() { xsel --clipboard --output; }
+  COPY_BIN()  { xsel --clipboard --input; }
+elif [ -n "${TMUX:-}" ]; then
+  MODE="tmux buffer ONLY (no local system clipboard)"
+  PASTE_BIN() { tmux save-buffer -; }
+  COPY_BIN()  { tmux load-buffer -w -; }
+  TMUX_ONLY=1
+else
+  echo "clip-test-matrix: no clipboard mechanism available" >&2
+  echo "  Need one of: pbpaste (macOS), wl-paste (Wayland), xclip/xsel (X11)," >&2
+  echo "  or be inside tmux for the tmux-buffer fallback." >&2
+  exit 2
+fi
+
+# --- Environment detection (for the report header) ---
+case "${TERM_PROGRAM:-}" in
+  Apple_Terminal) OUTER="Terminal.app" ;;
+  iTerm.app)      OUTER="iTerm2" ;;
+  ghostty)        OUTER="Ghostty" ;;
+  WezTerm)        OUTER="WezTerm" ;;
+  vscode)         OUTER="VS Code" ;;
+  tmux)           OUTER="tmux (outer unknown -- re-run outside tmux to identify)" ;;
+  *)              OUTER="${TERM_PROGRAM:-unknown}" ;;
+esac
+TMUX_STATE="no-tmux"
+[ -n "${TMUX:-}" ] && TMUX_STATE="tmux"
+
+# SSH context hint (so PuTTY/remote users see why we're in tmux-only mode)
+SSH_NOTE=""
+if [ -n "${SSH_CONNECTION:-}${SSH_CLIENT:-}" ]; then
+  SSH_NOTE=" (SSH session)"
+fi
+
+printf '====================================================\n'
+printf '  Verify mode: %s\n' "$MODE"
+printf '  Terminal:    %s%s\n' "$OUTER" "$SSH_NOTE"
+printf '  tmux:        %s\n' "$TMUX_STATE"
+printf '  OS:          %s\n' "$(uname -s)"
+printf '====================================================\n'
+
+if [ "$TMUX_ONLY" = 1 ]; then
+  cat <<'EOF'
+  NOTE: No local system clipboard detected -- verification reads from tmux's
+        buffer.  tmux intercepts OSC 52 internally regardless of whether the
+        outer terminal honors it.  So a PASS here proves the local chain
+        works up to tmux; it does NOT prove the outer terminal received it.
+        For end-to-end verification, manually paste from your outer terminal
+        (e.g., Cmd-V in macOS, right-click in PuTTY) after each test.
+        Known outer-terminal behavior:
+          - PuTTY:           drops OSC 52 (Windows clipboard never updates)
+          - Windows Terminal: honors OSC 52
+          - iTerm2/Ghostty:   honor OSC 52 (may require setting; see doc)
+          - Terminal.app:    drops OSC 52
+EOF
+fi
+echo
+
+# --- Clipboard save/restore + tty safety net ---
+ORIG=$(PASTE_BIN 2>/dev/null || true)
+cleanup() {
+  printf '%s' "$ORIG" | COPY_BIN 2>/dev/null || true
+  # vim/nvim can leave the terminal in a half-cooked state on abnormal exit
+  # (no ONLCR etc.).  Restore sane defaults.  Do NOT emit \033[?1049l here:
+  # on some terminals (Terminal.app), emitting rmcup while already on the
+  # main screen triggers a screen-restore that wipes the script's own output.
+  # Vim handles its alt-screen entry/exit itself on normal qa!.
+  stty sane 2>/dev/null || true
+  printf '\033[?25h\033[0m' 2>/dev/null || true  # show cursor, reset attrs
+}
+trap cleanup EXIT
+
+report() {
+  local name="$1" mark="$2" got="$3"
+  if [ "$got" = "$mark" ]; then
+    printf '  [PASS] %s\n' "$name"
+  else
+    printf '  [FAIL] %s\n         expected=%q\n         got     =%q\n' \
+      "$name" "$mark" "$got"
+  fi
+}
+
+# Pre-set a sentinel so we can distinguish "test wrote something new" from
+# "test did nothing and we're seeing leftover state."
+set_sentinel() {
+  local label="$1"
+  printf 'sentinel-%s-%s' "$label" "$$" | COPY_BIN
+  sleep 0.05
+}
+
+# --- 1. Direct OSC 52 ---
+test_osc52_direct() {
+  local mark="osc52-direct-$$-$(date +%s)"
+  set_sentinel direct
+  if [ ! -t 1 ]; then
+    echo "  [SKIP] OSC 52 direct (no controlling tty -- run interactively)"
+    return
+  fi
+  local b64
+  b64=$(printf '%s' "$mark" | base64 | tr -d '\n')
+  printf '\033]52;c;%s\a' "$b64" > /dev/tty 2>/dev/null || {
+    echo "  [SKIP] OSC 52 direct (/dev/tty not writable)"
+    return
+  }
+  sleep 0.3
+  report "OSC 52 direct (terminal layer)" "$mark" "$(PASTE_BIN)"
+}
+
+# --- 2. clip-in script ---
+test_clipin() {
+  if ! command -v clip-in >/dev/null; then
+    echo "  [SKIP] clip-in (not in PATH)"
+    return
+  fi
+  local mark="clipin-$$-$(date +%s)"
+  set_sentinel clipin
+  printf '%s' "$mark" | clip-in
+  sleep 0.3
+  report "clip-in script" "$mark" "$(PASTE_BIN)"
+}
+
+# --- 3 & 4. Editor "+" register (uses user's config) ---
+test_editor_default() {
+  local editor="$1"
+  if ! command -v "$editor" >/dev/null; then
+    printf '  [SKIP] %s "+ register (not installed)\n' "$editor"
+    return
+  fi
+  if [ ! -t 0 ] || [ ! -t 1 ]; then
+    printf '  [SKIP] %s "+ register (no controlling tty -- run interactively)\n' "$editor"
+    return
+  fi
+  local mark="${editor}-plus-$$-$(date +%s)"
+  local tmp; tmp=$(mktemp)
+  printf '%s\n' "$mark" > "$tmp"
+  set_sentinel "$editor"
+  # nvim needs --headless so plugin managers (lazy.nvim, packer) don't hang
+  # waiting for their startup UI / sync tasks to release.
+  local extra=()
+  if [ "$editor" = "nvim" ]; then
+    extra=(--headless)
+  fi
+  "$editor" "${extra[@]}" \
+    --cmd 'set nomore' \
+    --cmd 'set shortmess+=aoOtTIF' \
+    -c 'silent! normal! gg"+yy' \
+    -c 'qa!' \
+    "$tmp"
+  rm -f "$tmp"
+  sleep 0.3
+  report "$editor \"+ register (default config)" "$mark" "$(PASTE_BIN)"
+}
+
+# --- 5. vim with OSC 52 forced (bypass pbcopy) ---
+test_vim_osc52() {
+  if ! command -v vim >/dev/null; then return; fi
+  if [ ! -t 0 ] || [ ! -t 1 ]; then
+    echo "  [SKIP] vim OSC 52 forced (no controlling tty)"
+    return
+  fi
+  local version_line
+  version_line=$(vim --version 2>/dev/null | head -1)
+  if ! echo "$version_line" | grep -qE 'IMproved 9\.(1|[2-9])|IMproved 1[0-9]'; then
+    printf '  [SKIP] vim OSC 52 forced (need 9.1+; got: %s)\n' "$version_line"
+    return
+  fi
+  local mark="vim-osc52-$$-$(date +%s)"
+  local tmp; tmp=$(mktemp)
+  printf '%s\n' "$mark" > "$tmp"
+  set_sentinel vim-osc52
+  vim --cmd 'set nomore' \
+      --cmd 'set shortmess+=aoOtTIF' \
+      -c 'silent! packadd osc52' \
+      -c 'silent! set clipmethod=osc52' \
+      -c 'silent! normal! gg"+yy' \
+      -c 'qa!' \
+      "$tmp"
+  rm -f "$tmp"
+  sleep 0.3
+  report "vim OSC 52 forced (packadd osc52)" "$mark" "$(PASTE_BIN)"
+  # On any +clipboard vim, "+ register writes through the native clipboard
+  # provider (pasteboard on macOS, X11/Wayland on Linux) in addition to
+  # whatever clipmethod selects.  So this test can PASS even when OSC 52
+  # itself doesn't reach the outer terminal.  Use the "OSC 52 direct" and
+  # "nvim OSC 52 forced" rows as the authoritative OSC 52 signals.
+  if [[ "$(vim --version 2>/dev/null)" == *"+clipboard"* ]]; then
+    echo "         WARN: +clipboard vim falls through to the native provider."
+    echo "               PASS here does NOT prove OSC 52 reaches the outer terminal."
+    echo "               Trust the 'OSC 52 direct' and 'nvim OSC 52 forced' rows."
+  fi
+}
+
+# --- 6. nvim with OSC 52 forced (bypass native provider via vim.ui.clipboard.osc52) ---
+test_nvim_osc52() {
+  if ! command -v nvim >/dev/null; then return; fi
+  if [ ! -t 0 ] || [ ! -t 1 ]; then
+    echo "  [SKIP] nvim OSC 52 forced (no controlling tty)"
+    return
+  fi
+  local mark="nvim-osc52-$$-$(date +%s)"
+  local tmp; tmp=$(mktemp)
+  printf '%s\n' "$mark" > "$tmp"
+  set_sentinel nvim-osc52
+  # --clean isolates from user config (no lazy.nvim → no hang); vim.g.clipboard
+  # set inline to force OSC 52.  Do NOT add --headless: in headless mode nvim
+  # has no TUI, so vim.ui.clipboard.osc52's emission has no terminal output
+  # channel and the escape sequence never reaches the outer terminal, causing
+  # this test to FAIL even on terminals that fully support OSC 52.
+  nvim --clean \
+    --cmd 'set nomore' \
+    --cmd 'set shortmess+=aoOtTIF' \
+    -c 'lua local ok,osc=pcall(require,"vim.ui.clipboard.osc52"); if not ok then vim.cmd("cq") end; vim.g.clipboard={name="osc52",copy={["+"]=osc.copy("+"),["*"]=osc.copy("*")},paste={["+"]=osc.paste("+"),["*"]=osc.paste("*")}}' \
+    -c 'silent! normal! gg"+yy' \
+    -c 'qa!' \
+    "$tmp"
+  local nvim_status=$?
+  rm -f "$tmp"
+  if [ $nvim_status -ne 0 ]; then
+    echo "  [SKIP] nvim OSC 52 forced (vim.ui.clipboard.osc52 unavailable -- need 0.10+)"
+    return
+  fi
+  sleep 0.3
+  report "nvim OSC 52 forced (vim.ui.clipboard.osc52)" "$mark" "$(PASTE_BIN)"
+}
+
+# --- Run ---
+test_osc52_direct
+test_clipin
+test_editor_default vim
+test_editor_default nvim
+
+if [ "$FORCE_OSC52" = 1 ]; then
+  printf -- '----- OSC 52 forced (bypass native clipboard provider) -----\n'
+  test_vim_osc52
+  test_nvim_osc52
+fi
