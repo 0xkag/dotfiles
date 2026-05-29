@@ -63,9 +63,20 @@ elif [ -n "${TMUX:-}" ]; then
   COPY_BIN()  { tmux load-buffer -w -; }
   TMUX_ONLY=1
 else
-  echo "clip-test-matrix: no clipboard mechanism available" >&2
-  echo "  Need one of: pbpaste (macOS), wl-paste (Wayland), xclip/xsel (X11)," >&2
-  echo "  or be inside tmux for the tmux-buffer fallback." >&2
+  echo "clip-test-matrix: no clipboard mechanism available for verification" >&2
+  echo "  Need one of:" >&2
+  echo "    - pbpaste (macOS)" >&2
+  echo "    - wl-paste (Wayland: \$WAYLAND_DISPLAY set)" >&2
+  echo "    - xclip or xsel (X11: \$DISPLAY set)" >&2
+  echo "    - inside tmux (tmux-buffer fallback)" >&2
+  echo "" >&2
+  if [ -n "${SSH_CONNECTION:-}${SSH_CLIENT:-}" ]; then
+    echo "  You appear to be in an SSH session without X forwarding.  Start a" >&2
+    echo "  tmux session (tmux new) and re-run -- the tmux buffer will let the" >&2
+    echo "  script verify the local chain up to tmux.  For end-to-end through" >&2
+    echo "  your outer terminal (e.g. PuTTY), test manually: paste into a GUI" >&2
+    echo "  app on your local machine after running the OSC 52 emission." >&2
+  fi
   exit 2
 fi
 
@@ -191,12 +202,15 @@ test_editor_default() {
   printf '%s\n' "$mark" > "$tmp"
   set_sentinel "$editor"
   # nvim needs --headless so plugin managers (lazy.nvim, packer) don't hang
-  # waiting for their startup UI / sync tasks to release.
-  local extra=()
+  # waiting for their startup UI / sync tasks to release.  Plain string (not
+  # array) keeps this set-u-safe on bash < 4.4 (Linux remotes), where
+  # expanding "${arr[@]}" of an empty array trips "unbound variable".
+  local headless_flag=""
   if [ "$editor" = "nvim" ]; then
-    extra=(--headless)
+    headless_flag="--headless"
   fi
-  "$editor" "${extra[@]}" \
+  # shellcheck disable=SC2086  # unquoted expansion is intentional for the flag
+  "$editor" $headless_flag \
     --cmd 'set nomore' \
     --cmd 'set shortmess+=aoOtTIF' \
     -c 'silent! normal! gg"+yy' \
