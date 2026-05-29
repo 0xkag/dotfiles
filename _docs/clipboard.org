@@ -401,10 +401,21 @@ clipboard.  Explicit keybindings:
 | =<leader>C=         | Legacy alias for =<leader>y=                |
 | =<leader><space>=   | Copy current line/visual selection to clipboard |
 
-When vim is compiled with =+clipboard= (or =+unnamedplus=), these use the
-native ="+= register, which communicates directly with X11/Wayland.  When vim
-lacks clipboard support (minimal installs, SSH), they fall back to shelling
-out to =clip-in=/=clip-out=.
+vimrc picks the implementation at startup based on whether the ="+= register
+can *actually reach* a clipboard provider (function =s:HasUsableClipboard()=
+in =vim/vimrc=).  =has('clipboard')= only reports compile-time support, not
+runtime reachability -- on a Linux SSH session without X forwarding, vim is
+=+clipboard= but X11 isn't reachable and ="+y= silently fails.  The check
+treats ="+= as usable if any of:
+
+- macOS (=pbcopy=/=pbpaste= always present)
+- X11 reachable (=$DISPLAY= set)
+- Wayland reachable (=$WAYLAND_DISPLAY= set)
+- =clipmethod= includes =osc52= (the bundled vim 9.1+ plugin -- enabled in
+  vimrc on supported builds, see below)
+
+If none of these hold, the keybindings fall back to shelling out to
+=clip-in=/=clip-out=, which themselves try OSC 52 emission as a last resort.
 
 You can also use the ="+= register directly at any time:
 - ="+ y {motion}= -- yank to clipboard
@@ -428,13 +439,13 @@ This makes the ="+= register work natively over SSH even on minimal vim builds
 without =+clipboard=.  The plugin auto-detects terminal support via DA1 query.
 Requires a terminal that supports OSC 52 (not PuTTY).
 
-*Not currently enabled in vimrc.*  The current =clip-in=/=clip-out= fallback
-already provides the same end result over SSH: =<leader>y= calls =clip-in=,
-which calls =tmux load-buffer -w=, which emits OSC 52 through tmux.  The
-difference is ergonomic -- with the osc52 plugin, the ="+= register and the
-=has('clipboard')= branch of the keybindings would activate on systems where
-they currently don't, so ="+yiw= would just work without needing =<leader>y=.
-Revisit once most target systems have vim 9.1+.
+*Enabled in vimrc* (vim 9.1+ only -- the guard is
+=has('patch-9.1.0') && exists('+clipmethod')=).  This makes ="+yiw= and
+="+p= work directly over SSH without needing =<leader>y= / =<leader>p=,
+because vim emits OSC 52 escape sequences that tmux intercepts (with
+=set-clipboard on=) and forwards to capable outer terminals.  On vim builds
+older than 9.1, the plugin is silently skipped and the =clip-in=/=clip-out=
+fallback keybindings still cover the same scenarios via =<leader>y=.
 
 ** Spacemacs (=spacemacs/spacemacs=)
 
@@ -573,10 +584,18 @@ the real OS after each test.
 |---------------------+---------------------------------------------|
 | OSC 52 direct       | PASS (tmux buffer received it)              |
 | clip-in script      | PASS (clip-in falls to =tmux load-buffer=)    |
-| vim "+ register     | PASS (vim's clip-in fallback or "+ → tmux)  |
-| nvim "+ register    | PASS                                        |
+| vim "+ register     | PASS *iff* vim 9.1+ AND osc52 plugin enabled in vimrc (default in this dotfiles); FAIL on older vim with no X11 |
+| nvim "+ register    | PASS (nvim's clipboard provider auto-picks tmux fallback)  |
 | vim OSC 52 forced   | PASS (FP -- via tmux capture, see caveat)   |
 | nvim OSC 52 forced  | PASS (tmux captures OSC 52 emission)        |
+
+Note: vim ="+= without X11 used to silently fail (vim's =+clipboard= means
+X11 support, which has no fallback when =$DISPLAY= is unset).  The dotfiles
+=vim/vimrc= now (a) loads the bundled =osc52= plugin on vim 9.1+ so ="+y=
+emits OSC 52 → tmux → outer terminal, and (b) detects unreachable-X11 and
+routes ="+y= bindings through =clip-in= when the osc52 plugin isn't
+available.  See the =vim (vim/vimrc)= section above for the
+=s:HasUsableClipboard()= guard.
 
 Whether the outer terminal *also* received the clipboard data:
 

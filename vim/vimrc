@@ -192,8 +192,46 @@ map <leader>h :nohlsearch<cr>
 noremap <leader>a =ip
 
 " ... system clipboard (selective copy/paste)
+"
+" Enable the bundled osc52 plugin (vim 9.1+) so the "+ register works over
+" SSH/tmux even without X11.  Must come before the capability check below.
+" The plugin adds osc52 to clipmethod, so "+y emits OSC 52 escape sequences;
+" tmux (set-clipboard on) intercepts them, and capable outer terminals
+" (Ghostty, Windows Terminal, iTerm2, kitty, etc.) update the system
+" clipboard.  Doc: _docs/clipboard.org.
 
-if has('unnamedplus') || has('clipboard')
+if has('patch-9.1.0') && exists('+clipmethod')
+  silent! packadd osc52
+  if exists('+clipmethod')
+    set clipmethod^=osc52
+  endif
+endif
+
+" Detect whether vim's "+ register can actually reach a clipboard provider.
+" has('clipboard') only reports compile-time support, not whether that
+" support can communicate.  On a Linux SSH session without X forwarding,
+" +clipboard is present but X11 isn't reachable -- "+y silently fails.
+" "+ is usable when any of: macOS (pbcopy/pbpaste always present), X11
+" reachable ($DISPLAY), Wayland reachable ($WAYLAND_DISPLAY), or the
+" osc52 plugin loaded into clipmethod.  Else fall back to clip-in.
+
+function! s:HasUsableClipboard()
+  if !(has('unnamedplus') || has('clipboard'))
+    return 0
+  endif
+  if has('mac') || has('macunix')
+    return 1
+  endif
+  if $DISPLAY != '' || $WAYLAND_DISPLAY != ''
+    return 1
+  endif
+  if exists('+clipmethod') && &clipmethod =~# 'osc52'
+    return 1
+  endif
+  return 0
+endfunction
+
+if s:HasUsableClipboard()
   nmap <leader>y "+y
   vmap <leader>y "+y
   nmap <leader>Y "+y$
