@@ -56,7 +56,18 @@ return {
           theme = cyberpunk_theme,
         },
         sections = {
-          lualine_a = { "mode" },
+          lualine_a = {
+            "mode",
+            {
+              function()
+                return "MC:" .. require("multicursor-nvim").numCursors()
+              end,
+              cond = function()
+                local ok, mc = pcall(require, "multicursor-nvim")
+                return ok and mc.hasCursors()
+              end,
+            },
+          },
           lualine_b = { "branch", "diff" },
           lualine_c = {
             {
