@@ -54,15 +54,15 @@ return {
       callback = try_lint,
     })
 
-    vim.keymap.set("n", "<leader>cl", try_lint, {
+    vim.keymap.set("n", "<leader>el", try_lint, {
       desc = "Lint buffer",
       silent = true,
     })
 
-    vim.keymap.set("n", "<leader>cL", function()
+    vim.keymap.set("n", "<leader>eL", function()
       vim.diagnostic.setloclist({ open = true })
     end, {
-      desc = "Diagnostics list",
+      desc = "Error loclist",
       silent = true,
     })
   end,

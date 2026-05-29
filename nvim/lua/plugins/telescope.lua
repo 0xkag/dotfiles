@@ -67,11 +67,25 @@ return {
       desc = "Recent files",
     },
     {
-      "<leader>fh",
+      "<leader>hh",
       function()
         require("telescope.builtin").help_tags()
       end,
       desc = "Help tags",
+    },
+    {
+      "<leader>hk",
+      function()
+        require("telescope.builtin").keymaps()
+      end,
+      desc = "Keymaps",
+    },
+    {
+      "<leader>hm",
+      function()
+        require("telescope.builtin").man_pages()
+      end,
+      desc = "Man pages",
     },
     { "<leader>pf", util.project_files, desc = "Project files" },
     { "<leader>pp", projects.pick, desc = "Switch project" },

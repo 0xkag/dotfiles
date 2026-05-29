@@ -562,7 +562,12 @@ return {
 
       vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
       vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
-      vim.keymap.set("n", "<leader>ce", vim.diagnostic.open_float, { desc = "Line diagnostics" })
+      vim.keymap.set("n", "<leader>ex", vim.diagnostic.open_float, { desc = "Explain error" })
+      vim.keymap.set("n", "<leader>en", vim.diagnostic.goto_next, { desc = "Next error" })
+      vim.keymap.set("n", "<leader>ep", vim.diagnostic.goto_prev, { desc = "Previous error" })
+      vim.keymap.set("n", "<leader>ec", function()
+        vim.diagnostic.reset(nil, 0)
+      end, { desc = "Clear errors" })
 
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(event)
@@ -589,9 +594,9 @@ return {
           map("n", "<localleader>hs", signature_help, "Signature help")
           map("n", "<leader>ca", vim.lsp.buf.code_action, "Code action")
           map("n", "<leader>cr", rename_dispatch, "Rename symbol (scoped)")
-          map("n", "<leader>cd", function()
+          map("n", "<leader>eb", function()
             builtin.diagnostics({ bufnr = 0 })
-          end, "Buffer diagnostics")
+          end, "Buffer errors")
           map("n", "<leader>cs", builtin.lsp_document_symbols, "Document symbols")
           map("n", "<leader>cS", builtin.lsp_dynamic_workspace_symbols, "Workspace symbols")
           map("n", "<leader>ci", builtin.lsp_implementations, "Implementations")
