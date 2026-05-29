@@ -35,6 +35,14 @@ return {
     },
     opts = {
       file_types = { "gitcommit", "markdown", "org" },
+      ignore = function(buf)
+        for _, win in ipairs(vim.fn.win_findbuf(buf)) do
+          if vim.api.nvim_win_get_config(win).relative ~= "" then
+            return true
+          end
+        end
+        return false
+      end,
     },
   },
 }

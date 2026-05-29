@@ -122,10 +122,12 @@ tests, terminals, and the highest-value Spacemacs/Evil behavior.
 - Completion and command-line cleanup completed:
   - command-line completion now uses the classic `wildmenu` style instead of the popup-menu `wildoptions=pum` behavior
   - insert completion keeps `Ctrl-a` / `Ctrl-e` for line start/end
-  - completion trigger/accept/abort are centered on `Ctrl-Space`, `Enter`, `Esc`, `Tab`, and `Shift-Tab`
+  - completion defaults to quiet auto-popup after a 1 second pause, with no ghost text and no first-item preselect
+  - completion trigger/accept/abort are centered on `Ctrl-Space`, `Enter`, `Esc`, `Ctrl-g`, `Tab`, and `Shift-Tab`
+  - `SPC t a` toggles quiet-auto/manual completion, `SPC t C` cycles quiet/manual/full, `SPC t A` toggles completion for the current buffer, and `SPC t h` toggles automatic signature popups
 - Popup-style `Ctrl-g` cancel behavior completed:
   - `Ctrl-g` now closes Telescope, Oil, Neo-tree, multicursor transient state, and utility popup buffers without becoming a global remap
-  - insert-mode completion keeps `Esc` for abort so Neovim's built-in `Ctrl-g` insert family is left intact
+  - insert-mode completion now lets both `Esc` and `Ctrl-g` abort the completion menu
 - Picker and future fzf options documented:
   - Telescope remains the current picker stack
   - low-risk `telescope-fzf-native.nvim` and stronger `fzf-lua` options are written down in `~/.dotfiles/nvim/PICKER_NOTES.md`

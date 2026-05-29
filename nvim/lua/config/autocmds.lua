@@ -28,6 +28,45 @@ autocmd("ColorScheme", {
   callback = blend_signcolumn,
 })
 
+local function link_if_unset(target, source)
+  local existing = vim.api.nvim_get_hl(0, { name = target, link = false })
+  if next(existing) == nil then
+    vim.api.nvim_set_hl(0, target, { link = source })
+  end
+end
+
+local function apply_cmp_fallbacks()
+  link_if_unset("CmpItemAbbr", "Pmenu")
+  link_if_unset("CmpItemAbbrDeprecated", "Comment")
+  link_if_unset("CmpItemAbbrMatch", "Search")
+  link_if_unset("CmpItemAbbrMatchFuzzy", "IncSearch")
+  link_if_unset("CmpItemMenu", "Comment")
+  link_if_unset("CmpItemKindFunction", "Function")
+  link_if_unset("CmpItemKindMethod", "Function")
+  link_if_unset("CmpItemKindVariable", "Identifier")
+  link_if_unset("CmpItemKindField", "Identifier")
+  link_if_unset("CmpItemKindClass", "Type")
+  link_if_unset("CmpItemKindInterface", "Type")
+  link_if_unset("CmpItemKindStruct", "Type")
+  link_if_unset("CmpItemKindModule", "PreProc")
+  link_if_unset("CmpItemKindKeyword", "Keyword")
+  link_if_unset("CmpItemKindSnippet", "String")
+  link_if_unset("CmpItemKindText", "Normal")
+  link_if_unset("CmpItemKindProperty", "Constant")
+  link_if_unset("CmpItemKindConstant", "Constant")
+  link_if_unset("LspSignatureActiveParameter", "Search")
+  link_if_unset("@markup.raw.markdown", "NormalFloat")
+  link_if_unset("@markup.raw.block.markdown", "NormalFloat")
+  link_if_unset("@markup.raw.delimiter.markdown", "NormalFloat")
+end
+
+autocmd("ColorScheme", {
+  group = general,
+  callback = apply_cmp_fallbacks,
+})
+
+apply_cmp_fallbacks()
+
 autocmd("TextYankPost", {
   group = general,
   callback = function()
