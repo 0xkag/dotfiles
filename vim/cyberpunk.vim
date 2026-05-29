@@ -123,10 +123,10 @@ Hi('TabLineFill',  '',        '#1A1A1A')
 Hi('TabLineSel',   '#4c83ff', '#333333', 'bold')
 
 # --- Popup menu ---
-Hi('Pmenu',        '#ffff00', '#8B8989')
-Hi('PmenuSel',     '#000000', '#ff1493')
-Hi('PmenuSbar',    '',        '#333333')
-Hi('PmenuThumb',   '',        '#000000')
+Hi('Pmenu',        '#d3d3d3', '#1A1A1A')
+Hi('PmenuSel',     '#ffffff', '#7F073F', 'bold')
+Hi('PmenuSbar',    '',        '#1A1A1A')
+Hi('PmenuThumb',   '',        '#4c83ff')
 
 # --- Search & selection ---
 Hi('Visual',       '',        '#7F073F')
