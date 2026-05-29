@@ -68,6 +68,12 @@ hl("@markup.raw.markdown",           { link = "NormalFloat" })
 hl("@markup.raw.block.markdown",     { link = "NormalFloat" })
 hl("@markup.raw.delimiter.markdown", { link = "NormalFloat" })
 
+hl("@variable",              { fg = "#d3d3d3" })
+hl("@variable.member",       { fg = "#d3d3d3" })
+hl("@variable.parameter",    { fg = "#ff69b4", italic = true })
+hl("@property",              { fg = "#d3d3d3" })
+hl("@string.documentation",  { fg = "#fbde2d" })
+
 hl("Visual", { bg = "#7f073f" })
 hl("VisualNOS", { bg = "#7f073f" })
 hl("Search", { fg = "#000000", bg = "#ffff00" })
