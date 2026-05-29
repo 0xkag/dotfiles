@@ -19,8 +19,8 @@ fi
 # neovim > 0.12.x
 
 if command -v nvim > /dev/null 2>&1; then
-    ver=$(nvim --version | head -1 | grep -oP '\d+\.\d+')
-    if awk "BEGIN {exit !($ver >= 0.12)}"; then
+    ver=$(nvim --version 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
+    if [ -n "$ver" ] && awk "BEGIN {exit !($ver >= 0.12)}"; then
         disable+=("neovim")
     fi
 fi
@@ -28,8 +28,8 @@ fi
 # node >= 20
 
 if command -v node > /dev/null 2>&1; then
-    ver=$(node --version | grep -oP '\d+' | head -1)
-    if [ "$ver" -ge 20 ] 2>/dev/null; then
+    ver=$(node --version 2>/dev/null | grep -oE '[0-9]+' | head -1)
+    if [ -n "$ver" ] && [ "$ver" -ge 20 ] 2>/dev/null; then
         disable+=("node")
     fi
 fi
@@ -37,8 +37,8 @@ fi
 # pandoc > 3.1
 
 if command -v pandoc > /dev/null 2>&1; then
-    ver=$(pandoc --version | head -1 | grep -oP '\d+\.\d+' | head -1)
-    if awk "BEGIN {exit !($ver >= 3.1)}"; then
+    ver=$(pandoc --version 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
+    if [ -n "$ver" ] && awk "BEGIN {exit !($ver >= 3.1)}"; then
         disable+=("pandoc")
     fi
 fi
@@ -58,8 +58,8 @@ fi
 # vim > 9.2
 
 if command -v vim > /dev/null 2>&1; then
-    ver=$(vim --version | head -1 | grep -oP '\d+\.\d+')
-    if awk "BEGIN {exit !($ver >= 9.2)}"; then
+    ver=$(vim --version 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
+    if [ -n "$ver" ] && awk "BEGIN {exit !($ver >= 9.2)}"; then
         disable+=("vim")
     fi
 fi
