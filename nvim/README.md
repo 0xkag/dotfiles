@@ -109,6 +109,32 @@ For FreeBSD-specific Neovim install notes, see
   - Shell uses `shfmt`; Go uses `gofmt` + `goimports`; JavaScript/TypeScript/JSON/Markdown/YAML use `prettierd` then `prettier`; Lua uses `stylua`; Rust uses `rustfmt`; Terraform uses `terraform_fmt`; TOML uses `taplo`
 - `:ConformInfo` shows which formatters conform sees for the current buffer
 
+### `gq` vs `<localleader>=`
+
+Two different jobs:
+
+- **`gq` / `gqq`** -- reflow prose and comment blocks to `textwidth`, honoring
+  `formatoptions` and the buffer's comment leader (`#`, `//`, etc.). Always uses
+  Neovim's **built-in** text formatter, exactly like plain Vim. Reach for it to
+  rewrap a long comment or a commit-message paragraph to the column guide.
+- **`<localleader>=b` / `<localleader>=r`** -- language-aware formatting via
+  conform/LSP (terraform fmt, ruff, prettier, ...). Reach for it to reformat code
+  structure, not just rewrap text.
+
+The split is deliberate. In Neovim, two things otherwise capture `gq`:
+
+- Any attached LSP client sets `formatexpr=v:lua.vim.lsp.formatexpr()`, which
+  reroutes `gq` through the server's range formatter. Most servers only re-indent
+  code and never reflow comments to `textwidth`, so `gq` silently does nothing.
+- `nvim-treesitter` sets `indentexpr`, which recomputes each reflowed line's
+  indent and drops comment-continuation lines to column 0.
+
+The `gq`/`gqq` maps in `lua/config/keymaps.lua` route through `operatorfunc` and
+blank both `formatexpr` and `indentexpr` for the duration of the format, so `gq`
+behaves like it does in plain Vim regardless of which LSP is attached. (This is
+why the column guide could look right while `gq` misbehaved -- `colorcolumn` is
+an independent option.)
+
 ## Refactoring
 
 - `<leader>cr` / `<localleader>rr` / `SPC c r` opens a scope picker for renaming the symbol under the cursor
