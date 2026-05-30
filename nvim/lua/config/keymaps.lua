@@ -84,6 +84,13 @@ map("n", "<leader>yY", '"+yy', { desc = "Yank line to clipboard" })
 map({ "n", "x" }, "<leader>yp", '"+p', { desc = "Paste after" })
 map({ "n", "x" }, "<leader>yP", '"+P', { desc = "Paste before" })
 
+-- Mouse: auto-yank visual selection to "+ on mouse release.  mouse=a is set
+-- in options.lua so drag enters visual mode; this yanks on release so the
+-- selection lands on the system clipboard via nvim's clipboard provider
+-- (and via tmux's OSC 52 intercept when no native provider is available).
+-- Shift+drag bypasses nvim so terminal/tmux selection still works.
+map("x", "<LeftRelease>", '"+y', { desc = "Auto-yank mouse selection to clipboard", silent = true })
+
 -- Disabled Vim-era clipboard fallback for hosts without unnamedplus/clipboard:
 -- map("x", "<leader>yy", "<Cmd>w !clip-in<CR>", { desc = "Yank to clipboard fallback", silent = true })
 -- map("n", "<leader>yY", "<Cmd>.w !clip-in<CR>", { desc = "Yank line to clipboard fallback", silent = true })

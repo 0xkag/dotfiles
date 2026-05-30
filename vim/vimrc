@@ -75,6 +75,10 @@ set formatoptions+=l     "
 set formatoptions+=c     " 
 " set formatoptions-=t     " 
 set viminfo='100,<5000,s10,h
+set mouse=a              " let vim handle mouse inside its window (shift-drag bypasses to tmux)
+if exists('+ttymouse')
+  set ttymouse=sgr       " modern SGR mouse protocol -- required for tmux + wide-screen
+endif
 
 "" --------
 "" spelling
@@ -193,29 +197,80 @@ noremap <leader>a =ip
 
 " ... system clipboard (selective copy/paste)
 "
-" Enable the bundled osc52 plugin (vim 9.1+) so the "+ register works over
-" SSH/tmux even without X11.  Must come before the capability check below.
-" The plugin adds osc52 to clipmethod, so "+y emits OSC 52 escape sequences;
-" tmux (set-clipboard on) intercepts them, and capable outer terminals
-" (Ghostty, Windows Terminal, iTerm2, kitty, etc.) update the system
-" clipboard.  Doc: _docs/clipboard.org.
+" Yank to "+ always emits OSC 52 via a TextYankPost autocmd (defined below).
+" This is the load-bearing path: it works on any vim 7.4+ regardless of
+" whether vim was built with +clipboard, the bundled osc52 plugin's
+" terminal-capability check, $DISPLAY, etc.  tmux (set-clipboard on)
+" intercepts the OSC 52 sequence; capable outer terminals (Ghostty, iTerm2,
+" Windows Terminal, kitty, etc.) then set the system clipboard.  PuTTY and
+" Terminal.app silently drop OSC 52 -- in those, paste from the tmux buffer
+" with `prefix p` instead.  Doc: _docs/clipboard.org.
+"
+" Also enable the bundled osc52 plugin on vim 9.1+ as a redundant path
+" (gives ":OSCYank" etc.).  Harmless if the plugin's emission isn't actually
+" used because our autocmd always fires.
+
+" Load the osc52 plugin (vim 9.1+) and configure clipmethod.
+"
+" On macOS, *clear* clipmethod entirely so "+y falls through to the
+" legacy +clipboard pasteboard path (Cocoa).  The default clipmethod on
+" macOS vim 9.2 is "wayland,x11" -- neither of which works on macOS, and
+" yet vim still routes "+y through clipmethod first.  With every method
+" failing, "+y can fail to even populate the + register.  Clearing the
+" option restores the pre-9.1 behavior of writing straight to the
+" pasteboard.
+"
+" On non-macOS, prepend osc52 so "+y emits OSC 52 (intercepted by tmux,
+" forwarded to a capable outer terminal).
 
 if has('patch-9.1.0') && exists('+clipmethod')
   silent! packadd osc52
-  if exists('+clipmethod')
+  if has('mac') || has('macunix')
+    set clipmethod=
+  else
     set clipmethod^=osc52
   endif
 endif
 
-" Detect whether vim's "+ register can actually reach a clipboard provider.
+" TextYankPost hook for "+ register yanks:
+"   - On macOS, call pbcopy directly.  This is the load-bearing path because
+"     vim's clipmethod machinery can short-circuit pasteboard access in
+"     edge cases (e.g. when clipmethod is set non-empty by config), and we
+"     want "+y to always reach the macOS clipboard regardless.
+"   - Always emit OSC 52 to /dev/tty too -- on SSH-through-tmux to capable
+"     outer terminals this is what reaches the local clipboard.  Harmless
+"     where unsupported (Terminal.app silently drops it).
+
+function! s:OnPlusRegisterYank()
+  if v:event.regname !=# '+' | return | endif
+  let l:text = join(v:event.regcontents, "\n")
+  if has('mac') || has('macunix')
+    silent! call system('pbcopy', l:text)
+  endif
+  let l:b64 = substitute(system('base64', l:text), '\n', '', 'g')
+  silent! call writefile(
+        \ [printf("\<Esc>]52;c;%s\<Bell>", l:b64)],
+        \ '/dev/tty',
+        \ 'b')
+endfunction
+
+augroup OSC52Yank
+  autocmd!
+  autocmd TextYankPost * call s:OnPlusRegisterYank()
+augroup END
+
+" Detect whether vim's "+ register can actually *read* from a clipboard
+" provider.  Used for the paste-side keybindings only -- the yank side
+" always uses "+y (the autocmd above takes care of emission).
 " has('clipboard') only reports compile-time support, not whether that
 " support can communicate.  On a Linux SSH session without X forwarding,
-" +clipboard is present but X11 isn't reachable -- "+y silently fails.
-" "+ is usable when any of: macOS (pbcopy/pbpaste always present), X11
-" reachable ($DISPLAY), Wayland reachable ($WAYLAND_DISPLAY), or the
-" osc52 plugin loaded into clipmethod.  Else fall back to clip-in.
+" +clipboard is present but X11 isn't reachable -- "+p silently fails.
+" Treat "+ as readable when any of: macOS (pbpaste always present), X11
+" reachable ($DISPLAY), or Wayland reachable ($WAYLAND_DISPLAY).  Else
+" fall back to clip-out (which uses tmux save-buffer on a Linux SSH
+" remote, or the native paster on macOS/Linux desktop).
 
-function! s:HasUsableClipboard()
+function! s:HasUsableClipboardPaste()
   if !(has('unnamedplus') || has('clipboard'))
     return 0
   endif
@@ -225,21 +280,30 @@ function! s:HasUsableClipboard()
   if $DISPLAY != '' || $WAYLAND_DISPLAY != ''
     return 1
   endif
-  if exists('+clipmethod') && &clipmethod =~# 'osc52'
-    return 1
-  endif
   return 0
 endfunction
 
-if s:HasUsableClipboard()
-  nmap <leader>y "+y
-  vmap <leader>y "+y
-  nmap <leader>Y "+y$
+" Yank: always via "+ -- the OSC52Yank autocmd above does the work.
+
+nmap <leader>y "+y
+vmap <leader>y "+y
+nmap <leader>Y "+y$
+
+" Mouse: auto-yank visual selection to "+ on mouse release.  With mouse=a
+" set above, a mouse drag enters visual mode; on release this yanks the
+" selection to "+, which triggers the OSC52Yank autocmd, which emits OSC
+" 52, which tmux + the outer terminal turn into a system clipboard write.
+" Shift+drag bypasses vim entirely so terminal/tmux selection still works
+" for cross-pane copy.
+
+xnoremap <LeftRelease> "+y
+
+" Paste: from "+ if readable, else shell out to clip-out.
+
+if s:HasUsableClipboardPaste()
   nmap <leader>p "+p
   nmap <leader>P "+P
 else
-  vnoremap <silent> <leader>y :w !clip-in<cr>
-  nnoremap <silent> <leader>Y :.w !clip-in<cr>
   nnoremap <silent> <leader>p :r !clip-out<cr>
   nnoremap <silent> <leader>P :.-1r !clip-out<cr>
 endif

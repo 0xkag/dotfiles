@@ -121,6 +121,39 @@ if [ "$TMUX_ONLY" = 1 ]; then
           - Terminal.app:    drops OSC 52
 EOF
 fi
+
+# --- Editor feature diagnostic (vim/nvim build features that affect tests) ---
+diagnose_editor() {
+  local editor="$1"
+  if ! command -v "$editor" >/dev/null 2>&1; then
+    return
+  fi
+  local out
+  out=$("$editor" --version 2>/dev/null | head -1)
+  printf '  %-4s:        %s\n' "$editor" "$out"
+  if [ "$editor" = "vim" ]; then
+    local diag_file
+    diag_file=$(mktemp)
+    "$editor" -c "call writefile([printf(\"clipboard=%s unnamedplus=%s clipmethod_opt=%s clipmethod=%s\", has('clipboard'), has('unnamedplus'), exists('+clipmethod'), &clipmethod)], '$diag_file')" -c 'qa!' 2>/dev/null
+    if [ -s "$diag_file" ]; then
+      local diag
+      diag=$(cat "$diag_file")
+      printf '               %s\n' "$diag"
+      if echo "$diag" | grep -q 'clipboard=0'; then
+        printf '               WARN: vim built without +clipboard.  Raw "+y goes to a\n'
+        printf '                     plain register, not the system clipboard, unless\n'
+        printf '                     vimrc registers a TextYankPost autocmd to emit\n'
+        printf '                     OSC 52 (the dotfiles vimrc does this -- if "vim\n'
+        printf '                     "+ register" PASSes below, the autocmd is active).\n'
+      fi
+    fi
+    rm -f "$diag_file"
+  fi
+}
+echo "  --- editor features ---"
+diagnose_editor vim
+diagnose_editor nvim
+
 echo
 
 # --- Clipboard save/restore + tty safety net ---
