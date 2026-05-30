@@ -125,19 +125,34 @@ This means mouse-selected text goes through =clip-in= → system clipboard
 even over SSH -- provided the outer terminal supports OSC 52 (Terminal.app
 and PuTTY do not; see the platform scenarios below).
 
-** vim handles mouse
+** vim / nvim handle mouse
 
-Vim can handle the mouse independently of tmux when =set mouse=a= is
-configured (not currently set in the dotfiles).  Without it, vim does not
-intercept mouse events -- tmux or the terminal handles them.
+Both editors are configured with =set mouse=a= (vim) / =opt.mouse = "a"=
+(nvim), so they intercept mouse events inside their window.  Vim
+additionally sets =ttymouse=sgr= (nvim auto-detects this) -- without it,
+vim defaults to =ttymouse=xterm= which doesn't decode tmux's modern SGR
+mouse coordinates, and some drags get "stolen" by Terminal.app's own
+text selection because vim never sees the events.  A drag enters visual
+mode; on release, an =xnoremap <LeftRelease> "+y= mapping auto-yanks the
+selection to the ="+= register.  That triggers the =OSC52Yank=
+autocmd in vim (or nvim's native clipboard provider) → OSC 52 → tmux
+intercept → outer terminal.  End result: *mouse-drag inside vim/nvim
+copies to the system clipboard*.
+
+To bypass vim/nvim and use tmux's cross-pane selection instead, hold
+*Shift* while dragging -- this gives the terminal/tmux the mouse events,
+and tmux's =MouseDragEnd1Pane= binding pipes the selection through
+=clip-in= the same way it does at the shell prompt.
 
 ** Summary: which layer gets the mouse?
 
-| tmux mouse | Shift held? | Who handles selection      | Where does text go?          |
-|------------+-------------+----------------------------+------------------------------|
-| ON         | No          | tmux (pane-aware)          | System clipboard via clip-in |
-| ON         | Yes         | Terminal (raw text)        | PRIMARY (X11) or Windows CB  |
-| OFF        | --          | Terminal (raw text)        | PRIMARY (X11) or Windows CB  |
+| Context           | Shift held? | Who handles selection      | Where does text go?              |
+|-------------------+-------------+----------------------------+----------------------------------|
+| In vim/nvim       | No          | vim/nvim (visual mode)     | "+ register via <LeftRelease>    |
+| In vim/nvim       | Yes         | Terminal/tmux              | tmux clip-in (system clipboard)  |
+| At shell, tmux ON | No          | tmux (pane-aware)          | System clipboard via clip-in     |
+| At shell, tmux ON | Yes         | Terminal (raw text)        | PRIMARY (X11) or Windows CB      |
+| At shell, tmux OFF| --          | Terminal (raw text)        | PRIMARY (X11) or Windows CB      |
 
 *Tip*: Use tmux selection (no Shift) for most work -- it's pane-aware and goes
 to the system clipboard.  Use Shift+drag when you need to select across panes
@@ -401,21 +416,33 @@ clipboard.  Explicit keybindings:
 | =<leader>C=         | Legacy alias for =<leader>y=                |
 | =<leader><space>=   | Copy current line/visual selection to clipboard |
 
-vimrc picks the implementation at startup based on whether the ="+= register
-can *actually reach* a clipboard provider (function =s:HasUsableClipboard()=
-in =vim/vimrc=).  =has('clipboard')= only reports compile-time support, not
-runtime reachability -- on a Linux SSH session without X forwarding, vim is
-=+clipboard= but X11 isn't reachable and ="+y= silently fails.  The check
-treats ="+= as usable if any of:
+The dotfiles vimrc has a *TextYankPost autocmd* (=OSC52Yank= group) that
+fires whenever something is yanked to the ="+= register.  It does two
+things, in this order:
 
-- macOS (=pbcopy=/=pbpaste= always present)
-- X11 reachable (=$DISPLAY= set)
-- Wayland reachable (=$WAYLAND_DISPLAY= set)
-- =clipmethod= includes =osc52= (the bundled vim 9.1+ plugin -- enabled in
-  vimrc on supported builds, see below)
+1. On macOS, call =pbcopy= directly via =system()=.  This is the
+   load-bearing path on macOS Terminal.app and any other terminal where
+   OSC 52 doesn't reach pasteboard.  It also defends against vim's
+   =clipmethod= machinery short-circuiting the native pasteboard
+   provider (observed: with =clipmethod=osc52,wayland,x11=, ="+y= can
+   skip the Cocoa pasteboard path entirely).
+2. Always emit an OSC 52 escape sequence to =/dev/tty=.  For SSH sessions
+   through tmux to a capable outer terminal (Ghostty, Windows Terminal,
+   iTerm2, kitty, etc.), this is the load-bearing path -- tmux
+   (=set-clipboard on=) intercepts and forwards.  Harmless where
+   unsupported (Terminal.app, PuTTY just drop it).
 
-If none of these hold, the keybindings fall back to shelling out to
-=clip-in=/=clip-out=, which themselves try OSC 52 emission as a last resort.
+Works on any vim 7.4+ regardless of =+clipboard= or the bundled =osc52=
+plugin's terminal-capability check.
+
+Paste is different: OSC 52 read is blocked by most terminals for security,
+so we can't symmetrically read the clipboard back over OSC 52.  Paste-side
+keybindings (=<leader>p= / =<leader>P=) use the ="+= register only when
+vim can actually read from a clipboard provider -- function
+=s:HasUsableClipboardPaste()= checks for macOS, =$DISPLAY=, or
+=$WAYLAND_DISPLAY=.  Otherwise paste falls back to =clip-out=, which on a
+tmux-only Linux remote reads from =tmux save-buffer= -- so =<leader>p=
+gives you whatever was last copied through tmux.
 
 You can also use the ="+= register directly at any time:
 - ="+ y {motion}= -- yank to clipboard
@@ -440,12 +467,28 @@ without =+clipboard=.  The plugin auto-detects terminal support via DA1 query.
 Requires a terminal that supports OSC 52 (not PuTTY).
 
 *Enabled in vimrc* (vim 9.1+ only -- the guard is
-=has('patch-9.1.0') && exists('+clipmethod')=).  This makes ="+yiw= and
-="+p= work directly over SSH without needing =<leader>y= / =<leader>p=,
-because vim emits OSC 52 escape sequences that tmux intercepts (with
-=set-clipboard on=) and forwards to capable outer terminals.  On vim builds
-older than 9.1, the plugin is silently skipped and the =clip-in=/=clip-out=
-fallback keybindings still cover the same scenarios via =<leader>y=.
+=has('patch-9.1.0') && exists('+clipmethod')=) as a *redundant* secondary
+path.  In practice, the plugin's emission isn't always exercised: it has a
+terminal-capability check that can refuse on chains where the outer
+terminal doesn't advertise OSC 52 support (observed: tmux + PuTTY), AND
+its clipmethod machinery requires =+clipboard= on some builds (e.g., the
+Nix minimal vim build has =+clipmethod= but =-clipboard=, and ="+y= does
+not route through clipmethod).
+
+The *load-bearing* path is the =TextYankPost= autocmd (=OSC52Yank= group)
+in =vim/vimrc=, which on macOS calls =pbcopy= directly and always emits
+OSC 52 to =/dev/tty=.  Works on any vim 7.4+ regardless of vim build
+features or terminal-capability detection.
+
+vimrc also configures =clipmethod= conservatively:
+
+- *macOS*: =set clipmethod== (empty) -- forces vim to use the legacy
+  =+clipboard= pasteboard path.  vim 9.2's default =clipmethod= on macOS
+  is =wayland,x11=, neither of which works on macOS, and vim still routes
+  ="+y= through clipmethod first; clearing the option restores
+  pre-9.1 native pasteboard behavior.
+- *non-macOS*: =set clipmethod^=osc52= so ="+y= emits OSC 52 (intercepted
+  by tmux, forwarded to capable outer terminals).
 
 ** Spacemacs (=spacemacs/spacemacs=)
 
@@ -584,18 +627,18 @@ the real OS after each test.
 |---------------------+---------------------------------------------|
 | OSC 52 direct       | PASS (tmux buffer received it)              |
 | clip-in script      | PASS (clip-in falls to =tmux load-buffer=)    |
-| vim "+ register     | PASS *iff* vim 9.1+ AND osc52 plugin enabled in vimrc (default in this dotfiles); FAIL on older vim with no X11 |
+| vim "+ register     | PASS (TextYankPost autocmd in vimrc emits OSC 52 unconditionally; tmux captures) |
 | nvim "+ register    | PASS (nvim's clipboard provider auto-picks tmux fallback)  |
 | vim OSC 52 forced   | PASS (FP -- via tmux capture, see caveat)   |
 | nvim OSC 52 forced  | PASS (tmux captures OSC 52 emission)        |
 
-Note: vim ="+= without X11 used to silently fail (vim's =+clipboard= means
-X11 support, which has no fallback when =$DISPLAY= is unset).  The dotfiles
-=vim/vimrc= now (a) loads the bundled =osc52= plugin on vim 9.1+ so ="+y=
-emits OSC 52 → tmux → outer terminal, and (b) detects unreachable-X11 and
-routes ="+y= bindings through =clip-in= when the osc52 plugin isn't
-available.  See the =vim (vim/vimrc)= section above for the
-=s:HasUsableClipboard()= guard.
+Note: previously, vim ="+y= without X11 silently failed -- =+clipboard= on
+Linux means X11 support, which has nothing to talk to when =$DISPLAY= is
+unset; and the bundled =osc52= plugin's terminal-capability check refuses
+to emit on tmux+PuTTY.  The dotfiles =vim/vimrc= now installs a
+=TextYankPost= autocmd that emits OSC 52 directly, bypassing both gates.
+Works on any vim 7.4+ regardless of build features.  See the
+=vim (vim/vimrc)= section above.
 
 Whether the outer terminal *also* received the clipboard data:
 
