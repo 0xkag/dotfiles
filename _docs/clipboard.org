@@ -113,16 +113,36 @@ pane, which is usually what you want.
 | Middle-click        | Not handled by tmux (falls through to terminal)      |
 | Shift + click-drag  | Bypasses tmux -- terminal handles selection directly |
 
-tmux mouse selection uses the =MouseDragEnd1Pane= binding (=tmux.conf=):
+tmux mouse selection uses the =MouseDragEnd1Pane= binding (=tmux.conf=),
+which switches between =copy-pipe-no-clear= and =copy-pipe-and-cancel=
+based on whether the user was already scrolled back before the drag:
 
 #+begin_example
-bind-key -T copy-mode-vi MouseDragEnd1Pane \
-  send-keys -X copy-pipe-and-cancel 'clip-in'
+bind-key -T copy-mode-vi MouseDragEnd1Pane {
+    if-shell -F '#{scroll_position}' {
+        send-keys -X copy-pipe-no-clear 'clip-in'
+    } {
+        send-keys -X copy-pipe-and-cancel 'clip-in'
+    }
+}
 #+end_example
 
-This means mouse-selected text goes through =clip-in= → system clipboard
-(and also the tmux buffer).  With OSC 52, this reaches the system clipboard
-even over SSH -- provided the outer terminal supports OSC 52 (Terminal.app
+- If =scroll_position == 0= (user was at the prompt; the drag is what
+  entered copy mode): exit copy mode after copying so the cursor stays at
+  the prompt.
+- If =scroll_position > 0= (user was already in copy mode from scrolling
+  back): stay in copy mode so they can keep navigating; press =q= to
+  exit.
+
+This avoids the "cursor jumps back to the shell prompt" UX when scrolled
+back, *and* avoids the "stays in copy mode unnecessarily" UX when just
+selecting at the prompt.  The keyboard yank bindings (=y=, =M-y=) still
+use =copy-pipe-and-cancel= unconditionally because pressing a key to copy
+*implies* you're done navigating.
+
+Mouse-selected text goes through =clip-in= → system clipboard (and also
+the tmux buffer).  With OSC 52, this reaches the system clipboard even
+over SSH -- provided the outer terminal supports OSC 52 (Terminal.app
 and PuTTY do not; see the platform scenarios below).
 
 ** vim / nvim handle mouse
