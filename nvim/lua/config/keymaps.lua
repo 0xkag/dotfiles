@@ -24,6 +24,28 @@ map("n", "<C-e>", "<End>", { desc = "Line end", silent = true })
 map("n", "Y", "y$", { desc = "Yank to end of line", silent = true })
 map("n", "gV", "`[v`]", { desc = "Select last changed text", silent = true })
 
+-- gq/gqq: reflow with Vim's built-in formatter, not the LSP/treesitter ones.
+-- An attached LSP client sets formatexpr=vim.lsp.formatexpr(), which reroutes
+-- gq through the server's range formatter -- most servers (terraform-ls, etc.)
+-- only re-indent and never reflow comments to textwidth, so gq becomes a
+-- no-op.  treesitter sets indentexpr, which recomputes each reflowed line's
+-- indent and drops comment-continuation lines to column 0.  Neutralize both
+-- for the duration of the format so gq behaves like it does in plain Vim.
+function _G.__reflow_builtin()
+  local indentexpr, formatexpr = vim.bo.indentexpr, vim.bo.formatexpr
+  vim.bo.indentexpr, vim.bo.formatexpr = "", ""
+  vim.cmd("normal! `[V`]gq")
+  vim.bo.indentexpr, vim.bo.formatexpr = indentexpr, formatexpr
+end
+map({ "n", "x" }, "gq", function()
+  vim.o.operatorfunc = "v:lua.__reflow_builtin"
+  return "g@"
+end, { expr = true, desc = "Reflow (built-in formatter)" })
+map("n", "gqq", function()
+  vim.o.operatorfunc = "v:lua.__reflow_builtin"
+  return "g@_"
+end, { expr = true, desc = "Reflow line (built-in formatter)" })
+
 map("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 map("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 map("n", "0", "g0", { silent = true })
