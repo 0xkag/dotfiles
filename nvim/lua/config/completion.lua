@@ -237,13 +237,13 @@ vim.keymap.set("n", "<leader>ta", function()
   M.cycle_mode(false)
 end, { desc = "Toggle auto-completion mode" })
 
-vim.keymap.set("n", "<leader>tA", function()
+vim.keymap.set("n", "<leader>tab", function()
   M.toggle_buffer()
-end, { desc = "Toggle completion for buffer" })
+end, { desc = "Auto-completion: toggle for buffer" })
 
-vim.keymap.set("n", "<leader>tC", function()
+vim.keymap.set("n", "<leader>tac", function()
   M.cycle_mode(true)
-end, { desc = "Cycle completion mode" })
+end, { desc = "Auto-completion: cycle mode" })
 
 vim.keymap.set("n", "<leader>th", function()
   M.toggle_signature_auto()

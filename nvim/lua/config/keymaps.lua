@@ -113,6 +113,14 @@ map({ "n", "x" }, "<leader>yP", '"+P', { desc = "Paste before" })
 -- Shift+drag bypasses nvim so terminal/tmux selection still works.
 map("x", "<LeftRelease>", '"+y', { desc = "Auto-yank mouse selection to clipboard", silent = true })
 
+-- Clipboard mode toggle: cycles full -> tmux -> off -> full.
+-- See nvim/lua/config/options.lua for the provider switch logic.
+-- Mirrors tmux's `prefix t C` / `prefix t X` for cross-layer parity.
+map("n", "<leader>tC", function() _G.NvimClipMode.cycle() end,
+  { desc = "Cycle clipboard mode (full/tmux/off)", silent = true })
+map("n", "<leader>tX", function() _G.NvimClipMode.toggle_off() end,
+  { desc = "Toggle clipboard off ↔ full", silent = true })
+
 -- Disabled Vim-era clipboard fallback for hosts without unnamedplus/clipboard:
 -- map("x", "<leader>yy", "<Cmd>w !clip-in<CR>", { desc = "Yank to clipboard fallback", silent = true })
 -- map("n", "<leader>yY", "<Cmd>.w !clip-in<CR>", { desc = "Yank line to clipboard fallback", silent = true })
