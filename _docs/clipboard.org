@@ -110,6 +110,8 @@ pane, which is usually what you want.
 | Click-drag          | Enters copy mode, selects text within pane           |
 | Release mouse       | Copies selection to system clipboard via =clip-in=   |
 |                     | (configured by =MouseDragEnd1Pane= binding)          |
+| Double-click        | Selects word under cursor and copies                 |
+| Triple-click        | Selects line under cursor and copies                 |
 | Middle-click        | Not handled by tmux (falls through to terminal)      |
 | Shift + click-drag  | Bypasses tmux -- terminal handles selection directly |
 
@@ -393,6 +395,53 @@ No =$DISPLAY=, no Wayland.  If inside tmux, falls back to tmux buffer
 (unlikely on raw console, but works over SSH with a capable client -- not
 Terminal.app, not PuTTY; see the platform-specific scenarios above).
 
+** Nested tmux (Terminal.app + local tmux + SSH + remote tmux)
+
+A common Mac workflow stacks two tmux layers: local tmux on macOS for
+pane management, then SSH into a Linux box where you attach a remote
+tmux for the work session.  Clipboard-wise, this stack chains *three*
+OSC 52 hops:
+
+#+begin_example
+  vim/nvim → remote tmux → SSH → local tmux → Terminal.app
+              (passthru)         (passthru)   (drops it)
+#+end_example
+
+Both tmux layers have =allow-passthrough on=, so the OSC 52 escape
+sequence makes it all the way out.  But the *outermost* terminal still
+has to honor it -- and Terminal.app does not (see [[*macOS Terminal.app
+(built-in) -- /NO OSC 52 support/][above]]).  Net effect: =pbpaste=
+never receives anything from the remote, even though clipboard works
+fine in single-tmux runs from the same Linux host.
+
+iTerm2, Ghostty, kitty, Alacritty, WezTerm at the outer layer all work
+through nested tmux without issue.
+
+*** Bypasses for Terminal.app users stuck in nested-tmux
+
+In rough preference order:
+
+1. *Switch terminal (permanent)*.  Use Ghostty, iTerm2, kitty,
+   Alacritty, or WezTerm.  Zero dotfiles changes; nested-tmux clipboard
+   works end-to-end.  This is the only fix that doesn't require
+   per-selection effort.
+
+2. *=prefix t X= (raw-bypass combo, defined in =tmux/tmux.conf=)*.
+   Disables both mouse mode and =set-clipboard= on the *local* (outer)
+   tmux in one keystroke.  Now drag-select on Terminal.app's window
+   directly: Terminal.app sees raw mouse events, makes its own
+   selection, =Cmd-C= copies to macOS clipboard.  Press =prefix t X=
+   again to restore.  Use this for "I just need to grab text once".
+
+3. *=prefix M= (mouse off, then re-enable with =prefix m=)*.  Same idea
+   as above but only flips mouse mode, leaving =set-clipboard= alone.
+   Safer if you've manually customized =set-clipboard=.
+
+4. *FN+drag (Terminal.app's modifier)*.  Terminal.app honors FN as a
+   mouse-passthrough bypass even with mouse mode active.  Selects raw
+   text into Terminal.app; =Cmd-C= to copy.  No tmux state change
+   needed but requires holding the modifier on every drag.
+
 * Tool Integration
 
 ** tmux (=tmux/tmux.conf=)
@@ -400,17 +449,21 @@ Terminal.app, not PuTTY; see the platform-specific scenarios above).
 Mouse mode is on by default (=set -g mouse on=).  Toggle with =prefix m= /
 =prefix M=.
 
-| Binding           | Action                                    |
-|-------------------+-------------------------------------------|
-| =y= (copy mode)  | Yank selection to system clipboard        |
-| =M-y= (copy mode)| Yank to system clipboard (with message)   |
-| mouse drag end    | Copy selection to system clipboard        |
-| =C-y= (copy mode)| Append to =~/tmux.out=                    |
-| =prefix C=        | Copy tmux buffer to system clipboard      |
-| =prefix P=        | Paste from system clipboard into tmux     |
-| =prefix p=        | Paste from tmux buffer (internal)         |
-| =prefix m=        | Turn mouse mode on                        |
-| =prefix M=        | Turn mouse mode off                       |
+| Binding           | Action                                       |
+|-------------------+----------------------------------------------|
+| =y= (copy mode)  | Yank selection (clipboard or tmux buffer; see toggle) |
+| =M-y= (copy mode)| Yank with message                            |
+| mouse drag end    | Copy selection (clipboard or tmux buffer)    |
+| double-click      | Select word + copy                           |
+| triple-click      | Select line + copy                           |
+| =C-y= (copy mode)| Append to =~/tmux.out=                       |
+| =prefix C=        | Copy tmux buffer to system clipboard         |
+| =prefix P=        | Paste from system clipboard into tmux        |
+| =prefix p=        | Paste from tmux buffer (internal)            |
+| =prefix m=        | Turn mouse mode on                           |
+| =prefix M=        | Turn mouse mode off                          |
+| =prefix t C=      | Toggle clipboard sync (system ↔ tmux buffer) |
+| =prefix t X=      | Raw bypass: disable mouse + clipboard at once |
 
 OSC 52 (=set-clipboard on=) means tmux also sets the terminal's clipboard
 whenever the tmux buffer is updated via copy-pipe.  This is the mechanism that
@@ -421,6 +474,42 @@ Terminal.app -- see the Terminal.app scenario above).
 
 =allow-passthrough on= lets nested programs (vim, emacs) send their own OSC 52
 sequences through tmux to the outer terminal.
+
+*** Toggling clipboard integration
+
+Sometimes you want a selection to *not* leave tmux/vim/nvim -- e.g. when
+you're handling a secret, or when you're juggling multiple buffers and
+don't want to clobber the system clipboard.  Three independent toggles
+sharing a unified =[prefix|leader] t {C,X}= mnemonic:
+
+| Layer  | Cycle/toggle      | Off ↔ full / bypass | States                          |
+|--------+-------------------+---------------------+---------------------------------|
+| tmux   | =prefix t C=        | =prefix t X=          | C: on (system clipboard) ↔ off (tmux buffer).  X: bypass on/off (mouse + clipboard both flip together) |
+| vim    | =<leader>tC=        | =<leader>tX=          | C: =full= → =tmux= → =off= → cycle.  X: =off= ↔ =full= toggle |
+| nvim   | =<leader>tC=        | =<leader>tX=          | C: =full= → =tmux= → =off= → cycle.  X: =off= ↔ =full= toggle |
+
+State is per-process and not persisted -- restart resets to defaults
+(=on= for tmux, =full= for vim/nvim).
+
+In tmux, =off= means yank/mouse-drag still copies, but goes to tmux's
+buffer only (paste with =prefix p=).  =set-clipboard= is also flipped to
+=off= so OSC 52 emission stops; this prevents nested vim/nvim from
+leaking through tmux's passthrough.
+
+In vim/nvim, the three modes are:
+
+- =full=: yanks to ="+= reach the system clipboard (pbcopy on macOS,
+  OSC 52 on Linux/SSH).  Default.
+- =tmux=: yanks reach the tmux buffer (=tmux load-buffer=) but not the
+  system clipboard.  Useful when tmux's own toggle is off too -- the
+  combination is fully tmux-local.
+- =off=: yanks populate only vim's internal ="+= register; nothing
+  leaves vim.
+
+Combo: =prefix t X= on tmux disables mouse + clipboard in one keystroke
+for the "let me grab raw text into the outer terminal's clipboard" case
+(see [[*Bypasses for Terminal.app users stuck in nested-tmux][nested-tmux
+bypasses]] above).
 
 ** vim (=vim/vimrc=)
 

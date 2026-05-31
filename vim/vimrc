@@ -232,18 +232,31 @@ if has('patch-9.1.0') && exists('+clipmethod')
   endif
 endif
 
-" TextYankPost hook for "+ register yanks:
-"   - On macOS, call pbcopy directly.  This is the load-bearing path because
-"     vim's clipmethod machinery can short-circuit pasteboard access in
-"     edge cases (e.g. when clipmethod is set non-empty by config), and we
-"     want "+y to always reach the macOS clipboard regardless.
-"   - Always emit OSC 52 to /dev/tty too -- on SSH-through-tmux to capable
-"     outer terminals this is what reaches the local clipboard.  Harmless
-"     where unsupported (Terminal.app silently drops it).
+" TextYankPost hook for "+ register yanks; behavior depends on the tristate
+" g:vim_clipboard_mode (default 'full'):
+"   'full' : pbcopy on macOS + emit OSC 52 to /dev/tty (full sync to system
+"            clipboard, including SSH-through-tmux to capable outer terminals)
+"   'tmux' : pipe to `tmux load-buffer -` so the yank reaches tmux's buffer
+"            but not the system clipboard (paste with `prefix p`)
+"   'off'  : autocmd no-ops; "+y populates only vim's internal + register
+"            (vim-local; nothing leaves vim)
+" Toggle via :ClipMode {full|tmux|off} or <leader>tC (cycles).
+
+if !exists('g:vim_clipboard_mode')
+  let g:vim_clipboard_mode = 'full'
+endif
 
 function! s:OnPlusRegisterYank()
   if v:event.regname !=# '+' | return | endif
+  if g:vim_clipboard_mode ==# 'off' | return | endif
   let l:text = join(v:event.regcontents, "\n")
+  if g:vim_clipboard_mode ==# 'tmux'
+    if !empty($TMUX)
+      silent! call system('tmux load-buffer -', l:text)
+    endif
+    return
+  endif
+  " 'full'
   if has('mac') || has('macunix')
     silent! call system('pbcopy', l:text)
   endif
@@ -258,6 +271,41 @@ augroup OSC52Yank
   autocmd!
   autocmd TextYankPost * call s:OnPlusRegisterYank()
 augroup END
+
+function! s:SetClipMode(mode)
+  if a:mode !=# 'full' && a:mode !=# 'tmux' && a:mode !=# 'off'
+    echohl ErrorMsg | echo 'ClipMode: invalid mode (full|tmux|off)' | echohl None
+    return
+  endif
+  let g:vim_clipboard_mode = a:mode
+  echo 'clipboard: ' . a:mode
+endfunction
+
+function! s:CycleClipMode()
+  if g:vim_clipboard_mode ==# 'full'
+    call s:SetClipMode('tmux')
+  elseif g:vim_clipboard_mode ==# 'tmux'
+    call s:SetClipMode('off')
+  else
+    call s:SetClipMode('full')
+  endif
+endfunction
+
+function! s:ToggleClipModeOff()
+  if g:vim_clipboard_mode ==# 'off'
+    call s:SetClipMode('full')
+  else
+    call s:SetClipMode('off')
+  endif
+endfunction
+
+command! -nargs=1 -complete=customlist,s:ClipModeComplete ClipMode call s:SetClipMode(<f-args>)
+function! s:ClipModeComplete(A, L, P)
+  return filter(['full', 'tmux', 'off'], 'v:val =~# "^" . a:A')
+endfunction
+
+nnoremap <silent> <leader>tC :call <SID>CycleClipMode()<cr>
+nnoremap <silent> <leader>tX :call <SID>ToggleClipModeOff()<cr>
 
 " Detect whether vim's "+ register can actually *read* from a clipboard
 " provider.  Used for the paste-side keybindings only -- the yank side

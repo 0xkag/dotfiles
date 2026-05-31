@@ -6,7 +6,72 @@ opt.relativenumber = true
 opt.background = "dark"
 opt.lazyredraw = true
 opt.mouse = "a"
-opt.clipboard = "unnamedplus"
+
+-- Clipboard tristate.  Default 'full' = unnamedplus (system clipboard).
+-- 'tmux' = custom provider that pipes "+ writes to `tmux load-buffer -`
+-- so yanks reach tmux's buffer but not the system clipboard.
+-- 'off'  = clipboard option cleared; "+y populates only nvim's internal
+-- + register.
+-- Toggle via :ClipMode {full|tmux|off} or <leader>tC (see keymaps.lua).
+vim.g.nvim_clipboard_mode = vim.g.nvim_clipboard_mode or "full"
+
+local function apply_clipboard_mode(mode)
+  if mode == "off" then
+    opt.clipboard = ""
+    vim.g.clipboard = nil
+  elseif mode == "tmux" then
+    opt.clipboard = "unnamedplus"
+    vim.g.clipboard = {
+      name = "tmux-only",
+      copy = {
+        ["+"] = { "tmux", "load-buffer", "-" },
+        ["*"] = { "tmux", "load-buffer", "-" },
+      },
+      paste = {
+        ["+"] = { "tmux", "save-buffer", "-" },
+        ["*"] = { "tmux", "save-buffer", "-" },
+      },
+      cache_enabled = 0,
+    }
+  else
+    opt.clipboard = "unnamedplus"
+    vim.g.clipboard = nil  -- let nvim auto-detect (pbcopy/wl-copy/xclip/etc.)
+  end
+end
+_G.NvimClipMode = {
+  apply = apply_clipboard_mode,
+  cycle = function()
+    local cur = vim.g.nvim_clipboard_mode or "full"
+    local nxt = cur == "full" and "tmux" or cur == "tmux" and "off" or "full"
+    vim.g.nvim_clipboard_mode = nxt
+    apply_clipboard_mode(nxt)
+    vim.notify("clipboard: " .. nxt, vim.log.levels.INFO)
+  end,
+  set = function(mode)
+    if mode ~= "full" and mode ~= "tmux" and mode ~= "off" then
+      vim.notify("ClipMode: invalid (full|tmux|off)", vim.log.levels.ERROR)
+      return
+    end
+    vim.g.nvim_clipboard_mode = mode
+    apply_clipboard_mode(mode)
+    vim.notify("clipboard: " .. mode, vim.log.levels.INFO)
+  end,
+  toggle_off = function()
+    local cur = vim.g.nvim_clipboard_mode or "full"
+    local nxt = cur == "off" and "full" or "off"
+    vim.g.nvim_clipboard_mode = nxt
+    apply_clipboard_mode(nxt)
+    vim.notify("clipboard: " .. nxt, vim.log.levels.INFO)
+  end,
+}
+apply_clipboard_mode(vim.g.nvim_clipboard_mode)
+
+vim.api.nvim_create_user_command("ClipMode", function(args)
+  _G.NvimClipMode.set(args.args)
+end, {
+  nargs = 1,
+  complete = function() return { "full", "tmux", "off" } end,
+})
 opt.ignorecase = true
 opt.smartcase = true
 opt.incsearch = true
