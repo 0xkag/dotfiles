@@ -1147,6 +1147,20 @@ function M.gitrebase_move(dir)
   end
 end
 
+function M.gitrebase_insert(directive, takes_arg)
+  -- The built-in ftplugin only transforms commit lines; exec/break/label/reset/
+  -- merge/update-ref are separate directives, so insert them on a new line below
+  -- the current commit. Argument-taking ones leave the cursor in insert mode at
+  -- end of line so the command/label/ref can be typed inline.
+  local lnum = vim.fn.line(".")
+  local text = takes_arg and (directive .. " ") or directive
+  vim.fn.append(lnum, text)
+  vim.api.nvim_win_set_cursor(0, { lnum + 1, #text })
+  if takes_arg then
+    vim.cmd("startinsert!")
+  end
+end
+
 function M.gitrebase_show_commit()
   local line = vim.api.nvim_get_current_line()
   -- Todo lines look like "<cmd> <sha> <subject>"; ignore exec/break/blank/comments.
@@ -1364,8 +1378,9 @@ function M.setup()
 
       -- Core actions reuse the built-in gitrebase ftplugin's -range commands:
       -- normal mode acts on the current line, visual mode on the selection.
+      -- Letters mirror magit's git-rebase-mode (pick = c; p stays a vim motion).
       local actions = {
-        p = "Pick",
+        c = "Pick",
         r = "Reword",
         e = "Edit",
         s = "Squash",
@@ -1377,19 +1392,46 @@ function M.setup()
         map("x", "<localleader>" .. key, ":" .. cmd .. "<CR>", cmd) -- ':' prefills "'<,'>"
       end
 
-      map("n", "<localleader>k", function()
-        M.gitrebase_move(-1)
-      end, "Move commit up")
-      map("n", "<localleader>j", function()
-        M.gitrebase_move(1)
-      end, "Move commit down")
-      map("n", "<localleader><CR>", M.gitrebase_show_commit, "Show commit")
-      map("n", "<localleader>cc", M.gitrebase_finish, "Apply rebase")
-      map("n", "<localleader>ck", M.gitrebase_abort, "Abort rebase")
+      -- Less-common directives are not provided by the ftplugin, so insert them as
+      -- new lines below the current commit. Letters mirror magit; arg-taking ones
+      -- drop into insert mode to type the command/label/ref inline.
+      local inserts = {
+        { key = "x", directive = "exec", arg = true },
+        { key = "b", directive = "break", arg = false },
+        { key = "l", directive = "label", arg = true },
+        { key = "t", directive = "reset", arg = true },
+        { key = "M", directive = "merge", arg = true },
+        { key = "u", directive = "update-ref", arg = true },
+      }
+      for _, ins in ipairs(inserts) do
+        map("n", "<localleader>" .. ins.key, function()
+          M.gitrebase_insert(ins.directive, ins.arg)
+        end, "Insert " .. ins.directive)
+      end
 
-      -- Override the global localleader group labels (refactor/errors/flow/debug/
-      -- compile) with buffer-local leaves so the which-key menu reads correctly and
-      -- the keys fire on the first press instead of waiting for a prefix.
+      local move_up = function()
+        M.gitrebase_move(-1)
+      end
+      local move_down = function()
+        M.gitrebase_move(1)
+      end
+      map("n", "<localleader>k", move_up, "Move commit up")
+      map("n", "<localleader>j", move_down, "Move commit down")
+      -- magit-style synonyms for moving the commit line
+      map("n", "<M-p>", move_up, "Move commit up")
+      map("n", "<M-Up>", move_up, "Move commit up")
+      map("n", "<M-n>", move_down, "Move commit down")
+      map("n", "<M-Down>", move_down, "Move commit down")
+
+      map("n", "<localleader><CR>", M.gitrebase_show_commit, "Show commit")
+      -- pick takes ,c, so finish/abort move to their own prefix (magit keeps these
+      -- in with-editor as C-c C-c / C-c C-k, not in git-rebase-mode-map).
+      map("n", "<localleader>qq", M.gitrebase_finish, "Apply rebase")
+      map("n", "<localleader>qa", M.gitrebase_abort, "Abort rebase")
+
+      -- Override the global localleader group labels (compile/refactor/errors/flow/
+      -- execute/backend/test/workspace) with buffer-local leaves so the which-key
+      -- menu reads correctly and keys fire on first press without a prefix wait.
       --
       -- which-key shows a node's spec label in preference to the real keymap desc,
       -- and within a node the last-registered spec wins. The global group labels are
@@ -1403,18 +1445,24 @@ function M.setup()
           return
         end
         wk.add({
-          { "<localleader>p", desc = "pick", buffer = buf },
+          { "<localleader>c", desc = "pick", buffer = buf },
           { "<localleader>r", desc = "reword", buffer = buf },
           { "<localleader>e", desc = "edit", buffer = buf },
           { "<localleader>s", desc = "squash", buffer = buf },
           { "<localleader>f", desc = "fixup", buffer = buf },
           { "<localleader>d", desc = "drop", buffer = buf },
+          { "<localleader>x", desc = "exec", buffer = buf },
+          { "<localleader>b", desc = "break", buffer = buf },
+          { "<localleader>l", desc = "label", buffer = buf },
+          { "<localleader>t", desc = "reset", buffer = buf },
+          { "<localleader>M", desc = "merge", buffer = buf },
+          { "<localleader>u", desc = "update-ref", buffer = buf },
           { "<localleader>k", desc = "move up", buffer = buf },
           { "<localleader>j", desc = "move down", buffer = buf },
           { "<localleader><CR>", desc = "show commit", buffer = buf },
-          { "<localleader>c", group = "rebase", buffer = buf },
-          { "<localleader>cc", desc = "apply rebase", buffer = buf },
-          { "<localleader>ck", desc = "abort rebase", buffer = buf },
+          { "<localleader>q", group = "finish", buffer = buf },
+          { "<localleader>qq", desc = "apply rebase", buffer = buf },
+          { "<localleader>qa", desc = "abort rebase", buffer = buf },
         })
       end
 
