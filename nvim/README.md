@@ -379,10 +379,12 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
   - `,cl` runs `tflint`
   - `,=c` checks formatting with `terraform fmt -check`
 - Git rebase (the `gitrebase` todo buffer from `git rebase -i`, including Neogit's rebase):
-  - `,p`, `,r`, `,e`, `,s`, `,f`, `,d` set the current line (or visual selection) to pick, reword, edit, squash, fixup, or drop
-  - `,k` / `,j` move the commit under the cursor up or down to reorder it
+  - letters mirror magit's git-rebase-mode under the localleader prefix
+  - `,c`, `,r`, `,e`, `,s`, `,f`, `,d` set the current line (or visual selection) to pick, reword, edit, squash, fixup, or drop
+  - `,x`, `,b`, `,l`, `,t`, `,M`, `,u` insert an exec, break, label, reset, merge, or update-ref directive below the current commit (arg-taking ones drop into insert mode)
+  - `,k` / `,j` move the commit under the cursor up or down to reorder it; `<M-p>` / `<M-Up>` and `<M-n>` / `<M-Down>` are magit-style synonyms
   - `,<CR>` shows the commit under the cursor in a split (`q` closes it)
-  - `,cc` writes the todo list and applies the rebase; `,ck` aborts it
+  - `,qq` writes the todo list and applies the rebase; `,qa` aborts it
   - built-in `<C-A>` / `<C-X>` still cycle the action, and `:wq` / `ZZ` still finish
 
 ## Vim-style editing helpers
