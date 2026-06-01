@@ -386,6 +386,10 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
   - `,<CR>` shows the commit under the cursor in a split (`q` closes it)
   - `,qq` writes the todo list and applies the rebase; `,qa` aborts it
   - built-in `<C-A>` / `<C-X>` still cycle the action, and `:wq` / `ZZ` still finish
+- Git commit (the `gitcommit` message buffer from `git commit`, also Neogit's commit editor and rebase `reword` steps):
+  - `,qq` writes the message and commits; `,qa` empties the message and aborts the commit
+  - keys match the rebase finish/abort for muscle memory; uses window-close (not quit-all) so it is safe inside Neogit's in-session editor
+  - native `:wq` / `:cq` still work
 
 ## Vim-style editing helpers
 

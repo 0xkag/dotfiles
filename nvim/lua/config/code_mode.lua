@@ -61,6 +61,41 @@ local function current_indent(bufnr)
   return prefix or ""
 end
 
+-- Register buffer-local which-key labels once which-key has loaded.
+--
+-- which-key shows a node's spec label in preference to the real keymap desc, and
+-- within a node the last-registered spec wins. The global localleader group labels
+-- are added during which-key's own (VeryLazy) load. A `git commit` / `git rebase -i`
+-- launches a fresh Neovim whose gitcommit/gitrebase FileType fires *before* that
+-- load, so a direct wk.add() would be overridden by the global groups. Register once
+-- which-key has loaded (immediately if it already has) so our buffer-local labels win.
+local function register_git_editor_labels(buf, specs)
+  local function apply()
+    local ok, wk = pcall(require, "which-key")
+    if not ok or not vim.api.nvim_buf_is_valid(buf) then
+      return
+    end
+    wk.add(specs)
+  end
+
+  local cfg_ok, wk_config = pcall(require, "which-key.config")
+  if cfg_ok and wk_config.loaded then
+    apply()
+  else
+    -- which-key not loaded yet: register after lazy.nvim loads it.
+    vim.api.nvim_create_autocmd("User", {
+      pattern = "LazyLoad",
+      callback = function(ev)
+        if ev.data ~= "which-key.nvim" then
+          return
+        end
+        vim.schedule(apply)
+        return true -- which-key handled; remove this one-shot autocmd
+      end,
+    })
+  end
+end
+
 local function insert_lines(lines, opts)
   opts = opts or {}
   local row = opts.row
@@ -1202,6 +1237,20 @@ function M.gitrebase_abort()
   vim.cmd("qall!")
 end
 
+function M.gitcommit_finish()
+  -- Write + close the editor window. nvim exits when this is the last window
+  -- (standalone `git commit`), or just closes the editor when Neogit opened it
+  -- in-session, so we never qall an interactive session like the gitrebase helpers.
+  vim.cmd("write")
+  vim.cmd("quit")
+end
+
+function M.gitcommit_abort()
+  vim.cmd("silent! %delete _") -- an empty message tells git to abort the commit
+  vim.cmd("write")
+  vim.cmd("quit")
+end
+
 function M.setup()
   local group = vim.api.nvim_create_augroup("user_code_mode_actions", { clear = true })
 
@@ -1432,56 +1481,53 @@ function M.setup()
       -- Override the global localleader group labels (compile/refactor/errors/flow/
       -- execute/backend/test/workspace) with buffer-local leaves so the which-key
       -- menu reads correctly and keys fire on first press without a prefix wait.
-      --
-      -- which-key shows a node's spec label in preference to the real keymap desc,
-      -- and within a node the last-registered spec wins. The global group labels are
-      -- added during which-key's own (VeryLazy) load. A `git rebase -i` launches a
-      -- fresh Neovim whose gitrebase FileType fires *before* that load, so a direct
-      -- wk.add() here would be overridden by the global groups. Register once
-      -- which-key has loaded (immediately if it already has) so our labels win.
-      local function register_labels()
-        local ok, wk = pcall(require, "which-key")
-        if not ok or not vim.api.nvim_buf_is_valid(buf) then
-          return
-        end
-        wk.add({
-          { "<localleader>c", desc = "pick", buffer = buf },
-          { "<localleader>r", desc = "reword", buffer = buf },
-          { "<localleader>e", desc = "edit", buffer = buf },
-          { "<localleader>s", desc = "squash", buffer = buf },
-          { "<localleader>f", desc = "fixup", buffer = buf },
-          { "<localleader>d", desc = "drop", buffer = buf },
-          { "<localleader>x", desc = "exec", buffer = buf },
-          { "<localleader>b", desc = "break", buffer = buf },
-          { "<localleader>l", desc = "label", buffer = buf },
-          { "<localleader>t", desc = "reset", buffer = buf },
-          { "<localleader>M", desc = "merge", buffer = buf },
-          { "<localleader>u", desc = "update-ref", buffer = buf },
-          { "<localleader>k", desc = "move up", buffer = buf },
-          { "<localleader>j", desc = "move down", buffer = buf },
-          { "<localleader><CR>", desc = "show commit", buffer = buf },
-          { "<localleader>q", group = "finish", buffer = buf },
-          { "<localleader>qq", desc = "apply rebase", buffer = buf },
-          { "<localleader>qa", desc = "abort rebase", buffer = buf },
+      register_git_editor_labels(buf, {
+        { "<localleader>c", desc = "pick", buffer = buf },
+        { "<localleader>r", desc = "reword", buffer = buf },
+        { "<localleader>e", desc = "edit", buffer = buf },
+        { "<localleader>s", desc = "squash", buffer = buf },
+        { "<localleader>f", desc = "fixup", buffer = buf },
+        { "<localleader>d", desc = "drop", buffer = buf },
+        { "<localleader>x", desc = "exec", buffer = buf },
+        { "<localleader>b", desc = "break", buffer = buf },
+        { "<localleader>l", desc = "label", buffer = buf },
+        { "<localleader>t", desc = "reset", buffer = buf },
+        { "<localleader>M", desc = "merge", buffer = buf },
+        { "<localleader>u", desc = "update-ref", buffer = buf },
+        { "<localleader>k", desc = "move up", buffer = buf },
+        { "<localleader>j", desc = "move down", buffer = buf },
+        { "<localleader><CR>", desc = "show commit", buffer = buf },
+        { "<localleader>q", group = "finish", buffer = buf },
+        { "<localleader>qq", desc = "apply rebase", buffer = buf },
+        { "<localleader>qa", desc = "abort rebase", buffer = buf },
+      })
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("FileType", {
+    group = group,
+    pattern = "gitcommit",
+    callback = function(event)
+      local buf = event.buf
+      local map = function(lhs, rhs, desc)
+        vim.keymap.set("n", lhs, rhs, {
+          buffer = buf,
+          desc = desc,
+          silent = true,
         })
       end
 
-      local cfg_ok, wk_config = pcall(require, "which-key.config")
-      if cfg_ok and wk_config.loaded then
-        register_labels()
-      else
-        -- which-key not loaded yet: register after lazy.nvim loads it.
-        vim.api.nvim_create_autocmd("User", {
-          pattern = "LazyLoad",
-          callback = function(ev)
-            if ev.data ~= "which-key.nvim" then
-              return
-            end
-            vim.schedule(register_labels)
-            return true -- which-key handled; remove this one-shot autocmd
-          end,
-        })
-      end
+      -- Match the gitrebase finish/abort keys for muscle memory. Uses window-close
+      -- semantics (see M.gitcommit_finish) so it is safe in Neogit's in-session
+      -- commit editor, which shares the gitcommit filetype.
+      map("<localleader>qq", M.gitcommit_finish, "Commit")
+      map("<localleader>qa", M.gitcommit_abort, "Abort commit")
+
+      register_git_editor_labels(buf, {
+        { "<localleader>q", group = "finish", buffer = buf },
+        { "<localleader>qq", desc = "commit", buffer = buf },
+        { "<localleader>qa", desc = "abort commit", buffer = buf },
+      })
     end,
   })
 end
