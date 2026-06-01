@@ -1137,6 +1137,57 @@ function M.shell_add_backslashes_visual()
   shell_backslash_range(start_line, end_line)
 end
 
+function M.gitrebase_move(dir)
+  local cur = vim.fn.line(".")
+  local last = vim.fn.line("$")
+  if dir < 0 and cur > 1 then
+    vim.cmd("move .-2") -- :move leaves the cursor on the moved line
+  elseif dir > 0 and cur < last then
+    vim.cmd("move .+1")
+  end
+end
+
+function M.gitrebase_show_commit()
+  local line = vim.api.nvim_get_current_line()
+  -- Todo lines look like "<cmd> <sha> <subject>"; ignore exec/break/blank/comments.
+  local sha = line:match("^%s*%a+%s+(%x%x%x%x+)") or line:match("^%s*(%x%x%x%x+)")
+  if not sha then
+    vim.notify("No commit on this line", vim.log.levels.WARN)
+    return
+  end
+
+  local dir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+  local out = vim.fn.systemlist({ "git", "-C", dir, "show", "--stat", "-p", sha })
+  if vim.v.shell_error ~= 0 then
+    vim.notify("git show failed for " .. sha, vim.log.levels.ERROR)
+    return
+  end
+
+  vim.cmd("botright vsplit")
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_win_set_buf(0, buf)
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, out)
+  vim.bo[buf].filetype = "git" -- built-in git syntax highlighting
+  vim.bo[buf].bufhidden = "wipe"
+  vim.bo[buf].modifiable = false
+  vim.keymap.set("n", "q", "<Cmd>close<CR>", {
+    buffer = buf,
+    desc = "Close",
+    silent = true,
+  })
+end
+
+function M.gitrebase_finish()
+  vim.cmd("write")
+  vim.cmd("qall") -- nvim must fully exit for git to proceed
+end
+
+function M.gitrebase_abort()
+  vim.cmd("silent! %delete _") -- an empty todo list tells git to abort
+  vim.cmd("write")
+  vim.cmd("qall!")
+end
+
 function M.setup()
   local group = vim.api.nvim_create_augroup("user_code_mode_actions", { clear = true })
 
@@ -1295,6 +1346,94 @@ function M.setup()
       map("n", "<localleader>ig", M.shell_insert_getopts, "Insert getopts loop")
       map("n", "<localleader>\\", M.shell_add_backslashes, "Append backslashes")
       map("x", "<localleader>\\", M.shell_add_backslashes_visual, "Append backslashes")
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("FileType", {
+    group = group,
+    pattern = "gitrebase",
+    callback = function(event)
+      local buf = event.buf
+      local map = function(mode, lhs, rhs, desc)
+        vim.keymap.set(mode, lhs, rhs, {
+          buffer = buf,
+          desc = desc,
+          silent = true,
+        })
+      end
+
+      -- Core actions reuse the built-in gitrebase ftplugin's -range commands:
+      -- normal mode acts on the current line, visual mode on the selection.
+      local actions = {
+        p = "Pick",
+        r = "Reword",
+        e = "Edit",
+        s = "Squash",
+        f = "Fixup",
+        d = "Drop",
+      }
+      for key, cmd in pairs(actions) do
+        map("n", "<localleader>" .. key, "<Cmd>" .. cmd .. "<CR>", cmd)
+        map("x", "<localleader>" .. key, ":" .. cmd .. "<CR>", cmd) -- ':' prefills "'<,'>"
+      end
+
+      map("n", "<localleader>k", function()
+        M.gitrebase_move(-1)
+      end, "Move commit up")
+      map("n", "<localleader>j", function()
+        M.gitrebase_move(1)
+      end, "Move commit down")
+      map("n", "<localleader><CR>", M.gitrebase_show_commit, "Show commit")
+      map("n", "<localleader>cc", M.gitrebase_finish, "Apply rebase")
+      map("n", "<localleader>ck", M.gitrebase_abort, "Abort rebase")
+
+      -- Override the global localleader group labels (refactor/errors/flow/debug/
+      -- compile) with buffer-local leaves so the which-key menu reads correctly and
+      -- the keys fire on the first press instead of waiting for a prefix.
+      --
+      -- which-key shows a node's spec label in preference to the real keymap desc,
+      -- and within a node the last-registered spec wins. The global group labels are
+      -- added during which-key's own (VeryLazy) load. A `git rebase -i` launches a
+      -- fresh Neovim whose gitrebase FileType fires *before* that load, so a direct
+      -- wk.add() here would be overridden by the global groups. Register once
+      -- which-key has loaded (immediately if it already has) so our labels win.
+      local function register_labels()
+        local ok, wk = pcall(require, "which-key")
+        if not ok or not vim.api.nvim_buf_is_valid(buf) then
+          return
+        end
+        wk.add({
+          { "<localleader>p", desc = "pick", buffer = buf },
+          { "<localleader>r", desc = "reword", buffer = buf },
+          { "<localleader>e", desc = "edit", buffer = buf },
+          { "<localleader>s", desc = "squash", buffer = buf },
+          { "<localleader>f", desc = "fixup", buffer = buf },
+          { "<localleader>d", desc = "drop", buffer = buf },
+          { "<localleader>k", desc = "move up", buffer = buf },
+          { "<localleader>j", desc = "move down", buffer = buf },
+          { "<localleader><CR>", desc = "show commit", buffer = buf },
+          { "<localleader>c", group = "rebase", buffer = buf },
+          { "<localleader>cc", desc = "apply rebase", buffer = buf },
+          { "<localleader>ck", desc = "abort rebase", buffer = buf },
+        })
+      end
+
+      local cfg_ok, wk_config = pcall(require, "which-key.config")
+      if cfg_ok and wk_config.loaded then
+        register_labels()
+      else
+        -- which-key not loaded yet: register after lazy.nvim loads it.
+        vim.api.nvim_create_autocmd("User", {
+          pattern = "LazyLoad",
+          callback = function(ev)
+            if ev.data ~= "which-key.nvim" then
+              return
+            end
+            vim.schedule(register_labels)
+            return true -- which-key handled; remove this one-shot autocmd
+          end,
+        })
+      end
     end,
   })
 end

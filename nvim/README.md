@@ -378,6 +378,12 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
   - `,cc` runs `terraform validate`
   - `,cl` runs `tflint`
   - `,=c` checks formatting with `terraform fmt -check`
+- Git rebase (the `gitrebase` todo buffer from `git rebase -i`, including Neogit's rebase):
+  - `,p`, `,r`, `,e`, `,s`, `,f`, `,d` set the current line (or visual selection) to pick, reword, edit, squash, fixup, or drop
+  - `,k` / `,j` move the commit under the cursor up or down to reorder it
+  - `,<CR>` shows the commit under the cursor in a split (`q` closes it)
+  - `,cc` writes the todo list and applies the rebase; `,ck` aborts it
+  - built-in `<C-A>` / `<C-X>` still cycle the action, and `:wq` / `ZZ` still finish
 
 ## Vim-style editing helpers
 
