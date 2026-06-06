@@ -110,7 +110,7 @@ autocmd("FileType", {
 
 autocmd("FileType", {
   group = writing,
-  pattern = "gitcommit",
+  pattern = { "gitcommit", "gitrebase" },
   callback = function()
     local opt = vim.opt_local
     opt.textwidth = 75
