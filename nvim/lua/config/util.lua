@@ -160,6 +160,7 @@ local function literal_pattern(text)
   local pattern = "\\V" .. vim.fn.escape(text, [[/\]])
   return pattern:gsub("\n", [[\n]])
 end
+M.literal_pattern = literal_pattern
 
 function M.search_visual(forward)
   local text = M.visual_selection_text()
@@ -213,6 +214,7 @@ local function run_search(command, cwd, title, parser)
   end)
 end
 
+-- Exposed on M (underscore prefix) for headless specs; callers use the locals.
 local function parse_git_grep(line, cwd)
   local file, lnum, col, text = line:match("^(.-):(%d+):(%d+):(.*)$")
   if not file then
@@ -250,6 +252,11 @@ local function parse_global(line, cwd)
 
   return item
 end
+
+M._parse_git_grep = parse_git_grep
+M._parse_grep = parse_grep
+M._parse_global = parse_global
+M._to_absolute = to_absolute
 
 function M.grep_prompt(opts)
   opts = opts or {}
@@ -483,6 +490,7 @@ local function squeeze_line(line)
   local indent, body = line:match("^(%s*)(.-)%s*$")
   return indent .. body:gsub("%s+", " ")
 end
+M._squeeze_line = squeeze_line
 
 function M.squeeze_spaces(start_line, end_line)
   local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)

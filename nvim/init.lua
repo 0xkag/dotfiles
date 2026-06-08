@@ -22,6 +22,10 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
+-- Load order matters: env sets PATH before anything spawns tools; options/
+-- autocmds establish editor state; code_mode.setup() registers its FileType
+-- autocmds before keymaps so its localleader which-key labels are in place;
+-- python/deps/projects wire side effects; then lazy loads the plugin specs.
 require("config.env")
 require("config.options")
 require("config.autocmds")

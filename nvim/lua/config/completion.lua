@@ -11,6 +11,7 @@ M.state = {
 local function valid_mode(mode)
   return mode == "quiet" or mode == "manual" or mode == "full"
 end
+M.valid_mode = valid_mode
 
 local function notify_state()
   vim.notify(
@@ -237,11 +238,11 @@ vim.keymap.set("n", "<leader>ta", function()
   M.cycle_mode(false)
 end, { desc = "Toggle auto-completion mode" })
 
-vim.keymap.set("n", "<leader>tab", function()
+vim.keymap.set("n", "<leader>tA", function()
   M.toggle_buffer()
 end, { desc = "Auto-completion: toggle for buffer" })
 
-vim.keymap.set("n", "<leader>tac", function()
+vim.keymap.set("n", "<leader>tM", function()
   M.cycle_mode(true)
 end, { desc = "Auto-completion: cycle mode" })
 

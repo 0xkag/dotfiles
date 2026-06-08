@@ -39,6 +39,7 @@ return {
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
       local completion = require("config.completion")
       local python_env = require("config.python")
+      local lsp_util = require("config.lsp_util")
 
       local function format_buffer(bufnr, range)
         require("conform").format({
@@ -440,20 +441,7 @@ return {
         return clients[1]
       end
 
-      local function count_edits(result)
-        local files, total = {}, 0
-        for uri, edits in pairs(result.changes or {}) do
-          table.insert(files, vim.uri_to_fname(uri))
-          total = total + #edits
-        end
-        for _, c in ipairs(result.documentChanges or {}) do
-          if c.textDocument then
-            table.insert(files, vim.uri_to_fname(c.textDocument.uri))
-            total = total + #(c.edits or {})
-          end
-        end
-        return files, total
-      end
+      local count_edits = lsp_util.count_edits
 
       local function rename_with_preview()
         vim.ui.input({
@@ -727,31 +715,9 @@ return {
               end,
             })
 
-            local function clean_label(raw)
-              local name, default = raw:match("^%s*([^:=]-)%s*:.-=%s*(.*)$")
-              if name and name ~= "" then
-                return name .. "=" .. default
-              end
-              name, default = raw:match("^%s*([^:=]-)%s*=%s*(.*)$")
-              if name and name ~= "" then
-                return name .. "=" .. default
-              end
-              local no_type = raw:match("^%s*([^:]+)%s*:")
-              if no_type then
-                return vim.trim(no_type)
-              end
-              return vim.trim(raw)
-            end
-
-            local function bare_name(raw)
-              local stripped = raw:match("^%s*%*?%*?([%w_]+)")
-              return stripped or vim.trim(raw)
-            end
-
-            local function is_kwargable(raw)
-              local trimmed = vim.trim(raw)
-              return trimmed ~= "*" and trimmed ~= "/" and not trimmed:match("^%*")
-            end
+            local clean_label = lsp_util.clean_label
+            local bare_name = lsp_util.bare_name
+            local is_kwargable = lsp_util.is_kwargable
 
             local function prepare_for_expand()
               -- Ensures there is a ( immediately before cursor and ) immediately after,
@@ -834,12 +800,7 @@ return {
               end)
             end
 
-            local function param_label(sig, param)
-              if type(param.label) == "table" then
-                return sig.label:sub(param.label[1] + 1, param.label[2])
-              end
-              return param.label
-            end
+            local param_label = lsp_util.param_label
 
             local function do_expand(parts, row, col)
               vim.api.nvim_win_set_cursor(0, { row, col })
