@@ -39,7 +39,7 @@ When you performed non-conversational work (reading files, running tests, implem
 ```
 
 ```markdown
-*(Used boto3 describe_repositories to enumerate ECR repos. Found 42 core-infra/* repositories containing 23,169 images published after 2024-10-01.)*
+*(Used boto3 describe_repositories to enumerate ECR repos. Found 42 infra/* repositories containing 23,169 images published after 2024-10-01.)*
 ```
 
 ### Embedded artifacts
@@ -70,9 +70,9 @@ When you asked the user a structured question with multiple-choice options, form
 
 > **Scope:** Are you only concerned with images from the primary ECR registry, or do you also need to check third-party/public images?
 >
-> - **ECR only (674283286888)** — Only check images hosted in the primary Arcesium ECR. Public/third-party images are out of scope.
+> - **ECR only** — Only check images hosted in the primary Company ECR. Public/third-party images are out of scope.
 > - **All registries** — Check every image regardless of registry origin.
-> - **ECR + registry.arcesium.com** — Check both Arcesium-controlled registries but skip public images.
+> - **ECR + registry.company.com** — Check both Company-controlled registries but skip public images.
 
 ## User
 
