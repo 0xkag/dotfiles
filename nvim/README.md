@@ -529,3 +529,15 @@ Bulk install example for a typical frontend + backend workstation:
 - `,o` open the result pane
 - `,i` inspect the parsed request
 - `,s` show request stats
+
+## Testing
+
+- Config logic with non-trivial behavior has headless specs under `nvim/test/`,
+  named `*_spec.lua`
+- Run them all with `nvim/test/run.sh`; it runs each spec headless and exits
+  nonzero if any fail
+- Run specific specs by name, e.g. `nvim/test/run.sh reflow` for
+  `nvim/test/reflow_spec.lua`
+- Each spec is self-contained (`nvim --headless -u NONE -l <spec>`): it sets its
+  own `package.path`, requires the module under test, prints `ok` / `FAIL` lines,
+  and calls `cquit 1` on failure so the runner sees a nonzero exit
