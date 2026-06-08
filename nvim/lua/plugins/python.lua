@@ -29,6 +29,9 @@ return {
           local conform = require("conform")
           local formatters = {}
 
+          -- Default chain: ruff (or black/yapf fallback). autopep8 is NOT here;
+          -- it is reached only via reflow_mode="conservative" (config.reflow),
+          -- which sets opts.formatters = { "autopep8" } explicitly.
           if conform.get_formatter_info("ruff_format", bufnr).available then
             if conform.get_formatter_info("ruff_organize_imports", bufnr).available then
               table.insert(formatters, "ruff_organize_imports")

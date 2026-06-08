@@ -15,6 +15,9 @@ For picker-stack and future fzf-integration notes, see
 For FreeBSD-specific Neovim install notes, see
 [FREEBSD_NOTES.md](./FREEBSD_NOTES.md:1).
 
+For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
+[FORMATTING_NOTES.md](./FORMATTING_NOTES.md:1).
+
 ## Core keys
 
 - `SPC` is the main leader key
@@ -102,24 +105,51 @@ For FreeBSD-specific Neovim install notes, see
 
 - `<leader>cf` / `SPC c f` formats the current buffer via conform.nvim
 - `<localleader>=b` / `,=b` is the same format-buffer action in the major-mode map
-- `<localleader>=r` / `,=r` formats the current visual selection
+- `<localleader>=r` / `,=r` restyles the current visual selection and keeps the
+  selection active afterward
+- `gQ` / `gQQ` and `<localleader>=q` / `,=q` always restyle (run the formatter),
+  regardless of the current reflow mode
+- `<localleader>=t` / `,=t` cycles the session reflow mode that drives `gq`
 - Nothing auto-formats on save; formatting is always explicit
 - Formatter selection is per-filetype in `lua/plugins/python.lua` `formatters_by_ft`:
   - Python is a function that probes availability at call time: `ruff_organize_imports` + `ruff_format` when ruff is on `PATH`, falling back to `black` then `yapf`
   - Shell uses `shfmt`; Go uses `gofmt` + `goimports`; JavaScript/TypeScript/JSON/Markdown/YAML use `prettierd` then `prettier`; Lua uses `stylua`; Rust uses `rustfmt`; Terraform uses `terraform_fmt`; TOML uses `taplo`
 - `:ConformInfo` shows which formatters conform sees for the current buffer
 
-### `gq` vs `<localleader>=`
+### `gq` vs `gQ` / `<localleader>=`
 
-Two different jobs:
+Two different jobs -- reflow (structure-preserving) and restyle (authoritative):
 
-- **`gq` / `gqq`** -- reflow prose and comment blocks to `textwidth`, honoring
-  `formatoptions` and the buffer's comment leader (`#`, `//`, etc.). Always uses
-  Neovim's **built-in** text formatter, exactly like plain Vim. Reach for it to
-  rewrap a long comment or a commit-message paragraph to the column guide.
-- **`<localleader>=b` / `<localleader>=r`** -- language-aware formatting via
-  conform/LSP (terraform fmt, ruff, prettier, ...). Reach for it to reformat code
-  structure, not just rewrap text.
+- **`gq` / `gqq`** -- reflow per the session **reflow mode** (default
+  `builtin` = Neovim's built-in text formatter). Built-in reflow rewraps prose
+  and comment blocks to `textwidth`, honoring `formatoptions` and the buffer's
+  comment leader (`#`, `//`, etc.), exactly like plain Vim. With the default
+  mode, `gq` muscle memory is unchanged. Reach for it to rewrap a long comment
+  or a commit-message paragraph to the column guide.
+- **`gQ` / `gQQ`** and **`<localleader>=q` / `,=q`** -- always restyle:
+  language-aware formatting via conform/LSP (terraform fmt, ruff, prettier,
+  ...), regardless of the reflow mode. Reach for it to reformat code structure,
+  not just rewrap text. `gQ` replaces stock Vim's Ex-mode entry, which is still
+  reachable via `Q`.
+- **`<localleader>=b`** restyles the whole buffer; **`<localleader>=r`**
+  restyles the visual selection and keeps it selected afterward.
+
+After a visual-mode reflow (`gq` / `gQ` / `,=q`), the selection is re-applied to
+the lines the reflow actually produced: if a 2-line block wraps to 3 lines, all 3
+end up selected; if several lines join into one, the selection shrinks to match.
+The reflow path reselects via the `'[` / `']` change marks for this. The restyle
+path (and `,=r`) instead reselects with `gv`, because conform formats
+asynchronously and the edited extent is not known when the mapping returns.
+
+The session reflow mode is cycled with `<localleader>=t` / `,=t`, in the order
+`builtin` -> `lsp` -> `smart` -> `conservative` -> `builtin`:
+
+- `builtin` -- built-in reflow (the default; today's behavior).
+- `lsp` -- conform/LSP restyle.
+- `smart` -- treesitter-detected: comment/string nodes reflow, code restyles.
+- `conservative` -- autopep8 for Python (fix-violations-only, preserves
+  already-compliant code); other filetypes restyle normally via conform, and
+  Python falls back to built-in reflow if autopep8 is unavailable.
 
 The split is deliberate. In Neovim, two things otherwise capture `gq`:
 
@@ -129,11 +159,12 @@ The split is deliberate. In Neovim, two things otherwise capture `gq`:
 - `nvim-treesitter` sets `indentexpr`, which recomputes each reflowed line's
   indent and drops comment-continuation lines to column 0.
 
-The `gq`/`gqq` maps in `lua/config/keymaps.lua` route through `operatorfunc` and
-blank both `formatexpr` and `indentexpr` for the duration of the format, so `gq`
-behaves like it does in plain Vim regardless of which LSP is attached. (This is
-why the column guide could look right while `gq` misbehaved -- `colorcolumn` is
-an independent option.)
+The reflow maps in `lua/config/reflow.lua` route through `operatorfunc` and
+blank both `formatexpr` and `indentexpr` for the duration of a built-in reflow,
+so `gq` behaves like it does in plain Vim regardless of which LSP is attached.
+(This is why the column guide could look right while `gq` misbehaved --
+`colorcolumn` is an independent option.) For more detail see
+[FORMATTING_NOTES.md](./FORMATTING_NOTES.md:1).
 
 ## Refactoring
 
