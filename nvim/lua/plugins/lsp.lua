@@ -660,14 +660,29 @@ return {
             format_buffer(bufnr)
           end, "Format buffer")
           local reflow = require("config.reflow")
+          -- ,=r restyles (async) then drops the selection (vanilla gq behavior),
+          -- recording the original range as the last-visual selection so gv
+          -- reselects it; the async edit has not landed, so '[ '] are not valid.
+          -- The stash lets ,=v restore the exact original selection afterward.
           map("x", "<localleader>=r", function()
-            reflow.restyle(reflow.selection_range())
-            vim.cmd("normal! gv")
+            local range = reflow.selection_range()
+            reflow.stash_visual()
+            reflow.restyle(range)
+            vim.cmd(string.format("normal! %dGV%dG\27", range.start[1], range["end"][1]))
           end, "Format selection (restyle)")
+          -- ,=q always restyles; in visual mode stash the original, drop the
+          -- selection afterward, and record the operated extent ('[ '] for a sync
+          -- reflow fallback, else the original range) so gv reselects it.
           map({ "n", "x" }, "<localleader>=q", function()
             if vim.fn.mode():match("[vV\22]") then
-              local reflowed = reflow.dispatch_range(reflow.selection_range(), true)
-              vim.cmd(reflowed and "normal! `[V`]" or "normal! gv")
+              local range = reflow.selection_range()
+              reflow.stash_visual()
+              local reflowed = reflow.dispatch_range(range, true)
+              if reflowed then
+                vim.cmd("normal! `[V`]\27")
+              else
+                vim.cmd(string.format("normal! %dGV%dG\27", range.start[1], range["end"][1]))
+              end
             else
               reflow._pending_restyle = true
               vim.o.operatorfunc = "v:lua.require'config.reflow'.opfunc"
@@ -675,6 +690,7 @@ return {
             end
           end, "Restyle (formatter)")
           map("n", "<localleader>=t", reflow.cycle, "Cycle reflow mode")
+          map("n", "<localleader>=v", reflow.reselect_visual, "Reselect original visual")
           map("n", "<localleader>=o", apply_code_action("source.organizeImports"), "Organize imports")
           map("n", "<localleader>xh", function()
             highlight_symbol(bufnr)

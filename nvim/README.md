@@ -105,11 +105,14 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 
 - `<leader>cf` / `SPC c f` formats the current buffer via conform.nvim
 - `<localleader>=b` / `,=b` is the same format-buffer action in the major-mode map
-- `<localleader>=r` / `,=r` restyles the current visual selection and keeps the
-  selection active afterward
+- `<localleader>=r` / `,=r` restyles the current visual selection, then drops it
+  (vanilla `gq` behavior); `gv` reselects the reflowed extent and `<localleader>=v`
+  / `,=v` restores the exact original selection
 - `gQ` / `gQQ` and `<localleader>=q` / `,=q` always restyle (run the formatter),
   regardless of the current reflow mode
 - `<localleader>=t` / `,=t` cycles the session reflow mode that drives `gq`
+- `<localleader>=v` / `,=v` reselects the exact pre-op selection (mode + columns)
+  of the last visual reflow/restyle
 - Nothing auto-formats on save; formatting is always explicit
 - Formatter selection is per-filetype in `lua/plugins/python.lua` `formatters_by_ft`:
   - Python is a function that probes availability at call time: `ruff_organize_imports` + `ruff_format` when ruff is on `PATH`, falling back to `black` then `yapf`
@@ -132,14 +135,19 @@ Two different jobs -- reflow (structure-preserving) and restyle (authoritative):
   not just rewrap text. `gQ` replaces stock Vim's Ex-mode entry, which is still
   reachable via `Q`.
 - **`<localleader>=b`** restyles the whole buffer; **`<localleader>=r`**
-  restyles the visual selection and keeps it selected afterward.
+  restyles the visual selection, then drops it (vanilla `gq` behavior).
 
-After a visual-mode reflow (`gq` / `gQ` / `,=q`), the selection is re-applied to
-the lines the reflow actually produced: if a 2-line block wraps to 3 lines, all 3
-end up selected; if several lines join into one, the selection shrinks to match.
-The reflow path reselects via the `'[` / `']` change marks for this. The restyle
-path (and `,=r`) instead reselects with `gv`, because conform formats
-asynchronously and the edited extent is not known when the mapping returns.
+After a visual-mode reflow (`gq` / `gQ` / `,=q` / `,=r`), the selection is
+dropped -- exactly like vanilla Vim's `gq`. The operated extent is recorded as
+the last-visual selection, so `gv` reselects it (always linewise). On the reflow
+path this is the real wrapped extent (via the `'[` / `']` change marks): if a
+2-line block wraps to 3 lines, `gv` selects all 3; if several lines join into
+one, `gv` selects the single line. On the restyle path `gv` reselects the
+original lines, because conform formats asynchronously and the edited extent is
+not known when the mapping returns. To get the *exact* original selection back
+(its mode and columns -- a charwise `v` stays charwise), use `<localleader>=v` /
+`,=v`, which restores the stashed pre-op selection; reflow overwrites the
+`'<` / `'>` marks, so `gv` alone cannot recover it.
 
 The session reflow mode is cycled with `<localleader>=t` / `,=t`, in the order
 `builtin` -> `lsp` -> `smart` -> `conservative` -> `builtin`:

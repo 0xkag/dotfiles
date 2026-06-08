@@ -36,18 +36,20 @@ local function opfunc_map(force_restyle)
   end
 end
 
--- Visual: read live selection, dispatch, then reselect so the block stays lit.
--- A synchronous reflow may grow/shrink the region, so reselect its real extent
--- via the '[ '] change marks. Restyle is async (conform), so the edit has not
--- landed yet -- fall back to gv, which restores the original selection.
+-- Visual: stash the original selection (for ,=v), dispatch, then drop the
+-- selection (vanilla gq behavior) while recording the operated extent as the
+-- last-visual selection so gv reselects it. A synchronous reflow may grow/shrink
+-- the region, so record its real extent via the '[ '] change marks. Restyle is
+-- async (conform), so the edit has not landed yet -- record the original range.
 local function visual_map(force_restyle)
   return function()
     local range = reflow.selection_range()
+    reflow.stash_visual()
     local reflowed = reflow.dispatch_range(range, force_restyle)
     if reflowed then
-      vim.cmd("normal! `[V`]")
+      vim.cmd("normal! `[V`]\27")
     else
-      vim.cmd("normal! gv")
+      vim.cmd(string.format("normal! %dGV%dG\27", range.start[1], range["end"][1]))
     end
   end
 end
