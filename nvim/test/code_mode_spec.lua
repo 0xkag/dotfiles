@@ -98,21 +98,31 @@ do
 end
 
 -- java.java_test_method_name(): finds the nearest test method walking UPWARD
--- from the cursor. The test*-name convention works. Note a known limitation:
--- because the walk is upward and the @Test annotation sits ABOVE the signature,
--- the signature line is inspected before the annotation is seen, so an
--- @Test-annotated method whose name does NOT start with "test" is not detected.
--- These assertions pin the current behavior (see code_mode/java.lua).
+-- from the cursor. A method counts as a test if it is named test* OR carries a
+-- @Test annotation (checked by an upward lookahead from the signature, which
+-- tolerates other annotations and blank lines between @Test and the signature).
 do
   vim.api.nvim_buf_set_name(0, "/proj/src/test/java/WidgetTest.java")
   set_buf({ "  public void testThing() {", "    int x = 1;" }, 2)
   check("java_test_method via test prefix", java.java_test_method_name(0) == "testThing", java.java_test_method_name(0))
-  -- @Test + test-prefixed name: still found (the name convention matches first).
+  -- @Test + test-prefixed name.
   set_buf({ "  @Test", "  public void testWorks() {", "    assertTrue(true);" }, 3)
   check("java_test_method @Test + test name", java.java_test_method_name(0) == "testWorks", java.java_test_method_name(0))
-  -- @Test + non-test name: NOT found (documented upward-walk limitation).
+  -- @Test + non-test name: now detected via the annotation lookahead.
   set_buf({ "  @Test", "  public void shouldWork() {", "    assertTrue(true);" }, 3)
-  check("java_test_method @Test + non-test name unfound (known)", java.java_test_method_name(0) == nil, java.java_test_method_name(0))
+  check("java_test_method @Test + non-test name", java.java_test_method_name(0) == "shouldWork", java.java_test_method_name(0))
+  -- @Test with an intervening annotation before the signature.
+  set_buf({ "  @Test", '  @DisplayName("works")', "  public void verifies() {", "    assertTrue(true);" }, 4)
+  check("java_test_method @Test + extra annotation", java.java_test_method_name(0) == "verifies", java.java_test_method_name(0))
+  -- @Test with a blank line before the signature.
+  set_buf({ "  @Test", "", "  public void runs() {", "    assertTrue(true);" }, 4)
+  check("java_test_method @Test + blank line", java.java_test_method_name(0) == "runs", java.java_test_method_name(0))
+  -- A plain (non-test, non-annotated) method is not picked up.
+  set_buf({ "  public void helper() {", "    int x = 1;" }, 2)
+  check("java_test_method ignores plain method", java.java_test_method_name(0) == nil, java.java_test_method_name(0))
+  -- An @Override (non-@Test) annotated, non-test-named method is not a test.
+  set_buf({ "  @Override", "  public void setUp() {", "    init();" }, 3)
+  check("java_test_method ignores @Override non-test", java.java_test_method_name(0) == nil, java.java_test_method_name(0))
 end
 
 -- python_debug.python_test_target(): nearest test fn + enclosing Test class,

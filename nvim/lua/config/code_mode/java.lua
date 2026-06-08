@@ -43,26 +43,46 @@ function M.java_test_class_name(bufnr)
   return class_name .. "Test"
 end
 
-function M.java_test_method_name(bufnr)
-  local pending_test_annotation = false
+-- The method name a Java method signature line declares, or nil. Matches
+-- "<modifiers/return type> name(...)" with an optional trailing { or ;.
+local function signature_name(line)
+  return line:match("^%s*[%w_<>,%[%]@%s]+%s+([%w_]+)%s*%b()%s*[{;]?")
+end
 
-  return shared.nearest_matching_line(bufnr or 0, function(line)
+-- Whether the method whose signature is on sig_lnum carries a @Test annotation.
+-- JUnit allows other annotations (@DisplayName, @Order, ...) and blank lines
+-- between the annotation and the signature, so scan upward across those and
+-- stop at the first line that is neither an annotation nor blank.
+local function has_test_annotation(bufnr, sig_lnum)
+  for lnum = sig_lnum - 1, 1, -1 do
+    local line = vim.api.nvim_buf_get_lines(bufnr, lnum - 1, lnum, false)[1] or ""
     if line:match("^%s*@Test") then
-      pending_test_annotation = true
-      return nil
+      return true
     end
-
-    local name = line:match("^%s*[%w_<>,%[%]@%s]+%s+([%w_]+)%s*%b()%s*[{;]?")
-    if not name then
-      return nil
+    if not (line:match("^%s*@") or line:match("^%s*$")) then
+      return false
     end
+  end
 
-    if pending_test_annotation or name:match("^test") then
+  return false
+end
+
+function M.java_test_method_name(bufnr)
+  bufnr = bufnr or 0
+  local cursor = vim.api.nvim_win_get_cursor(0)[1]
+
+  -- Walk upward to the nearest test method: one named test* or annotated
+  -- @Test. The annotation sits ABOVE the signature, so it is checked by a
+  -- separate upward lookahead from the signature rather than a running flag.
+  for lnum = cursor, 1, -1 do
+    local line = vim.api.nvim_buf_get_lines(bufnr, lnum - 1, lnum, false)[1] or ""
+    local name = signature_name(line)
+    if name and (name:match("^test") or has_test_annotation(bufnr, lnum)) then
       return name
     end
+  end
 
-    return nil
-  end)
+  return nil
 end
 
 function M.java_build_tool(root)
