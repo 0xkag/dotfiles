@@ -144,11 +144,9 @@ map("n", "<leader>tC", function() _G.NvimClipMode.cycle() end,
 map("n", "<leader>tX", function() _G.NvimClipMode.toggle_off() end,
   { desc = "Toggle clipboard off ↔ full", silent = true })
 
--- Disabled Vim-era clipboard fallback for hosts without unnamedplus/clipboard:
--- map("x", "<leader>yy", "<Cmd>w !clip-in<CR>", { desc = "Yank to clipboard fallback", silent = true })
--- map("n", "<leader>yY", "<Cmd>.w !clip-in<CR>", { desc = "Yank line to clipboard fallback", silent = true })
--- map("n", "<leader>yp", "<Cmd>r !clip-out<CR>", { desc = "Paste after fallback", silent = true })
--- map("n", "<leader>yP", "<Cmd>.-1r !clip-out<CR>", { desc = "Paste before fallback", silent = true })
+-- A Vim-era clip-in/clip-out shell clipboard fallback (for hosts without
+-- unnamedplus/clipboard) was kept here as disabled reference. It is recorded in
+-- the README "Backlog" instead; revive from git history if a host ever needs it.
 
 map("n", "<leader>wv", "<C-w>v", { desc = "Vertical split" })
 map("n", "<leader>ws", "<C-w>s", { desc = "Horizontal split" })

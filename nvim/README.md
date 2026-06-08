@@ -45,11 +45,12 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 - `SPC b` buffers
 - `SPC c` code and LSP
 - `SPC d` debugging
-- `SPC e` edit and multiple cursors
+- `SPC e` errors and diagnostics
 - `SPC f` files
 - `SPC f e` config files
 - `SPC g` git
 - `SPC j` jump
+- `SPC m` multiple cursors
 - `SPC o` open, org, outline, and terminals
 - `SPC p` project
 - `SPC q` quit and sessions
@@ -95,8 +96,8 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 ## Syntax checking
 
 - `SPC cf` formats the current buffer on demand
-- `SPC cl` lint the current buffer
-- `SPC cL` open diagnostics in the location list
+- `SPC el` lint the current buffer
+- `SPC eL` open diagnostics in the location list
 - Automatic linting is enabled on read and write when a supported linter exists
 - Current machine support includes `shellcheck`, `yamllint`, `ruff`, `mypy`, fallback `pylint` or `flake8`, and `tflint`
 - completion popup navigation also works with the `Up` and `Down` arrow keys
@@ -267,7 +268,7 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
 - `<Esc>` and `<C-g>` abort the completion popup
 - `<leader>ta` / `SPC t a` toggles between quiet-auto and manual completion
 - `<leader>tA` / `SPC t A` disables or enables completion for the current buffer; completion is disabled by default on `gitcommit` buffers so commit-message editing stays clean
-- `<leader>tC` / `SPC t C` cycles quiet-auto, manual, and full-auto modes. Full-auto restores ghost text and a short popup debounce for temporary aggressive completion
+- `<leader>tM` / `SPC t M` cycles quiet-auto, manual, and full-auto modes. Full-auto restores ghost text and a short popup debounce for temporary aggressive completion
 - `<leader>th` / `SPC t h` toggles automatic signature popups for this session
 - `:NvimCompletionMode quiet|manual|full` sets the session completion mode directly
 - `:NvimCompletionDelay 1.5` sets quiet-auto delay in seconds for this session
@@ -549,3 +550,60 @@ Bulk install example for a typical frontend + backend workstation:
 - Each spec is self-contained (`nvim --headless -u NONE -l <spec>`): it sets its
   own `package.path`, requires the module under test, prints `ok` / `FAIL` lines,
   and calls `cquit 1` on failure so the runner sees a nonzero exit
+- Current specs cover the pure logic that backs the keymaps: `reflow_spec`
+  (`config.reflow`), `util_spec` (root/grep/global parsers, visual selection,
+  whitespace squeeze), `completion_spec` (the completion mode state machine),
+  `code_mode_spec` (Go/Java/Python test-target detection, indentation, shell
+  template rendering), and `lsp_util_spec` (signature-label and workspace-edit
+  helpers)
+- The language helpers behind `config.code_mode` live in per-language
+  submodules under `lua/config/code_mode/` (`go`, `java`, `markdown`, `shell`,
+  `python_debug`, `terraform`, `git_editor`, plus `shared`); when adding a pure
+  helper there, expose it (or an `_`-prefixed test seam) and add a spec
+
+## Backlog
+
+Durable guardrails and the still-open work, salvaged from the (now retired)
+migration-status tracker. Completed milestones and the original baseline commits
+live in git history.
+
+### Guardrails
+
+- Do not enable automatic formatting on save for any language; keep formatting an
+  explicit action via `SPC c f` (conform) or `:ConformInfo`
+- Keep `:NvimDeps` reporting explicit — surface missing tools rather than
+  auto-installing them
+
+### Open alignment checks
+
+- Keep auditing code-mode `SPC m` and `,` bindings against Spacemacs defaults;
+  more localleader parity checks may still be useful
+- Keep checking localleader `which-key` coverage in filetype-specific buffers so
+  `,` stays discoverable everywhere it matters
+- Review the old `~/.dotfiles/vim` config behavior-by-behavior and classify each
+  as already-matched, intentionally-different, or worth-porting
+
+### Known partial / intentionally deferred
+
+- Spacemacs code-mode parity is partial by choice: advanced Go helpers
+  (go-play, graphical coverage, test generation, deep refactors), advanced
+  Java generator/refactor actions, and niche Markdown/Terraform actions are
+  approximated via LSP or omitted
+- Some `lsp-ui`/peek-style overlays are approximated with Telescope/quickfix
+- Python debugging is terminal/`ipdb`-oriented rather than a full DAP UI (see
+  [DEBUGGING_NOTES.md](./DEBUGGING_NOTES.md:1))
+- Remote editing is deferred; Oil SSH is the leading future option (`netrw` is
+  intentionally disabled) — see
+  [REMOTE_AND_RUNBOOK_NOTES.md](./REMOTE_AND_RUNBOOK_NOTES.md:1)
+- The legacy clipboard fallback aliases remain disabled reference comments in
+  `lua/config/keymaps.lua`; decide later whether to revive them as a toggle
+- The Emacs-native long tail is unported: heavy Org integrations, Elfeed, the
+  PDF workflow, the IETF/xkcd/speed-reading layers, and some secondary
+  language/tooling layers
+
+### Validation baseline
+
+- `nvim --headless '+qa'`
+- `nvim --headless '+Lazy! load all' '+qa'`
+- `nvim/test/run.sh` passes
+- `:NvimDeps` reports all checked dependencies installed
