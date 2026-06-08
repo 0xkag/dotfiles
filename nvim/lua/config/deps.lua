@@ -39,7 +39,7 @@ local features = {
   python_format = {
     label = "Python formatting",
     mode = "any",
-    bins = { "ruff", "black", "yapf" },
+    bins = { "ruff", "black", "yapf", "autopep8" },
   },
   python_lint = {
     label = "Python linting",

@@ -659,14 +659,22 @@ return {
           map("n", "<localleader>=b", function()
             format_buffer(bufnr)
           end, "Format buffer")
+          local reflow = require("config.reflow")
           map("x", "<localleader>=r", function()
-            local start_pos = vim.api.nvim_buf_get_mark(bufnr, "<")
-            local end_pos = vim.api.nvim_buf_get_mark(bufnr, ">")
-            format_buffer(bufnr, {
-              start = { start_pos[1], start_pos[2] },
-              ["end"] = { end_pos[1], end_pos[2] + 1 },
-            })
-          end, "Format selection")
+            reflow.restyle(reflow.selection_range())
+            vim.cmd("normal! gv")
+          end, "Format selection (restyle)")
+          map({ "n", "x" }, "<localleader>=q", function()
+            if vim.fn.mode():match("[vV\22]") then
+              local reflowed = reflow.dispatch_range(reflow.selection_range(), true)
+              vim.cmd(reflowed and "normal! `[V`]" or "normal! gv")
+            else
+              reflow._pending_restyle = true
+              vim.o.operatorfunc = "v:lua.require'config.reflow'.opfunc"
+              vim.api.nvim_feedkeys("g@", "n", false)
+            end
+          end, "Restyle (formatter)")
+          map("n", "<localleader>=t", reflow.cycle, "Cycle reflow mode")
           map("n", "<localleader>=o", apply_code_action("source.organizeImports"), "Organize imports")
           map("n", "<localleader>xh", function()
             highlight_symbol(bufnr)
