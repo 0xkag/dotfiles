@@ -12,7 +12,7 @@
       "Bash(sts)"
     ]
   },
-  "model": "us.anthropic.claude-opus-4-7[1m]",
+  "model": "us.anthropic.claude-opus-4-8[1m]",
   "hooks": {
     "Notification": [
       {
