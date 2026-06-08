@@ -24,8 +24,9 @@ it did before, so existing muscle memory is unchanged.
 | `gq{motion}` / `gqq` | n, x | reflow per reflow_mode (default builtin) |
 | `gQ{motion}` / `gQQ` | n, x | always restyle (formatter) |
 | `,=q` (`<localleader>=q`) | n, x | restyle (same as gQ, in the ,= family) |
-| `,=r` (`<localleader>=r`) | x | restyle selection (selection preserved) |
+| `,=r` (`<localleader>=r`) | x | restyle selection (selection dropped; gv reselects) |
 | `,=t` (`<localleader>=t`) | n | cycle reflow_mode |
+| `,=v` (`<localleader>=v`) | n | reselect exact original visual selection |
 | `,=b` (`<localleader>=b`) | n | restyle whole buffer (unchanged) |
 | `,=o` (`<localleader>=o`) | n | organize imports (unchanged) |
 | `<leader>cf` / `SPC c f` | n | format buffer via conform (unchanged) |
@@ -65,8 +66,10 @@ What `gq` does in each mode:
    semantics), and the `'<` / `'>` marks are only updated AFTER leaving visual
    mode -- so they pointed at the previous selection. Fix: read the live
    selection via `getpos("v")` / `getpos(".")` (`config.reflow.selection_range`,
-   which returns rows 1-indexed and columns 0-indexed to match conform's range)
-   and reselect afterward (see finding 6 for which marks).
+   which returns rows 1-indexed and columns 0-indexed to match conform's range).
+   The maps now drop the selection afterward (vanilla `gq`) and record the
+   operated extent as the last-visual selection (see finding 6 for which marks)
+   so `gv` reselects it.
 
 3. There is NO "preserve my code style" restyle. ruff and black parse to an AST
    and re-print from scratch in one canonical, non-configurable style -- there
@@ -82,15 +85,24 @@ What `gq` does in each mode:
    buffer (e.g. one just loaded) returns nil from `get_node`, which would
    otherwise make smart mode misclassify everything as code and always restyle.
 
-6. The visual maps reselect by two different strategies, because a reflow can
-   change the line count (a 2-line bullet that wraps to 3, or three short lines
-   that join to one). `config.reflow.reflow_builtin` returns `true` to signal it
-   reflowed synchronously, so `dispatch_range` returns `true` on the reflow path
-   and a falsy value on the restyle path. The visual `gq` / `gQ` / `,=q` maps
-   then reselect:
-   - reflow -> ``normal! `[V`]`` -- the `'[` / `']` change marks span the actual
-     reflowed extent, so the selection grows or shrinks to match the new wrap.
-   - restyle -> `gv` -- conform formats asynchronously, so the edit has not
-     landed when the map returns; `'[` / `']` are not yet valid. `gv` restores
-     the original selection as a best effort. (`,=r` is always restyle, so it
-     always uses `gv`.)
+6. The visual maps drop the selection afterward (vanilla `gq`), then record the
+   operated extent as the last-visual selection so `gv` reselects it. They use
+   two strategies, because a reflow can change the line count (a 2-line bullet
+   that wraps to 3, or three short lines that join to one).
+   `config.reflow.reflow_builtin` returns `true` to signal it reflowed
+   synchronously, so `dispatch_range` returns `true` on the reflow path and a
+   falsy value on the restyle path. The visual `gq` / `gQ` / `,=q` maps then:
+   - reflow -> ``normal! `[V`]<Esc>`` -- the `'[` / `']` change marks span the
+     actual reflowed extent, so `gv` grows or shrinks to match the new wrap.
+   - restyle -> reselect the original rows linewise then `<Esc>` -- conform
+     formats asynchronously, so the edit has not landed when the map returns and
+     `'[` / `']` are not yet valid; recording the original range lets `gv`
+     restore the pre-restyle lines as a best effort. (`,=r` is always restyle, so
+     it always records the original range.)
+
+   `gv` reselects linewise in all cases. To recover the *exact* original
+   selection -- its charwise/blockwise mode and columns -- use `,=v`
+   (`config.reflow.reselect_visual`), which restores a selection stashed by
+   `stash_visual` before the op. The stash is necessary because `reflow_builtin`
+   runs `` `[V`]gq `` internally, clobbering the `'<` / `'>` marks that `gv`
+   reads, so the original columns are otherwise unrecoverable.

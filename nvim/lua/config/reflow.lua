@@ -36,6 +36,34 @@ function M.selection_range()
   return { start = { s_line, s_col - 1 }, ["end"] = { e_line, e_col - 1 } }
 end
 
+-- Original visual selection (mode + 1-indexed start/end positions, as setpos
+-- 4-lists) of the last visual reflow/restyle, stashed so `,=v` can restore the
+-- exact pre-op selection -- reflow_builtin's internal `[V`]gq clobbers '< '>,
+-- so gv alone cannot recover the original columns or charwise/blockwise mode.
+M._last_visual = nil
+
+-- Capture the live visual selection for later exact restore. Call from a visual
+-- map while still IN visual mode (getpos("v")/getpos(".") are live then).
+function M.stash_visual()
+  M._last_visual = {
+    mode = vim.fn.mode(),
+    start = vim.fn.getpos("v"),
+    ["end"] = vim.fn.getpos("."),
+  }
+end
+
+-- Reselect the exact selection stashed by stash_visual (mode + columns). No-op
+-- if nothing has been stashed this session.
+function M.reselect_visual()
+  local s = M._last_visual
+  if not s then
+    return
+  end
+  vim.fn.setpos(".", s.start)
+  vim.cmd("normal! " .. s.mode)
+  vim.fn.setpos(".", s["end"])
+end
+
 -- Structure-preserving reflow via Vim's built-in formatter.
 -- Blank indentexpr/formatexpr so gq does not get rerouted to the LSP range
 -- formatter (re-indent only, no reflow) or treesitter indentexpr (drops

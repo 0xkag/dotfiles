@@ -192,7 +192,8 @@ reflow.dispatch_range = reflow._dr_real
 reflow._pending_restyle = false
 
 -- dispatch_range reports whether a synchronous reflow ran, so the visual maps
--- know to reselect via the '[ '] change marks (reflow) vs gv (async restyle).
+-- know which extent to record as the last-visual selection: the '[ '] change
+-- marks (reflow) vs the original range (async restyle).
 reflow._rb3 = reflow.reflow_builtin
 reflow._rs3 = reflow.restyle
 reflow.reflow_builtin = function() return true end
@@ -234,6 +235,31 @@ vim.api.nvim_feedkeys(
 reflow.reflow_builtin({ start = { 1, 0 }, ["end"] = { 1, #vlong - 1 } })
 local vb = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 check("reflow_builtin(range) wraps from active visual mode", #vb > 2, #vb)
+vim.api.nvim_feedkeys(
+  vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", false)
+
+-- stash_visual/reselect_visual round-trip restores the exact charwise selection
+-- (mode and columns), which gv cannot: reflow clobbers the '< '> marks.
+vim.api.nvim_buf_set_lines(0, 0, -1, false, { "hello world", "second line", "third line" })
+vim.keymap.set("x", "<Plug>(reflow_test_stash)", function()
+  reflow.stash_visual()
+end)
+-- Charwise-select line 1 col 3 .. line 2 col 6, then stash from visual mode.
+vim.api.nvim_feedkeys(
+  vim.api.nvim_replace_termcodes("1G3|v2G6|", true, false, true), "x", false)
+vim.api.nvim_feedkeys(
+  vim.api.nvim_replace_termcodes("\\<Plug>(reflow_test_stash)", true, true, true), "xt", false)
+vim.api.nvim_feedkeys(
+  vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", false)
+-- Clobber '< '> the way a reflow would, then restore via the stash.
+vim.fn.setpos("'<", { 0, 1, 1, 0 })
+vim.fn.setpos("'>", { 0, 3, 1, 0 })
+reflow.reselect_visual()
+check("reselect_visual mode is charwise", vim.fn.mode() == "v", vim.fn.mode())
+check("reselect_visual start", vim.fn.getpos("v")[2] == 1 and vim.fn.getpos("v")[3] == 3,
+  vim.inspect(vim.fn.getpos("v")))
+check("reselect_visual end", vim.fn.getpos(".")[2] == 2 and vim.fn.getpos(".")[3] == 6,
+  vim.inspect(vim.fn.getpos(".")))
 vim.api.nvim_feedkeys(
   vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", false)
 
