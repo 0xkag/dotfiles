@@ -115,6 +115,13 @@ autocmd("FileType", {
     local opt = vim.opt_local
     opt.textwidth = 75
     opt.colorcolumn = "76"
+    -- The built-in gitcommit ftplugin sets `formatoptions+=tl`. The `l` flag
+    -- suppresses auto-wrap on any line that was already longer than textwidth
+    -- when insert started -- which is exactly the pre-filled body of an amended
+    -- commit. That makes textwidth look ignored on `--amend` while a fresh
+    -- commit (short lines you type from scratch) wraps fine. Drop `l` so long
+    -- pre-existing lines reflow to textwidth as they are edited.
+    opt.formatoptions:remove("l")
   end,
 })
 
