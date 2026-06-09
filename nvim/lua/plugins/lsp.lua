@@ -41,6 +41,11 @@ return {
       local python_env = require("config.python")
       local lsp_util = require("config.lsp_util")
 
+      -- Bound a runaway loop in Neovim's semantic-tokens highlighter that a
+      -- malformed token field (a wrapped-negative deltaStart seen from
+      -- terraform-ls) can otherwise spin forever on the main thread.
+      require("config.lsp_semantic_guard").apply()
+
       local function format_buffer(bufnr, range)
         require("conform").format({
           async = true,
@@ -860,11 +865,33 @@ return {
         end,
       })
 
+      local lsp_watch = require("config.lsp_watch")
+
+      -- Decline the recursive file watcher when the pure-Lua watchdirs backend
+      -- would otherwise walk a huge workspace on the main thread. Composed into
+      -- every server's on_init (preserving any server-defined one); it no-ops
+      -- unless that exact condition holds.
+      local function with_watch_guard(on_init)
+        return function(client, init_result)
+          lsp_watch.maybe_suppress(client)
+          if on_init then
+            on_init(client, init_result)
+          end
+        end
+      end
+
       for name, config in pairs(servers) do
         config.capabilities = vim.tbl_deep_extend("force", {}, capabilities, config.capabilities or {})
+        config.on_init = with_watch_guard(config.on_init)
         vim.lsp.config(name, config)
         vim.lsp.enable(name)
       end
+
+      vim.api.nvim_create_autocmd("LspDetach", {
+        callback = function(event)
+          lsp_watch.cleanup(event.data.client_id)
+        end,
+      })
 
       vim.api.nvim_create_user_command("PyrightWorkspaceMode", function()
         local clients = vim.lsp.get_clients({ name = "pyright" })

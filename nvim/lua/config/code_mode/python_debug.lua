@@ -1,5 +1,5 @@
 -- Python debugging helpers: terminal-driven ipdb / pytest --trace runs.
--- (See DEBUGGING_NOTES.md for why this is terminal-first, not DAP.)
+-- (See DEBUGGING_PYTHON.md for why this is terminal-first, not DAP.)
 local M = {}
 
 local shared = require("config.code_mode.shared")
