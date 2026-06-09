@@ -1,6 +1,7 @@
 local M = {}
 
 local notified = {}
+local lsp_watch = require("config.lsp_watch")
 local python_env = require("config.python")
 local treesitter = require("config.treesitter")
 local tools = require("config.tools")
@@ -20,6 +21,19 @@ local features = {
     label = "Binary editing",
     mode = "all",
     bins = { "xxd" },
+  },
+  file_watch = {
+    label = "LSP file watching",
+    check = function()
+      if lsp_watch.native_watch_available() then
+        return true, {}
+      end
+
+      local sysname = (vim.uv or vim.loop).os_uname().sysname
+      local remedy = sysname == "FreeBSD" and "inotify-tools port"
+        or "inotify-tools"
+      return false, { remedy .. " (off-main-thread file watching)" }
+    end,
   },
   gnu_global = {
     label = "GNU Global fallback navigation",
@@ -250,6 +264,7 @@ local all_features = {
   "core_git",
   "core_search",
   "binary_edit",
+  "file_watch",
   "gnu_global",
   "pyenv",
   "python_lsp",
@@ -288,6 +303,7 @@ local startup_features = {
   "core_git",
   "core_search",
   "binary_edit",
+  "file_watch",
   "gnu_global",
   "go_lsp",
   "go_runtime",

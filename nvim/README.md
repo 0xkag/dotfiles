@@ -4,7 +4,11 @@ This configuration is a Spacemacs-style Neovim setup centered on modal editing,
 leader-key discovery, LSP, search, git, tests, terminals, and writing support.
 
 For Python debugging tradeoffs and future DAP notes, see
-[DEBUGGING_NOTES.md](./DEBUGGING_NOTES.md:1).
+[DEBUGGING_PYTHON.md](./DEBUGGING_PYTHON.md:1).
+
+For diagnosing main-thread hangs and other Neovim performance problems (with
+reusable profiling and LSP-probe recipes), see
+[DEBUGGING_NVIM.md](./DEBUGGING_NVIM.md:1).
 
 For deferred decisions around remote editing and Org-style literal runbooks,
 see [REMOTE_AND_RUNBOOK_NOTES.md](./REMOTE_AND_RUNBOOK_NOTES.md:1).
@@ -523,6 +527,52 @@ Bulk install example for a typical frontend + backend workstation:
 - Remove entries for languages you never use to silence their warnings; per-filetype checks still fire when opening a matching file
 - `filetype_features` in the same file maps filetype to the checks that run on first buffer open
 
+## LSP performance in large repos
+
+Opening many files from a large monorepo (e.g. a few hundred `.tf` files in a
+tree with tens of thousands of directories) used to pin a CPU core and lock up
+Neovim. Two unrelated main-thread hazards are handled here.
+
+### Semantic-token guard
+
+The lockup was a malformed semantic token. terraform-ls can send a token whose
+`deltaStart` is a small negative delta encoded as an unsigned 32-bit int (e.g.
+`4294967253`, which is `2^32 - 43`). Neovim's
+`runtime/lua/vim/lsp/semantic_tokens.lua` then computes an astronomical
+end-of-token column and spins its range-extension loop billions of times on the
+main thread, ignoring even SIGTERM.
+
+`lua/config/lsp_semantic_guard.lua` wraps `STHighlighter:process_response` and
+clamps each token's `deltaStart` and `length` to the buffer's longest line
+before that loop runs. The LSP spec forbids a token from spanning lines, so
+valid tokens are untouched; only the malformed value is bounded. It is applied
+globally for every server in `lua/plugins/lsp.lua`, degrades to a no-op if the
+runtime internals change, and leaves semantic highlighting fully enabled. This
+is a workaround for an upstream Neovim bug, not a feature toggle: semantic
+tokens still color buffers normally on top of treesitter.
+
+### LSP file watching
+
+When a server registers `workspace/didChangeWatchedFiles` and no native
+file-watch backend is available, Neovim falls back to a pure-Lua `watchdirs`
+walk that creates one watch handle per directory on the main thread. In a huge
+workspace that walk is itself expensive.
+
+- On macOS/Windows Neovim uses an efficient native recursive watcher, and when
+  `inotifywait` (from `inotify-tools`) is on `PATH` it watches via an
+  off-main-thread subprocess. In both cases watching is left fully enabled.
+- Otherwise (the `watchdirs` backend) `lua/config/lsp_watch.lua` declines the
+  watcher for a client only when its workspace tree is huge, and installs a
+  single `.git/HEAD` watch so a branch switch still triggers an `:LspRestart`
+  to refresh the server. The only thing lost is live detection of external
+  changes between branch switches (e.g. a `terraform init` writing
+  `.terraform/modules` while Neovim is open); `:LspRestart` refreshes manually.
+- The `file_watch` dependency check warns once on startup (and in `:NvimDeps`)
+  when no native backend is available, recommending `inotify-tools`
+  (`inotify-tools port` on FreeBSD). Install it on your normal `PATH` (flox,
+  system package manager) rather than via Mason: it is a system tool, not a
+  language server.
+
 ## Org defaults
 
 - Agenda files: `~/wc/personal/personal/*.org`
@@ -591,7 +641,7 @@ live in git history.
   approximated via LSP or omitted
 - Some `lsp-ui`/peek-style overlays are approximated with Telescope/quickfix
 - Python debugging is terminal/`ipdb`-oriented rather than a full DAP UI (see
-  [DEBUGGING_NOTES.md](./DEBUGGING_NOTES.md:1))
+  [DEBUGGING_PYTHON.md](./DEBUGGING_PYTHON.md:1))
 - Remote editing is deferred; Oil SSH is the leading future option (`netrw` is
   intentionally disabled) — see
   [REMOTE_AND_RUNBOOK_NOTES.md](./REMOTE_AND_RUNBOOK_NOTES.md:1)
