@@ -422,6 +422,7 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
   - `,cc` runs `terraform validate`
   - `,cl` runs `tflint`
   - `,=c` checks formatting with `terraform fmt -check`
+  - `,o` opens the file or module path named under the cursor (see below)
 - Git rebase (the `gitrebase` todo buffer from `git rebase -i`, including Neogit's rebase):
   - letters mirror magit's git-rebase-mode under the localleader prefix
   - `,c`, `,r`, `,e`, `,s`, `,f`, `,d` set the current line (or visual selection) to pick, reword, edit, squash, fixup, or drop
@@ -434,6 +435,36 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
   - `,qq` writes the message and commits; `,qa` empties the message and aborts the commit
   - keys match the rebase finish/abort for muscle memory; uses window-close (not quit-all) so it is safe inside Neogit's in-session editor
   - native `:wq` / `:cq` still work
+
+### Terraform: open file/module under cursor (`,o`)
+
+In terraform buffers, `,o` jumps to the file or module whose path is named
+under the cursor (`lua/config/code_mode/terraform.lua`, bound in the terraform
+`FileType` block in `lua/config/code_mode/init.lua`). It resolves, in order:
+
+1. The string under the cursor is read via treesitter (walking to the
+   outermost `quoted_template`, so a `${...}` prefix is not dropped), falling
+   back to `<cfile>` if no string node is found.
+2. Path references are expanded: `${path.module}` to the current file's
+   directory, and `${path.root}` / `${path.cwd}` to the project root
+   (`util.project_root`). A string that still contains an unresolved
+   interpolation (e.g. `${var.name}`) is skipped, since the real path is only
+   known at plan time.
+3. The path is resolved against the module directory first, then the project
+   root. A path that resolves to a **file** is opened directly (e.g. a
+   `templatefile(...)` / `file(...)` argument). A path that resolves to a
+   **directory** is a module `source`, so its entry file is opened: `main.tf`,
+   else the first `*.tf` alphabetically, else the directory itself.
+4. If nothing resolves locally, it falls back to following an LSP
+   `textDocument/documentLink` under the cursor, then notifies if there is
+   still nothing.
+
+This is the only way to follow `templatefile`/`file` path arguments, which are
+plain strings the LSP does not track. For module `source` values it overlaps
+with `,gg` (LSP go-to-definition, which terraform-ls also resolves to the
+module) — both land in the right place; `,o` additionally works when no LSP is
+attached. Built-in `gf` is not sufficient here because it cannot expand
+`${path.module}`.
 
 ## Vim-style editing helpers
 
