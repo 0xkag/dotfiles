@@ -104,6 +104,13 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 - `SPC eL` open diagnostics in the location list
 - Automatic linting is enabled on read and write when a supported linter exists
 - Current machine support includes `shellcheck`, `yamllint`, `ruff`, `mypy`, fallback `pylint` or `flake8`, and `tflint`
+- tflint is scoped to the edited file's module: the on-read/on-write linter is
+  overridden (`lua/plugins/lint.lua`) to run `tflint --chdir=<file's dir>
+  --filter=<file>` instead of nvim-lint's default `tflint --recursive`. The
+  default scans the whole repo on every read/save, so editing several files in
+  a large repo spawns many concurrent full-repo scans that saturate the CPU;
+  the scoped form lints just the active module. For a wider run use `,cl` (see
+  Terraform keybindings), which runs `tflint` from the project root
 - completion popup navigation also works with the `Up` and `Down` arrow keys
 
 ## Formatting
@@ -420,7 +427,8 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
   - `,cp`, `,cP`, `,cr` preview, toggle, or enable rendered Markdown
 - Terraform:
   - `,cc` runs `terraform validate`
-  - `,cl` runs `tflint`
+  - `,cl` runs `tflint` from the project root (the on-read/on-write linter, by
+    contrast, is scoped to the active file's module -- see Linting)
   - `,=c` checks formatting with `terraform fmt -check`
   - `,o` opens the file or module path named under the cursor (see below)
 - Git rebase (the `gitrebase` todo buffer from `git rebase -i`, including Neogit's rebase):
