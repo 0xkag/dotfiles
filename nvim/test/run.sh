@@ -9,6 +9,16 @@
 set -uo pipefail
 
 test_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+nvim_dir=$(dirname "$test_dir")
+
+# Prepend THIS checkout's nvim/ to runtimepath so specs that `require` config
+# modules resolve them from the checkout under test -- not from whatever
+# ~/.config/nvim happens to point at. Neovim's runtimepath loader runs before
+# the package.path loader, and ~/.config/nvim is on rtp even under `-u NONE`, so
+# without this a spec run from a worktree (or any non-deployed checkout) would
+# silently test the deployed copy instead of its own source. See
+# DEBUGGING_NVIM.md ("Tests resolve config.* via runtimepath, not the checkout").
+rtp_prepend="set runtimepath^=$nvim_dir"
 
 specs=()
 if [ "$#" -gt 0 ]; then
@@ -34,7 +44,7 @@ for spec in "${specs[@]}"; do
     continue
   fi
   echo "=== $(basename "$spec") ==="
-  if ! nvim --headless -u NONE -l "$spec"; then
+  if ! nvim --headless -u NONE --cmd "$rtp_prepend" -l "$spec"; then
     failed=1
   fi
 done
