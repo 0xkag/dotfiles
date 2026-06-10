@@ -33,6 +33,7 @@ require("config.code_mode").setup()
 require("config.python")
 require("config.deps")
 require("config.projects").setup()
+require("config.diagnostic_float").setup()
 require("config.keymaps")
 require("config.theme_review")
 
