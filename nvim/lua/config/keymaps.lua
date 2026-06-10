@@ -194,6 +194,9 @@ map("n", "<leader>tc", function()
   vim.wo.cursorline = enabled
   vim.wo.cursorcolumn = enabled
 end, { desc = "Cursor guides" })
+map("n", "<leader>td", function()
+  require("config.diagnostic_float").toggle()
+end, { desc = "Diagnostic hover float" })
 
 map("n", "<leader>qq", "<Cmd>quit<CR>", { desc = "Quit window", silent = true })
 map("n", "<leader>qQ", "<Cmd>qa<CR>", { desc = "Quit all", silent = true })

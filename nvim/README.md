@@ -102,6 +102,11 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 - `SPC cf` formats the current buffer on demand
 - `SPC el` lint the current buffer
 - `SPC eL` open diagnostics in the location list
+- `SPC ex` shows the diagnostic under the cursor in a float on demand
+- Inline diagnostic messages use a hover float, not virtual text: the
+  diagnostic under the cursor is shown automatically on `CursorHold` (after
+  `updatetime`, 200ms). `SPC td` toggles this auto-float for the session
+  (`lua/config/diagnostic_float.lua`); `SPC ex` always shows it on demand
 - Automatic linting is enabled on read and write when a supported linter exists
 - Current machine support includes `shellcheck`, `yamllint`, `ruff`, `mypy`, fallback `pylint` or `flake8`, and `tflint`
 - tflint is scoped to the edited file's module: the on-read/on-write linter is
