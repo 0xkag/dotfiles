@@ -157,6 +157,7 @@ function M.setup()
       map("n", "<localleader>cc", M.terraform_validate, "Validate project")
       map("n", "<localleader>cl", M.terraform_lint, "Lint project")
       map("n", "<localleader>=c", M.terraform_fmt_check, "Check formatting")
+      map("n", "<localleader>o", M.terraform_open_file, "Open file under cursor")
     end,
   })
 
