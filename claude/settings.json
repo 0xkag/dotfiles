@@ -20,7 +20,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "tmux new-window -d 'printf \"\\a\"; sleep 2'"
+            "command": "printf '\\a' > \"$(tmux display -p -t \"$TMUX_PANE\" '#{pane_tty}')\""
           }
         ]
       }
@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "tmux new-window -d 'printf \"\\a\"; sleep 2'"
+            "command": "printf '\\a' > \"$(tmux display -p -t \"$TMUX_PANE\" '#{pane_tty}')\""
           }
         ]
       }
@@ -42,7 +42,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "tmux new-window -d 'printf \"\\a\"; sleep 2'"
+            "command": "printf '\\a' > \"$(tmux display -p -t \"$TMUX_PANE\" '#{pane_tty}')\""
           }
         ]
       }
@@ -55,7 +55,7 @@
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "gitlab@claude-plugins-official": true,
-    "caveman@caveman": true
+    "caveman@caveman": false,
   },
   "extraKnownMarketplaces": {
     "caveman": {
@@ -65,8 +65,10 @@
       }
     }
   },
+  "skipWebFetchPreflight": true,
   "effortLevel": "medium",
-  "autoUpdatesChannel": "latest",
-  "theme": "dark-ansi",
+  "skipWorkflowUsageWarning": true,
+  "theme": "dark",
+  "editorMode": "normal",
   "mcpServers": {}
 }
