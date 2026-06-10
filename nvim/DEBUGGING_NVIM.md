@@ -183,3 +183,31 @@ reproduce a scenario by hand from an arbitrary checkout, pass the same flag.
 Practical upshot: **do not develop this config in a git worktree.** Because the
 live config is symlinked from `~/.config/nvim`, edit and test on a branch in the
 main `~/.dotfiles` checkout, where what you edit is what Neovim loads.
+
+## Trace keystrokes when a mapping "does the wrong thing"
+
+When a key seems to misbehave -- a chord not firing, a plugin grabbing a key,
+"it works in one filetype but not another" -- the missing fact is almost always
+*what mode you were actually in* and *what UI was active* at the moment of the
+press. Headless `feedkeys` tests often can't reproduce it because they bypass
+real typing speed, `timeoutlen`, and popups. Instead, log every key live with
+`vim.on_key`, including mode and completion-popup state:
+
+```lua
+:lua local ns=vim.api.nvim_create_namespace("keytrace"); local f=io.open("/tmp/fd_trace.log","a"); vim.on_key(function(k) local ok,cmp=pcall(require,"cmp"); f:write(vim.fn.keytrans(k).." mode="..vim.api.nvim_get_mode().mode.." cmp="..tostring(ok and cmp.visible()).."\n"); f:flush() end, ns)
+```
+
+Then reproduce the action once and read `/tmp/fd_trace.log`. Each line is the
+translated key, the mode at that instant (`i` insert, `n` normal, `niI`/`no...`
+pending states), and whether the cmp menu was visible. This disambiguates the
+common culprits without guessing:
+- The key fired in normal mode when you thought you were in insert (e.g. an
+  earlier escape chord already left insert, so a stray `f` hit flash.nvim's
+  `f`/`F`/`t`/`T` char motion instead of being literal text).
+- A completion/snippet popup was open and consumed or reshaped the key.
+- A multi-key chord did not resolve because an intervening event fired inside
+  `timeoutlen`.
+
+Pass a namespace (as above) so you can remove just this tracer with
+`:lua vim.on_key(nil, vim.api.nvim_create_namespace("keytrace"))` -- it fires on
+every keypress, so do not leave it installed.
