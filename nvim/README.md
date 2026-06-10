@@ -352,11 +352,20 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
 
 ## Navigation
 
+- Jumping is powered by flash.nvim
 - `s` triggers labeled jump mode
 - `S` jumps by Treesitter nodes
 - `SPC jj` jumps across visible text
 - `SPC jt` jumps by Treesitter nodes
 - `SPC jr` performs a remote jump
+- flash also enhances the `f` / `F` / `t` / `T` char motions in normal, visual,
+  and operator-pending mode (not insert): press the motion, the buffer dims
+  while it waits for a target character, then it jumps to it -- searching across
+  lines, not just the current one. `;` / `,` repeat forward / back, and `f` / `F`
+  repeat clever-f style (same case next, opposite case previous). Because this
+  is normal-mode only, an insert-mode chord like `fd` (Escape) is unaffected; a
+  stray `f` that triggers this dim-and-wait usually means you were already in
+  normal mode
 - `gd` open definitions through Telescope
 - `gi` open implementations through Telescope
 - `gr` open references through Telescope
