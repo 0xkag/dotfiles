@@ -553,11 +553,17 @@ return {
         )
       end, { desc = "Toggle inc-rename live preview" })
 
-      vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
-      vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+      local function diagnostic_jump(count)
+        return function()
+          vim.diagnostic.jump({ count = count })
+        end
+      end
+
+      vim.keymap.set("n", "[d", diagnostic_jump(-1), { desc = "Previous diagnostic" })
+      vim.keymap.set("n", "]d", diagnostic_jump(1), { desc = "Next diagnostic" })
       vim.keymap.set("n", "<leader>ex", vim.diagnostic.open_float, { desc = "Explain error" })
-      vim.keymap.set("n", "<leader>en", vim.diagnostic.goto_next, { desc = "Next error" })
-      vim.keymap.set("n", "<leader>ep", vim.diagnostic.goto_prev, { desc = "Previous error" })
+      vim.keymap.set("n", "<leader>en", diagnostic_jump(1), { desc = "Next error" })
+      vim.keymap.set("n", "<leader>ep", diagnostic_jump(-1), { desc = "Previous error" })
       vim.keymap.set("n", "<leader>ec", function()
         vim.diagnostic.reset(nil, 0)
       end, { desc = "Clear errors" })
