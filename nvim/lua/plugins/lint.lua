@@ -5,6 +5,23 @@ return {
     local lint = require("lint")
     local tools = require("config.tools")
 
+    -- The built-in tflint linter runs `tflint --recursive`, scanning the whole
+    -- repo on every buffer read/save; in a large repo, editing several files
+    -- spawns many concurrent full-repo scans that saturate the CPU. Scope each
+    -- run to the edited file's module directory instead. Args are evaluated per
+    -- run by nvim-lint, so they reflect the current buffer.
+    local tflint = vim.deepcopy(require("lint.linters.tflint"))
+    tflint.args = {
+      "--format=json",
+      function()
+        return "--chdir=" .. vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+      end,
+      function()
+        return "--filter=" .. vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":t")
+      end,
+    }
+    lint.linters.tflint = tflint
+
     local function executable(bin)
       return tools.available(bin)
     end
