@@ -142,7 +142,44 @@ Guidelines that kept this safe:
 ## Tests run headless
 
 All specs are self-contained and run via `test/run.sh` (each does
-`nvim --headless -u NONE -l <spec>`, prints `ok`/`FAIL`, `cquit 1` on failure).
-Fake `vim.fn.has`/`vim.fn.executable` to exercise platform branches; build real
-scratch buffers with `nvim_create_buf` + `nvim_buf_set_lines` to test
-buffer-dependent helpers.
+`nvim --headless -u NONE --cmd 'set runtimepath^=<this nvim/>' -l <spec>`,
+prints `ok`/`FAIL`, `cquit 1` on failure). Fake `vim.fn.has`/`vim.fn.executable`
+to exercise platform branches; build real scratch buffers with `nvim_create_buf`
++ `nvim_buf_set_lines` to test buffer-dependent helpers.
+
+## Tests resolve config.* via runtimepath, not the checkout
+
+This one cost a long debugging session, so it is worth stating plainly. A spec
+that does `require("config.autocmds")` does **not** necessarily load the file
+from the checkout the spec lives in. Neovim's module loader searches
+`runtimepath` (searcher #2) *before* the `package.path` searcher (#3), and
+`~/.config/nvim` is on `runtimepath` even under `-u NONE`. Here `~/.config/nvim`
+is a symlink to the deployed `~/.dotfiles/nvim`, so `require("config.*")`
+resolves to the **deployed** checkout regardless of the `package.path` a spec
+prepends from its own directory.
+
+Consequences:
+- The `package.path = here .. "/lua/?.lua;" ...` line every spec sets is
+  effectively dead for `config.*` modules whenever the deployed config already
+  has the module -- the runtimepath copy wins. It is kept for consistency and
+  for the rare module not present on the deployed path.
+- Running specs from a **git worktree** (or any non-deployed checkout) silently
+  tests the *deployed* `~/.config/nvim` copy, not the worktree's source. A fix
+  staged only in the worktree appears to "fail" its own brand-new test, and a
+  regression staged in the worktree can pass against the still-good deployed
+  copy. Both are false readings. Symptom to recognize: the buffer-visible
+  effects of an autocmd apply (e.g. `textwidth` changes) while edits you *just*
+  made to that autocmd seem to have no effect -- you are looking at two
+  different files.
+- Confirm what `require` actually loads with
+  `:lua = vim.loader.find("config.autocmds")[1].modpath` -- it prints the real
+  resolved path.
+
+`test/run.sh` defends against this by prepending the checkout-under-test's
+`nvim/` to `runtimepath` (`--cmd 'set runtimepath^=...'`) so specs resolve
+`config.*` from their own source no matter where `~/.config/nvim` points. To
+reproduce a scenario by hand from an arbitrary checkout, pass the same flag.
+
+Practical upshot: **do not develop this config in a git worktree.** Because the
+live config is symlinked from `~/.config/nvim`, edit and test on a branch in the
+main `~/.dotfiles` checkout, where what you edit is what Neovim loads.
