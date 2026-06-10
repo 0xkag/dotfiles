@@ -116,6 +116,14 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
   a large repo spawns many concurrent full-repo scans that saturate the CPU;
   the scoped form lints just the active module. For a wider run use `,cl` (see
   Terraform keybindings), which runs `tflint` from the project root
+- terraform diagnostics are layered, and a bare invalid interpolation like
+  `${foobar}` is intentionally not underlined live. terraform-ls's enhanced
+  validation (on by default) resolves references only within `var.*` and
+  `local.*` scope, so it flags `${var.nonexistent}` but not `${foobar}`; tflint
+  does no reference resolution. The catch-all is `,cc` (`terraform validate`),
+  which reports invalid/undeclared references. terraform-ls's
+  `experimentalFeatures.validateOnSave` would surface these live but runs
+  `terraform validate` per module (needs `terraform init`), so it is left off
 - completion popup navigation also works with the `Up` and `Down` arrow keys
 
 ## Formatting
