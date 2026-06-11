@@ -89,6 +89,14 @@ autocmd("VimEnter", {
 
 autocmd({ "BufRead", "BufNewFile" }, {
   group = general,
+  pattern = "*.tftpl",
+  callback = function()
+    vim.bo.filetype = "terraform"
+  end,
+})
+
+autocmd({ "BufRead", "BufNewFile" }, {
+  group = general,
   pattern = "*.zsh-theme",
   callback = function()
     vim.bo.filetype = "zsh"
