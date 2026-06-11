@@ -347,6 +347,7 @@ return {
         taplo = {},
         terraformls = {
           cmd = { "terraform-ls", "serve" },
+          filetypes = { "terraform", "terraform-vars", "tftpl" },
           init_options = {
             ignoreSingleFileWarning = true,
           },
