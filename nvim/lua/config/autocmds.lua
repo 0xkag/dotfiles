@@ -91,7 +91,7 @@ autocmd({ "BufRead", "BufNewFile" }, {
   group = general,
   pattern = "*.tftpl",
   callback = function()
-    vim.bo.filetype = "terraform"
+    vim.bo.filetype = "tftpl"
   end,
 })
 
@@ -151,6 +151,7 @@ autocmd("FileType", {
     "lua",
     "markdown",
     "terraform",
+    "tftpl",
     "toml",
     "typescript",
     "typescriptreact",
