@@ -12,6 +12,15 @@ return {
       treesitter.setup({
         install_dir = vim.fn.stdpath("data") .. "/site",
       })
+
+      -- Ensure bundled queries (highlights, injections, etc.) are findable
+      -- even when the install step hasn't symlinked them into site/queries/.
+      local queries_runtime = vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/runtime"
+      if not vim.list_contains(vim.opt.rtp:get(), queries_runtime) then
+        vim.opt.rtp:prepend(queries_runtime)
+      end
+
+      vim.treesitter.language.register("terraform", "tf")
       if auto_install then
         treesitter.install(parser_config.parsers)
       end
