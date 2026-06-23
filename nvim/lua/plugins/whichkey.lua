@@ -20,6 +20,8 @@ return {
       { "<leader>f", group = "files" },
       { "<leader>fe", group = "config" },
       { "<leader>g", group = "git" },
+      { "<leader>gl", desc = "blame file (reblame r/R)" },
+      { "<leader>gL", desc = "log line history (git log -L)", mode = { "n", "x" } },
       { "<leader>h", group = "help" },
       { "<leader>j", group = "jump" },
       { "<leader>m", group = "multicursor" },

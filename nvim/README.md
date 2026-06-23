@@ -97,6 +97,41 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 - Treesitter parser auto-install is off by default; set `vim.g.nvim_treesitter_auto_install = true` before plugin setup if you want startup to ensure the configured parser list
 - `:checkhealth` inspect Neovim health
 
+## Git
+
+Neogit is the magit-equivalent UI; gitsigns drives the gutter, hunks, and blame.
+
+- `SPC gg` open Neogit (status / staging / committing / rebasing)
+- `SPC gb` blame the current line in a popup (one-shot, full message)
+- `SPC gB` toggle inline current-line blame
+- `SPC gl` open the full-file blame buffer; inside it:
+  - `r` reblame at the commit under the cursor
+  - `R` reblame at that commit's parent (`<hash>^`) to walk back through
+    history one change at a time
+  - `<CR>` open the context menu, `d` diff in a tab, `s` / `S` show the
+    commit (message + diff) in a vsplit / new tab, `q` quit the buffer
+  - `o` open the full file at the commit that touched the line under the
+    cursor (the whole file as of that revision, not just the commit's diff)
+  - the winbar shows this legend; `SPC ex`-style hints are not needed
+  - note: `R` repositions the cursor to the same screen line in the
+    reblamed file, not the same source line, because the parent revision is
+    a different file whose line numbers have shifted (gitsigns clamps the
+    old line number to the new buffer rather than following the blamed line)
+- `SPC gL` log the current line's history with `git log -L` (`-L` mnemonic),
+  in normal mode the line under the cursor and in visual mode the selected
+  range; unlike blame's `R` this follows the line as it moves across
+  revisions, opening the full history (commit + diff for that line) in a
+  scratch tab; also works from inside the blame buffer, where it targets the
+  scroll-bound source line; inside the log buffer:
+  - `b` open gitsigns' interactive blame at the commit under the cursor, so
+    `r` / `R` reblame cycling continues from that revision
+  - `o` open the full file at the commit under the cursor
+  - `q` quit the buffer; the winbar shows this legend
+- `SPC gm` toggle branch review: diff the gutter against the merge-base with
+  the default branch, so only what this branch changed shows as hunks
+- `:GitsignsBase <ref>` diff the gutter against any ref; `:GitsignsBase` with
+  no argument resets to the index
+
 ## Syntax checking
 
 - `SPC cf` formats the current buffer on demand
