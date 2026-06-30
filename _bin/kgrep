@@ -20,5 +20,5 @@ ag --hidden \
           awk '{printf \"%d\t%s\n\", NR, \$0}' | \
           sed -n -e '{2},\$ p'" \
         --preview-window='up:75%:wrap' \
-        --bind='enter:execute(vim +{2} {1} < /dev/tty)'
+        --bind='enter:execute(nvim +{2} {1} < /dev/tty)'
 
