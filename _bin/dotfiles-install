@@ -204,6 +204,11 @@ def main():
     heading('less')
     # ... sourced in _shell/shellinteractive
 
+    # mc
+
+    heading('mc')
+    relink_relative('~/.dotfiles/mc', '~/.config/mc')
+
     # mosh
 
     heading('mosh')
