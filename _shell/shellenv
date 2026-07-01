@@ -167,6 +167,12 @@ fi
 export MISE_DATA_DIR=${MISE_DATA_DIR:-$HOME/.local/share/mise}
 export PATH="$MISE_DATA_DIR/shims:$PATH"
 
+# tools to skip installing via mise (system copy preferred, per-machine skips)
+# - cached, since probing system versions is slow; refreshed by mise/install.
+# See mise/check-tools.
+
+export MISE_DISABLE_TOOLS=$(bash ~/.dotfiles/mise/check-tools --cached)
+
 # ... pyenv
 
 if command -v pyenv &> /dev/null; then

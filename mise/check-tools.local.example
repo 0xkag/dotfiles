@@ -1,0 +1,15 @@
+# Per-machine overrides for check-tools. Copy to check-tools.local (untracked)
+# and edit for this host. Sourced after the defaults, so it can append to skip
+# or reassign any array (policy/minver/cmd).
+
+# Skip installs on this host only, keeping the tool in the shared config:
+#skip+=(ollama)
+
+# Force a tool's policy for this host (system / newer / mise):
+#policy[node]=mise
+
+# Override a minimum version for this host:
+#minver[node]=22
+
+# Probe a differently-named system binary for this host:
+#cmd[node]=nodejs

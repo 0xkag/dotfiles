@@ -5,9 +5,6 @@ locked = false
 lockfile = true
 paranoid = true
 
-[env]
-MISE_DISABLE_TOOLS = "{{ exec(command='bash ~/.dotfiles/mise/check-tools', cache_key='check-tools', cache_duration='1 minute') | trim }}"
-
 [tools]
 ag = "2.2.0"
 awscli = { version = "2.34.24", symlink_bins = "true" }
