@@ -42,6 +42,9 @@ mise_trust_and_install () {
     if [[ -f ~/.mise.toml ]]; then
         ~/.local/bin/mise trust ~/.mise.toml
     fi
+    # Compute fresh (refreshing the cache) and export so the install honors
+    # skips - the [env]-templated value does not feed mise's own resolution.
+    export MISE_DISABLE_TOOLS=$(bash ~/.dotfiles/mise/check-tools)
     ~/.local/bin/mise install
 }
 

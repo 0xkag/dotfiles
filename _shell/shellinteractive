@@ -157,6 +157,52 @@ man() {
 #    fi
 #fi
 
+# mise tool exclusion (see mise/check-tools). MISE_DISABLE_TOOLS is exported at
+# shell start by shellenv from a slow cached probe. These helpers let it be
+# refreshed and bypassed without restarting the shell.
+
+# mise-refresh -- recompute the exclusion list (probing the system afresh) and
+# re-export it here. Run after installing/removing a system or flox tool; a
+# mise install/remove never changes the list, so it is not needed for those.
+
+mise-refresh() {
+    local list
+    list=$(bash ~/.dotfiles/mise/check-tools)
+    export MISE_DISABLE_TOOLS=$list
+    command mise reshim 2> /dev/null
+    echo "MISE_DISABLE_TOOLS=$MISE_DISABLE_TOOLS"
+}
+
+# mise-all -- run mise with the exclusion lifted, to manage (e.g. uninstall)
+# tools that are otherwise hidden: `mise-all ls`, `mise-all uninstall neovim`.
+
+mise-all() {
+    # shellcheck disable=SC1007  # VAR= command is an intentional empty scope
+    MISE_DISABLE_TOOLS= command mise "$@"
+}
+
+# Cheap per-prompt sync (~5ms): --cached serves the file when fresh and rebuilds
+# only on the first prompt after check-tools/config.toml/check-tools.local
+# change, so an edited minimum version or policy is picked up without a new
+# shell or manual mise-refresh. The mtime check short-circuits before any slow
+# --version probing, so a warm cache costs the same as a raw file read.
+
+_mise_disable_sync() {
+    local list
+    list=$(bash ~/.dotfiles/mise/check-tools --cached 2> /dev/null)
+    export MISE_DISABLE_TOOLS=$list
+}
+
+if $IS_ZSH; then
+    autoload -Uz add-zsh-hook
+    add-zsh-hook precmd _mise_disable_sync
+elif $IS_BASH; then
+    case "$PROMPT_COMMAND" in
+        *_mise_disable_sync*) ;;
+        *) PROMPT_COMMAND="_mise_disable_sync${PROMPT_COMMAND:+;$PROMPT_COMMAND}" ;;
+    esac
+fi
+
 # awscli
 
 export AWS_PAGER=""

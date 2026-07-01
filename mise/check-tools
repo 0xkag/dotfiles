@@ -1,75 +1,220 @@
 #!/usr/bin/env bash
 
-# Outputs a JSON array of tools to disable (already present on system at
-# acceptable versions)
+# Outputs a comma-separated list of mise tool names to disable (skip installing
+# via mise because an acceptable copy is already available on the system). The
+# result is exported as MISE_DISABLE_TOOLS by _shell/shellenv (per shell) and by
+# mise/install (per install) - mise's own config [env] cannot set it, because a
+# value computed there does not feed back into that process's tool resolution.
+#
+# Invocation: check-tools [--cached]
+#   --cached prints a cached result instead of recomputing: probing slow
+#   --version binaries (aws, pre-commit, mvn) costs several seconds, too slow to
+#   run on every shell start. The cache is rebuilt when stale (this script or
+#   config.toml changed) or absent. mise/install always runs without --cached,
+#   so re-running it after adding a system tool refreshes the cache.
+#
+# The decision is global (whole machine). Per-project version pins are honored
+# by mise itself only under `mise activate`, which recomputes env per directory;
+# this setup uses shims (see _shell/shellenv), so a single cached list is used
+# everywhere. If you switch to `mise activate`, reintroduce a per-directory pin
+# walk here keyed on the invocation cwd.
 
-disable=("poetry" "python")
+set -u
 
-if [[ -n $MISE_LOCKING ]]; then
-    IFS=','; echo "${disable[*]}"
+cached=
+[[ ${1:-} == --cached ]] && cached=1
+
+self_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+config_toml="$self_dir/config.toml"
+local_override="$self_dir/check-tools.local"
+cache_file="${XDG_CACHE_HOME:-$HOME/.cache}/mise/check-tools-disable"
+mise_data_dir="${MISE_DATA_DIR:-$HOME/.local/share/mise}"
+
+# Serve the cache when asked and it is strictly newer than the script, the
+# config, and the per-machine override (when present), so editing any of them
+# rebuilds. Strict (-nt) so a same-second edit rebuilds rather than serving
+# stale - mtime is second-granular, and a tie means "written together, recheck".
+# ponytail: mtime check, not a content hash - a system tool added/removed
+# outside an edit to these files needs a manual mise-refresh to pick up.
+
+if [[ -n $cached && -f $cache_file \
+      && $cache_file -nt ${BASH_SOURCE[0]} \
+      && $cache_file -nt $config_toml \
+      && ( ! -f $local_override || $cache_file -nt $local_override ) ]]; then
+    cat "$cache_file"
     exit 0
 fi
 
-# ag (any version)
+# Per-tool policy: how to decide system-vs-mise.
+#   system  -> always disable mise (use system copy, any version)
+#   newer   -> disable mise only if the system version meets the minimum
+#   mise    -> never disable; always let mise manage it
+# Anything not listed uses DEFAULT_POLICY.
 
-if command -v ag > /dev/null 2>&1; then
-    disable+=("ag")
+declare -A policy=(
+    [ag]=system
+    [poetry]=system
+    [python]=system
+    [ripgrep]=system
+    [shellcheck]=system
+    [yamllint]=system
+    [awscli]=newer
+    [cmake]=newer
+    [codex]=newer
+    [fzf]=newer
+    [maven]=newer
+    [neovim]=newer
+    [ninja]=newer
+    [node]=newer
+    [pandoc]=newer
+    [perl]=newer
+    [pre-commit]=newer
+    [terraform]=newer
+    [tflint]=newer
+    [vim]=newer
+    [ollama]=mise
+    [rust]=mise
+)
+DEFAULT_POLICY=newer
+
+# Explicit minimum versions for `newer` tools. A tool with no entry here falls
+# back to the version mise pins in config.toml; if that is missing or
+# non-numeric (e.g. "latest"), any system version is accepted.
+
+declare -A minver=(
+    [neovim]=0.12
+    [node]=20
+    [pandoc]=3.9
+)
+
+# System command to probe when it differs from the mise tool name.
+
+declare -A cmd=(
+    [awscli]=aws
+    [maven]=mvn
+    [neovim]=nvim
+    [ripgrep]=rg
+    [rust]=rustc
+)
+
+# Per-machine skips: tool names here are always disabled (mise never installs
+# them on this host) regardless of policy, keeping them in the shared config.
+# Populate this from check-tools.local, e.g. `skip+=(ollama)`.
+
+skip=()
+
+# Source the optional per-machine override (path set above). It runs after the
+# defaults, so it can append to skip or reassign any array (policy/minver/cmd)
+# for this host only.
+
+# shellcheck source=/dev/null
+[[ -f $local_override ]] && source "$local_override"
+
+# emit LIST -> print the comma-separated list and refresh the cache file.
+
+emit() {
+    mkdir -p "$(dirname "$cache_file")" 2>/dev/null
+    printf '%s\n' "$1" | tee "$cache_file" 2>/dev/null || printf '%s\n' "$1"
+}
+
+# pinned_version TOOL -> the major.minor mise pins in config.toml, or empty.
+# ponytail: regex over a fixed-format TOML file, not a real parser - fine here.
+
+pinned_version() {
+    local tool=$1 line
+    line=$(grep -E "^[[:space:]]*${tool}[[:space:]]*=" "$config_toml" 2>/dev/null | head -1)
+    grep -oE '[0-9]+\.[0-9]+' <<<"$line" | head -1
+}
+
+# system_version TOOL -> the major.minor of the best non-mise copy on PATH, or
+# empty if none works. Walks PATH so a provider hierarchy is honored (rpm/apt,
+# then flox, then a homedir build - whatever comes first wins); the source does
+# not matter, only "installed outside mise and runnable". Reads --version stdout
+# only, and keeps walking past a binary that prints no version (e.g. a
+# GLIBC-broken build whose error goes to stderr), so a broken copy never masks a
+# working one further down PATH.
+#
+# Any */shims directory is skipped: shims are version-manager redirectors (mise,
+# but also pyenv/rbenv/asdf), not real installs, and they chain into each other
+# - a pyenv "system" shim forwards to the next PATH entry, which here is mise's
+# shim, so probing it would count mise's own copy as external. mise's install
+# dir is skipped for the same "never probe the tool we are deciding" reason.
+
+system_version() {
+    local bin=${cmd[$1]:-$1} dir p ver
+    local IFS=:
+    for dir in $PATH; do
+        [[ -z $dir ]] && continue
+        [[ ${dir%/} == */shims ]] && continue
+        case $dir in "$mise_data_dir"/*) continue ;; esac
+        p="$dir/$bin"
+        [[ -x $p && ! -d $p ]] || continue
+        ver=$("$p" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+' | head -1)
+        if [[ -n $ver ]]; then
+            printf '%s\n' "$ver"
+            return 0
+        fi
+    done
+}
+
+# version_ge A B -> success if A >= B (numeric, handles decimals like 0.12).
+
+version_ge() {
+    awk "BEGIN {exit !($1 >= $2)}"
+}
+
+# Always-system tools (the MISE_LOCKING fast path emits only these).
+
+# Note: ${skip[@]+...} guards the empty-array case for bash 4.2 under set -u.
+
+system_tools=(${skip[@]+"${skip[@]}"})
+for tool in "${!policy[@]}"; do
+    [[ ${policy[$tool]} == system ]] && system_tools+=("$tool")
+done
+
+if [[ -n ${MISE_LOCKING:-} ]]; then
+    mapfile -t system_tools < <(printf '%s\n' "${system_tools[@]}" | sort -u)
+    # Distinct (smaller) list - do not poison the shared cache with it.
+    IFS=','; echo "${system_tools[*]}"
+    exit 0
 fi
 
-# neovim > 0.12.x
+# Per-machine skips are always disabled.
 
-if command -v nvim > /dev/null 2>&1; then
-    ver=$(nvim --version 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
-    if [ -n "$ver" ] && awk "BEGIN {exit !($ver >= 0.12)}"; then
-        disable+=("neovim")
-    fi
-fi
+declare -A skipped=()
+for tool in ${skip[@]+"${skip[@]}"}; do
+    skipped[$tool]=1
+done
 
-# node >= 20
+# Decide each tool. Iterate the policy table so every configured tool is
+# considered (the union of [tools] and the always-system extras), plus any
+# skipped tools not otherwise in the policy table.
 
-if command -v node > /dev/null 2>&1; then
-    ver=$(node --version 2>/dev/null | grep -oE '[0-9]+' | head -1)
-    if [ -n "$ver" ] && [ "$ver" -ge 20 ] 2>/dev/null; then
-        disable+=("node")
-    fi
-fi
+disable=(${skip[@]+"${skip[@]}"})
+for tool in "${!policy[@]}"; do
+    [[ -n ${skipped[$tool]:-} ]] && continue
 
-# pandoc > 3.1
+    case ${policy[$tool]:-$DEFAULT_POLICY} in
+        system)
+            disable+=("$tool")
+            ;;
+        mise)
+            ;;
+        newer)
+            sysver=$(system_version "$tool")
+            [[ -z $sysver ]] && continue
+            min=${minver[$tool]:-$(pinned_version "$tool")}
+            if [[ -z $min ]]; then
+                # No threshold known: any system version is acceptable.
+                disable+=("$tool")
+            elif version_ge "$sysver" "$min"; then
+                disable+=("$tool")
+            fi
+            ;;
+    esac
+done
 
-if command -v pandoc > /dev/null 2>&1; then
-    ver=$(pandoc --version 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
-    if [ -n "$ver" ] && awk "BEGIN {exit !($ver >= 3.1)}"; then
-        disable+=("pandoc")
-    fi
-fi
+# Sort for stable, readable output.
 
-# ripgrep (any version)
-
-if command -v rg > /dev/null 2>&1; then
-    disable+=("ripgrep")
-fi
-
-# shellcheck (any version)
-
-if command -v shellcheck > /dev/null 2>&1; then
-    disable+=("shellcheck")
-fi
-
-# vim > 9.2
-
-if command -v vim > /dev/null 2>&1; then
-    ver=$(vim --version 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
-    if [ -n "$ver" ] && awk "BEGIN {exit !($ver >= 9.2)}"; then
-        disable+=("vim")
-    fi
-fi
-
-# yamllint (any version)
-
-if command -v yamllint > /dev/null 2>&1; then
-    disable+=("yamllint")
-fi
-
-# output for MISE_DISABLE_TOOLS consumption
-
-IFS=','; echo "${disable[*]}"
+mapfile -t disable < <(printf '%s\n' "${disable[@]}" | sort -u)
+IFS=','; emit "${disable[*]}"
