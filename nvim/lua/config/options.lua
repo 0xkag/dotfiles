@@ -150,6 +150,7 @@ opt.sessionoptions = {
 
 opt.shortmess:append("c")
 opt.diffopt:append("linematch:60")
+opt.diffopt:append("inline:word")
 
 local dictionary = "/usr/share/dict/words"
 if vim.fn.filereadable(dictionary) == 1 then
