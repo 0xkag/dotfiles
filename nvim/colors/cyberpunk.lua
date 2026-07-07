@@ -89,10 +89,11 @@ hl("ModeMsg", { fg = "#4c83ff", bold = true })
 hl("Question", { fg = "#61ce3c", bg = "#000000" })
 hl("Title", { fg = "#ff1493", bold = true })
 
-hl("DiffAdd", { fg = "#00ff00" })
-hl("DiffChange", { fg = "#ffff00" })
-hl("DiffDelete", { fg = "#ff0000" })
-hl("DiffText", { fg = "#ffff00", bg = "#4f4f4f", bold = true })
+-- bg-only so syntax highlighting shows through in diff windows
+hl("DiffAdd", { bg = "#003b00" })
+hl("DiffChange", { bg = "#2b2b00" })
+hl("DiffDelete", { fg = "#ff0000", bg = "#3b0000" })
+hl("DiffText", { bg = "#5f5f00", bold = true })
 
 hl("SpellBad", { sp = "#ff6400", undercurl = true })
 hl("SpellCap", { sp = "#fbde2d", undercurl = true })
