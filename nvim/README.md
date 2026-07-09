@@ -482,6 +482,7 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
   - `,xb`, `,xi`, `,xc`, `,xq`, `,xB` add emphasis, code, blockquotes, and checkboxes
   - `,o` follows the thing under the cursor
   - `,cp`, `,cP`, `,cr` preview, toggle, or enable rendered Markdown
+  - `,cg` views the saved file rendered by `glow` in a floating terminal (`q` closes)
 - Terraform:
   - `,cc` runs `terraform validate`
   - `,cl` runs `tflint` from the project root (the on-read/on-write linter, by
@@ -610,6 +611,9 @@ The warnings shown on startup come from `lua/config/deps.lua`. The binary names 
 | `terraform-ls` / `tflint`        | `terraform-ls` / `tflint`      |
 | `rust-analyzer` / `rustfmt`      | `rust-analyzer` (rustfmt via rustup) |
 | `gopls` / `goimports`            | `gopls` / `goimports`          |
+
+Not everything in the warnings is a Mason package: `glow` (Markdown terminal
+view) comes from mise (`mise/config.toml`) or your system package manager.
 
 Bulk install example for a typical frontend + backend workstation:
 
