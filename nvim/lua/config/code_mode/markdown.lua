@@ -143,6 +143,24 @@ function M.markdown_insert_checkbox()
   vim.api.nvim_win_set_cursor(0, { row, #prefix + 6 })
 end
 
+function M.markdown_view_glow()
+  if vim.fn.executable("glow") ~= 1 then
+    vim.notify("glow is not installed.", vim.log.levels.WARN)
+    return
+  end
+
+  if vim.bo.modified then
+    vim.notify("Buffer has unsaved changes; glow renders the file on disk.", vim.log.levels.WARN)
+  end
+
+  local Terminal = require("toggleterm.terminal").Terminal
+  Terminal:new({
+    cmd = "glow -p " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0)),
+    close_on_exit = true,
+    direction = "float",
+  }):toggle()
+end
+
 function M.markdown_toggle_render()
   require("render-markdown").buf_toggle()
 end
