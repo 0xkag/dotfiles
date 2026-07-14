@@ -143,6 +143,38 @@ url = "https://github.com/junegunn/fzf/releases/download/v0.71.0/fzf-0.71.0-darw
 checksum = "sha256:15bf30fa658c596d740f0ce9a9a97b6b5d90566124903657d09fd109dd0973d2"
 url = "https://github.com/junegunn/fzf/releases/download/v0.71.0/fzf-0.71.0-windows_amd64.zip"
 
+[[tools.glow]]
+version = "2.1.2"
+backend = "aqua:charmbracelet/glow"
+
+[tools.glow."platforms.linux-arm64"]
+checksum = "sha256:cf63abebcb50b72909db965d78290e7cecbf17a900e84705dc84addbb6952099"
+url = "https://github.com/charmbracelet/glow/releases/download/v2.1.2/glow_2.1.2_Linux_arm64.tar.gz"
+
+[tools.glow."platforms.linux-arm64-musl"]
+checksum = "sha256:cf63abebcb50b72909db965d78290e7cecbf17a900e84705dc84addbb6952099"
+url = "https://github.com/charmbracelet/glow/releases/download/v2.1.2/glow_2.1.2_Linux_arm64.tar.gz"
+
+[tools.glow."platforms.linux-x64"]
+checksum = "sha256:6063d4f2af8a82a5f4bba0831e165de9381660aa8b41df4816d0106a265b07d5"
+url = "https://github.com/charmbracelet/glow/releases/download/v2.1.2/glow_2.1.2_Linux_x86_64.tar.gz"
+
+[tools.glow."platforms.linux-x64-musl"]
+checksum = "sha256:6063d4f2af8a82a5f4bba0831e165de9381660aa8b41df4816d0106a265b07d5"
+url = "https://github.com/charmbracelet/glow/releases/download/v2.1.2/glow_2.1.2_Linux_x86_64.tar.gz"
+
+[tools.glow."platforms.macos-arm64"]
+checksum = "sha256:6f7abfb47de69fbf7b0e67d2fa019cc554916e8b6694f9877212be89fc7ebb8c"
+url = "https://github.com/charmbracelet/glow/releases/download/v2.1.2/glow_2.1.2_Darwin_arm64.tar.gz"
+
+[tools.glow."platforms.macos-x64"]
+checksum = "sha256:8cbc78a4947c68e804edf34d36070153fcc5d424873152da83ad6be14fa88ed3"
+url = "https://github.com/charmbracelet/glow/releases/download/v2.1.2/glow_2.1.2_Darwin_x86_64.tar.gz"
+
+[tools.glow."platforms.windows-x64"]
+checksum = "sha256:9bc12fce6061b0dd45325401b0d11ec2e45981b76eef2b7fa3c0f941ba5c0b39"
+url = "https://github.com/charmbracelet/glow/releases/download/v2.1.2/glow_2.1.2_Windows_x86_64.zip"
+
 [[tools.maven]]
 version = "3.9.15"
 backend = "aqua:apache/maven"
@@ -385,7 +417,7 @@ checksum = "sha256:124510b94b6baa3380d051fdf4650eaa80a302c876d611e9dba0b2e18d874
 url = "https://github.com/BurntSushi/ripgrep/releases/download/15.1.0/ripgrep-15.1.0-x86_64-pc-windows-msvc.zip"
 
 [[tools.rust]]
-version = "1.95.0"
+version = "1.96.0"
 backend = "core:rust"
 
 [[tools.shellcheck]]
