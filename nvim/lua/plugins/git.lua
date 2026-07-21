@@ -195,24 +195,113 @@ local function log_line_history()
   end), { buffer = buf, desc = "Open the full file at the commit under the cursor" })
 end
 
--- Tracks whether the gutter is showing branch changes vs. the default index base.
-local review_active = false
+-- True when HEAD is the default branch (commits go straight onto it).
+local function on_default_branch()
+  local out, code = git({ "rev-parse", "--abbrev-ref", "HEAD" })
+  return code == 0 and out[1] == default_branch()
+end
 
-local function toggle_branch_review()
+-- The remote-tracking ref of the default branch (e.g. origin/master), or nil
+-- when it does not exist (no remote).
+local function origin_default()
+  local branch = default_branch()
+  if not branch then
+    vim.notify("gitsigns: could not find a main/master branch", vim.log.levels.WARN)
+    return nil
+  end
+  local ref = "origin/" .. branch
+  local _, code = git({ "rev-parse", "--verify", "--quiet", ref })
+  if code ~= 0 then
+    vim.notify("gitsigns: no " .. ref .. " ref (no remote?)", vim.log.levels.WARN)
+    return nil
+  end
+  return ref
+end
+
+-- <leader>gm cycles the gitsigns diff base:
+--   index -> merge-base -> origin/<default> -> index
+-- The very first press instead jumps to the most useful base for the context:
+-- origin/<default> when HEAD is the default branch (unpushed commits),
+-- merge-base otherwise (branch changes). After a manual base (<leader>gM or
+-- :GitsignsBase) the next press restarts the cycle at index.
+local base_ref = nil -- ref currently applied, nil at the index base
+local base_smart = true -- true until the first <leader>gm press
+local base_state = "index" -- index | merge-base | origin | manual
+
+-- Pure cycle step: the state a <leader>gm press moves to from `state`.
+local function base_next(state, smart, on_default)
+  if state == "index" then
+    if smart then
+      return on_default and "origin" or "merge-base"
+    end
+    return "merge-base"
+  elseif state == "merge-base" then
+    return "origin"
+  end
+  return "index"
+end
+
+-- Move to `state`, resolving and applying its base ref. If the ref cannot be
+-- resolved, warn and stay on the current base.
+local function base_apply(state)
   local gs = require("gitsigns")
-  if review_active then
+  if state == "index" then
     gs.change_base(nil, true)
-    review_active = false
+    base_state, base_ref = "index", nil
     vim.notify("gitsigns: base reset to index (uncommitted changes)")
-  else
+  elseif state == "merge-base" then
     local base, branch = branch_merge_base()
     if not base then
       return
     end
     gs.change_base(base, true)
-    review_active = true
-    vim.notify("gitsigns: reviewing branch changes vs. merge-base with " .. branch)
+    base_state, base_ref = "merge-base", base
+    vim.notify("gitsigns: diff vs merge-base with " .. branch .. " (branch changes)")
+  else
+    local ref = origin_default()
+    if not ref then
+      return
+    end
+    gs.change_base(ref, true)
+    base_state, base_ref = "origin", ref
+    vim.notify("gitsigns: diff vs " .. ref .. " (unpushed + uncommitted)")
   end
+end
+
+local function base_cycle()
+  local state = base_next(base_state, base_smart, on_default_branch())
+  base_smart = false
+  base_apply(state)
+end
+
+-- Apply an explicit base ref; nil/empty resets to index. Shared by
+-- :GitsignsBase and <leader>gM.
+local function base_set(ref)
+  if ref == nil or ref == "" then
+    base_apply("index")
+    return
+  end
+  require("gitsigns").change_base(ref, true)
+  base_state, base_ref = "manual", ref
+  vim.notify("gitsigns: base set to " .. ref)
+end
+
+-- Prompt for a base ref, prefilled with the active base or, at index, the
+-- ref the smart first press would pick. Empty input resets to index.
+local function base_prompt()
+  local prefill = base_ref
+  if not prefill then
+    if on_default_branch() then
+      prefill = origin_default()
+    else
+      prefill = branch_merge_base()
+    end
+  end
+  vim.ui.input({ prompt = "gitsigns base (empty = index): ", default = prefill or "" }, function(input)
+    if input then
+      base_set(input)
+    end
+  end)
 end
 
 return {
@@ -229,17 +318,7 @@ return {
     -- :GitsignsBase <ref>  -> diff gutter against any ref (all buffers).
     -- :GitsignsBase        -> reset to the default index base.
     vim.api.nvim_create_user_command("GitsignsBase", function(cmd)
-      local gs = require("gitsigns")
-      local ref = cmd.args
-      if ref == nil or ref == "" then
-        gs.change_base(nil, true)
-        review_active = false
-        vim.notify("gitsigns: base reset to index (uncommitted changes)")
-      else
-        gs.change_base(ref, true)
-        review_active = true
-        vim.notify("gitsigns: base set to " .. ref)
-      end
+      base_set(cmd.args)
     end, { nargs = "?", desc = "Set gitsigns diff base to a git ref (empty resets)" })
 
     -- Fix up gitsigns' blame buffer. gitsigns maps r/R/d/s/S/<CR> without
@@ -377,8 +456,13 @@ return {
     },
     {
       "<leader>gm",
-      toggle_branch_review,
-      desc = "Toggle branch review (merge-base diff)",
+      base_cycle,
+      desc = "Cycle diff base (index / merge-base / origin)",
+    },
+    {
+      "<leader>gM",
+      base_prompt,
+      desc = "Set diff base to a ref (prompt)",
     },
   },
 }
