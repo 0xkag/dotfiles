@@ -152,9 +152,9 @@ return {
         mc.matchAddCursor(1)
       end, { desc = "Add next cursor" })
 
+      -- No <Left>/<Right> here: the README binds them to prev/nextCursor, but
+      -- arrows must keep moving the cursor normally while editing.
       mc.addKeymapLayer(function(layer)
-        layer({ "n", "x" }, "<Left>", mc.prevCursor)
-        layer({ "n", "x" }, "<Right>", mc.nextCursor)
         layer({ "n", "x" }, "<Esc>", function()
           if not mc.cursorsEnabled() then
             mc.enableCursors()
