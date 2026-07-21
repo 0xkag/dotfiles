@@ -127,8 +127,13 @@ Neogit is the magit-equivalent UI; gitsigns drives the gutter, hunks, and blame.
     `r` / `R` reblame cycling continues from that revision
   - `o` open the full file at the commit under the cursor
   - `q` quit the buffer; the winbar shows this legend
-- `SPC gm` toggle branch review: diff the gutter against the merge-base with
-  the default branch, so only what this branch changed shows as hunks
+- `SPC gm` cycle the gutter's diff base: index -> merge-base with the default
+  branch (what this branch changed) -> `origin/<default>` (unpushed commits +
+  uncommitted) -> index; the first press skips straight to the most useful
+  base for the context (`origin/<default>` when on the default branch itself,
+  merge-base otherwise)
+- `SPC gM` prompt for any ref as the diff base, prefilled with the active (or
+  auto-detected) base; empty input resets to the index
 - `:GitsignsBase <ref>` diff the gutter against any ref; `:GitsignsBase` with
   no argument resets to the index
 
