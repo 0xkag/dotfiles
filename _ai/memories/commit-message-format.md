@@ -53,7 +53,14 @@ Kyle George's commit message convention. Follow it for EVERY commit in his repos
 - If a Slack / ArcTech / Jira / GitHub / GitLab issue or MR is in context,
   include it at the **end of the body, BEFORE** Co-Authored-By.
 - If AI assisted with the commit, the message **ends with** a `Co-Authored-By`
-  line.
+  line naming the model actually used, in the form:
+  `Co-Authored-By: <Provider> <Model> [Model Info Extra] <email>`.
+  `<>` fields are required, `[]` fields are optional, `<email>` is always
+  wrapped in a literal `<`/`>`, and adjacent whitespace is always collapsed to
+  a single space (so if `[Model Info Extra]` is omitted, only one space sits
+  between `<Model>` and `<email>`). E.g. `Co-Authored-By: Claude Opus 4.8
+  <noreply@anthropic.com>` or `Co-Authored-By: Claude Opus 4.8 (1M context)
+  <noreply@anthropic.com>`.
 
 ## Blank-line rules
 - One blank line between the Subject and the body (or first `topic:` heading).
