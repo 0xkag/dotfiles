@@ -5,6 +5,9 @@
 - binaries: Support for NFS homedir mounted on multiple architectures (amd64
   and arm64); this is a problem for things like ~/.local, pyenv, pipx, and
   mise
+- docs: Shell toolchain productivity backlog in
+  _docs/shell-toolchain-recommendations.md (ssh/fzf/git/zsh/tmux/nvim);
+  update item statuses as work lands
 - editor: vim git commit message fill column at 75
 - editor: Track nvim-treesitter-locals
   (https://github.com/nvim-treesitter/nvim-treesitter-locals) as a future
