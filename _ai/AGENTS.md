@@ -81,10 +81,19 @@ These conventions are mostly for programming, but can apply generally too.
   `topic: Phrase` subject, `--` body bullets, 75-col wrap, ASCII-only, refs +
   Co-Authored-By last
 
+## Git workflow
+
+- [Branch & worktree creation](~/.dotfiles/_ai/memories/git-branch-creation.md) — never create a
+  branch or worktree unless I ask; suggest one freely, then wait for a yes
+- [Branch naming](~/.dotfiles/_ai/memories/git-branch-naming.md) — plain descriptive kebab-case
+  slug, no `feature/` / `bugfix/` / `chore/` prefix
+
 ## GitLab mechanics
 
 - [GitLab MR dependencies](~/.dotfiles/_ai/memories/gitlab-mr-dependencies.md) — set cross-project
   "blocked-by" via glab GraphQL (REST 400s); inline-array gotcha
 - [glab MR review comments](~/.dotfiles/_ai/memories/glab-mr-review-comments.md) — find an MR,
   read/reply to inline + summary review comments, retrigger review bots
+- [glab token source](~/.dotfiles/_ai/memories/glab-token-source.md) — on glab REST 401, source
+  `~/.gitlab-token` into the environment first
 
