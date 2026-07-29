@@ -1,0 +1,217 @@
+#+TITLE: TTY Sizing Across tmux, SSH, and the Sandbox
+#+AUTHOR: Kyle George (w/ Claude Code assistance)
+#+STARTUP: showall
+
+* Overview
+
+There is no single shared "terminal size."  Every pseudo-terminal (pty) stores
+its own dimensions in a kernel =winsize= struct (rows, cols).  Each layer in
+the stack has its own pty and must *copy* the size downward; when the size
+changes, the kernel delivers =SIGWINCH= to the foreground process of that pty,
+which is the app's cue to re-measure and repaint.
+
+The failure mode this document addresses: run Claude Code (or any full-screen
+TUI) inside tmux on one machine, detach, then attach from another machine with
+a different window size.  The app renders garbled -- text overwrites itself,
+stale frames linger -- until something forces a full redraw.  A manual =stty=
+on the pane fixes it, but only after killing and restarting the app.
+
+* The resize chain
+
+On (re)attach, the size has to propagate through several hops:
+
+#+begin_example
+  outer terminal window
+    -> tmux client reports its size          (#{client_width}x#{client_height})
+      -> tmux resizes the window/pane        (aggressive-resize, layout)
+        -> tmux writes pane pty winsize      (TIOCSWINSZ on #{pane_tty})
+          -> kernel delivers SIGWINCH        (to the pane's foreground process)
+            -> app re-measures + repaints    (ioctl TIOCGWINSZ / process.stdout.columns)
+#+end_example
+
+Two links break in practice:
+
+1. *The pane pty winsize goes stale.*  tmux doesn't push the new geometry to
+   the pane's pty, so =stty size= on the pane disagrees with the tmux pane
+   size.  The app, reading the pty, still believes the old dimensions.
+
+2. *The app mishandles the SIGWINCH even when it arrives.*  Some apps cache
+   the size at startup, or their incremental repaint interleaves incorrectly
+   under tmux (which historically lacked synchronized-output, DEC mode 2026).
+   The frame stays corrupt until a forced full redraw.
+
+* Reading the three size sources
+
+A past debugging session captured this from a pane:
+
+#+begin_example
+  % echo "tmux: $(tmux display -p '#{client_width}x#{client_height}')"
+  % echo "stty: $(stty size)"
+  % echo "tput: $(tput cols)x$(tput lines)"
+  tmux: 250x64
+  stty: 63 250
+  tput: 250x63
+#+end_example
+
+This is the *healthy* state, not a mismatch:
+
+- =client_width/client_height= is the whole tmux *client* (outer terminal):
+  250x64.
+- The status line consumes one row, so the *pane* is 250x63.
+- =stty size= prints =rows cols= (note the order), i.e. 63 rows x 250 cols --
+  the pane pty, correct.
+- =tput= prints cols x lines = 250x63 -- also the pane, correct.
+
+The bug is when these *diverge*: e.g. =stty size= reports the pre-attach
+geometry while =#{pane_width}x#{pane_height}= shows the new one.
+
+Note: =#{pane_height}= already excludes the status line, so it maps to =stty
+rows= 1:1.  Compare against =#{pane_*}=, not =#{client_*}=, when checking a
+pane's pty.
+
+* Why the CTRL-C / stty / resume dance was needed
+
+=stty rows R cols C= writes the winsize of the pty *and* asks the kernel to
+send =SIGWINCH= -- but only to that pty's *current foreground process*.
+
+The manual workaround was: Ctrl-C (suspend/kill Claude) -> =stty= -> restart.
+That works for the wrong reason: with Claude gone, the =stty= SIGWINCH lands on
+nobody, but the *restarted* Claude re-reads the (now-corrected) winsize at
+startup.  The restart, not the signal, is what fixed it.
+
+To fix it *without* restarting: from another pane, target the app's pane tty
+directly so the running process receives the SIGWINCH live --
+
+#+begin_src sh
+stty -F "$(tmux display -p -t <pane> '#{pane_tty}')" cols 250 rows 63
+#+end_src
+
+* The tmux hook (automatic fix)
+
+=tmux/tmux.conf= installs a =client-attached= hook that re-syncs every pane's
+pty winsize to its tmux pane geometry on every (re)attach:
+
+#+begin_src tmux
+set-hook -g client-attached {
+  run-shell "tmux list-panes -s -F '##{pane_tty} ##{pane_width} ##{pane_height}' | \
+    while read -r tty w h; do \
+      stty -F \"\$tty\" cols \"\$w\" rows \"\$((h - 1))\" 2>/dev/null; \
+      stty -F \"\$tty\" cols \"\$w\" rows \"\$h\" 2>/dev/null; \
+    done"
+}
+#+end_src
+
+Two details make it robust:
+
+- *Double set* (rows =h-1= then =h=): the kernel only delivers SIGWINCH when
+  the winsize actually *changes*.  If the size already looks correct, a single
+  =stty= to the same value is a no-op and no signal fires -- which is exactly
+  the stuck-frame case we need to break.  Writing a different value first
+  guarantees the final write is a real change, so SIGWINCH always fires.  This
+  also unsticks apps whose repaint-on-resize is buggy (a forced SIGWINCH is a
+  forced redraw).
+- =-s= on =list-panes= covers all panes in the session, and =2>/dev/null=
+  swallows =stty= errors on panes whose pty we can't write (rare, harmless).
+
+Reload with =prefix R= after editing.
+
+* The sandbox: a second pty layer
+
+Sandboxed Claude sessions (=~/claude-sandbox=) add another pty *inside* the
+container, and this is where most of the garbling shows up.
+
+=claude-sandbox/run= launches the container with =docker run -it= (see the
+=tty_flag= logic, ~line 760).  The =-t= allocates a pty *inside* the container;
+Claude runs on that inner pty (e.g. =/dev/pts/11= in the container), which is a
+completely separate =winsize= struct from the host pane pty (e.g.
+=/dev/pts/9=).
+
+#+begin_example
+  outer terminal
+    -> host tmux pane pty        (/dev/pts/9 on the host)
+      -> docker CLI (-it)         forwards SIGWINCH -> resizes the inner pty
+        -> container pty          (/dev/pts/11 in the container)
+          -> Claude Code
+#+end_example
+
+Consequences:
+
+- The docker CLI is what bridges the two pty layers: on host-side SIGWINCH it
+  reads the host pane size and calls =TIOCSWINSZ= on the inner pty.  If the
+  *host* pane pty winsize is stale (problem #1 above), docker reads the wrong
+  size and the inner pty inherits it -- garbling inside the sandbox.
+- The tmux =client-attached= hook fixes this too: forcing a real SIGWINCH on
+  the host pane makes the docker CLI re-read and re-push the size into the
+  container.  One fix covers both the bare and sandboxed cases.
+- Host-side =stty= / hooks cannot reach the *inner* pty directly -- only docker
+  forwards into it.  So if garbling persists inside the sandbox after the host
+  pane is confirmed correct, suspect docker's resize forwarding rather than
+  tmux.
+
+The container's =tmux= is only a shim (answers the =pane_tty= query for bell
+hooks; every other command is a no-op), so there is no inner tmux resize layer
+to worry about -- just the raw docker pty.
+
+* Claude Code resize bugs (upstream)
+
+Independent of pty plumbing, Claude Code has had recurring resize-corruption
+bugs under tmux; this is why the garbling predates and survives the full-screen
+renderer:
+
+- =#52309= -- resize duplicates/corrupts output in tmux (regression in
+  v2.1.116; closed stale, Linux + web terminal).
+- =#74122= -- TUI garbled in tmux since v2.1.200; does *not* self-heal, only
+  fixes on a forced redraw (open; suspected unbalanced synchronized-output
+  frame, =\e[?2026h= / =\e[?2026l=).
+- =#29937= -- general tmux rendering corruption (open).
+
+Relevant env vars / settings:
+
+- =CLAUDE_CODE_ALT_SCREEN_FULL_REPAINT=1= -- repaint every cell every frame
+  instead of diffing.  Use if full-screen mode leaves stale fragments after a
+  resize.
+- =CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN=1= (or =/tui default=) -- drop the
+  alternate-screen full-screen renderer entirely.
+- Upgrading tmux to a release with synchronized-output support (3.x current
+  series) reduces redraw flicker/corruption.
+
+The tmux hook above helps regardless of the upstream bug: a forced SIGWINCH is
+a forced full redraw, which is precisely what these bugs need to recover.
+
+* Related tmux settings already in place
+
+- =setw -g aggressive-resize on= -- size a window to the smallest *attached*
+  client viewing it, rather than the smallest client in the session.  Helps
+  multi-client attach but does not by itself push the winsize into a stale
+  foreground pty (hence the hook).
+- =set -g focus-events on= -- lets apps know when the pane gains/loses focus;
+  unrelated to sizing but part of the same "tell the app about terminal state"
+  family.
+
+* Troubleshooting
+
+- *Garbled after reattach, bare (no sandbox)*: confirm the mismatch first --
+  in the affected pane, compare =stty size= (rows cols) against
+  =tmux display -p '#{pane_width}x#{pane_height}'= (cols rows).  If they
+  differ, the hook didn't fire or was edited without reload; =prefix R= and
+  reattach (=tmux attach -d=).  Manual one-shot fix from another pane:
+  =stty -F "$(tmux display -p -t <pane> '#{pane_tty}')" cols C rows R=.
+- *Garbled only in the sandbox*: check the *host* pane first (as above).  If
+  the host pane is correct but Claude inside is still wrong, the docker =-it=
+  resize forwarding is the suspect -- there is no host-side stty that reaches
+  the inner pty.  Detach/reattach to re-trigger docker's forwarding, or restart
+  the sandbox.
+- *Still garbled with correct sizes*: likely an upstream Claude Code redraw bug
+  (see above).  Try =CLAUDE_CODE_ALT_SCREEN_FULL_REPAINT=1=, =/tui default=, or
+  a manual full redraw (Ctrl-L in many apps).
+- *Always use =tmux attach -d=* when moving between machines: it detaches other
+  clients so tmux resizes to *your* client immediately, avoiding a lingering
+  (e.g. dropped-SSH) client pinning the old geometry.
+
+* References
+
+- tmux =set-hook= / =client-attached=: =man tmux= (HOOKS section)
+- winsize / SIGWINCH: =man 4 tty_ioctl= (=TIOCGWINSZ=, =TIOCSWINSZ=)
+- Claude Code full-screen renderer: https://code.claude.com/docs/en/fullscreen
+- Claude Code tmux resize issues: anthropics/claude-code =#52309=, =#74122=,
+  =#29937=
