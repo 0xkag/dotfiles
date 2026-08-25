@@ -43,6 +43,15 @@ return {
       use_libuv_file_watcher = true,
     },
     window = {
+      -- neo-tree maps <space> to toggle_node without nowait, which leaves the
+      -- leader key ambiguous inside the tree: nvim waits timeoutlen (500ms)
+      -- after <space> and, if the rest of the sequence is not typed in time,
+      -- runs toggle_node and swallows the leader press. which-key's hint only
+      -- appears at 300ms, so pausing to read it loses the race. <cr> already
+      -- expands and collapses directories, so drop the <space> binding.
+      mappings = {
+        ["<space>"] = "none",
+      },
       width = 32,
     },
   },
