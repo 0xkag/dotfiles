@@ -108,6 +108,41 @@ do
   check("visual charwise span", charwise == "hello", charwise)
 end
 
+-- find_files(): picks git_files inside a repo and find_files outside one, and
+-- must never ask git_files for both --others and --recurse-submodules, which
+-- telescope refuses outright (the picker then never opens).
+do
+  local calls = {}
+  package.preload["telescope.builtin"] = function()
+    return {
+      find_files = function(opts)
+        table.insert(calls, { picker = "find_files", opts = opts })
+      end,
+      git_files = function(opts)
+        table.insert(calls, { picker = "git_files", opts = opts })
+      end,
+    }
+  end
+
+  local repo = vim.fn.tempname()
+  vim.fn.mkdir(repo .. "/.git", "p")
+  util.find_files({ cwd = repo, title = "Project Files" })
+  local git = calls[1]
+  check("find_files uses git_files in a repo", git and git.picker == "git_files", git and git.picker)
+  check("git_files keeps untracked files", git and git.opts.show_untracked == true, git and git.opts.show_untracked)
+  check(
+    "git_files does not also recurse submodules",
+    git and git.opts.recurse_submodules == nil,
+    git and git.opts.recurse_submodules
+  )
+  check("git_files gets the title", git and git.opts.prompt_title == "Project Files", git and git.opts.prompt_title)
+
+  local plain = vim.fn.tempname()
+  vim.fn.mkdir(plain, "p")
+  util.find_files({ cwd = plain })
+  check("find_files falls back outside a repo", calls[2] and calls[2].picker == "find_files", calls[2] and calls[2].picker)
+end
+
 if #failures > 0 then
   io.write("\n" .. #failures .. " failed\n")
   vim.cmd("cquit 1")

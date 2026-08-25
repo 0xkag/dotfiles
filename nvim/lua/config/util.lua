@@ -73,11 +73,15 @@ function M.find_files(opts)
   local builtin = require("telescope.builtin")
   local cwd = opts.cwd or M.cwd()
 
+  -- git ls-files cannot combine --others with --recurse-submodules, and
+  -- telescope rejects the pair outright rather than dropping one, so keep
+  -- untracked: a file just created is exactly the one you want to find,
+  -- while recursing submodules buries the project under vendored trees
+  -- (~60 of them under _lib in ~/.dotfiles, turning 373 paths into 22k).
   if opts.git ~= false and M.is_git_repo(cwd) then
     builtin.git_files({
       cwd = cwd,
       prompt_title = opts.title or "Git Files",
-      recurse_submodules = true,
       show_untracked = true,
     })
     return
