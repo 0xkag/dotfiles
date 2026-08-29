@@ -70,7 +70,8 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 - `SPC pr` reopens the same recent-project picker
 - `SPC pa` adds the current project to the recent list
 - `SPC pd` removes the current project from the recent list
-- `SPC pf` finds files in the current project
+- `SPC pf` finds files in the current project, each entry marked against the active diff base (`M` modified, `A` added, `D` deleted, `R` renamed, `?` untracked) with the base named in the prompt title, so it agrees with `SPC gc` about what changed
+- Those marks appear in any file picker that lands in a git repo (`SPC ff` and `SPC fd` too), and they follow `SPC gm`: at the index base a file committed earlier on the branch is unmarked, against `origin/<default>` it shows as changed
 - `SPC pg` or `SPC p/` greps in the current project
 - `SPC pt` opens the project tree
 - `SPC od` opens the current directory in Oil
@@ -136,6 +137,8 @@ Neogit is the magit-equivalent UI; gitsigns drives the gutter, hunks, and blame.
   merge-base otherwise)
 - `SPC gM` prompt for any ref as the diff base, prefilled with the active (or
   auto-detected) base; empty input resets to the index
+- `SPC pf` marks changed files inline; `SPC gc` below is the same base, filtered
+  to only what changed
 - `SPC gc` project-wide picker of every file changed against the active diff
   base, previewing each file's diff against that base; the base is global but
   the gutter only shows it in files that are already open, so this is the

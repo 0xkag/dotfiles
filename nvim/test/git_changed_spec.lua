@@ -135,6 +135,9 @@ local function new_repo()
 end
 
 local function load_maps()
+  -- The diff base lives in config.gitdiff now, so resetting the spec's view of
+  -- the base means dropping both modules.
+  package.loaded["config.gitdiff"] = nil
   package.loaded["plugins.git"] = nil
   local spec = require("plugins.git")
   local maps = {}

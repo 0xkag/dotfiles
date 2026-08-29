@@ -1,12 +1,12 @@
-local util = require("config.util")
+local gitdiff = require("config.gitdiff")
 
--- Run git in `dir` so the right repo is used regardless of nvim's cwd.
-local function git_in(dir, args)
-  local cmd = { "git", "-C", dir }
-  vim.list_extend(cmd, args)
-  local out = vim.fn.systemlist(cmd)
-  return out, vim.v.shell_error
-end
+-- The diff base, the changed-file listing, and the git runner are shared with
+-- the file pickers, which decorate their entries from the same base.
+local base_label = gitdiff.label
+local changed_files = gitdiff.changed_files
+local file_diff_args = gitdiff.file_diff_args
+local git_in = gitdiff.git_in
+local repo_toplevel = gitdiff.repo_toplevel
 
 -- Run git in the directory of the current buffer (falls back to cwd).
 local function git(args)
@@ -226,7 +226,6 @@ end
 -- origin/<default> when HEAD is the default branch (unpushed commits),
 -- merge-base otherwise (branch changes). After a manual base (<leader>gM or
 -- :GitsignsBase) the next press restarts the cycle at index.
-local base_ref = nil -- ref currently applied, nil at the index base
 local base_smart = true -- true until the first <leader>gm press
 local base_state = "index" -- index | merge-base | origin | manual
 
@@ -249,7 +248,8 @@ local function base_apply(state)
   local gs = require("gitsigns")
   if state == "index" then
     gs.change_base(nil, true)
-    base_state, base_ref = "index", nil
+    base_state = "index"
+    gitdiff.set_base(nil)
     vim.notify("gitsigns: base reset to index (uncommitted changes)")
   elseif state == "merge-base" then
     local base, branch = branch_merge_base()
@@ -257,7 +257,8 @@ local function base_apply(state)
       return
     end
     gs.change_base(base, true)
-    base_state, base_ref = "merge-base", base
+    base_state = "merge-base"
+    gitdiff.set_base(base)
     vim.notify("gitsigns: diff vs merge-base with " .. branch .. " (branch changes)")
   else
     local ref = origin_default()
@@ -265,7 +266,8 @@ local function base_apply(state)
       return
     end
     gs.change_base(ref, true)
-    base_state, base_ref = "origin", ref
+    base_state = "origin"
+    gitdiff.set_base(ref)
     vim.notify("gitsigns: diff vs " .. ref .. " (unpushed + uncommitted)")
   end
 end
@@ -284,14 +286,15 @@ local function base_set(ref)
     return
   end
   require("gitsigns").change_base(ref, true)
-  base_state, base_ref = "manual", ref
+  base_state = "manual"
+  gitdiff.set_base(ref)
   vim.notify("gitsigns: base set to " .. ref)
 end
 
 -- Prompt for a base ref, prefilled with the active base or, at index, the
 -- ref the smart first press would pick. Empty input resets to index.
 local function base_prompt()
-  local prefill = base_ref
+  local prefill = gitdiff.base()
   if not prefill then
     if on_default_branch() then
       prefill = origin_default()
@@ -304,89 +307,6 @@ local function base_prompt()
       base_set(input)
     end
   end)
-end
-
--- Human-readable name for the active base, for list and picker titles.
-local function base_label()
-  return base_ref or "index"
-end
-
--- Toplevel of the git repo holding the current buffer's project. git diff and
--- git status report paths relative to this, and resolving it from the project
--- root (rather than nvim's cwd) keeps the project's repo in play no matter
--- where nvim was started.
-local function repo_toplevel()
-  local out, code = git_in(util.project_root(0), { "rev-parse", "--show-toplevel" })
-  if code ~= 0 or not out[1] or out[1] == "" then
-    vim.notify("git: not inside a git repository", vim.log.levels.WARN)
-    return nil
-  end
-  return out[1]
-end
-
--- Every file changed against the active diff base, as { path, status } with
--- repo-relative paths, sorted by path. At the index base that is git status
--- (staged, unstaged, and untracked); against a ref it is git diff
--- --name-status plus the untracked files, which a diff cannot see but are
--- still part of what this branch changed. Renames report the new path.
-local function changed_files(root)
-  local files = {}
-
-  local function add(status, path)
-    if path and path ~= "" then
-      table.insert(files, { path = path, status = status })
-    end
-  end
-
-  if base_ref then
-    local out, code = git_in(root, { "diff", "--name-status", base_ref })
-    if code ~= 0 then
-      vim.notify("git diff --name-status failed: " .. table.concat(out, "\n"), vim.log.levels.ERROR)
-      return nil
-    end
-    for _, line in ipairs(out) do
-      local parts = vim.split(line, "\t", { plain = true })
-      add(parts[1], parts[#parts])
-    end
-
-    -- Untracked files are invisible to git diff, so list them separately.
-    local others, others_code = git_in(root, { "ls-files", "--others", "--exclude-standard" })
-    if others_code == 0 then
-      for _, path in ipairs(others) do
-        add("??", path)
-      end
-    end
-  else
-    local out, code = git_in(root, { "status", "--porcelain" })
-    if code ~= 0 then
-      vim.notify("git status --porcelain failed: " .. table.concat(out, "\n"), vim.log.levels.ERROR)
-      return nil
-    end
-    for _, line in ipairs(out) do
-      local path = line:sub(4)
-      add(line:sub(1, 2), path:match("^.* %-> (.*)$") or path)
-    end
-  end
-
-  table.sort(files, function(a, b)
-    return a.path < b.path
-  end)
-  return files
-end
-
--- git diff arguments for one file against the active base. Untracked files have
--- nothing to diff against, so --no-index against /dev/null renders them as
--- all-added instead of as an empty diff.
-local function file_diff_args(file)
-  if file.status == "??" then
-    return { "diff", "--no-index", "--", "/dev/null", file.path }
-  end
-  local args = { "diff" }
-  if base_ref then
-    table.insert(args, base_ref)
-  end
-  vim.list_extend(args, { "--", file.path })
-  return args
 end
 
 -- Project-wide picker of the files changed against the active base, each
