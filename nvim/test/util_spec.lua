@@ -110,7 +110,8 @@ end
 
 -- find_files(): picks git_files inside a repo and find_files outside one, and
 -- must never ask git_files for both --others and --recurse-submodules, which
--- telescope refuses outright (the picker then never opens).
+-- telescope refuses outright (the picker then never opens). Inside a repo it
+-- also decorates entries with a git status mark from the active diff base.
 do
   local calls = {}
   package.preload["telescope.builtin"] = function()
@@ -124,18 +125,85 @@ do
     }
   end
 
+  -- Stand in for telescope's file entry maker: one icon-width highlight so the
+  -- shifting the status column has to do is observable.
+  package.preload["telescope.make_entry"] = function()
+    return {
+      gen_from_file = function(_)
+        return function(line)
+          return {
+            display = function(e)
+              return "IC " .. e.value, { { { 0, 3 }, "DevIcon" } }
+            end,
+            ordinal = line,
+            value = line,
+          }
+        end
+      end,
+    }
+  end
+
+  -- A real repo: the marks come from git, not from a fixture.
   local repo = vim.fn.tempname()
-  vim.fn.mkdir(repo .. "/.git", "p")
+  vim.fn.mkdir(repo, "p")
+  local function git(args)
+    local out = vim.fn.systemlist(vim.list_extend({ "git", "-C", repo }, args))
+    assert(vim.v.shell_error == 0, table.concat(out, "\n"))
+    return out
+  end
+  vim.fn.writefile({ "one" }, repo .. "/tracked")
+  vim.fn.writefile({ "keep" }, repo .. "/untouched")
+  git({ "init", "-q", "-b", "master" })
+  git({ "config", "user.email", "t@t" })
+  git({ "config", "user.name", "t" })
+  git({ "add", "-A" })
+  git({ "commit", "-q", "-m", "A" })
+  vim.fn.writefile({ "changed" }, repo .. "/tracked")
+  vim.fn.writefile({ "fresh" }, repo .. "/untracked")
+
   util.find_files({ cwd = repo, title = "Project Files" })
-  local git = calls[1]
-  check("find_files uses git_files in a repo", git and git.picker == "git_files", git and git.picker)
-  check("git_files keeps untracked files", git and git.opts.show_untracked == true, git and git.opts.show_untracked)
+  local picker = calls[1]
+  check("find_files uses git_files in a repo", picker and picker.picker == "git_files", picker and picker.picker)
+  check("git_files keeps untracked files", picker and picker.opts.show_untracked == true, picker and picker.opts.show_untracked)
   check(
     "git_files does not also recurse submodules",
-    git and git.opts.recurse_submodules == nil,
-    git and git.opts.recurse_submodules
+    picker and picker.opts.recurse_submodules == nil,
+    picker and picker.opts.recurse_submodules
   )
-  check("git_files gets the title", git and git.opts.prompt_title == "Project Files", git and git.opts.prompt_title)
+  check(
+    "the title names the active base",
+    picker and picker.opts.prompt_title == "Project Files (vs index)",
+    picker and picker.opts.prompt_title
+  )
+
+  -- Render an entry the way telescope's entry_display.resolve does.
+  local function shown(path)
+    local entry = picker.opts.entry_maker(path)
+    local text, style = entry.display(entry)
+    return text, style
+  end
+
+  local modified, modified_style = shown("tracked")
+  check("a modified file is marked", modified == "M IC tracked", modified)
+  check("the mark is highlighted as a change", modified_style[1][2] == "TelescopeResultsDiffChange", modified_style[1][2])
+  check("the mark covers only itself", modified_style[1][1][2] == 1, vim.inspect(modified_style[1][1]))
+  check(
+    "the wrapped highlight shifts by the column width",
+    modified_style[2][1][1] == 2 and modified_style[2][1][2] == 5,
+    vim.inspect(modified_style[2][1])
+  )
+
+  local untracked, untracked_style = shown("untracked")
+  check("an untracked file is marked", untracked == "? IC untracked", untracked)
+  check(
+    "untracked gets its own highlight",
+    untracked_style[1][2] == "TelescopeResultsDiffUntracked",
+    untracked_style[1][2]
+  )
+
+  local clean, clean_style = shown("untouched")
+  check("an unchanged file gets a blank column", clean == "  IC untouched", clean)
+  check("an unchanged file adds no highlight", #clean_style == 1, #clean_style)
 
   local plain = vim.fn.tempname()
   vim.fn.mkdir(plain, "p")

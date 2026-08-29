@@ -67,6 +67,53 @@ function M.is_git_repo(path)
   return vim.fn.isdirectory(vim.fs.joinpath(path, ".git")) == 1 or vim.fn.filereadable(vim.fs.joinpath(path, ".git")) == 1
 end
 
+-- Status marks reuse telescope's own diff highlight groups, the same ones its
+-- git_status picker paints with.
+local git_status_highlights = {
+  A = "TelescopeResultsDiffAdd",
+  C = "TelescopeResultsDiffChange",
+  D = "TelescopeResultsDiffDelete",
+  M = "TelescopeResultsDiffChange",
+  R = "TelescopeResultsDiffChange",
+  U = "TelescopeResultsDiffAdd",
+  ["?"] = "TelescopeResultsDiffUntracked",
+}
+local git_status_width = 2
+
+-- Prefix telescope's file entries with a one-character git status mark, so the
+-- file picker shows what changed against the active diff base without becoming
+-- a separate picker. Wrapping the built-in file entry maker is what keeps
+-- devicons and path highlighting; the highlight ranges it returns are shifted
+-- right by the width of the column added in front of them.
+local function gen_from_file_with_status(opts, marks)
+  local entry_maker = require("telescope.make_entry").gen_from_file(opts)
+
+  return function(line)
+    local entry = entry_maker(line)
+    if not entry then
+      return entry
+    end
+
+    local display = entry.display
+    entry.display = function(e, picker)
+      local text, style = display(e, picker)
+      local mark = marks[to_absolute(e.value, opts.cwd or M.cwd())] or ""
+
+      local shifted = {}
+      for i, item in ipairs(style or {}) do
+        shifted[i] = { { item[1][1] + git_status_width, item[1][2] + git_status_width }, item[2] }
+      end
+      if mark ~= "" then
+        local group = git_status_highlights[mark] or "TelescopeResultsDiffChange"
+        table.insert(shifted, 1, { { 0, #mark }, group })
+      end
+
+      return string.format("%-" .. git_status_width .. "s", mark) .. text, shifted
+    end
+    return entry
+  end
+end
+
 function M.find_files(opts)
   opts = opts or {}
 
@@ -79,11 +126,14 @@ function M.find_files(opts)
   -- while recursing submodules buries the project under vendored trees
   -- (~60 of them under _lib in ~/.dotfiles, turning 373 paths into 22k).
   if opts.git ~= false and M.is_git_repo(cwd) then
-    builtin.git_files({
+    local gitdiff = require("config.gitdiff")
+    local git_opts = {
       cwd = cwd,
-      prompt_title = opts.title or "Git Files",
+      prompt_title = (opts.title or "Git Files") .. " (vs " .. gitdiff.label() .. ")",
       show_untracked = true,
-    })
+    }
+    git_opts.entry_maker = gen_from_file_with_status(git_opts, gitdiff.status_by_path(cwd))
+    builtin.git_files(git_opts)
     return
   end
 
