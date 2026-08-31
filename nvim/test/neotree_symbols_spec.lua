@@ -39,6 +39,13 @@ package.preload["neo-tree.sources.manager"] = function()
     get_state = function()
       return { path = "/nowhere" }
     end,
+    refresh = function() end,
+  }
+end
+package.preload["neo-tree.events"] = function()
+  return {
+    GIT_STATUS_CHANGED = "git_status_changed",
+    subscribe = function() end,
   }
 end
 local setup_calls = 0
