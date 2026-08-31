@@ -345,7 +345,9 @@ return {
       function()
         vim.cmd("Neotree reveal dir=" .. vim.fn.fnameescape(util.project_root(0)))
       end,
-      desc = "Project tree",
+      -- Deliberately the same action as <leader>pe; the description says so
+      -- because which-key is the only place the duplication is visible.
+      desc = "Project tree (same as SPC pe)",
     },
     {
       "<leader>tg",

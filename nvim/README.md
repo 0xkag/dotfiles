@@ -73,7 +73,7 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 - `SPC pf` finds files in the current project, each entry marked against the active diff base (`M` modified, `A` added, `D` deleted, `R` renamed, `?` untracked) with the base named in the prompt title, so it agrees with `SPC gc` about what changed
 - Those marks appear in any file picker that lands in a git repo (`SPC ff` and `SPC fd` too), and they follow `SPC gm`: at the index base a file committed earlier on the branch is unmarked, against `origin/<default>` it shows as changed
 - `SPC pg` or `SPC p/` greps in the current project
-- `SPC pt` opens the project tree
+- `SPC pt` opens the project tree -- the same action as `SPC pe`, kept as a synonym
 - `SPC od` opens the current directory in Oil, `SPC oD` the project root; both carry a git status column marked against the active diff base, the same marks the pickers and the tree use
 - Oil's column does *not* redraw itself when `SPC gm` changes the base: an Oil buffer can be holding unsaved filesystem edits and a refresh discards them, so `<C-l>` (Oil's refresh) is left to you
 - Project switching saves the current session, changes directory, and restores the target project session when one exists
@@ -465,7 +465,7 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
 - `gr` open references through Telescope
 - `gy` open type definitions through Telescope
 - `SPC ft` toggles the file tree
-- `SPC pt` opens the project tree
+- `SPC pt` opens the project tree -- the same action as `SPC pe`, kept as a synonym
 - `SPC od` opens the current directory in Oil
 - `SPC oD` opens the current project root in Oil
 - `SPC SPC` searches commands
