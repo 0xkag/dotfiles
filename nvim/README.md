@@ -77,6 +77,8 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 - `SPC oD` opens the project root in Oil
 - Project switching saves the current session, changes directory, and restores the target project session when one exists
 - In the project picker, `<C-d>` in insert mode or `dd` in normal mode removes the selected project from history
+- Inside any Telescope picker, `<C-h>` (or Telescope's own `<C-/>`) lists that picker's mappings; they are buffer-local to the prompt buffer, so `SPC ?` and `SPC hk` never show them
+- Picker mappings worth knowing: `<C-q>` sends every result to the quickfix list and opens it, `<Tab>` multi-selects and `<M-q>` sends only the selection, `<C-x>` / `<C-v>` / `<C-t>` open in a split, vsplit, or tab, and `q` or `<C-g>` closes
 
 ## Useful commands
 
@@ -134,6 +136,24 @@ Neogit is the magit-equivalent UI; gitsigns drives the gutter, hunks, and blame.
   merge-base otherwise)
 - `SPC gM` prompt for any ref as the diff base, prefilled with the active (or
   auto-detected) base; empty input resets to the index
+- `SPC gc` project-wide picker of every file changed against the active diff
+  base, previewing each file's diff against that base; the base is global but
+  the gutter only shows it in files that are already open, so this is the
+  whole-project view of the same base. At the index base the list is `git
+  status` (staged, unstaged, and untracked); against a ref it is `git diff
+  --name-status <ref>` plus the untracked files a diff cannot see, with
+  renames listed under their new path; `<C-q>` in the picker turns the list
+  into a quickfix list of the changed files
+- `SPC gC` project-wide hunk list (one quickfix entry per hunk) from gitsigns'
+  own `setqflist("all")` scan, narrowed to the current project's repo -- the
+  scan otherwise covers every repo gitsigns knows about, the cwd's plus one
+  per attached buffer -- and titled with the active base; untracked files are
+  omitted because that scan skips them unless `attach_to_untracked` is on
+- an empty `SPC gC` says which of the three causes it was, since gitsigns'
+  output cannot distinguish them: no changes at all, only untracked changes
+  (which its scan skips), or tracked changes that the scan never reached
+  because neither nvim's cwd nor any attached buffer was in the repo -- the
+  last case warns and tells you to cd there or open a file from it
 - `:GitsignsBase <ref>` diff the gutter against any ref; `:GitsignsBase` with
   no argument resets to the index
 
