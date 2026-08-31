@@ -65,6 +65,28 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 - `SPC w` windows
 - `SPC y` clipboard
 
+## File and picker views
+
+Three components split the work, and it is worth knowing which one you are in:
+
+| Component | What it is | Main keys |
+|---|---|---|
+| **neo-tree** | Persistent sidebar tree. For *looking*: navigating and seeing structure. | `SPC pe` / `SPC pt`, `SPC oe`, `SPC ft` |
+| **Oil** | An editable directory buffer, dired-style. For *changing*: rename a line to rename the file, delete a line to delete it, add a line to create one, then `:w` to apply. One directory at a time, in a normal buffer. | `SPC od`, `SPC oD`, `:Oil`, `<C-l>` to refresh |
+| **Telescope** | The picker: a popup of prompt + results + preview. For *finding*. | `SPC pf`, `SPC ff`, `SPC /`, `SPC gc`, `SPC SPC` |
+
+- "Picker" means a Telescope popup. Each is built from a finder (where candidates
+  come from), a sorter (how typing filters them), a previewer (the right-hand
+  pane), and an entry maker (how one candidate becomes a display line). `<C-h>`
+  inside one lists its own mappings.
+- All three mark changed files against the same diff base, the one `SPC gm` sets,
+  so they agree about what "changed" means.
+- Oil is the default file explorer in place of `netrw`, so `:e somedir/` opens it.
+- `Ctrl-g` closes all three.
+- Two lookalikes that are not Telescope: the small prompt `SPC gM` opens is
+  snacks.nvim's `input`, and any `vim.ui.select` menu is routed into Telescope's
+  UI by telescope-ui-select.
+
 ## Project workflow
 
 - `SPC pp` opens the recent-project switcher
