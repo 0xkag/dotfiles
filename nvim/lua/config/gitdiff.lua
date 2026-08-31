@@ -20,8 +20,19 @@ function M.base()
   return base_ref
 end
 
+-- Bumped on every base change so a view that caches a listing can notice
+-- without registering a callback, and announced as a User event so an open view
+-- can redraw rather than waiting for its next refresh.
+local generation = 0
+
 function M.set_base(ref)
   base_ref = ref
+  generation = generation + 1
+  vim.api.nvim_exec_autocmds("User", { pattern = "GitDiffBaseChanged" })
+end
+
+function M.generation()
+  return generation
 end
 
 -- Human-readable name for the active base, for list and picker titles.
@@ -33,10 +44,14 @@ end
 -- project. git diff and git status report paths relative to this, and resolving
 -- it from the project root rather than nvim's cwd keeps the project's repo in
 -- play no matter where nvim was started.
-function M.repo_toplevel(dir)
+-- `quiet` is for callers that probe speculatively, such as a file tree that may
+-- be pointed anywhere and should not complain on every redraw.
+function M.repo_toplevel(dir, quiet)
   local out, code = M.git_in(dir or util.project_root(0), { "rev-parse", "--show-toplevel" })
   if code ~= 0 or not out[1] or out[1] == "" then
-    vim.notify("git: not inside a git repository", vim.log.levels.WARN)
+    if not quiet then
+      vim.notify("git: not inside a git repository", vim.log.levels.WARN)
+    end
     return nil
   end
   return out[1]
@@ -107,6 +122,33 @@ function M.file_diff_args(file)
   return args
 end
 
+-- Files this branch changed in commits since the base, i.e. base..HEAD, as
+-- { path, status } with repo-relative paths. Complements changed_files: that
+-- one answers "what differs from the base", this one narrows it to what is
+-- already committed, which is what a worktree status cannot see. At the index
+-- base there is nothing to report, since the base is the index and git status
+-- already covers everything it would list.
+function M.committed_files(root)
+  if not base_ref then
+    return {}
+  end
+
+  local out, code = M.git_in(root, { "diff", "--name-status", base_ref, "HEAD" })
+  if code ~= 0 then
+    return {}
+  end
+
+  local files = {}
+  for _, line in ipairs(out) do
+    local parts = vim.split(line, "\t", { plain = true })
+    local path = parts[#parts]
+    if path and path ~= "" then
+      table.insert(files, { path = path, status = parts[1] })
+    end
+  end
+  return files
+end
+
 -- One character standing in for a status, for a narrow picker column: the
 -- change type from git diff (M/A/D/R/C), the first of the two porcelain status
 -- columns, or ? for untracked. R100-style similarity scores collapse to R.
@@ -122,9 +164,11 @@ function M.status_mark(status)
 end
 
 -- Absolute path -> status mark for everything changed against the active base,
--- for decorating file pickers that list far more than the changed files.
-function M.status_by_path(dir)
-  local root = M.repo_toplevel(dir)
+-- for decorating file views that list far more than the changed files. `quiet`
+-- is passed through for callers that may be pointed outside a repo, such as a
+-- directory editor.
+function M.status_by_path(dir, quiet)
+  local root = M.repo_toplevel(dir, quiet)
   if not root then
     return {}
   end
