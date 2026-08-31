@@ -78,8 +78,36 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 - `SPC oD` opens the project root in Oil
 - Project switching saves the current session, changes directory, and restores the target project session when one exists
 - In the project picker, `<C-d>` in insert mode or `dd` in normal mode removes the selected project from history
+- The tree marks changed files: `M` modified, `R` renamed, `?` untracked, `*` unstaged, `+` staged, `✚` added, `✖` deleted, bubbled up onto parent directories
+- The tree renders in a *plain* profile by default: neo-tree's defaults lean on Nerd Font private-use codepoints for most git marks, the folder icons, the expander arrows, and -- via `icon.provider` on every single file row -- the nvim-web-devicons glyph, all of which arrive as tofu over PuTTY or any unpatched font. Ordinary Unicode is left alone (the box-drawing indent markers, `✚` / `✖`, the symlink arrow), because it renders fine unpatched -- checked in PuTTY + tmux
+- `SPC tg` toggles the whole tree between the plain profile and the full Nerd Font set (status marks, folder icons, devicons, expanders); an open tree is closed and re-revealed, because glyphs are resolved as it draws
 - Inside any Telescope picker, `<C-h>` (or Telescope's own `<C-/>`) lists that picker's mappings; they are buffer-local to the prompt buffer, so `SPC ?` and `SPC hk` never show them
 - Picker mappings worth knowing: `<C-q>` sends every result to the quickfix list and opens it, `<Tab>` multi-selects and `<M-q>` sends only the selection, `<C-x>` / `<C-v>` / `<C-t>` open in a split, vsplit, or tab, and `q` or `<C-g>` closes
+
+Every glyph the tree can draw, and what the plain profile does with it. The
+entries marked `std` are ordinary Unicode and render without a patched font, so
+the plain profile keeps them; everything else is a private-use codepoint and
+gets replaced:
+
+| Row element | Neo-tree default | Plain profile |
+|---|---|---|
+| File icon | whatever nvim-web-devicons returns, via `icon.provider` -- on every file row | blank (the provider is dropped, not replaced) |
+| Directory closed / open | U+E5FF / U+E5FE | `+` / `-` |
+| Directory empty / empty open | U+F0256 / U+F0DCF | `-` / `-` |
+| Expander collapsed / expanded | U+F460 / U+F47C | `>` / `v` |
+| Indent marker / last | `std` U+2502 / U+2514 | kept -- box drawing needs no patch |
+| Symlink arrow | `std` U+279B | kept |
+| Status added / deleted | `std` U+271A / U+2716 | kept (`✚` / `✖`) |
+| Status modified / renamed | U+F444 / U+F0055 | `M` / `R` |
+| Status untracked / ignored | U+F128 / U+F474 | `?` / `I` |
+| Status unstaged / staged | U+F0131 / U+F046 | `*` / `+` |
+| Status conflict | U+E727 | `!` |
+
+The file icon is deliberately blank: the status column already owns the right of
+the row, so anything in the icon column reads as a status too. `*` was the worst
+of both, being the unstaged mark as well, so it printed twice on one line with
+two meanings. `+` still means "directory closed" on the left and "staged" on the
+right; they never share a row, so it is left as is.
 
 ## Useful commands
 
@@ -775,6 +803,13 @@ live in git history.
   [REMOTE_AND_RUNBOOK_NOTES.md](./REMOTE_AND_RUNBOOK_NOTES.md:1)
 - The legacy clipboard fallback aliases remain disabled reference comments in
   `lua/config/keymaps.lua`; decide later whether to revive them as a toggle
+- The file tree's diff-base marks are ours, not neo-tree's: upstream accepts
+  `:Neotree git_base=<ref>` and diffs `<base>..HEAD` for the same purpose, but
+  at the tip of `v3.x` (`ebd6676`) every row fails to render with
+  `git/init.lua:632: attempt to index local 'git_status' (a boolean value)`, and
+  even working it cannot tell base-derived changes from uncommitted ones (it
+  computes a `status_from_diff` flag and then ignores it). If upstream fixes
+  both, the custom `git_status` component could be retired
 - The Emacs-native long tail is unported: heavy Org integrations, Elfeed, the
   PDF workflow, the IETF/xkcd/speed-reading layers, and some secondary
   language/tooling layers
