@@ -27,6 +27,7 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 - `SPC` is the main leader key
 - `,` is the local leader key
 - `SPC` and `,` both open `which-key` popups for discoverable mappings
+- The popups spell special key names -- `SPC`, `TAB`, `RET`, `ESC`, `BS`, `C-`, `M-` -- rather than drawing them as pictograms; which-key's defaults put 24 of its 28 key icons in the Material Design Icons block that only exists in Nerd Fonts v3, so on an older patched font they render as tofu, and spelling them also matches the notation this README uses
 - `SPC SPC` opens searchable commands, similar to a lightweight Spacemacs `SPC SPC`
 - `SPC ?` opens searchable keymaps
 - Global indentation defaults to 4 spaces; common languages override that explicitly

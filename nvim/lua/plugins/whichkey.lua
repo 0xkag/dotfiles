@@ -4,6 +4,44 @@ return {
   opts = {
     delay = 300,
     icons = {
+      -- which-key draws special key names as Nerd Font pictograms, and 24 of
+      -- the 28 sit in the Material Design Icons block (U+F0000 and up) that
+      -- Nerd Fonts only added in v3, so on an older patched font <Space>,
+      -- <Tab>, <Esc>, <BS> and every modifier come out as tofu -- which is why
+      -- "alternate buffer", "Commands", "close" and which-key's own "back"
+      -- looked broken. Spell them out instead: font-proof, and it matches the
+      -- SPC / TAB / C- notation the README already uses. Word-style names carry
+      -- a trailing space because view.format concatenates keys with no
+      -- separator; modifier prefixes must not.
+      keys = {
+        BS = "BS ",
+        C = "C-",
+        CR = "RET ",
+        D = "D-",
+        Down = "Down ",
+        Esc = "ESC ",
+        F1 = "F1 ",
+        F2 = "F2 ",
+        F3 = "F3 ",
+        F4 = "F4 ",
+        F5 = "F5 ",
+        F6 = "F6 ",
+        F7 = "F7 ",
+        F8 = "F8 ",
+        F9 = "F9 ",
+        F10 = "F10 ",
+        F11 = "F11 ",
+        F12 = "F12 ",
+        Left = "Left ",
+        M = "M-",
+        Right = "Right ",
+        S = "S-",
+        ScrollWheelDown = "WheelDown ",
+        ScrollWheelUp = "WheelUp ",
+        Space = "SPC ",
+        Tab = "TAB ",
+        Up = "Up ",
+      },
       mappings = false,
     },
     preset = "modern",
