@@ -163,6 +163,23 @@ function M.status_mark(status)
   return trimmed:sub(1, 1)
 end
 
+-- Status mark -> highlight group. Telescope defines these, linked to the Diff*
+-- groups, and its own git_status picker paints with them, so reusing them keeps
+-- one visual language across every view that shows a mark.
+local status_highlights = {
+  A = "TelescopeResultsDiffAdd",
+  C = "TelescopeResultsDiffChange",
+  D = "TelescopeResultsDiffDelete",
+  M = "TelescopeResultsDiffChange",
+  R = "TelescopeResultsDiffChange",
+  U = "TelescopeResultsDiffAdd",
+  ["?"] = "TelescopeResultsDiffUntracked",
+}
+
+function M.status_highlight(mark)
+  return status_highlights[mark] or "TelescopeResultsDiffChange"
+end
+
 -- Absolute path -> status mark for everything changed against the active base,
 -- for decorating file views that list far more than the changed files. `quiet`
 -- is passed through for callers that may be pointed outside a repo, such as a

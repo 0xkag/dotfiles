@@ -67,17 +67,6 @@ function M.is_git_repo(path)
   return vim.fn.isdirectory(vim.fs.joinpath(path, ".git")) == 1 or vim.fn.filereadable(vim.fs.joinpath(path, ".git")) == 1
 end
 
--- Status marks reuse telescope's own diff highlight groups, the same ones its
--- git_status picker paints with.
-local git_status_highlights = {
-  A = "TelescopeResultsDiffAdd",
-  C = "TelescopeResultsDiffChange",
-  D = "TelescopeResultsDiffDelete",
-  M = "TelescopeResultsDiffChange",
-  R = "TelescopeResultsDiffChange",
-  U = "TelescopeResultsDiffAdd",
-  ["?"] = "TelescopeResultsDiffUntracked",
-}
 local git_status_width = 2
 
 -- Prefix telescope's file entries with a one-character git status mark, so the
@@ -104,8 +93,7 @@ local function gen_from_file_with_status(opts, marks)
         shifted[i] = { { item[1][1] + git_status_width, item[1][2] + git_status_width }, item[2] }
       end
       if mark ~= "" then
-        local group = git_status_highlights[mark] or "TelescopeResultsDiffChange"
-        table.insert(shifted, 1, { { 0, #mark }, group })
+        table.insert(shifted, 1, { { 0, #mark }, require("config.gitdiff").status_highlight(mark) })
       end
 
       return string.format("%-" .. git_status_width .. "s", mark) .. text, shifted
