@@ -74,8 +74,8 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 - Those marks appear in any file picker that lands in a git repo (`SPC ff` and `SPC fd` too), and they follow `SPC gm`: at the index base a file committed earlier on the branch is unmarked, against `origin/<default>` it shows as changed
 - `SPC pg` or `SPC p/` greps in the current project
 - `SPC pt` opens the project tree
-- `SPC od` opens the current directory in Oil
-- `SPC oD` opens the project root in Oil
+- `SPC od` opens the current directory in Oil, `SPC oD` the project root; both carry a git status column marked against the active diff base, the same marks the pickers and the tree use
+- Oil's column does *not* redraw itself when `SPC gm` changes the base: an Oil buffer can be holding unsaved filesystem edits and a refresh discards them, so `<C-l>` (Oil's refresh) is left to you
 - Project switching saves the current session, changes directory, and restores the target project session when one exists
 - In the project picker, `<C-d>` in insert mode or `dd` in normal mode removes the selected project from history
 - The tree marks changed files: `M` modified, `R` renamed, `?` untracked, `*` unstaged, `+` staged, `✚` added, `✖` deleted, bubbled up onto parent directories
