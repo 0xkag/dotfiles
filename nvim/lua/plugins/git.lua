@@ -1,3 +1,5 @@
+local util = require("config.util")
+
 -- Run git in `dir` so the right repo is used regardless of nvim's cwd.
 local function git_in(dir, args)
   local cmd = { "git", "-C", dir }
@@ -304,6 +306,203 @@ local function base_prompt()
   end)
 end
 
+-- Human-readable name for the active base, for list and picker titles.
+local function base_label()
+  return base_ref or "index"
+end
+
+-- Toplevel of the git repo holding the current buffer's project. git diff and
+-- git status report paths relative to this, and resolving it from the project
+-- root (rather than nvim's cwd) keeps the project's repo in play no matter
+-- where nvim was started.
+local function repo_toplevel()
+  local out, code = git_in(util.project_root(0), { "rev-parse", "--show-toplevel" })
+  if code ~= 0 or not out[1] or out[1] == "" then
+    vim.notify("git: not inside a git repository", vim.log.levels.WARN)
+    return nil
+  end
+  return out[1]
+end
+
+-- Every file changed against the active diff base, as { path, status } with
+-- repo-relative paths, sorted by path. At the index base that is git status
+-- (staged, unstaged, and untracked); against a ref it is git diff
+-- --name-status plus the untracked files, which a diff cannot see but are
+-- still part of what this branch changed. Renames report the new path.
+local function changed_files(root)
+  local files = {}
+
+  local function add(status, path)
+    if path and path ~= "" then
+      table.insert(files, { path = path, status = status })
+    end
+  end
+
+  if base_ref then
+    local out, code = git_in(root, { "diff", "--name-status", base_ref })
+    if code ~= 0 then
+      vim.notify("git diff --name-status failed: " .. table.concat(out, "\n"), vim.log.levels.ERROR)
+      return nil
+    end
+    for _, line in ipairs(out) do
+      local parts = vim.split(line, "\t", { plain = true })
+      add(parts[1], parts[#parts])
+    end
+
+    -- Untracked files are invisible to git diff, so list them separately.
+    local others, others_code = git_in(root, { "ls-files", "--others", "--exclude-standard" })
+    if others_code == 0 then
+      for _, path in ipairs(others) do
+        add("??", path)
+      end
+    end
+  else
+    local out, code = git_in(root, { "status", "--porcelain" })
+    if code ~= 0 then
+      vim.notify("git status --porcelain failed: " .. table.concat(out, "\n"), vim.log.levels.ERROR)
+      return nil
+    end
+    for _, line in ipairs(out) do
+      local path = line:sub(4)
+      add(line:sub(1, 2), path:match("^.* %-> (.*)$") or path)
+    end
+  end
+
+  table.sort(files, function(a, b)
+    return a.path < b.path
+  end)
+  return files
+end
+
+-- git diff arguments for one file against the active base. Untracked files have
+-- nothing to diff against, so --no-index against /dev/null renders them as
+-- all-added instead of as an empty diff.
+local function file_diff_args(file)
+  if file.status == "??" then
+    return { "diff", "--no-index", "--", "/dev/null", file.path }
+  end
+  local args = { "diff" }
+  if base_ref then
+    table.insert(args, base_ref)
+  end
+  vim.list_extend(args, { "--", file.path })
+  return args
+end
+
+-- Project-wide picker of the files changed against the active base, each
+-- previewed as its own diff against that base. The base <leader>gm sets is
+-- global, but the gutter only shows it in files that are already open; this is
+-- the whole-project view of the same base.
+local function changed_files_pick()
+  local root = repo_toplevel()
+  if not root then
+    return
+  end
+
+  local files = changed_files(root)
+  if not files then
+    return
+  end
+  if #files == 0 then
+    vim.notify("git: no files changed vs " .. base_label())
+    return
+  end
+
+  local conf = require("telescope.config").values
+  local finders = require("telescope.finders")
+  local pickers = require("telescope.pickers")
+  local previewers = require("telescope.previewers")
+
+  pickers
+    .new({}, {
+      prompt_title = "Changed vs " .. base_label(),
+      finder = finders.new_table({
+        results = files,
+        entry_maker = function(file)
+          return {
+            display = string.format("%-4s %s", file.status, file.path),
+            ordinal = file.path,
+            path = vim.fs.joinpath(root, file.path),
+            status = file.status,
+            value = file.path,
+          }
+        end,
+      }),
+      previewer = previewers.new_buffer_previewer({
+        title = "Diff vs " .. base_label(),
+        define_preview = function(self, entry)
+          local lines = git_in(root, file_diff_args({ path = entry.value, status = entry.status }))
+          vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
+          vim.bo[self.state.bufnr].filetype = "diff"
+        end,
+      }),
+      sorter = conf.generic_sorter({}),
+    })
+    :find()
+end
+
+-- Why a project-wide hunk list came back empty, as (message, level). gitsigns
+-- discovers repos from nvim's cwd plus its attached buffers, so in its output a
+-- repo it never scanned looks exactly like a clean one; ask git directly rather
+-- than reporting "no hunks" for three different situations.
+local function changed_hunks_reason(root)
+  local files = changed_files(root)
+  if not files or #files == 0 then
+    return "git: no changes vs " .. base_label()
+  end
+
+  for _, file in ipairs(files) do
+    if file.status ~= "??" then
+      return "git: "
+        .. vim.fn.fnamemodify(root, ":~")
+        .. " has tracked changes but the hunk scan found none; it covers nvim's"
+        .. " cwd plus attached buffers, so cd there or open a file from it",
+        vim.log.levels.WARN
+    end
+  end
+
+  return "git: only untracked changes vs "
+    .. base_label()
+    .. "; the hunk scan skips those (attach_to_untracked is off)"
+end
+
+-- Project-wide hunk list in the quickfix list. gitsigns' own "all" target
+-- honors the global base, but scans every repo it knows about (the cwd's, plus
+-- one per attached buffer), so narrow the result to this project's repo and
+-- retitle it with the base.
+local function changed_hunks_list()
+  local root = repo_toplevel()
+  if not root then
+    return
+  end
+
+  require("gitsigns").setqflist("all", { open = false }, function(err)
+    vim.schedule(function()
+      if err then
+        vim.notify("gitsigns setqflist: " .. err, vim.log.levels.ERROR)
+        return
+      end
+
+      local prefix = root .. "/"
+      local items = vim.tbl_filter(function(item)
+        local name = item.filename or ""
+        if item.bufnr and item.bufnr > 0 and vim.api.nvim_buf_is_valid(item.bufnr) then
+          name = vim.api.nvim_buf_get_name(item.bufnr)
+        end
+        return vim.startswith(name, prefix)
+      end, vim.fn.getqflist())
+
+      if #items == 0 then
+        vim.notify(changed_hunks_reason(root))
+        return
+      end
+
+      vim.fn.setqflist({}, " ", { items = items, title = "Hunks vs " .. base_label() })
+      vim.cmd.copen()
+    end)
+  end)
+end
+
 return {
   "lewis6991/gitsigns.nvim",
   event = { "BufReadPre", "BufNewFile" },
@@ -453,6 +652,16 @@ return {
         require("gitsigns").diffthis()
       end,
       desc = "Diff this",
+    },
+    {
+      "<leader>gc",
+      changed_files_pick,
+      desc = "Changed files vs diff base (project)",
+    },
+    {
+      "<leader>gC",
+      changed_hunks_list,
+      desc = "Changed hunks vs diff base (project quickfix)",
     },
     {
       "<leader>gm",
