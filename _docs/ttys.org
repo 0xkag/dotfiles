@@ -38,7 +38,7 @@ On (re)attach, the size has to propagate through several hops:
 #+begin_example
   outer terminal window
     -> tmux client reports its size          (#{client_width}x#{client_height})
-      -> tmux resizes the window/pane        (window-size, aggressive-resize, layout)
+      -> tmux resizes the window/pane        (window-size, layout)
         -> tmux writes pane pty winsize      (TIOCSWINSZ on #{pane_tty})
           -> kernel delivers SIGWINCH        (to the fg pgroup of the pty's session)
             -> app re-measures + repaints    (ioctl TIOCGWINSZ / process.stdout.columns)
@@ -116,57 +116,61 @@ directly so the running process receives the SIGWINCH live --
 stty -F "$(tmux display -p -t <pane> '#{pane_tty}')" cols 250 rows 63
 #+end_src
 
-* The tmux hook (automatic fix)
+* The manual redraw key (=prefix M-r=)
 
-=tmux/tmux.conf= installs a =client-attached= hook that re-syncs every pane's
-pty winsize to its tmux pane geometry on every (re)attach:
+An earlier version of this config installed a =client-attached= hook that
+swept every pane on every (re)attach, double-setting each pane pty's winsize
+to force a SIGWINCH.  It was removed, for two reasons.
+
+- *Its premise was false.*  The hook was there to fix case 1 (a stale pane pty
+  winsize), but case 1 does not actually occur: tmux is the pty master and
+  always calls =TIOCSWINSZ= when it resizes a pane.  Tested on a hookless
+  server (=tmux -f /dev/null=) across four =attach -d= cycles at 100x30,
+  170x45, 80x24 and 200x60 -- the pane pty tracked the tmux pane geometry
+  every time.  The old snippet that seemed to motivate the hook (=tmux: 250x64=
+  vs =stty: 63 250=) is annotated earlier in this document as the *healthy*
+  state -- the status line's one row -- not a stale pty.
+- *It could not fix the bug that actually bit* (case 2, the sandbox's missing
+  ctty), and its only real use (case 3, forcing a redraw for the upstream
+  Claude Code repaint bugs) came at the cost of firing two SIGWINCHes at every
+  app in every window on every attach, one of them at a deliberately wrong
+  size.  For a bug suspected to be unbalanced synchronized-output frames
+  *around* resizes, manufacturing spurious resizes is as likely to feed it as
+  to cure it.
+
+What replaces it is a *key* -- deliberate, current-pane-only, and free on
+every attach:
 
 #+begin_src tmux
-set-hook -g client-attached {
-  run-shell "tmux list-panes -s -F '##{pane_tty} ##{pane_width} ##{pane_height}' | \
-    while read -r tty w h; do \
-      stty -F \"\$tty\" cols \"\$w\" rows \"\$((h - 1))\" 2>/dev/null; \
-      stty -F \"\$tty\" cols \"\$w\" rows \"\$h\" 2>/dev/null; \
-    done"
-}
+bind-key M-r run-shell "tty=#{pane_tty}; w=#{pane_width}; h=#{pane_height}; \
+    stty -F \"\$tty\" cols \"\$w\" rows \"\$((h - 1))\" 2>/dev/null; \
+    stty -F \"\$tty\" cols \"\$w\" rows \"\$h\" 2>/dev/null" \; \
+  display 'pane redraw: SIGWINCH sent'
 #+end_src
 
-Two details make it robust:
+- =prefix r= (=refresh-client=) redraws tmux's *own* view of the client; it
+  does not signal the app.  =prefix M-r= pokes the foreground app itself, for
+  the occasional TUI left with a stale frame after an upstream redraw glitch
+  (case 3), or any app you find stuck.
+- *Double set* (rows =h-1= then =h=): the kernel delivers SIGWINCH only when
+  the winsize actually *changes*, so a single =stty= to the current size is a
+  no-op.  Writing a different value first guarantees the final write is a real
+  change, so the signal always fires -- the whole point of a manual redraw.
+- =run-shell= format-expands =#{pane_tty}= / =#{pane_width}= / =#{pane_height}=
+  against the pane that was active when the key was pressed, so the effect is
+  scoped to that one pane.  =$((h - 1))= and the =$tty= / =$w= / =$h= reads are
+  shell, not tmux formats; the =\"\$...\"= escaping carries them intact through
+  config-file parsing.  (=list-keys= and =show-hooks= re-escape the stored
+  string asymmetrically for display -- =$tty= prints as =\$tty= while
+  =$((h - 1))= keeps a bare =$= -- which looks broken but is only a display
+  artifact.)
+- It does *nothing* for case 2: with no controlling terminal there is nobody
+  for the kernel to signal.  The sandbox is fixed at the source instead
+  (=su --session-command= in =claude-sandbox/entrypoint=); to rescue a
+  still-running legacy container, =kill -WINCH= its inner Claude pid from the
+  host.
 
-- *Double set* (rows =h-1= then =h=): the kernel only delivers SIGWINCH when
-  the winsize actually *changes*.  If the size already looks correct, a single
-  =stty= to the same value is a no-op and no signal fires -- which is exactly
-  the stuck-frame case we need to break.  Writing a different value first
-  guarantees the final write is a real change, so SIGWINCH always fires.  This
-  also unsticks apps whose repaint-on-resize is buggy (a forced SIGWINCH is a
-  forced redraw).
-- =-s= on =list-panes= covers all panes in the session, and =2>/dev/null=
-  swallows =stty= errors on panes whose pty we can't write (rare, harmless).
-
-Reload with =prefix R= after editing.
-
-*Scope: this hook addresses case 1 only* (stale pane pty winsize).  It cannot
-fix case 2 -- if the app has no controlling terminal, no amount of =stty= on
-the pane will reach it, because the kernel has nobody to signal.  Do not reach
-for this hook when the sizes already agree.
-
-*The escaping is correct, despite appearances.*  =tmux show-hooks= re-escapes
-the stored string for display and does so asymmetrically: =$tty= / =$w= / =$h=
-print as =\$...= while =$((h - 1))= prints with a bare =$=.  That asymmetry is
-a display artifact, not a parsing bug.  Verified on a throwaway server
-(=tmux -L probe=) with the =stty= swapped for an =echo=: the loop emits
-=tty=[/dev/pts/12] cols=[80] rows1=[22] rows2=[23]= -- all four expansions
-happen at shell runtime, per iteration, as intended.
-
-*Caveat -- the hook can write stale geometry.*  =window-size= defaults to
-=latest=, and tmux only resizes a window when a client is actually *viewing*
-it.  So on reattach, windows the new client has not yet selected keep their
-old geometry, and this hook faithfully copies that *stale* size into their
-ptys.  Observed after reattaching from a 424x77 client to a 187x50 one: the two
-visited windows were 187x49 while six unvisited ones were still 424x77.  It is
-benign for ordinary apps -- selecting the window makes tmux resize it and the
-app repaints -- but it means the hook's premise ("tmux knows the right size at
-attach time") does not hold for unviewed windows.
+Reload the whole config with =prefix R= after editing.
 
 * The sandbox: a second pty layer
 
@@ -192,7 +196,7 @@ Consequences:
   reads the host pane size and calls =TIOCSWINSZ= on the inner pty.  If the
   *host* pane pty winsize is stale (case 1 above), docker reads the wrong size
   and the inner pty inherits it.
-- Host-side =stty= / hooks cannot reach the *inner* pty directly -- only docker
+- Host-side =stty= cannot reach the *inner* pty directly -- only docker
   forwards into it.  (The inner pty is visible on the host, since =run= bind
   mounts =-v /dev/pts:/dev/pts=, but it is owned by the container user and
   =stty -F= on it fails with =Permission denied= from the host.  Read it with
@@ -292,33 +296,39 @@ Relevant env vars / settings:
 - Upgrading tmux to a release with synchronized-output support (3.x current
   series) reduces redraw flicker/corruption.
 
-The tmux hook above helps with case 3 regardless of the upstream bug: a forced
-SIGWINCH is a forced full redraw, which is precisely what these bugs need to
-recover.  It does nothing for case 2, where the signal never arrives at all.
+The =prefix M-r= redraw key (above) helps with case 3 regardless of the
+upstream bug: a forced SIGWINCH is a forced full redraw, which is precisely
+what these bugs need to recover.  It does nothing for case 2, where the signal
+never arrives at all.
 
-* Related tmux settings already in place
+* Related tmux settings
 
-- =setw -g aggressive-resize on= -- size a window to the smallest client
-  *actively displaying* it, rather than the smallest client attached to the
-  session.  Helps multi-client attach but does not by itself push the winsize
-  into a stale foreground pty (hence the hook).  Note it only takes effect when
-  =window-size= is =smallest= or =largest=; under the default =latest= it is
-  ignored, which is the setting actually in force here.
+- =setw -g aggressive-resize= -- *removed.*  It sizes a window to the smallest
+  client *actively displaying* it rather than the smallest attached to the
+  session, but only takes effect when =window-size= is =smallest= or =largest=.
+  Under the default =latest= (in force here) it is simply ignored, so it was
+  dropped as dead configuration.
 - =window-size latest= (tmux default) -- size each window to the most recently
-  used client that is displaying it.  The corollary bites on reattach: windows
-  no client is currently viewing keep their old geometry until selected.  See
-  the hook caveat above.
+  used client displaying it.  The corollary bites on reattach: a window no
+  client is currently viewing keeps its old geometry until selected.  Observed
+  after reattaching from a 424x77 client to a 187x50 one -- the two visited
+  windows were 187x49 while six unvisited ones were still 424x77.  It
+  self-heals the moment you select the window (tmux resizes it and the app
+  repaints), so it needs no config; it is only worth knowing when a
+  just-reattached, not-yet-visited window looks wrong.
 - =set -g focus-events on= -- lets apps know when the pane gains/loses focus;
   unrelated to sizing but part of the same "tell the app about terminal state"
   family.
 
 * Troubleshooting
 
-- *Garbled after reattach, bare (no sandbox)*: confirm the mismatch first --
-  in the affected pane, compare =stty size= (rows cols) against
-  =tmux display -p '#{pane_width}x#{pane_height}'= (cols rows).  If they
-  differ, the hook didn't fire or was edited without reload; =prefix R= and
-  reattach (=tmux attach -d=).  Manual one-shot fix from another pane:
+- *Garbled after reattach, bare (no sandbox)*: compare =stty size= (rows cols)
+  in the affected pane against =tmux display -p '#{pane_width}x#{pane_height}'=
+  (cols rows).  They should *agree* -- tmux keeps the pane pty in sync, so a
+  divergence is unexpected (a not-yet-selected window under =window-size
+  latest=, or an app that resized its own pty).  When they agree and the frame
+  is still stale, it is case 3: press =prefix M-r= to force a redraw of that
+  pane.  One-shot equivalent from another pane:
   =stty -F "$(tmux display -p -t <pane> '#{pane_tty}')" cols C rows R=.
 - *Garbled only in the sandbox*: check the sizes at all four layers before
   theorizing.  Host pane pty via =stty -F <pane_tty> size=; inner pty via
@@ -350,7 +360,8 @@ recover.  It does nothing for case 2, where the signal never arrives at all.
 
 * References
 
-- tmux =set-hook= / =client-attached=: =man tmux= (HOOKS section)
+- tmux =bind-key= / =run-shell= format expansion: =man tmux= (COMMANDS,
+  FORMATS)
 - winsize / SIGWINCH: =man 4 tty_ioctl= (=TIOCGWINSZ=, =TIOCSWINSZ=)
 - Claude Code full-screen renderer: https://code.claude.com/docs/en/fullscreen
 - Claude Code tmux resize issues: anthropics/claude-code =#52309=, =#74122=,
