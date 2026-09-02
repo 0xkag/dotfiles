@@ -33,37 +33,6 @@ M.parsers = {
   "yaml",
 }
 
-local parser_by_filetype = {
-  bash = "bash",
-  c = "c",
-  cpp = "cpp",
-  css = "css",
-  diff = "diff",
-  dockerfile = "dockerfile",
-  go = "go",
-  gomod = "gomod",
-  html = "html",
-  javascript = "javascript",
-  javascriptreact = "tsx",
-  json = "json",
-  lua = "lua",
-  make = "make",
-  markdown = "markdown",
-  python = "python",
-  rust = "rust",
-  sh = "bash",
-  sql = "sql",
-  terraform = "terraform",
-  ["terraform-vars"] = "terraform",
-  tftpl = "terraform",
-  toml = "toml",
-  typescript = "typescript",
-  typescriptreact = "tsx",
-  vim = "vim",
-  yaml = "yaml",
-  zsh = "bash",
-}
-
 local function parser_installed(lang)
   if not lang or lang == "" then
     return true
@@ -84,24 +53,24 @@ local function parser_installed(lang)
   return false
 end
 
+-- Neovim's own filetype -> language mapping, which nvim-treesitter extends
+-- with its registrations at runtime. It never returns nil for a filetype: one
+-- nothing registered maps to itself.
 function M.parser_for_filetype(ft)
   if not ft or ft == "" then
     return nil
   end
 
-  if vim.treesitter and vim.treesitter.language and vim.treesitter.language.get_lang then
-    local ok, lang = pcall(vim.treesitter.language.get_lang, ft)
-    if ok and lang and lang ~= "" then
-      return lang
-    end
-  end
-
-  return parser_by_filetype[ft]
+  return vim.treesitter.language.get_lang(ft)
 end
 
+-- The parser `ft` needs and does not have, as a list. Only a language this
+-- config lists can be missing: a filetype with no parser anywhere (tftpl, which
+-- syntax/tftpl.vim highlights) maps to itself and must not be reported as
+-- missing a parser that does not exist.
 function M.missing_for_filetype(ft)
   local lang = M.parser_for_filetype(ft)
-  if not lang or parser_installed(lang) then
+  if not lang or not vim.list_contains(M.parsers, lang) or parser_installed(lang) then
     return {}
   end
 
