@@ -54,7 +54,9 @@ function M.configure_cmp(cmp, luasnip)
     end,
     preselect = cmp.PreselectMode.None,
     completion = {
-      autocomplete = manual and false or { cmp.TriggerEvent.TextChanged },
+      -- Not `manual and false or {...}`: that idiom yields the table for every
+      -- mode, and manual completion kept firing on each keystroke.
+      autocomplete = not manual and { cmp.TriggerEvent.TextChanged } or false,
       completeopt = "menu,menuone,noselect",
     },
     performance = {
