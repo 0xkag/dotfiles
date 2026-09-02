@@ -100,6 +100,8 @@ NFS home and in a monorepo.
 
 ### 2.1 Tool probing
 
+Status: done 2026-09-01. `tools.status` is memoized per PATH with `invalidate()` for `:NvimDeps`, `notify_once` latches before checking, lint resolves the current filetype only (`config/linters.lua`), and `grepprg` uses a plain executable check. Kept for the record:
+
 `lua/config/tools.lua` `status()` is uncached. `lua/config/env.lua` puts the
 mise shims dir first on PATH, so any mise-managed tool resolves to a shim and
 `status()` verifies it with a synchronous `mise which`. Measured here: about
