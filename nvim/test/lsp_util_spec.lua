@@ -108,6 +108,54 @@ do
   vim.lsp.rpc.start = rpc_start
 end
 
+-- strip_pylsp_capabilities(): pylsp advertises a provider for every plugin slot
+-- whether or not the plugin is enabled, so everything pyright and ruff own is
+-- removed from its server_capabilities and only code actions (rope refactors)
+-- survive. Runs from on_init: the runtime fires LspAttach before on_attach, so
+-- an on_attach strip left every LspAttach handler seeing the unstripped set.
+do
+  local code_actions = { codeActionKinds = { "refactor" } }
+  local caps = {
+    codeActionProvider = code_actions,
+    completionProvider = { triggerCharacters = { "." } },
+    declarationProvider = true,
+    definitionProvider = true,
+    documentHighlightProvider = true,
+    documentSymbolProvider = true,
+    executeCommandProvider = { commands = { "x" } },
+    hoverProvider = true,
+    implementationProvider = true,
+    referencesProvider = true,
+    renameProvider = { prepareProvider = true },
+    signatureHelpProvider = { triggerCharacters = { "(" } },
+    textDocumentSync = 2,
+    typeDefinitionProvider = true,
+    workspaceSymbolProvider = true,
+  }
+  local returned = lsp_util.strip_pylsp_capabilities(caps)
+  check("strip returns the same table", returned == caps)
+  for _, name in ipairs({
+    "completionProvider",
+    "declarationProvider",
+    "definitionProvider",
+    "documentHighlightProvider",
+    "documentSymbolProvider",
+    "hoverProvider",
+    "implementationProvider",
+    "referencesProvider",
+    "renameProvider",
+    "signatureHelpProvider",
+    "typeDefinitionProvider",
+    "workspaceSymbolProvider",
+  }) do
+    check("strip removes " .. name, not caps[name], vim.inspect(caps[name]))
+  end
+  check("strip keeps codeActionProvider", caps.codeActionProvider == code_actions, vim.inspect(caps.codeActionProvider))
+  check("strip keeps executeCommandProvider", caps.executeCommandProvider ~= nil)
+  check("strip keeps textDocumentSync", caps.textDocumentSync == 2, caps.textDocumentSync)
+  check("strip tolerates nil", lsp_util.strip_pylsp_capabilities(nil) == nil)
+end
+
 if #failures > 0 then
   io.write("\n" .. #failures .. " failed\n")
   vim.cmd("cquit 1")

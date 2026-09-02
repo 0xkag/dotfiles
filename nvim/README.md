@@ -349,10 +349,10 @@ Toggle with `<leader>tR`. Matches spacemacs `SPC s e` iedit feel for the in-buff
 
 Workspace rename routes to pyright even though pylsp is also attached. pylsp advertises `renameProvider` for every plugin slot regardless of whether the plugin is enabled in settings, so a naive `vim.lsp.get_clients({ method = "textDocument/rename" })` would hand the request to pylsp, which then returns nil (no rename plugin is actually wired up). Two things prevent this:
 
-- pylsp's `on_attach` in `lua/plugins/lsp.lua` strips `renameProvider`, `hoverProvider`, `definitionProvider`, `referencesProvider`, `documentSymbolProvider`, `workspaceSymbolProvider`, `completionProvider`, `signatureHelpProvider`, `declarationProvider`, `typeDefinitionProvider`, `implementationProvider`, and `documentHighlightProvider` from `client.server_capabilities` after attach. Only `codeActionProvider` is left, matching pylsp's actual job (rope refactors)
+- pylsp's `on_init` in `lua/plugins/lsp.lua` (via `strip_pylsp_capabilities` in `lua/config/lsp_util.lua`) strips `renameProvider`, `hoverProvider`, `definitionProvider`, `referencesProvider`, `documentSymbolProvider`, `workspaceSymbolProvider`, `completionProvider`, `signatureHelpProvider`, `declarationProvider`, `typeDefinitionProvider`, `implementationProvider`, and `documentHighlightProvider` from `client.server_capabilities` once, when the client initialises and before any `LspAttach` handler reads them. Only `codeActionProvider` is left, matching pylsp's actual job (rope refactors)
 - `rename_with_preview` additionally prefers a client named `pyright` when multiple rename-capable clients remain, as belt-and-suspenders for non-Python stacks that might add another rename provider
 
-If you add a new pylsp plugin that provides one of the stripped capabilities, remove the matching line from `on_attach` and restart the LSP.
+If you add a new pylsp plugin that provides one of the stripped capabilities, remove the matching line from `strip_pylsp_capabilities` and restart the LSP.
 
 ### UI
 
@@ -366,7 +366,7 @@ Python buffers attach three LSPs with a clear division of labor. Overlapping fea
 | Server | Role | Disabled features |
 |---|---|---|
 | pyright | types, hover, completion, go-to-def, rename | — |
-| pylsp | rope refactoring code actions only | all features except `codeActionProvider` disabled (see `on_attach` in `lua/plugins/lsp.lua`) |
+| pylsp | rope refactoring code actions only | all features except `codeActionProvider` disabled (see `strip_pylsp_capabilities` in `lua/config/lsp_util.lua`) |
 | ruff (server) | lint autofixes + `source.organizeImports` / `source.fixAll` | autoconfig defaults |
 
 **Scope-aware rename of a local**: pyright's LSP rename is AST-aware. Renaming a variable bound only inside one function does not touch same-name identifiers in other scopes. Use `<leader>cr`.

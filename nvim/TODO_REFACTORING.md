@@ -65,7 +65,7 @@ Fixed one commit each; tick the box in the fixing commit.
   happens. Fix: `cmd = function(dispatchers, config)` that resolves
   `python_env.pylsp_cmd(config.root_dir)` and calls `vim.lsp.rpc.start`;
   delete pyright's copy, whose `before_init` already does the work.
-- [ ] **5. pylsp capability strip runs in the wrong hook.** The runtime fires
+- [x] **5. pylsp capability strip runs in the wrong hook.** The runtime fires
   `LspAttach` before `config.on_attach`, so every LspAttach handler sees pylsp
   unstripped, and the strip reruns per buffer. Move it to `on_init`, which runs
   once per client after `server_capabilities` is set and before any attach.

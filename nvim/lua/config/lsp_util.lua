@@ -80,4 +80,31 @@ function M.lazy_cmd(resolve)
   end
 end
 
+-- Remove from pylsp's server_capabilities everything pyright and ruff own.
+-- pylsp advertises a provider for every plugin slot whether or not the plugin
+-- is enabled in settings, so left alone it would win rename, hover,
+-- definitions and the rest over the clients that actually implement them.
+-- Only codeActionProvider survives, matching pylsp's job here: rope refactors.
+-- Mutates and returns `caps`; meant for on_init, which runs once per client
+-- after the capabilities are set and before any LspAttach handler reads them.
+function M.strip_pylsp_capabilities(caps)
+  if not caps then
+    return caps
+  end
+
+  caps.completionProvider = nil
+  caps.declarationProvider = false
+  caps.definitionProvider = false
+  caps.documentHighlightProvider = false
+  caps.documentSymbolProvider = false
+  caps.hoverProvider = false
+  caps.implementationProvider = false
+  caps.referencesProvider = false
+  caps.renameProvider = false
+  caps.signatureHelpProvider = nil
+  caps.typeDefinitionProvider = false
+  caps.workspaceSymbolProvider = false
+  return caps
+end
+
 return M
