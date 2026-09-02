@@ -60,6 +60,36 @@ do
   check("parsers list is sorted", vim.deep_equal(sorted, treesitter.parsers))
 end
 
+-- attach(): starts the highlighter and, only then, marks the buffer for
+-- treesitter folding and hands its indent to treesitter. foldexpr() is the
+-- global 'foldexpr': it defers to vim.treesitter.foldexpr() for a marked buffer
+-- and answers "0" for any other, so a buffer without a parser never pays for a
+-- parser lookup per line. The mark is per buffer because a window-local option
+-- set at attach time stays with the window and leaks to every later buffer
+-- shown in it.
+do
+  vim.cmd("enew")
+  vim.bo.indentexpr = ""
+  vim.bo.filetype = "lua"
+  vim.api.nvim_buf_set_lines(0, 0, -1, false, { "local function f()", "  return 1", "end" })
+  local buf = vim.api.nvim_get_current_buf()
+  check("attach starts treesitter for a parsed filetype", treesitter.attach(buf) == true)
+  check("attach highlights the buffer", vim.treesitter.highlighter.active[buf] ~= nil)
+  check("attach marks the buffer for treesitter folds", vim.b[buf].ts_folds == true, vim.inspect(vim.b[buf].ts_folds))
+  check("foldexpr folds a marked buffer", treesitter.foldexpr(1) ~= "0", treesitter.foldexpr(1))
+  check("attach indents by nvim-treesitter", vim.bo.indentexpr == "v:lua.require'nvim-treesitter'.indentexpr()", vim.bo.indentexpr)
+
+  vim.cmd("enew")
+  vim.bo.indentexpr = ""
+  vim.bo.filetype = "zzz_no_such_language"
+  vim.api.nvim_buf_set_lines(0, 0, -1, false, { "function f()", "  return 1", "end" })
+  local plain = vim.api.nvim_get_current_buf()
+  check("attach declines a filetype without a parser", treesitter.attach(plain) == false)
+  check("no parser leaves the buffer unmarked", vim.b[plain].ts_folds == nil, vim.inspect(vim.b[plain].ts_folds))
+  check("foldexpr answers 0 for an unmarked buffer in the same window", treesitter.foldexpr(1) == "0", treesitter.foldexpr(1))
+  check("no parser leaves indent alone", vim.bo.indentexpr == "", vim.bo.indentexpr)
+end
+
 if #failures > 0 then
   io.write("\n" .. #failures .. " failed\n")
   vim.cmd("cquit 1")

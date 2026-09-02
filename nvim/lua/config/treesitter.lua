@@ -77,6 +77,36 @@ function M.missing_for_filetype(ft)
   return { lang }
 end
 
+-- Start treesitter for `bufnr` if its filetype has a parser, and only then mark
+-- the buffer for treesitter folding and hand its indent to treesitter. Returns
+-- whether treesitter started.
+--
+-- The mark is a buffer variable rather than a window option on purpose: a
+-- window-local 'foldmethod' set here stays with the window and every later
+-- buffer shown in it inherits it, parser or not. The global 'foldexpr' consults
+-- the mark instead (see M.foldexpr).
+function M.attach(bufnr)
+  local lang = M.parser_for_filetype(vim.bo[bufnr].filetype)
+  if not lang or not pcall(vim.treesitter.start, bufnr, lang) then
+    return false
+  end
+
+  vim.b[bufnr].ts_folds = true
+  vim.bo[bufnr].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+  return true
+end
+
+-- The global 'foldexpr': treesitter folds for a buffer attach() marked, and "0"
+-- for every other buffer. vim.treesitter.foldexpr() on its own looks a parser
+-- up per line for a buffer that has none, which is what a huge generated file
+-- used to pay on every redraw.
+function M.foldexpr(lnum)
+  if not vim.b[vim.api.nvim_get_current_buf()].ts_folds then
+    return "0"
+  end
+  return vim.treesitter.foldexpr(lnum)
+end
+
 function M.missing_configured()
   local missing = {}
   for _, lang in ipairs(M.parsers) do

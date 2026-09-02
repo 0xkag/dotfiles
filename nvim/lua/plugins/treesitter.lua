@@ -23,12 +23,9 @@ return {
     end
 
     vim.api.nvim_create_autocmd("FileType", {
+      group = vim.api.nvim_create_augroup("nvim-treesitter-attach", { clear = true }),
       callback = function(args)
-        local ft = vim.bo[args.buf].filetype
-        local lang = vim.treesitter.language.get_lang(ft)
-        if lang and pcall(vim.treesitter.start, args.buf, lang) then
-          vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-        end
+        parser_config.attach(args.buf)
       end,
     })
   end,
