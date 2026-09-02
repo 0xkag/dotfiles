@@ -6,10 +6,14 @@ local util = require("config.util")
 local marks = {}
 local marks_key = nil
 
+-- Bumped by <C-l>, so a refresh the user asks for recomputes the marks even
+-- when neither the directory nor the diff base has changed.
+local refresh_generation = 0
+
 local function marks_for(bufnr)
   local gitdiff = require("config.gitdiff")
   local dir = require("oil").get_current_dir(bufnr)
-  local key = (dir or "") .. "\0" .. gitdiff.generation()
+  local key = (dir or "") .. "\0" .. gitdiff.generation() .. "\0" .. refresh_generation
   if marks_key == key then
     return marks
   end
@@ -28,9 +32,9 @@ end
 -- Unlike the tree, a base change does not redraw this on its own: an oil buffer
 -- can be holding unsaved filesystem edits, and refreshing discards them (it
 -- prompts, and with force does not even do that), so triggering a refresh to
--- update a cosmetic column risks destroying a bulk rename in progress. The
--- marks are right on any redraw the user asks for -- <C-l> is oil's refresh --
--- because the cache key carries the base generation.
+-- update a cosmetic column risks destroying a bulk rename in progress. Instead
+-- the marks are recomputed on the redraw the user asks for: <C-l> is oil's
+-- refresh, wrapped below to bump the cache key first.
 local function register_git_column()
   local constants = require("oil.constants")
   local gitdiff = require("config.gitdiff")
@@ -90,6 +94,14 @@ return {
       natural_order = "fast",
     },
     keymaps = {
+      ["<C-l>"] = {
+        callback = function()
+          refresh_generation = refresh_generation + 1
+          require("oil.actions").refresh.callback()
+        end,
+        desc = "Refresh, recomputing the git marks",
+        mode = "n",
+      },
       ["q"] = { "actions.close", mode = "n" },
       ["<Esc>"] = { "actions.close", mode = "n" },
       ["<C-g>"] = { "actions.close", mode = "n" },
