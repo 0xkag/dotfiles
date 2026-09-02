@@ -91,13 +91,14 @@ local base_marks_key = nil
 local base_marks_stale = true
 
 -- One git call per refresh, not per row: the first node of a redraw recomputes
--- and the rest read the cache. The key folds in the base generation, so a
--- <leader>gm press invalidates it without a subscription; the stale flag covers
--- a tree refresh, where the paths may have changed but the base has not.
+-- and the rest read the cache. The key folds in gitdiff's listing version, so a
+-- <leader>gm press, or anything else that drops the cached listings,
+-- invalidates it without a subscription; the stale flag covers a tree refresh,
+-- where the paths may have changed but the base has not.
 local function base_marks_for(state)
   local gitdiff = require("config.gitdiff")
   local root = state and state.path
-  local key = (root or "") .. "\0" .. gitdiff.generation()
+  local key = (root or "") .. "\0" .. gitdiff.version()
   if not base_marks_stale and base_marks_key == key then
     return base_marks
   end
@@ -307,12 +308,16 @@ return {
     })
 
     -- The two recompute triggers: a tree refresh, which is exactly when
-    -- neo-tree recomputes its own git status, and a change of diff base.
+    -- neo-tree recomputes its own git status, and a change of diff base. The
+    -- first also means the worktree changed under neo-tree's file watcher, a
+    -- signal the other views cannot get anywhere else, so the shared listings
+    -- are dropped as well.
     local events = require("neo-tree.events")
     events.subscribe({
       event = events.GIT_STATUS_CHANGED,
       handler = function()
         base_marks_stale = true
+        require("config.gitdiff").invalidate()
       end,
     })
     vim.api.nvim_create_autocmd("User", {

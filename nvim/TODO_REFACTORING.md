@@ -158,9 +158,17 @@ Plan:
   in the three listing commands. Walking the 52 submodule worktrees under
   `_lib` was nearly the whole cost: 137 ms for a status and 106 ms for a diff
   in ~/.dotfiles, against 9 ms and 7 ms without it.
+- [x] Cache the listings by repo toplevel plus a version counter rather than by
+  directory, in `gitdiff` itself so Oil, the tree, the pickers and `]g` share
+  one listing. The version bumps on a base change, on the events that bracket
+  a git command the editor cannot see (`BufWritePost`, `FocusGained`,
+  `ShellCmdPost`, `TermLeave`, `User GitSignsChanged`, `User OilActionsPost`,
+  neo-tree's `GIT_STATUS_CHANGED`), and on Oil's `<C-l>`. A failed listing is
+  cached too, and `repo_toplevel` is memoized per directory alongside.
 - [ ] Switch `status_by_path` to async `vim.system` with a callback that redraws
-  the caller (picker refresh, tree redraw, Oil render), and cache by repo
-  toplevel plus generation rather than by directory.
+  the caller (picker refresh, Oil render). The tree's base marks stay
+  synchronous: `diff --name-status <base> HEAD` never touches the worktree
+  and costs 2 ms.
 - [ ] Use telescope's async job previewer for `SPC gc`.
 - [ ] Cache `default_branch` per repo; route `git()` through `repo_toplevel` so
   it works from `oil://` and neo-tree buffers.

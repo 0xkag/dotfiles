@@ -81,6 +81,12 @@ Three components split the work, and it is worth knowing which one you are in:
   inside one lists its own mappings.
 - All three mark changed files against the same diff base, the one `SPC gm` sets,
   so they agree about what "changed" means.
+- They also share one cached listing per repo. It is dropped when the base
+  changes, on a write, after a `:!` command, on leaving a terminal, on regaining
+  focus, after a gitsigns or Oil mutation, and when neo-tree's own status run
+  reports a change; Oil's `<C-l>` drops it by hand. Submodules are compared by
+  recorded commit only (`--ignore-submodules=dirty`), which is what makes a
+  listing in `~/.dotfiles` cost 9 ms rather than 137.
 - Oil is the default file explorer in place of `netrw`, so `:e somedir/` opens it.
 - `Ctrl-g` closes all three.
 - Two lookalikes that are not Telescope: the small prompt `SPC gM` opens is
@@ -98,7 +104,7 @@ Three components split the work, and it is worth knowing which one you are in:
 - `SPC pg` or `SPC p/` greps in the current project
 - `SPC pt` opens the project tree -- the same action as `SPC pe`, kept as a synonym
 - `SPC od` opens the current directory in Oil, `SPC oD` the project root; both carry a git status column marked against the active diff base, the same marks the pickers and the tree use
-- Oil's column does *not* redraw itself when `SPC gm` changes the base: an Oil buffer can be holding unsaved filesystem edits and a refresh discards them, so `<C-l>` (Oil's refresh, which also recomputes the marks) is left to you
+- Oil's column does *not* redraw itself when `SPC gm` changes the base: an Oil buffer can be holding unsaved filesystem edits and a refresh discards them, so `<C-l>` (Oil's refresh, which also drops the cached listing) is left to you
 - Project switching saves the current session, changes directory, and restores the target project session when one exists
 - In the project picker, `<C-d>` in insert mode or `dd` in normal mode removes the selected project from history
 - The tree marks changed files: `M` modified, `R` renamed, `?` untracked, `*` unstaged, `+` staged, `✚` added, `✖` deleted, bubbled up onto parent directories

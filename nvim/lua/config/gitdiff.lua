@@ -81,19 +81,52 @@ function M.base()
   return base_ref
 end
 
--- Bumped on every base change so a view that caches a listing can notice
--- without registering a callback, and announced as a User event so an open view
--- can redraw rather than waiting for its next refresh.
-local generation = 0
+-- The listings, one per repo toplevel, shared by every view: Oil asks per
+-- directory change, the pickers per open, the tree per refresh and ]g per
+-- press, and until something changes they would all get the same answer. A
+-- listing that failed is kept as false, so a bad base costs one spawn and one
+-- error rather than one of each per redraw. `toplevels` memoizes rev-parse per
+-- directory alongside.
+local listings = {}
+local toplevels = {}
+
+-- Bumped whenever the listings may have changed: a base change, or a sign that
+-- the worktree did (the autocmds at the end). A view that caches marks keys
+-- them by this and notices without registering a callback.
+local version = 0
+
+local function forget()
+  version = version + 1
+  listings = {}
+  toplevels = {}
+end
+
+function M.version()
+  return version
+end
+
+-- Drop every cached listing. The autocmds below call this on the events that
+-- bracket a git command the editor cannot see; Oil's <C-l> calls it for the
+-- refresh the user asks for.
+function M.invalidate()
+  forget()
+end
 
 function M.set_base(ref)
   base_ref = ref
-  generation = generation + 1
+  forget()
+  -- Announced as a User event too, so an open view can redraw rather than
+  -- waiting for its next refresh.
   vim.api.nvim_exec_autocmds("User", { pattern = "GitDiffBaseChanged" })
 end
 
-function M.generation()
-  return generation
+local function listing_for(root)
+  local listing = listings[root]
+  if not listing then
+    listing = {}
+    listings[root] = listing
+  end
+  return listing
 end
 
 -- Human-readable name for the active base, for list and picker titles.
@@ -108,14 +141,21 @@ end
 -- `quiet` is for callers that probe speculatively, such as a file tree that may
 -- be pointed anywhere and should not complain on every redraw.
 function M.repo_toplevel(dir, quiet)
-  local out, code = M.git_in(dir or util.project_root(0), { "rev-parse", "--show-toplevel" })
-  if code ~= 0 or not out[1] or out[1] == "" then
+  dir = dir or util.project_root(0)
+  local root = toplevels[dir]
+  if root == nil then
+    local out, code = M.git_in(dir, { "rev-parse", "--show-toplevel" })
+    root = code == 0 and out[1] ~= nil and out[1] ~= "" and out[1] or false
+    toplevels[dir] = root
+  end
+
+  if not root then
     if not quiet then
       vim.notify("git: not inside a git repository", vim.log.levels.WARN)
     end
     return nil
   end
-  return out[1]
+  return root
 end
 
 -- Submodules are compared by recorded commit only. Calling one dirty means
@@ -129,7 +169,7 @@ local submodules = "--ignore-submodules=dirty"
 -- (staged, unstaged, and untracked); against a ref it is git diff
 -- --name-status plus the untracked files, which a diff cannot see but are
 -- still part of what this branch changed. Renames report the new path.
-function M.changed_files(root)
+local function list_changed(root)
   local files
 
   if base_ref then
@@ -162,6 +202,16 @@ function M.changed_files(root)
   return files
 end
 
+-- The cached changed_files listing for `root`, listed on the first ask since
+-- the last invalidation. Shared between callers, so treat it as read-only.
+function M.changed_files(root)
+  local listing = listing_for(root)
+  if listing.changed == nil then
+    listing.changed = list_changed(root) or false
+  end
+  return listing.changed or nil
+end
+
 -- git diff arguments for one file against the active base. Untracked files have
 -- nothing to diff against, so --no-index against /dev/null renders them as
 -- all-added instead of as an empty diff.
@@ -188,11 +238,12 @@ function M.committed_files(root)
     return {}
   end
 
-  local fields, code = M.git_fields(root, { "diff", "--name-status", "-z", submodules, base_ref, "HEAD" })
-  if code ~= 0 then
-    return {}
+  local listing = listing_for(root)
+  if not listing.committed then
+    local fields, code = M.git_fields(root, { "diff", "--name-status", "-z", submodules, base_ref, "HEAD" })
+    listing.committed = code == 0 and parse_name_status(fields) or {}
   end
-  return parse_name_status(fields)
+  return listing.committed
 end
 
 -- One character standing in for a status, for a narrow picker column: the
@@ -242,5 +293,27 @@ function M.status_by_path(dir, quiet)
   end
   return marks
 end
+
+-- The worktree changes behind the editor's back through git commands it never
+-- sees, so drop the listings on the events that bracket one: a write (the
+-- file's own status changed), a :! command, leaving a terminal, regaining focus
+-- after a shell in another window, and the events gitsigns and Oil raise after
+-- mutating the repo or the directory.
+local group = vim.api.nvim_create_augroup("user_gitdiff", { clear = true })
+vim.api.nvim_create_autocmd({ "BufWritePost", "FocusGained", "ShellCmdPost", "TermLeave" }, {
+  group = group,
+  callback = function()
+    M.invalidate()
+  end,
+  desc = "Drop the cached git listings when the worktree may have changed",
+})
+vim.api.nvim_create_autocmd("User", {
+  group = group,
+  pattern = { "GitSignsChanged", "OilActionsPost" },
+  callback = function()
+    M.invalidate()
+  end,
+  desc = "Drop the cached git listings after a gitsigns or Oil mutation",
+})
 
 return M
