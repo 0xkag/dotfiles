@@ -3,6 +3,7 @@
 local M = {}
 
 local shared = require("config.code_mode.shared")
+local util = require("config.util")
 
 local function shell_filetype()
   return vim.bo.filetype
@@ -80,19 +81,16 @@ local function shell_backslash_range(start_line, end_line)
   vim.api.nvim_buf_set_lines(0, start_line - 1, end_line, false, lines)
 end
 
+-- The selected line span, or the cursor line when not in visual mode; see
+-- util.visual_range for why the '< '> marks are not read here.
 local function shell_visual_range()
-  local start_line = vim.fn.line("'<")
-  local end_line = vim.fn.line("'>")
-  if start_line == 0 or end_line == 0 then
-    start_line = vim.api.nvim_win_get_cursor(0)[1]
-    end_line = start_line
+  local range = util.visual_range()
+  if range then
+    return range.start_row, range.end_row
   end
 
-  if start_line > end_line then
-    start_line, end_line = end_line, start_line
-  end
-
-  return start_line, end_line
+  local line = vim.api.nvim_win_get_cursor(0)[1]
+  return line, line
 end
 
 function M.shell_insert_shebang()

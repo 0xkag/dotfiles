@@ -38,7 +38,7 @@ Fixed one commit each; tick the box in the fixing commit.
   upstream parser compares a nvim-cwd-relative name, which also fails for
   buffers outside cwd, and passes HCL's 1-based positions through unshifted).
   Spec: feed the parser tflint JSON.
-- [ ] **2. Visual-mode helpers act on the previous selection.**
+- [x] **2. Visual-mode helpers act on the previous selection.**
   `util.visual_selection_text`, `util.squeeze_spaces_visual`, markdown's
   `visual_positions`, and shell's `shell_visual_range` read the `'<` / `'>`
   marks, which are stale inside an x-mode Lua mapping (the mapping fires while
