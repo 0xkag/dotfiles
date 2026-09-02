@@ -138,6 +138,31 @@ do
   check("a base change recomputes once", listings == 1, listings)
   render("untouched")
   check("and only once", listings == 1, listings)
+
+  -- <C-l> is oil's refresh. A base change redraws the tree on its own but not
+  -- oil, whose buffer may hold unsaved edits, so the refresh the user asks for
+  -- has to be the moment the marks are recomputed.
+  local refreshed = 0
+  package.preload["oil.actions"] = function()
+    return {
+      refresh = {
+        desc = "Refresh current directory list",
+        callback = function()
+          refreshed = refreshed + 1
+        end,
+      },
+    }
+  end
+  local refresh = spec.opts.keymaps["<C-l>"]
+  check("<C-l> is mapped", type(refresh) == "table" and type(refresh.callback) == "function", vim.inspect(refresh))
+  if type(refresh) == "table" and type(refresh.callback) == "function" then
+    refresh.callback()
+  end
+  check("<C-l> runs oil's refresh", refreshed == 1, refreshed)
+  render("worktree_mod")
+  check("<C-l> recomputes the marks", listings == 2, listings)
+  render("untouched")
+  check("and only once per refresh", listings == 2, listings)
   gitdiff.changed_files = changed_files
 end
 
