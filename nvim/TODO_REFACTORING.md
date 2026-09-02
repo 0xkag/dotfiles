@@ -451,17 +451,19 @@ Keep, and do not migrate:
 
 Strong where they exist, all real-repo and real-module. Gaps:
 
-- No spec for `config/python.lua` (`pyright_settings`, `pylsp_cmd` order,
-  module cache), conform's Python formatter function,
+- No spec for conform's Python formatter function,
   `lsp_watch.install_git_head_refresh` / `cleanup`, `prepare_for_expand` /
   `rollback_expand`, `configure_cmp` (a fake `cmp` table can assert
   `autocomplete=false` / `debounce` / `ghost_text`). Closed since the
   analysis: the tflint parser, `config/treesitter.lua`, `projects.lua`,
   `config/tools.lua`, `config/linters.lua`, `config/deps.lua` and the `gr`
-  keymaps each have a spec (2026-09-01). Payoff: defects 1, 4 and 6 all
-  lived in modules without a spec, and the 2.3 rewrite could change every
-  listing call because the specs ran instead of a manual check; python.lua
-  and configure_cmp are the two largest modules still in that position.
+  keymaps each have a spec (2026-09-01); `config/python.lua` has
+  `python_env_spec` (2026-09-02), run against a fake pyenv, fake prefixes and
+  a pipx home pointed at scratch through the newly honoured `$PIPX_HOME`.
+  Payoff: defects 1, 4 and 6 all lived in modules without a spec, and the
+  2.3 rewrite could change every listing call because the specs ran instead
+  of a manual check; configure_cmp is the largest module still in that
+  position.
 - Untested gitdiff cases: `default_branch` via `origin/HEAD` or `main`,
   detached HEAD. Closed: quoted / space / non-ASCII paths and rename records
   in both parsers, the listing cache and its invalidation, the background
