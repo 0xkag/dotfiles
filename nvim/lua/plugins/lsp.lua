@@ -271,21 +271,12 @@ return {
           cmd = lsp_util.lazy_cmd(python_env.pylsp_cmd),
           -- pylsp advertises capabilities for every plugin even when disabled via
           -- settings. Strip the ones pyright/ruff own so other clients win rename,
-          -- hover, definitions, etc. Leaves codeActionProvider (rope refactors).
-          on_attach = function(client, _)
-            local caps = client.server_capabilities
-            caps.renameProvider = false
-            caps.hoverProvider = false
-            caps.completionProvider = nil
-            caps.signatureHelpProvider = nil
-            caps.definitionProvider = false
-            caps.declarationProvider = false
-            caps.typeDefinitionProvider = false
-            caps.implementationProvider = false
-            caps.referencesProvider = false
-            caps.documentSymbolProvider = false
-            caps.workspaceSymbolProvider = false
-            caps.documentHighlightProvider = false
+          -- hover, definitions, etc. (see lsp_util.strip_pylsp_capabilities). This
+          -- has to be on_init, not on_attach: the runtime fires LspAttach before
+          -- on_attach, so a strip there ran after every LspAttach handler had
+          -- already read the full set, and it ran again for each buffer.
+          on_init = function(client)
+            lsp_util.strip_pylsp_capabilities(client.server_capabilities)
           end,
           settings = {
             pylsp = {
