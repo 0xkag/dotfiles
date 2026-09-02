@@ -1,81 +1,33 @@
 {
-  "autoUpdatesChannel": "latest",
   "awsAuthRefresh": "rm -rf ~/.aws/cli/cache/* 2>/dev/null; aws sts get-caller-identity",
   "permissions": {
-    "allow": [
-      "Bash(ldapsearch:*)"
-    ],
     "deny": [
       "Bash(rm *)",
       "Bash(rm)",
       "Bash(sts *)",
       "Bash(sts)"
-    ]
-  },
-  "model": "us.anthropic.claude-opus-4-8[1m]",
-  "hooks": {
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "printf '\\a' > \"$(tmux display -p -t \"$TMUX_PANE\" '#{pane_tty}')\""
-          }
-        ]
-      }
     ],
-    "PermissionRequest": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "printf '\\a' > \"$(tmux display -p -t \"$TMUX_PANE\" '#{pane_tty}')\""
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "printf '\\a' > \"$(tmux display -p -t \"$TMUX_PANE\" '#{pane_tty}')\""
-          }
-        ]
-      }
-    ]
+    "defaultMode": "auto"
   },
+  "model": "claude-fable-5-1[1m]",
   "statusLine": {
     "type": "command",
     "command": "claude-statusline"
   },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
-    "gitlab@claude-plugins-official": true,
-    "caveman@caveman": false,
-    "ponytail@ponytail": true
+    "ponytail@ponytail": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "andrej-karpathy-skills@karpathy-skills": true,
+    "mr-tools@arcesium-devex-plugins": false,
+    "glab-mr@arcesium-devex-plugins": false,
+    "terraform@claude-plugins-official": true,
+    "context7@claude-plugins-official": false
   },
-  "extraKnownMarketplaces": {
-    "caveman": {
-      "source": {
-        "source": "github",
-        "repo": "JuliusBrussee/caveman"
-      }
-    },
-    "ponytail": {
-      "source": {
-        "source": "github",
-        "repo": "DietrichGebert/ponytail"
-      }
+  "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-fable-5-1": {
+      "effortLevel": "xhigh"
     }
-  },
-  "skipWebFetchPreflight": true,
-  "effortLevel": "medium",
-  "skipWorkflowUsageWarning": true,
-  "theme": "dark",
-  "editorMode": "normal",
-  "mcpServers": {}
+  }
 }
