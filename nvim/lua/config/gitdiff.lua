@@ -16,6 +16,67 @@ function M.git_in(dir, args)
   return out, vim.v.shell_error
 end
 
+-- Run git in `dir` with -z output: one NUL-terminated field per record, so a
+-- path comes back exactly as written on disk. Without it git C-quotes any path
+-- containing whitespace in porcelain output and octal-escapes non-ASCII under
+-- the default core.quotePath, in diff --name-status too, and a listing keyed by
+-- those strings never matches the file it describes. Note that systemlist()
+-- turns NUL into a newline, so this reads the raw bytes instead.
+function M.git_fields(dir, args)
+  local cmd = { "git", "-C", dir }
+  vim.list_extend(cmd, args)
+  local result = vim.system(cmd, { text = false }):wait()
+  local fields = vim.split(result.stdout or "", "\0", { plain = true, trimempty = true })
+  return fields, result.code, result.stderr or ""
+end
+
+-- Parse `diff --name-status -z` fields into { path, status } records. Each
+-- record is a status field then a path field, except renames and copies, which
+-- carry the old path and then the new one; the new path is what the file is
+-- called now, so that is the one reported.
+local function parse_name_status(fields)
+  local files = {}
+  local i = 1
+  while i <= #fields do
+    local status = fields[i]
+    local kind = status:sub(1, 1)
+    local path
+    if kind == "R" or kind == "C" then
+      path = fields[i + 2]
+      i = i + 3
+    else
+      path = fields[i + 1]
+      i = i + 2
+    end
+    if path and path ~= "" then
+      table.insert(files, { path = path, status = status })
+    end
+  end
+  return files
+end
+
+-- Parse `status --porcelain -z` fields into { path, status } records. Each
+-- record is "XY path", and a rename or copy in either column is followed by one
+-- more field holding the original path, which is skipped.
+local function parse_porcelain(fields)
+  local files = {}
+  local i = 1
+  while i <= #fields do
+    local entry = fields[i]
+    local status = entry:sub(1, 2)
+    local path = entry:sub(4)
+    if status:find("[RC]") then
+      i = i + 2
+    else
+      i = i + 1
+    end
+    if path ~= "" then
+      table.insert(files, { path = path, status = status })
+    end
+  end
+  return files
+end
+
 function M.base()
   return base_ref
 end
@@ -63,42 +124,30 @@ end
 -- --name-status plus the untracked files, which a diff cannot see but are
 -- still part of what this branch changed. Renames report the new path.
 function M.changed_files(root)
-  local files = {}
-
-  local function add(status, path)
-    if path and path ~= "" then
-      table.insert(files, { path = path, status = status })
-    end
-  end
+  local files
 
   if base_ref then
-    local out, code = M.git_in(root, { "diff", "--name-status", base_ref })
+    local fields, code, err = M.git_fields(root, { "diff", "--name-status", "-z", base_ref })
     if code ~= 0 then
-      vim.notify("git diff --name-status failed: " .. table.concat(out, "\n"), vim.log.levels.ERROR)
+      vim.notify("git diff --name-status failed: " .. vim.trim(err), vim.log.levels.ERROR)
       return nil
     end
-    for _, line in ipairs(out) do
-      local parts = vim.split(line, "\t", { plain = true })
-      add(parts[1], parts[#parts])
-    end
+    files = parse_name_status(fields)
 
     -- Untracked files are invisible to git diff, so list them separately.
-    local others, others_code = M.git_in(root, { "ls-files", "--others", "--exclude-standard" })
+    local others, others_code = M.git_fields(root, { "ls-files", "-z", "--others", "--exclude-standard" })
     if others_code == 0 then
       for _, path in ipairs(others) do
-        add("??", path)
+        table.insert(files, { path = path, status = "??" })
       end
     end
   else
-    local out, code = M.git_in(root, { "status", "--porcelain" })
+    local fields, code, err = M.git_fields(root, { "status", "--porcelain", "-z" })
     if code ~= 0 then
-      vim.notify("git status --porcelain failed: " .. table.concat(out, "\n"), vim.log.levels.ERROR)
+      vim.notify("git status --porcelain failed: " .. vim.trim(err), vim.log.levels.ERROR)
       return nil
     end
-    for _, line in ipairs(out) do
-      local path = line:sub(4)
-      add(line:sub(1, 2), path:match("^.* %-> (.*)$") or path)
-    end
+    files = parse_porcelain(fields)
   end
 
   table.sort(files, function(a, b)
@@ -133,20 +182,11 @@ function M.committed_files(root)
     return {}
   end
 
-  local out, code = M.git_in(root, { "diff", "--name-status", base_ref, "HEAD" })
+  local fields, code = M.git_fields(root, { "diff", "--name-status", "-z", base_ref, "HEAD" })
   if code ~= 0 then
     return {}
   end
-
-  local files = {}
-  for _, line in ipairs(out) do
-    local parts = vim.split(line, "\t", { plain = true })
-    local path = parts[#parts]
-    if path and path ~= "" then
-      table.insert(files, { path = path, status = parts[1] })
-    end
-  end
-  return files
+  return parse_name_status(fields)
 end
 
 -- One character standing in for a status, for a narrow picker column: the
