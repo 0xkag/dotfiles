@@ -128,6 +128,51 @@ do
   gitdiff.set_base(nil)
 end
 
+-- Submodules: to call one dirty, git has to walk its whole worktree, and in a
+-- repo with many that is where nearly all of a listing's time goes (137 ms
+-- against 9 ms for ~/.dotfiles and its 52). A submodule whose recorded commit
+-- moved is a change to this repo and stays listed; one that is merely dirty
+-- inside is not, at either base.
+do
+  local sub = vim.fn.tempname()
+  vim.fn.mkdir(sub, "p")
+  local function subgit(dir, args)
+    local out = vim.fn.systemlist(vim.list_extend({ "git", "-C", dir }, args))
+    assert(vim.v.shell_error == 0, table.concat(out, "\n"))
+    return out
+  end
+  vim.fn.writefile({ "lib" }, sub .. "/lib.txt")
+  subgit(sub, { "init", "-q", "-b", "master" })
+  subgit(sub, { "config", "user.email", "t@t" })
+  subgit(sub, { "config", "user.name", "t" })
+  subgit(sub, { "add", "-A" })
+  subgit(sub, { "commit", "-q", "-m", "lib A" })
+  git({ "-c", "protocol.file.allow=always", "submodule", "add", "-q", sub, "vendored" })
+  git({ "commit", "-q", "-m", "C" })
+  local vendored = repo .. "/vendored"
+  subgit(vendored, { "config", "user.email", "t@t" })
+  subgit(vendored, { "config", "user.name", "t" })
+
+  vim.fn.writefile({ "scratch" }, vendored .. "/scratch.txt")
+  gitdiff.set_base(nil)
+  local statuses = by_path(gitdiff.changed_files(root))
+  check("index: a submodule dirty inside is not listed", statuses.vendored == nil, statuses.vendored)
+  gitdiff.set_base("HEAD")
+  statuses = by_path(gitdiff.changed_files(root))
+  check("ref: a submodule dirty inside is not listed", statuses.vendored == nil, statuses.vendored)
+
+  subgit(vendored, { "add", "-A" })
+  subgit(vendored, { "commit", "-q", "-m", "lib B" })
+  gitdiff.set_base(nil)
+  statuses = by_path(gitdiff.changed_files(root))
+  check("index: a submodule at a new commit is listed", statuses.vendored ~= nil and statuses.vendored:find("M") ~= nil, statuses.vendored)
+  gitdiff.set_base("HEAD")
+  statuses = by_path(gitdiff.changed_files(root))
+  check("ref: a submodule at a new commit is listed", statuses.vendored == "M", statuses.vendored)
+  gitdiff.set_base(nil)
+  vim.fn.delete(sub, "rf")
+end
+
 vim.fn.delete(repo, "rf")
 
 if #failures > 0 then

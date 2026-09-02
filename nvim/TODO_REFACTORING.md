@@ -154,27 +154,31 @@ Every spawn in `gitdiff.lua` goes through `vim.fn.systemlist`. Process map:
 
 Plan:
 
-- Switch `status_by_path` to async `vim.system` with a callback that redraws
+- [x] Compare submodules by recorded commit only (`--ignore-submodules=dirty`)
+  in the three listing commands. Walking the 52 submodule worktrees under
+  `_lib` was nearly the whole cost: 137 ms for a status and 106 ms for a diff
+  in ~/.dotfiles, against 9 ms and 7 ms without it.
+- [ ] Switch `status_by_path` to async `vim.system` with a callback that redraws
   the caller (picker refresh, tree redraw, Oil render), and cache by repo
   toplevel plus generation rather than by directory.
-- Use telescope's async job previewer for `SPC gc`.
-- Cache `default_branch` per repo; route `git()` through `repo_toplevel` so it
-  works from `oil://` and neo-tree buffers.
-- Verify a ref before storing it as the base (`rev-parse --verify --quiet
+- [ ] Use telescope's async job previewer for `SPC gc`.
+- [ ] Cache `default_branch` per repo; route `git()` through `repo_toplevel` so
+  it works from `oil://` and neo-tree buffers.
+- [ ] Verify a ref before storing it as the base (`rev-parse --verify --quiet
   <ref>^{commit}`); honour the `quiet` flag in `changed_files` so an invalid
   base does not notify at ERROR on every redraw.
-- Realpath both sides of every path comparison (or compare repo-relative
+- [ ] Realpath both sides of every path comparison (or compare repo-relative
   paths): `--show-toplevel` returns a physical path while buffer names and
   `state.path` can be symlinked (`~/.config/nvim` -> `~/.dotfiles/nvim`), and
   `SPC gC`'s prefix filter drops every hunk the same way.
-- `util.is_git_repo` checks only `cwd/.git`; use `gitdiff.repo_toplevel` so a
-  nested project root inside a monorepo still gets marks.
-- neotree.lua calls `repo_toplevel` before `committed_files` short-circuits at
-  the index base: one wasted rev-parse per refresh.
-- Two "changed" sets exist: tree rows use `committed_files` (base..HEAD),
+- [ ] `util.is_git_repo` checks only `cwd/.git`; use `gitdiff.repo_toplevel` so
+  a nested project root inside a monorepo still gets marks.
+- [ ] neotree.lua calls `repo_toplevel` before `committed_files` short-circuits
+  at the index base: one wasted rev-parse per refresh.
+- [ ] Two "changed" sets exist: tree rows use `committed_files` (base..HEAD),
   everything else uses `changed_files` (base..worktree). Extract one
   name-status parser and either unify or document the difference.
-- Recommend `core.untrackedCache` / `core.fsmonitor` in large repos.
+- [ ] Recommend `core.untrackedCache` / `core.fsmonitor` in large repos.
 
 ### 2.4 Key timing and options
 
