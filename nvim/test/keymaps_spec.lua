@@ -36,6 +36,17 @@ check("gO default stays", mapped("gO"))
 check("gr is mapped", mapped("gr"), vim.fn.maparg("gr", "n"))
 check("gd is mapped", mapped("gd"), vim.fn.maparg("gd", "n"))
 
+-- Maps that restate Neovim's own defaults are not repeated: `Y` is `y$` since
+-- 0.6, and `[d` / `]d` jump diagnostics since 0.11 (with the same
+-- vim.diagnostic.jump call). `K` is not one of them: the config's hover adds a
+-- rounded border and its own close events, so it stays. The diagnostic jumps
+-- live in lsp.lua's plugin config, which no spec loads, so that file is read.
+check("Y keeps Neovim's default mapping", vim.fn.maparg("Y", "n", false, true).desc == ":help Y-default", vim.inspect(vim.fn.maparg("Y", "n", false, true)))
+local lsp_source = table.concat(vim.fn.readfile(here .. "/lua/plugins/lsp.lua"), "\n")
+check("lsp.lua does not remap [d", not lsp_source:find('"[d"', 1, true))
+check("lsp.lua does not remap ]d", not lsp_source:find('"]d"', 1, true))
+check("lsp.lua keeps its own K hover", lsp_source:find('map("n", "K", hover', 1, true) ~= nil)
+
 if #failures > 0 then
   io.write("\n" .. #failures .. " failed\n")
   vim.cmd("cquit 1")
