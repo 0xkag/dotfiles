@@ -118,6 +118,12 @@ function M.repo_toplevel(dir, quiet)
   return out[1]
 end
 
+-- Submodules are compared by recorded commit only. Calling one dirty means
+-- walking its whole worktree, and in a repo with many that is where nearly all
+-- of a listing's time goes: 137 ms against 9 ms for ~/.dotfiles and its 52.
+-- A submodule whose commit moved is a change to this repo and is still listed.
+local submodules = "--ignore-submodules=dirty"
+
 -- Every file changed against the active diff base, as { path, status } with
 -- repo-relative paths, sorted by path. At the index base that is git status
 -- (staged, unstaged, and untracked); against a ref it is git diff
@@ -127,7 +133,7 @@ function M.changed_files(root)
   local files
 
   if base_ref then
-    local fields, code, err = M.git_fields(root, { "diff", "--name-status", "-z", base_ref })
+    local fields, code, err = M.git_fields(root, { "diff", "--name-status", "-z", submodules, base_ref })
     if code ~= 0 then
       vim.notify("git diff --name-status failed: " .. vim.trim(err), vim.log.levels.ERROR)
       return nil
@@ -142,7 +148,7 @@ function M.changed_files(root)
       end
     end
   else
-    local fields, code, err = M.git_fields(root, { "status", "--porcelain", "-z" })
+    local fields, code, err = M.git_fields(root, { "status", "--porcelain", "-z", submodules })
     if code ~= 0 then
       vim.notify("git status --porcelain failed: " .. vim.trim(err), vim.log.levels.ERROR)
       return nil
@@ -182,7 +188,7 @@ function M.committed_files(root)
     return {}
   end
 
-  local fields, code = M.git_fields(root, { "diff", "--name-status", "-z", base_ref, "HEAD" })
+  local fields, code = M.git_fields(root, { "diff", "--name-status", "-z", submodules, base_ref, "HEAD" })
   if code ~= 0 then
     return {}
   end
