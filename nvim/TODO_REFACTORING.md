@@ -139,7 +139,13 @@ only, keeping the MRU list in memory and writing on head change or
 
 ### 2.3 Synchronous git
 
-Every spawn in `gitdiff.lua` goes through `vim.fn.systemlist`. Process map:
+Done, in the six commits from "Compare submodules by commit in the listings"
+through "Preview SPC gc diffs in the background". The listings share one cache
+per repo, run in the background behind `status_by_path`, compare submodules by
+commit, and key their marks the way each view spells its paths; git.lua
+resolves the default branch once per repo and verifies a ref before it becomes
+the base. The map below is the situation as it was: every spawn in
+`gitdiff.lua` went through `vim.fn.systemlist`.
 
 | Site                         | Command                                   | Trigger                                              |
 |------------------------------|-------------------------------------------|------------------------------------------------------|
@@ -172,7 +178,9 @@ Plan:
   holds unsaved edits; the file pickers call `picker:refresh()`. `]g` and
   `SPC gc` keep the blocking form, and the tree's base marks stay synchronous:
   `diff --name-status <base> HEAD` never touches the worktree and costs 2 ms.
-- [ ] Use telescope's async job previewer for `SPC gc`.
+- [x] `SPC gc` previews in the background, through `gitdiff.git_in_async`
+  (`vim.system`) rather than telescope's `job_maker`, which needs plenary's
+  Job and offers nothing over it here.
 - [x] Cache `default_branch` per repo (eight `symbolic-ref` spawns over one
   `SPC gm` cycle became one); route `git()` through `repo_toplevel` so it
   works from `oil://` and neo-tree buffers.
@@ -191,10 +199,12 @@ Plan:
   `cwd/.git`, so a nested project root inside a monorepo gets marks.
 - [x] `committed_by_path` returns before asking git at the index base; the tree
   used to resolve the toplevel first and throw it away on every refresh.
-- [ ] Two "changed" sets exist: tree rows use `committed_files` (base..HEAD),
-  everything else uses `changed_files` (base..worktree). Extract one
-  name-status parser and either unify or document the difference.
-- [ ] Recommend `core.untrackedCache` / `core.fsmonitor` in large repos.
+- [x] Two "changed" sets exist by design and now share one name-status parser:
+  tree rows use `committed_files` (base..HEAD) because neo-tree's own status
+  already covers the worktree, everything else uses `changed_files`
+  (base..worktree). Documented in the README rather than unified.
+- [x] `core.untrackedCache` / `core.fsmonitor` recommended in the README for
+  large repos.
 
 ### 2.4 Key timing and options
 

@@ -6,6 +6,7 @@ local base_label = gitdiff.label
 local changed_files = gitdiff.changed_files
 local file_diff_args = gitdiff.file_diff_args
 local git_in = gitdiff.git_in
+local git_in_async = gitdiff.git_in_async
 local repo_toplevel = gitdiff.repo_toplevel
 
 -- The current project's repo, falling back to cwd, so this also works from an
@@ -373,10 +374,18 @@ local function changed_files_pick()
       }),
       previewer = previewers.new_buffer_previewer({
         title = "Diff vs " .. base_label(),
+        -- In the background, so moving through the list never waits on git.
+        -- The buffer is telescope's own for this entry and may be gone by the
+        -- time the diff lands.
         define_preview = function(self, entry)
-          local lines = git_in(root, file_diff_args({ path = entry.value, status = entry.status }))
-          vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
-          vim.bo[self.state.bufnr].filetype = "diff"
+          local bufnr = self.state.bufnr
+          git_in_async(root, file_diff_args({ path = entry.value, status = entry.status }), function(lines)
+            if not vim.api.nvim_buf_is_valid(bufnr) then
+              return
+            end
+            vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+            vim.bo[bufnr].filetype = "diff"
+          end)
         end,
       }),
       sorter = conf.generic_sorter({}),

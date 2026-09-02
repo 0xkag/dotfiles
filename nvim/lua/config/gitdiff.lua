@@ -17,6 +17,22 @@ function M.git_in(dir, args)
   return out, vim.v.shell_error
 end
 
+-- git_in in the background: `callback(lines, code)` runs on the main loop once
+-- git exits, with the output split into lines the way systemlist() splits it.
+function M.git_in_async(dir, args, callback)
+  local cmd = { "git", "-C", dir }
+  vim.list_extend(cmd, args)
+  vim.system(cmd, { text = true }, function(result)
+    local lines = vim.split(result.stdout or "", "\n", { plain = true })
+    if lines[#lines] == "" then
+      table.remove(lines)
+    end
+    vim.schedule(function()
+      callback(lines, result.code)
+    end)
+  end)
+end
+
 -- Run git in `dir` with -z output: one NUL-terminated field per record, so a
 -- path comes back exactly as written on disk. Without it git C-quotes any path
 -- containing whitespace in porcelain output and octal-escapes non-ASCII under
