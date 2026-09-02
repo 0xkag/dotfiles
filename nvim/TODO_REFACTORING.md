@@ -137,6 +137,14 @@ the root in `vim.b[buf]`; consider tracking on `BufReadPost` / `BufNewFile`
 only, keeping the MRU list in memory and writing on head change or
 `VimLeavePre`.
 
+Deferred 2026-09-02: NFS is out of scope for the editor setup. Payoff: on
+local disk the whole BufEnter path costs well under 1 ms (`find_root` measured
+at 0.028 ms for a file four levels below `.git`, plus one read of the state
+file and one stat), so there is nothing to feel; it only matters on a
+networked home, where each of the ~60 stats and the read is a round trip. The
+write half is already done: since defect 6, `M.add` rewrites the file only
+when the head project changes.
+
 ### 2.3 Synchronous git
 
 Done, in the six commits from "Compare submodules by commit in the listings"
@@ -220,7 +228,18 @@ purpose in b1cb17c, not ported by accident. Left as decisions: the NFS
 `directory` / `undodir` move (local disk loses undo history across reboots),
 re-enabling snacks `bigfile` (explicitly disabled in ui.lua; it turns syntax
 off above 1.5 MB), and the `[d` / `]d` / `K` / `Y` maps that restate defaults
-(harmless, and they carry which-key descriptions). Kept for the record:
+(harmless, and they carry which-key descriptions).
+
+Payoff of each decision. NFS `directory` / `undodir`: deferred with 2.2 for
+the same reason; on a networked home it keeps swap and undo writes off the
+network on every change, on local disk it changes nothing. snacks `bigfile`:
+a multi-megabyte generated file opens at once instead of hanging while
+treesitter parses it (folding is guarded per buffer now, highlighting is
+not); the cost is syntax off above 1.5 MB in exactly those files. Estimate:
+seconds saved per such file, none otherwise. The `[d` / `]d` / `K` / `Y`
+maps: nothing measurable either way, four lines and their which-key labels.
+
+Kept for the record:
 
 - `gr` (global and LSP buffer-local) sits on Neovim 0.11's `grn` / `grr` /
   `gri` / `gra` / `grt` prefix, so every `gr` waits the full `timeoutlen`
@@ -248,6 +267,11 @@ lands inside startup for `nvim foo.py`). `version_file_for_dir` stops only at
 `$PYENV_ROOT/versions/<ver>` with `fs_stat` and spawn only as a fallback; add
 `vim.fs.root(start, ".git")` as a second stop; cache per directory.
 
+Deferred 2026-09-02: minor. Payoff: `pyenv prefix` measured at 11-13 ms, paid
+once per version per session on the first `.py` buffer, where a stat of
+`$PYENV_ROOT/versions/<ver>` answers in microseconds. The git-root stop only
+matters for Python files outside `$HOME`.
+
 ### 2.6 Lazy triggers
 
 Mostly right. Tighten: telescope (`event = "VeryLazy"` plus `cmd` / `keys`;
@@ -258,6 +282,14 @@ colorscheme handler loads it on demand, and `colors/cyberpunk.lua` is what
 actually gets applied), snacks (VeryLazy once bigfile is settled), flash and
 hydra (`keys`). Ungrouped autocmds: deps, python, treesitter, kulala,
 terminal, lsp, git, neotree.
+
+Payoff (measured 2026-09-02, dependencies included): loading telescope costs
+8.8 ms, hydra 8.4 ms, orgmode 3.5 ms, flash 0.7 ms; lualine (5.2 ms) is the
+statusline and stays. All are VeryLazy, so none delays the first frame; together
+they are ~21 ms of work right after the UI appears, which the tighter triggers
+move to first use. cyberdream loads at startup today (2.1 ms), so that item is
+worth at most that. Grouping the autocmds has no runtime payoff; it is what
+makes `:autocmd` readable and a re-source clean.
 
 ## 3. Plugin stack
 
@@ -284,24 +316,42 @@ At risk:
 
 - `hydra.nvim` backs only `symbol-highlight.lua`; the fork has had no commits
   since 2025-05. Replacement: which-key `show({ loop = true })` or a
-  hand-rolled buffer-local layer with a hint float (~70 lines).
+  hand-rolled buffer-local layer with a hint float (~70 lines). Payoff: the
+  one dependency with no maintainer goes, along with its 8.4 ms VeryLazy load
+  (measured 2026-09-02); the replacement is code you own. Risk reduction, not
+  speed.
 - `toggleterm.nvim` is dormant (last commit 2024-12) but works; `Snacks.terminal`
   could replace it in ~40 lines across `terminal.lua`, `code_mode/shared.lua`,
-  and `code_mode/markdown.lua`.
+  and `code_mode/markdown.lua`. Payoff: one fewer dormant dependency, no
+  user-visible change. Low; do it when toggleterm breaks.
 
 Consider:
 
 - `nvim-web-devicons` -> `mini.icons` with `style = "ascii"` and
   `mock_nvim_web_devicons()`: fits the PuTTY plain profile the README
   describes, and today Oil's icon column and lualine still emit Nerd glyphs.
+  Payoff: those glyphs stop rendering as tofu in PuTTY, which is what the
+  plain profile promises; the icon column becomes readable in every Oil
+  buffer. Startup gain is negligible (devicons loads in 0.19 ms).
 - `basedpyright` in place of `pyright`: same engine, adds inlay hints and
   semantic tokens (makes `,Tl` real); set `typeCheckingMode = "standard"` for
-  parity. `ty` is lighter but still incomplete as a checker in 2026.
+  parity. `ty` is lighter but still incomplete as a checker in 2026. Payoff:
+  inlay hints and semantic highlighting in Python, and a toggle that today
+  does nothing starts working; same engine, so diagnostics do not change.
 - mypy via nvim-lint duplicates pyright's type diagnostics and spawns per read
-  and per write (1-3 s); consider `dmypy` or `BufWritePost` only.
+  and per write (1-3 s); consider `dmypy` or `BufWritePost` only. Payoff:
+  1-3 s of CPU per Python read and write, in the background but competing
+  with the LSP servers, becomes sub-second re-checks with `dmypy` or half as
+  many spawns with write-only; the duplicated type diagnostics go either way.
 - shellcheck / shfmt are configured for zsh, which neither tool parses.
+  Payoff: one wasted spawn per zsh read and write, and no more diagnostics
+  about zsh syntax that shellcheck cannot parse; correctness of the list, not
+  speed.
 - `snacks.bufdelete` could replace `mini.bufremove`; `snacks.rename` would
-  give LSP file-rename on Oil moves.
+  give LSP file-rename on Oil moves. Payoff: `bufdelete` saves nothing
+  (mini.bufremove is a module of the already-loaded mini.nvim); `rename` is
+  the value, since moving a file in Oil today leaves every import of it
+  broken.
 
 Keep, and do not migrate:
 
@@ -327,20 +377,30 @@ Keep, and do not migrate:
   `config/lsp_rename.lua`, `config/lsp_signature.lua`. Replace the per-server
   capabilities / on_init loop with `vim.lsp.config("*", ...)`. Dead:
   `ensure_clients`' `action` param, the `codelens` / `inlay_hint` existence
-  guards, `clients_for`.
+  guards, `clients_for`. Payoff: the server table becomes data a spec can
+  load without booting the 885-line closure, and a change to one concern
+  (rename, signature) touches one file. No runtime change; the dead code is a
+  few dozen lines.
 - `lua/config/util.lua` holds seven unrelated groups: root markers, telescope
   pickers and the mark entry maker, listchars, visual search/substitute,
   quickfix grep, GNU Global, whitespace squeeze. Split into `root.lua`,
   `pickers.lua` (or fold into gitdiff, which would also remove the lazy
   require cycle gitdiff <-> util), `grep.lua`, `gtags.lua`, `editing.lua`;
-  listchars belong with options.
+  listchars belong with options. Payoff: each group becomes requireable on
+  its own (grep no longer pulls telescope's entry maker into scope), and the
+  require cycle goes. No runtime change.
 - `lua/config/deps.lua` (479 lines) plus `tools.lua`: replace the startup
   sweep and `:NvimDeps` with a `vim.health` module so `:checkhealth config`
   does the job at zero startup cost; keep the once-per-filetype warning if
   wanted; derive `startup_features` by filtering `all_features`. The three
   hand-kept lists already drift: cssls / ansiblels / dockerls / taplo are
   configured but never checked, `python_lint` advertises ruff though nvim-lint
-  never runs it.
+  never runs it. Payoff (measured 2026-09-02): the startup sweep runs 500 ms
+  after VimEnter and, with the tool cache cold as it is on every launch,
+  blocks for 172 ms (28 features; the mise-managed tools cost ~17 ms each),
+  so the editor freezes for that long just as typing starts. `:checkhealth
+  config` moves it to on demand, and one feature list ends the drift. The
+  highest payoff in this section.
 - Duplicated helpers to collapse: PATH prepend (`env.lua` vs `python.lua`);
   "buffer dir or cwd" (shared, python, git, terraform); `executable()`
   wrappers (deps, lint) and raw `vim.fn.executable` calls that bypass the
@@ -350,52 +410,79 @@ Keep, and do not migrate:
   in both `keymaps.lua` and `terminal.lua`, with `<C-\>` bound twice;
   which-key `desc` rows that restate keymap descs (the spec label wins, so the
   keymap desc is dead and the wording already differs); `vim.uv or vim.loop`
-  in eleven files (floor is 0.12).
+  in eleven files (floor is 0.12). Payoff: one place to fix a helper, and one
+  real bug class today: the raw `vim.fn.executable` calls miss mise shims, so
+  python.lua and lsp_watch can see a tool the rest of the config does not.
+  Otherwise readability; no runtime change.
 - `code_mode`: actions live per language but keymaps come from four places
   (code_mode/init.lua, plugins/python.lua `,t*`, kulala.lua, lsp.lua). Give
   each module one shape, `{ filetypes, actions, keymaps(buf) }`, and have
   init.lua iterate. The merge loop flattens namespaces; terraform exports
   unprefixed names. Leftovers: a fish branch with no fish pattern,
   `shared.shellescape` alias, `markdown_wrap_pair` building two closures to
-  call one.
+  call one. Payoff: adding a language becomes one module in one shape, and
+  the flattened namespace stops an unprefixed export shadowing another
+  language's. No runtime change.
 - Keymap hygiene: `,gA` / `,gs` / `,gS` all run `lsp_dynamic_workspace_symbols`
   yet promise "types" / "all"; `,gd` == `,gt`; `,gR` == `,gr`; `<leader>tl`
   == `<leader>tvt` (undocumented). kulala's `,r ,a ,i` sit under the global
   refactor / action / insert groups; reuse `register_git_editor_labels`.
-  Missing `desc` on several keymaps.lua entries.
+  Missing `desc` on several keymaps.lua entries. Payoff: which-key and the
+  README stop promising keys that do something else; each of `,gA`, `,gd`
+  and `,gR` is a user-facing lie today.
 - `options.lua`: clipboard state and `_G.NvimClipMode` belong in
   `config/clipboard.lua`; three noexpandtab autocmd blocks -> one pattern;
   several options restate defaults; `colorcolumn=80` / `textwidth=78` vs
-  gitcommit 75/76.
+  gitcommit 75/76. Payoff: readability, plus the commit-message width and the
+  column guide agreeing in gitcommit buffers. Small.
 - Coupling: the neo-tree components are installed by mutating
   `neo-tree.sources.<x>.components` before setup rather than via the documented
   per-source `components` key, and `]g` reimplements upstream's command using
   internal `utils` / `renderer` / `navigate` functions. Oil's column uses
   undocumented but stable `columns.register`. Telescope wraps the public
-  `gen_from_file`. Moderate risk on neo-tree upgrades.
+  `gen_from_file`. Moderate risk on neo-tree upgrades. Payoff: insurance. A
+  neo-tree release that renames `utils` / `renderer` / `navigate` breaks `]g`
+  and the plain profile silently today; on the documented API it keeps
+  working or fails loudly. No immediate change.
 
 ## 5. Tests
 
 Strong where they exist, all real-repo and real-module. Gaps:
 
 - No spec for `config/python.lua` (`pyright_settings`, `pylsp_cmd` order,
-  module cache), the tflint parser (would have caught defect 1), conform's
-  Python formatter function, `config/treesitter.lua` (tftpl / zsh),
-  `projects.lua`, `lsp_watch.install_git_head_refresh` / `cleanup`,
-  `prepare_for_expand` / `rollback_expand`, `configure_cmp` (a fake `cmp`
-  table can assert `autocomplete=false` / `debounce` / `ghost_text`).
-- Untested gitdiff cases: quoted / space / non-ASCII paths and rename records
-  in both parsers, `default_branch` via `origin/HEAD` or `main`, detached HEAD.
+  module cache), conform's Python formatter function,
+  `lsp_watch.install_git_head_refresh` / `cleanup`, `prepare_for_expand` /
+  `rollback_expand`, `configure_cmp` (a fake `cmp` table can assert
+  `autocomplete=false` / `debounce` / `ghost_text`). Closed since the
+  analysis: the tflint parser, `config/treesitter.lua`, `projects.lua`,
+  `config/tools.lua`, `config/linters.lua`, `config/deps.lua` and the `gr`
+  keymaps each have a spec (2026-09-01). Payoff: defects 1, 4 and 6 all
+  lived in modules without a spec, and the 2.3 rewrite could change every
+  listing call because the specs ran instead of a manual check; python.lua
+  and configure_cmp are the two largest modules still in that position.
+- Untested gitdiff cases: `default_branch` via `origin/HEAD` or `main`,
+  detached HEAD. Closed: quoted / space / non-ASCII paths and rename records
+  in both parsers, the listing cache and its invalidation, the background
+  listing, submodules, and symlinked directories (gitdiff_spec, 2026-09-02).
+  Payoff: `origin/HEAD` and detached HEAD are the two paths `SPC gm` takes
+  on a real clone that no spec drives; a regression there shows up only in
+  use.
 - `neotree_symbols_spec` regex-scans the source; `neotree_base_marks_spec`
   stubs seven neo-tree modules and reimplements `is_subpath` /
   `sort_by_tree_display`, so plugin API drift passes green. Add one
-  integration spec per plugin with the real plugin on `rtp`.
+  integration spec per plugin with the real plugin on `rtp`. Payoff: a
+  neo-tree or Oil API change turns into a red run instead of a broken column
+  found in use; cost is the plugin on `rtp` and roughly a second per spec.
 - The specs are pinned to the checkout only via `run.sh`; the "Run:" header in
   twelve specs and the README's direct `-u NONE -l` invocation resolve
-  `config.*` from `~/.config/nvim`.
-- Shared helpers: `check()` is defined sixteen times, an inline `git()` five
-  times -> `test/helpers.lua`. `diagnostic_float_spec` / `reflow_spec` leave
+  `config.*` from `~/.config/nvim`. Payoff: a spec run by its header from a
+  worktree stops testing the deployed copy and reporting green for the wrong
+  code.
+- Shared helpers: `check()` is defined twenty-four times, an inline `git()`
+  five times -> `test/helpers.lua`. `diagnostic_float_spec` / `reflow_spec` leave
   `vim.notify` unstubbed. `code_mode_spec` says default `sw=2` (it is 8).
+  Payoff: one `check()` to improve (a failure diff, say) instead of
+  twenty-four, and quieter runs; no behaviour change.
 
 ## 6. Documentation
 
@@ -405,12 +492,17 @@ Strong where they exist, all real-repo and real-module. Gaps:
   (core keys, groups, git, language localleader, HTTP),
   `docs/design/{formatting,pickers,remote-runbooks,debugging-nvim,
   debugging-python,freebsd}.md`, `docs/upstream/{bugs,neovim-semantic-tokens,
-  terraform-ls-delta}.md`, `docs/backlog.md`.
+  terraform-ls-delta}.md`, `docs/backlog.md`. Payoff: a key is found in
+  `docs/keys.md` without scrolling past design history, and each design note
+  gets a stable link; estimate ~150 lines of README from 848.
 - Add `nvim.log` to `.gitignore`: nvim falls back to logging in cwd when the
   state dir is not writable, which is where the stray zero-byte files came
-  from.
+  from. Payoff: a clean `git status` after any run with an unwritable state
+  dir; one line.
 
-README drift found (verify each when reorganising):
+README drift found (verify each when reorganising). Payoff of fixing the
+open rows: each one is a statement the README makes today that sends a
+reader to a key or tool that does something else.
 
 | README claim                                          | Code                                                        |
 |-------------------------------------------------------|-------------------------------------------------------------|
@@ -421,11 +513,11 @@ README drift found (verify each when reorganising):
 | JSON / Markdown / YAML use `prettierd` then `prettier` | prettier only                                              |
 | `,gA` searches project types                          | same call as `,gs`                                          |
 | css-lsp in the dependency table                       | no `css_lsp` feature in deps.lua                            |
-| five specs listed                                     | sixteen in `test/`                                          |
+| five specs listed                                     | twenty-four in `test/`                                      |
 | direct `-u NONE -l` is self-contained                 | resolves the deployed copy; only `run.sh` pins the checkout |
 | "Migration Notes" title                               | the tracker was retired                                     |
-| Oil is the default explorer                           | neo-tree also hijacks netrw (defect 8b)                     |
+| ~~Oil is the default explorer~~                       | true since defect 8b was fixed                              |
 | FORMATTING_NOTES: `,=` maps live in keymaps.lua       | they are in lsp.lua                                         |
-| tflint is scoped with `--filter`                      | see defect 1                                                |
-| Oil marks are right on any redraw you ask for         | see defect 8a                                               |
-| project venv pylsp wins over pipx                     | see defect 4                                                |
+| ~~tflint is scoped with `--filter`~~                  | README now describes the fix (defect 1)                     |
+| ~~Oil marks are right on any redraw you ask for~~     | true since defect 8a was fixed                              |
+| ~~project venv pylsp wins over pipx~~                 | true since defect 4 was fixed                               |
