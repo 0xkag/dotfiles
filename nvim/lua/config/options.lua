@@ -1,5 +1,4 @@
 local opt = vim.opt
-local tools = require("config.tools")
 
 opt.number = true
 opt.relativenumber = true
@@ -160,10 +159,12 @@ end
 -- Legacy Vim terminal tweak kept disabled for reference:
 -- vim.o.t_BE = ""
 
-if tools.available("rg") then
+-- A plain executable check: this runs before lazy loads, and verifying a mise
+-- shim (which tools.available does) would spawn mise on the startup path.
+if vim.fn.executable("rg") == 1 then
   opt.grepprg = "rg --vimgrep --smart-case --hidden"
   opt.grepformat = "%f:%l:%c:%m"
-elseif tools.available("grep") then
+elseif vim.fn.executable("grep") == 1 then
   opt.grepprg = "grep -RIn"
   opt.grepformat = "%f:%l:%m"
 end

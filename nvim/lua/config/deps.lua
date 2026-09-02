@@ -399,12 +399,16 @@ local function notify_once(feature_ids, title, key, bufnr)
     return
   end
 
+  -- Latch before checking, not only when something is missing: a check that
+  -- found everything installed must not run again, tool probes and all, for
+  -- every later buffer of the filetype.
+  notified[key] = true
+
   local lines = collect_lines(feature_ids, bufnr)
   if #lines == 0 then
     return
   end
 
-  notified[key] = true
   vim.notify(table.concat(lines, "\n"), vim.log.levels.WARN, {
     title = title,
   })
@@ -423,6 +427,9 @@ function M.check_current_buffer(bufnr)
 end
 
 function M.command(scope)
+  -- The explicit audit probes afresh, so a tool installed mid-session shows.
+  tools.invalidate()
+
   local feature_ids = all_features
   local title = "Missing dependencies"
 

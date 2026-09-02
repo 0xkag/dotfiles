@@ -651,6 +651,7 @@ attached. Built-in `gf` is not sufficient here because it cannot expand
 - On startup, Neovim warns once about missing non-Python tools referenced by this config
 - On the first buffer for a supported filetype, Neovim warns once about missing tools for that workflow
 - Tool checks treat inactive `mise` shims as missing so false positives do not hide broken commands
+- Tool probes are cached for the session, keyed by `PATH` so a pyenv activation re-probes; `:NvimDeps` always probes afresh, so a tool installed mid-session shows up there first
 - `SPC cm` checks dependencies for the current buffer
 - `SPC cM` runs the full configured dependency audit
 
