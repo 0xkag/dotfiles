@@ -98,9 +98,7 @@ return {
           return
         end
 
-        vim.lsp.stop_client(vim.tbl_map(function(client)
-          return client.id
-        end, clients), true)
+        lsp_util.stop_clients(clients)
         vim.schedule(function()
           vim.cmd.edit()
         end)
@@ -112,9 +110,7 @@ return {
           return
         end
 
-        vim.lsp.stop_client(vim.tbl_map(function(client)
-          return client.id
-        end, clients), true)
+        lsp_util.stop_clients(clients)
       end
 
       local function select_workspace_folder(prompt, callback)

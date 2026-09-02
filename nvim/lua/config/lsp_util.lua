@@ -107,4 +107,12 @@ function M.strip_pylsp_capabilities(caps)
   return caps
 end
 
+-- Stop every client in `clients`, forcefully. vim.lsp.stop_client is
+-- deprecated on 0.12 and removed in 0.13; each client stops itself.
+function M.stop_clients(clients)
+  for _, client in ipairs(clients) do
+    client:stop(true)
+  end
+end
+
 return M

@@ -58,6 +58,22 @@ check(
   vim.bo.formatoptions
 )
 
+-- TextYankPost highlights through vim.hl: vim.highlight is the deprecated alias
+-- (removed in 0.13). Shadow the alias so any remaining use errors.
+do
+  local saved = vim.highlight
+  vim.highlight = setmetatable({}, {
+    __index = function(_, key)
+      error("vim.highlight." .. key .. " is deprecated; use vim.hl")
+    end,
+  })
+  vim.cmd("enew")
+  vim.api.nvim_buf_set_lines(0, 0, -1, false, { "yank me" })
+  local ok, err = pcall(vim.cmd, "normal! yy")
+  check("yank highlight does not use vim.highlight", ok, err)
+  vim.highlight = saved
+end
+
 if #failures > 0 then
   io.write("\n" .. #failures .. " failed\n")
   vim.cmd("cquit 1")
