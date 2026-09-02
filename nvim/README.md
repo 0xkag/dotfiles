@@ -155,9 +155,8 @@ right; they never share a row, so it is left as is.
 - `:Oil` open a dired-style editable directory buffer
 - `:Telescope commands` search commands
 - `:Telescope keymaps` search mappings
-- `:NvimDeps` show missing configured dependencies on `PATH`
-- `:NvimDeps current` show missing dependencies for the current buffer workflow
-- `:NvimDeps current` also reports the current buffer's missing Treesitter parser
+- `:checkhealth config` audits every external tool this config leans on, probed afresh, in two sections (editor-wide, languages); `SPC cM` opens it
+- `SPC cm` re-checks the current buffer's workflow tools and its Treesitter parser, and says so when all are present
 - `:PyenvInfo` show the Python environment Neovim resolved for the current buffer
 - `:Org help` view orgmode help
 - `:TSInstall lua python markdown markdown_inline org kulala_http` install parsers you want
@@ -400,7 +399,7 @@ pipx inject python-lsp-server pylsp-rope
 
 If a project's pyenv already has `python-lsp-server` + `pylsp-rope` installed, Neovim uses that project's direct `bin/pylsp` before the pipx fallback. Rope then sees the project's installed deps, which can improve cross-file refactoring accuracy. To set this up inside a project venv: `pip install python-lsp-server pylsp-rope`.
 
-`:NvimDeps current` checks the same resolved `pylsp` path that LSP startup uses and warns if either piece is missing. Ruff is already on PATH via flox.
+`SPC cm` (and the once-per-filetype warning) checks the same resolved `pylsp` path that LSP startup uses and warns if either piece is missing; `:checkhealth config` lists it too. Ruff is already on PATH via flox.
 
 ### Python LSP footprint
 
@@ -462,7 +461,7 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
 - Python linting prefers `ruff` plus `mypy`, then falls back to `pylint`, then `flake8`
 - Python formatting prefers `ruff_organize_imports` plus `ruff_format`, then falls back to `black`, then `yapf`
 - Python tests run through the same interpreter Neovim resolves for the current project
-- Python debugging expects `ipdb` in that same interpreter and reports it through `:NvimDeps current` if it is missing
+- Python debugging expects `ipdb` in that same interpreter and reports it through `SPC cm` and `:checkhealth config` if it is missing
 - `SPC dd` or `,dd` debugs the current file with `python -m ipdb`
 - `SPC dt` or `,dt` debugs the nearest pytest test with `pytest --trace`
 - `SPC dT` or `,dT` debugs the current test file with `pytest --trace`
@@ -662,12 +661,13 @@ attached. Built-in `gf` is not sufficient here because it cannot expand
 
 ## Dependency checks
 
-- On startup, Neovim warns once about missing non-Python tools referenced by this config
-- On the first buffer for a supported filetype, Neovim warns once about missing tools for that workflow
+- On the first buffer for a supported filetype, Neovim warns once about missing tools for that workflow, half a second after the buffer opens
+- There is no startup sweep: the full audit is `:checkhealth config` (`SPC cM`). The sweep used to run half a second after every launch and block for about 170 ms probing 28 features, which is what the audit costs on demand instead
 - Tool checks treat inactive `mise` shims as missing so false positives do not hide broken commands
-- Tool probes are cached for the session, keyed by `PATH` so a pyenv activation re-probes; `:NvimDeps` always probes afresh, so a tool installed mid-session shows up there first
-- `SPC cm` checks dependencies for the current buffer
-- `SPC cM` runs the full configured dependency audit
+- Tool probes are cached for the session, keyed by `PATH` so a pyenv activation re-probes; `SPC cm` and `:checkhealth config` always probe afresh, so a tool installed mid-session shows up there first
+- `SPC cm` checks dependencies for the current buffer, and reports success too
+- `SPC cM` runs the full configured dependency audit as `:checkhealth config`
+- The one feature table in `lua/config/deps.lua` also covers the servers `lsp.lua` configures (ansiblels, cssls, dockerls, taplo) and takes linter names from `lua/config/linters.lua`, so it cannot advertise a linter nvim-lint would not run
 
 ## LSP installs
 
@@ -692,7 +692,7 @@ attached. Built-in `gf` is not sufficient here because it cannot expand
 
 ### Common dependency check warnings
 
-The warnings shown on startup come from `lua/config/deps.lua`. The binary names in the warning map to these Mason packages:
+The per-filetype warnings and `:checkhealth config` come from `lua/config/deps.lua`. The binary names they show map to these Mason packages:
 
 | Warning (binary)                 | Mason package                  |
 |----------------------------------|--------------------------------|
@@ -722,11 +722,10 @@ Bulk install example for a typical frontend + backend workstation:
 :MasonInstall html-lsp json-lsp css-lsp typescript-language-server prettierd clangd gopls goimports
 ```
 
-### Trimming startup warnings
+### Trimming the dependency warnings
 
-- `startup_features` in `lua/config/deps.lua` controls which checks fire on Neovim startup
-- Remove entries for languages you never use to silence their warnings; per-filetype checks still fire when opening a matching file
-- `filetype_features` in the same file maps filetype to the checks that run on first buffer open
+- Nothing warns on startup; `:checkhealth config` reports everything on demand
+- `filetype_features` in `lua/config/deps.lua` maps filetype to the checks that run on first buffer open; remove entries for tools you never want to hear about
 
 ## LSP performance in large repos
 
@@ -768,7 +767,7 @@ workspace that walk is itself expensive.
   to refresh the server. The only thing lost is live detection of external
   changes between branch switches (e.g. a `terraform init` writing
   `.terraform/modules` while Neovim is open); `:LspRestart` refreshes manually.
-- The `file_watch` dependency check warns once on startup (and in `:NvimDeps`)
+- The `file_watch` dependency check reports in `:checkhealth config`
   when no native backend is available, recommending `inotify-tools`
   (`inotify-tools port` on FreeBSD). Install it on your normal `PATH` (flox,
   system package manager) rather than via Mason: it is a system tool, not a
@@ -826,8 +825,8 @@ live in git history.
 
 - Do not enable automatic formatting on save for any language; keep formatting an
   explicit action via `SPC c f` (conform) or `:ConformInfo`
-- Keep `:NvimDeps` reporting explicit — surface missing tools rather than
-  auto-installing them
+- Keep dependency reporting explicit (`:checkhealth config`, `SPC cm`) — surface
+  missing tools rather than auto-installing them
 
 ### Open alignment checks
 
@@ -868,4 +867,4 @@ live in git history.
 - `nvim --headless '+qa'`
 - `nvim --headless '+Lazy! load all' '+qa'`
 - `nvim/test/run.sh` passes
-- `:NvimDeps` reports all checked dependencies installed
+- `:checkhealth config` reports every dependency installed

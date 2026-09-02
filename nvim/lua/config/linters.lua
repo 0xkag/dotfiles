@@ -33,6 +33,12 @@ function M.for_filetype(ft, available)
   return {}
 end
 
+-- The candidates for `ft` in preference order, as a copy, or an empty list.
+-- config.deps reports these, so a tool it names is one nvim-lint would run.
+function M.candidates(ft)
+  return vim.deepcopy(candidates_by_ft[ft] or {})
+end
+
 -- Every filetype with linters configured, sorted.
 function M.filetypes()
   local filetypes = vim.tbl_keys(candidates_by_ft)

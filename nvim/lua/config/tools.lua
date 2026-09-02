@@ -23,8 +23,9 @@ local function cache_for_path()
   return cache
 end
 
--- Drop every cached probe, so the next ask resolves afresh. :NvimDeps calls
--- this first: an explicit audit must see a tool installed mid-session.
+-- Drop every cached probe, so the next ask resolves afresh. :checkhealth
+-- config and <leader>cm call this first: an explicit audit must see a tool
+-- installed mid-session.
 function M.invalidate()
   cache = {}
   cache_path = nil
