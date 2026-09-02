@@ -3,6 +3,7 @@ return {
   event = "VeryLazy",
   config = function()
     local lint = require("lint")
+    local linters = require("config.linters")
     local tools = require("config.tools")
 
     -- The built-in tflint linter runs `tflint --recursive`, scanning the whole
@@ -15,49 +16,20 @@ return {
       return require("config.tflint").linter(upstream_tflint, vim.api.nvim_buf_get_name(0))
     end
 
-    local function executable(bin)
-      return tools.available(bin)
-    end
-
-    local function python_linters()
-      -- Ruff's diagnostics come from the ruff LSP server (see lsp.lua).
-      -- Keeping ruff here as a linter would duplicate squigglies.
-      local linters = {}
-
-      if executable("mypy") then
-        table.insert(linters, "mypy")
-      end
-
-      if #linters == 0 and executable("pylint") then
-        table.insert(linters, "pylint")
-      end
-
-      if #linters == 0 and executable("flake8") then
-        table.insert(linters, "flake8")
-      end
-
-      return linters
-    end
-
-    local function refresh_linters()
-      lint.linters_by_ft = {
-        bash = executable("shellcheck") and { "shellcheck" } or {},
-        python = python_linters(),
-        sh = executable("shellcheck") and { "shellcheck" } or {},
-        terraform = executable("tflint") and { "tflint" } or {},
-        yaml = executable("yamllint") and { "yamllint" } or {},
-        zsh = executable("shellcheck") and { "shellcheck" } or {},
-      }
-    end
-
     local lint_group = vim.api.nvim_create_augroup("user_lint", { clear = true })
 
+    -- Resolve the linters for the buffer's filetype right before linting it,
+    -- against the session's cached tool probes (config.linters, config.tools).
+    -- The old code rebuilt every filetype's list, probing all seven tools, on
+    -- each read and write of any buffer.
     local function try_lint()
-      refresh_linters()
+      local ft = vim.bo.filetype
+      local selected = linters.for_filetype(ft, tools.available)
+      if selected then
+        lint.linters_by_ft[ft] = selected
+      end
       lint.try_lint()
     end
-
-    refresh_linters()
 
     vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
       group = lint_group,
