@@ -31,7 +31,6 @@ map("i", "<C-h>", "<C-o>h", { desc = "Cursor left", silent = true })
 map("i", "<C-l>", "<C-o>l", { desc = "Cursor right", silent = true })
 map("n", "<C-a>", "<Home>", { desc = "Line start", silent = true })
 map("n", "<C-e>", "<End>", { desc = "Line end", silent = true })
-map("n", "Y", "y$", { desc = "Yank to end of line", silent = true })
 map("n", "gV", "`[v`]", { desc = "Select last changed text", silent = true })
 
 -- gq/gqq reflow per reflow_mode (default builtin); gQ/gQQ always restyle.

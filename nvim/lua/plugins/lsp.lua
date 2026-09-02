@@ -541,14 +541,14 @@ return {
         )
       end, { desc = "Toggle inc-rename live preview" })
 
+      -- `[d` / `]d` are Neovim's own since 0.11, with this same jump call, so
+      -- they are not repeated here; these are the leader-key spellings.
       local function diagnostic_jump(count)
         return function()
           vim.diagnostic.jump({ count = count })
         end
       end
 
-      vim.keymap.set("n", "[d", diagnostic_jump(-1), { desc = "Previous diagnostic" })
-      vim.keymap.set("n", "]d", diagnostic_jump(1), { desc = "Next diagnostic" })
       vim.keymap.set("n", "<leader>ex", vim.diagnostic.open_float, { desc = "Explain error" })
       vim.keymap.set("n", "<leader>en", diagnostic_jump(1), { desc = "Next error" })
       vim.keymap.set("n", "<leader>ep", diagnostic_jump(-1), { desc = "Previous error" })

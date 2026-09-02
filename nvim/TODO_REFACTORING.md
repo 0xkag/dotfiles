@@ -237,7 +237,11 @@ swap and undo writes off the network, on local disk it changes nothing. snacks
 to 0.6 s and one jump-to-end redraw from 1.7 s to 0.17 s, because the buffer
 gets the `bigfile` filetype before the treesitter hook or an LSP server sees
 it; the cost is regex syntax only, above 1.5 MB or 1000 bytes a line, in
-exactly those files. The `[d` / `]d` / `K` / `Y` maps: pending below.
+exactly those files. `Y`, `[d` and `]d`: dropped, since Neovim's own maps are
+the same (`y$`; `vim.diagnostic.jump` with the same call) and `<leader>en` /
+`<leader>ep` keep the leader spellings. `K`: kept. The original claim was
+wrong; the config's hover adds a rounded border and its own close events, so
+it never restated the default.
 
 Kept for the record:
 
