@@ -3,7 +3,6 @@ local opt = vim.opt
 opt.number = true
 opt.relativenumber = true
 opt.background = "dark"
-opt.lazyredraw = true
 opt.mouse = "a"
 
 -- Clipboard tristate.  Default 'full' = unnamedplus (system clipboard).

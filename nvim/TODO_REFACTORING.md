@@ -178,6 +178,20 @@ Plan:
 
 ### 2.4 Key timing and options
 
+Status 2026-09-01: done for the `gr` defaults (deleted in keymaps.lua), the
+insert-mode timeout (150 ms via InsertEnter / InsertLeave, restoring the
+normal-mode value), `lazyredraw` (dropped), treesitter folding (the global foldexpr is
+`config.treesitter.foldexpr`, which folds only buffers `attach` marked; note
+that Neovim 0.12's own ftplugins, `ftplugin/lua.lua` for one, set a
+window-local `v:lua.vim.treesitter.foldexpr()` themselves, which the guard
+cannot and need not override) and the lua_ls library
+(runtime plus luv types). Struck: `wildoptions = { "tagfile" }` was set on
+purpose in b1cb17c, not ported by accident. Left as decisions: the NFS
+`directory` / `undodir` move (local disk loses undo history across reboots),
+re-enabling snacks `bigfile` (explicitly disabled in ui.lua; it turns syntax
+off above 1.5 MB), and the `[d` / `]d` / `K` / `Y` maps that restate defaults
+(harmless, and they carry which-key descriptions). Kept for the record:
+
 - `gr` (global and LSP buffer-local) sits on Neovim 0.11's `grn` / `grr` /
   `gri` / `gra` / `grt` prefix, so every `gr` waits the full `timeoutlen`
   (500 ms). Either `pcall(vim.keymap.del, "n", k)` for the defaults or accept
