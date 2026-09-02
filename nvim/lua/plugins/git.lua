@@ -8,28 +8,43 @@ local file_diff_args = gitdiff.file_diff_args
 local git_in = gitdiff.git_in
 local repo_toplevel = gitdiff.repo_toplevel
 
--- Run git in the directory of the current buffer (falls back to cwd).
+-- The current project's repo, falling back to cwd, so this also works from an
+-- oil:// or neo-tree buffer, whose name is no directory on disk.
+local function repo()
+  return repo_toplevel(nil, true) or vim.fn.getcwd()
+end
+
+-- Run git in the current project's repo.
 local function git(args)
-  local dir = vim.fn.expand("%:p:h")
-  if dir == "" then
-    dir = vim.fn.getcwd()
-  end
-  return git_in(dir, args)
+  return git_in(repo(), args)
 end
 
 -- Best guess at the repo's default branch: prefer origin/HEAD, then main/master.
+-- Cached per repo for the session: one <leader>gm press asks up to three times,
+-- and each ask is up to three spawns.
+local default_branches = {}
+
 local function default_branch()
+  local root = repo()
+  if default_branches[root] then
+    return default_branches[root]
+  end
+
+  local branch
   local out, code = git({ "symbolic-ref", "--quiet", "--short", "refs/remotes/origin/HEAD" })
   if code == 0 and out[1] and out[1] ~= "" then
-    return (out[1]:gsub("^origin/", ""))
-  end
-  for _, b in ipairs({ "main", "master" }) do
-    local _, c = git({ "rev-parse", "--verify", "--quiet", b })
-    if c == 0 then
-      return b
+    branch = (out[1]:gsub("^origin/", ""))
+  else
+    for _, b in ipairs({ "main", "master" }) do
+      local _, c = git({ "rev-parse", "--verify", "--quiet", b })
+      if c == 0 then
+        branch = b
+        break
+      end
     end
   end
-  return nil
+  default_branches[root] = branch
+  return branch
 end
 
 -- Commit where the current branch forked off the default branch. Diffing
@@ -283,6 +298,14 @@ end
 local function base_set(ref)
   if ref == nil or ref == "" then
     base_apply("index")
+    return
+  end
+
+  -- Refuse a ref that is not a commit, or every listing would fail on it until
+  -- it was replaced.
+  local _, code = git({ "rev-parse", "--verify", "--quiet", ref .. "^{commit}" })
+  if code ~= 0 then
+    vim.notify("gitsigns: " .. ref .. " is not a commit", vim.log.levels.WARN)
     return
   end
   require("gitsigns").change_base(ref, true)

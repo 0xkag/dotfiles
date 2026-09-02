@@ -52,7 +52,12 @@ local sha_a = git({ "rev-parse", "HEAD" })[1]
 git({ "update-ref", "refs/remotes/origin/master", sha_a })
 git({ "commit", "-q", "--allow-empty", "-m", "B" })
 local sha_b = git({ "rev-parse", "HEAD" })[1]
+git({ "tag", "v1.0", sha_a })
 vim.cmd.cd(repo)
+
+-- Every git spawn plugins/git.lua makes, by subcommand. Wrapped before the
+-- plugin loads, since it binds the runner at load time.
+local spawns = {}
 
 -- Pull the mapped functions out of the lazy spec's keys table.
 local function load_maps()
@@ -60,6 +65,13 @@ local function load_maps()
   -- the base means dropping both modules.
   package.loaded["config.gitdiff"] = nil
   package.loaded["plugins.git"] = nil
+  local gitdiff = require("config.gitdiff")
+  local git_in = gitdiff.git_in
+  spawns = {}
+  gitdiff.git_in = function(dir, args)
+    spawns[args[1]] = (spawns[args[1]] or 0) + 1
+    return git_in(dir, args)
+  end
   local spec = require("plugins.git")
   local maps = {}
   for _, k in ipairs(spec.keys) do
@@ -84,6 +96,10 @@ do
   check("fourth press -> origin/master", bases[4] == "origin/master", bases[4])
   gm()
   check("fifth press -> index", bases[5] == "<index>", bases[5])
+
+  -- Five presses ask for the default branch up to three times each, and each
+  -- ask is up to three spawns; the answer does not change within a session.
+  check("the default branch is resolved once per repo", spawns["symbolic-ref"] == 1, spawns["symbolic-ref"])
 end
 
 -- gM prompt: prefills origin/master at index on master; accepting a manual
@@ -101,6 +117,17 @@ do
   check("gM applies the entered ref", bases[1] == "v1.0", bases[1])
   maps["<leader>gm"]()
   check("gm after manual base -> index", bases[2] == "<index>", bases[2])
+
+  -- A ref that is not a commit is refused, or every listing would fail on it
+  -- until it was replaced.
+  vim.ui.input = function(_, cb)
+    cb("no-such-ref")
+  end
+  notes = {}
+  maps["<leader>gM"]()
+  check("gM refuses a ref that is not a commit", #bases == 2, vim.inspect(bases))
+  check("and says so", notes[1] and notes[1]:find("no-such-ref", 1, true) ~= nil, vim.inspect(notes))
+  check("the shared base is unchanged", require("config.gitdiff").base() == nil, require("config.gitdiff").base())
 end
 
 -- On a feature branch: smart first press goes to the merge-base with master.
@@ -111,6 +138,16 @@ do
   bases = {}
   maps["<leader>gm"]()
   check("smart first press on feature -> merge-base sha", bases[1] == sha_b, bases[1])
+end
+
+-- From an oil:// or neo-tree buffer, whose name is no directory on disk, the
+-- repo is the current project's (falling back to cwd), not the buffer's path.
+do
+  vim.api.nvim_buf_set_name(0, "oil:///nowhere/")
+  local maps = load_maps()
+  bases = {}
+  maps["<leader>gm"]()
+  check("gm works from an oil buffer", bases[1] == sha_b, bases[1])
 end
 
 if #failures > 0 then
