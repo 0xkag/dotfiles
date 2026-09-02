@@ -5,6 +5,7 @@ local util = require("config.util")
 
 local state_file = vim.fs.joinpath(vim.fn.stdpath("state"), "projects.txt")
 local max_projects = 50
+local write_warned = false
 
 local function normalize(path)
   if not path or path == "" then
@@ -23,10 +24,15 @@ local function display_path(path)
   return vim.fn.fnamemodify(path, ":~")
 end
 
-local function ensure_state_dir()
-  vim.fn.mkdir(vim.fs.dirname(state_file), "p")
+-- Test seam: point the list at another file.
+function M._set_state_file(path)
+  state_file = path
+  write_warned = false
 end
 
+-- Every recorded project, most recent first, as written. A directory that does
+-- not exist right now is kept: it may be an unmounted share, and dropping it
+-- here would forget the project for good the next time the list is rewritten.
 local function read_projects()
   local projects = {}
   local file = io.open(state_file, "r")
@@ -36,7 +42,7 @@ local function read_projects()
 
   for line in file:lines() do
     local path = normalize(vim.trim(line))
-    if is_dir(path) then
+    if path then
       table.insert(projects, path)
     end
   end
@@ -45,23 +51,47 @@ local function read_projects()
   return projects
 end
 
+-- Rewrite the list through a temp file and a rename, so a crash mid-write
+-- cannot leave a truncated list. This runs from a BufEnter autocmd, so a state
+-- dir that cannot be written (read-only, full, an NFS home that is away) must
+-- not throw on every buffer switch: it warns once per session and gives up.
 local function write_projects(projects)
-  ensure_state_dir()
+  -- mkdir throws (E739) when a path component is a regular file.
+  local made, err = pcall(vim.fn.mkdir, vim.fs.dirname(state_file), "p")
 
-  local file = assert(io.open(state_file, "w"))
-  for _, path in ipairs(projects) do
-    file:write(path, "\n")
+  local temp = state_file .. ".tmp." .. vim.fn.getpid()
+  local file
+  if made then
+    file, err = io.open(temp, "w")
   end
-  file:close()
+  if file then
+    for _, path in ipairs(projects) do
+      file:write(path, "\n")
+    end
+    file:close()
+    local ok, rename_err = uv.fs_rename(temp, state_file)
+    if ok then
+      return true
+    end
+    err = rename_err
+    uv.fs_unlink(temp)
+  end
+
+  if not write_warned then
+    write_warned = true
+    vim.notify("Could not save the project list to " .. state_file .. ": " .. tostring(err), vim.log.levels.WARN)
+  end
+  return false
 end
 
+-- Normalised, unique, capped; existence is not checked here, see read_projects.
 local function dedupe(projects)
   local seen = {}
   local results = {}
 
   for _, path in ipairs(projects) do
     path = normalize(path)
-    if is_dir(path) and not seen[path] then
+    if path and not seen[path] then
       seen[path] = true
       table.insert(results, path)
     end
@@ -143,10 +173,10 @@ local function load_project_session()
   persistence.load()
 end
 
+-- The projects whose directories exist right now, most recent first. Missing
+-- ones are hidden, not removed; the file is left as it is.
 function M.list()
-  local projects = dedupe(read_projects())
-  write_projects(projects)
-  return projects
+  return vim.tbl_filter(is_dir, dedupe(read_projects()))
 end
 
 function M.current(bufnr)
@@ -164,10 +194,14 @@ function M.add(path, opts)
     return nil
   end
 
-  local projects = { path }
-  vim.list_extend(projects, read_projects())
-  projects = dedupe(projects)
-  write_projects(projects)
+  -- BufEnter tracks every buffer switch; when the project is already at the
+  -- head there is nothing to record, so skip the rewrite.
+  local recorded = read_projects()
+  if recorded[1] ~= path then
+    local projects = { path }
+    vim.list_extend(projects, recorded)
+    write_projects(dedupe(projects))
+  end
 
   if not opts.silent then
     vim.notify("Added project: " .. display_path(path), vim.log.levels.INFO)

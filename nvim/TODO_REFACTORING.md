@@ -70,7 +70,7 @@ Fixed one commit each; tick the box in the fixing commit.
   unstripped, and the strip reruns per buffer. Move it to `on_init`, which runs
   once per client after `server_capabilities` is set and before any attach.
   Extract the strip to `lsp_util` so it can be specced.
-- [ ] **6. Project tracker is fragile and busy.** `lua/config/projects.lua`
+- [x] **6. Project tracker is fragile and busy.** `lua/config/projects.lua`
   asserts on a failed state-file write inside a BufEnter autocmd (a read-only
   or full state dir errors on every buffer switch); `read_projects` drops any
   directory that fails `fs_stat` and `list()` writes the pruned list back, so a
