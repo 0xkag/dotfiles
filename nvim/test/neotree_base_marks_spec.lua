@@ -224,6 +224,42 @@ do
   check("resetting to the index clears the marks", vim.trim(out.text or "") == "", vim.inspect(out))
 end
 
+-- A tree rooted at a symlinked spelling of the repo (~/.config/nvim ->
+-- ~/.dotfiles/nvim) has node paths under that spelling while git reports the
+-- physical toplevel, so the marks have to be keyed the way the tree spells
+-- them. And at the index base there is nothing to list, so nothing is asked of
+-- git at all.
+do
+  local link = vim.fn.tempname()
+  vim.uv.fs_symlink(root, link)
+  local linked = { path = link }
+  local config = { symbols = { modified = "M", added = "A", deleted = "D", renamed = "R" } }
+
+  gitdiff.set_base("origin/master")
+  subscriptions["git_status_changed"]()
+  local marked = component(config, { path = link .. "/committed_mod" }, linked)
+  check("a committed change is marked under the tree's own spelling", vim.trim(marked.text or "") == "M", vim.inspect(marked))
+  local bubbled = component(config, { path = link .. "/sub" }, linked)
+  check("and bubbles up under it", vim.trim(bubbled.text or "") == "M", vim.inspect(bubbled))
+  local clean = component(config, { path = link .. "/untouched" }, linked)
+  check("an unchanged file stays unmarked there", vim.trim(clean.text or "") == "", vim.inspect(clean))
+
+  gitdiff.set_base(nil)
+  local rev_parses = 0
+  local git_in = gitdiff.git_in
+  gitdiff.git_in = function(dir, args)
+    if args[1] == "rev-parse" then
+      rev_parses = rev_parses + 1
+    end
+    return git_in(dir, args)
+  end
+  subscriptions["git_status_changed"]()
+  component(config, { path = link .. "/committed_mod" }, linked)
+  check("the index base asks git nothing", rev_parses == 0, rev_parses)
+  gitdiff.git_in = git_in
+  vim.fn.delete(link)
+end
+
 -- ]g and [g have to walk the same set the rows are marked with. Neo-tree's own
 -- versions read its worktree status table, which never sees the base marks and
 -- skips untracked files outright.

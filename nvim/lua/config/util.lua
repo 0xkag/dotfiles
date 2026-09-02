@@ -63,8 +63,10 @@ function M.project_root(bufnr)
   return M.find_root(name) or M.cwd()
 end
 
+-- Whether `path` is inside a git worktree, nested project roots included: a
+-- `.git` next to it is only the toplevel case.
 function M.is_git_repo(path)
-  return vim.fn.isdirectory(vim.fs.joinpath(path, ".git")) == 1 or vim.fn.filereadable(vim.fs.joinpath(path, ".git")) == 1
+  return require("config.gitdiff").repo_toplevel(path, true) ~= nil
 end
 
 local git_status_width = 2

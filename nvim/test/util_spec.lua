@@ -265,10 +265,18 @@ do
   check("a second picker is marked at once", cached == "M IC tracked", cached)
   check("and needs no refresh", refreshed == 1, refreshed)
 
+  -- A directory nested in the repo (a project root inside a monorepo) is still
+  -- in the repo: the check has to ask git rather than look for cwd/.git.
+  vim.fn.mkdir(repo .. "/nested", "p")
+  check("is_git_repo sees a nested directory", util.is_git_repo(repo .. "/nested") == true)
+  util.find_files({ cwd = repo .. "/nested" })
+  check("find_files uses git_files from a nested directory", calls[3] and calls[3].picker == "git_files", calls[3] and calls[3].picker)
+
   local plain = vim.fn.tempname()
   vim.fn.mkdir(plain, "p")
+  check("is_git_repo is false outside a repo", util.is_git_repo(plain) == false)
   util.find_files({ cwd = plain })
-  check("find_files falls back outside a repo", calls[3] and calls[3].picker == "find_files", calls[3] and calls[3].picker)
+  check("find_files falls back outside a repo", calls[4] and calls[4].picker == "find_files", calls[4] and calls[4].picker)
 end
 
 if #failures > 0 then
