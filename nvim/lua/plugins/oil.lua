@@ -1,19 +1,15 @@
 local util = require("config.util")
 
 -- Oil renders one column cell per line, so the marks are cached per directory
--- and diff-base generation the same way the tree's are: one git call per redraw
--- rather than one per file.
+-- and listing version the same way the tree's are: one lookup per redraw rather
+-- than one per file.
 local marks = {}
 local marks_key = nil
-
--- Bumped by <C-l>, so a refresh the user asks for recomputes the marks even
--- when neither the directory nor the diff base has changed.
-local refresh_generation = 0
 
 local function marks_for(bufnr)
   local gitdiff = require("config.gitdiff")
   local dir = require("oil").get_current_dir(bufnr)
-  local key = (dir or "") .. "\0" .. gitdiff.generation() .. "\0" .. refresh_generation
+  local key = (dir or "") .. "\0" .. gitdiff.version()
   if marks_key == key then
     return marks
   end
@@ -34,7 +30,7 @@ end
 -- prompts, and with force does not even do that), so triggering a refresh to
 -- update a cosmetic column risks destroying a bulk rename in progress. Instead
 -- the marks are recomputed on the redraw the user asks for: <C-l> is oil's
--- refresh, wrapped below to bump the cache key first.
+-- refresh, wrapped below to drop the cached listings first.
 local function register_git_column()
   local constants = require("oil.constants")
   local gitdiff = require("config.gitdiff")
@@ -96,7 +92,7 @@ return {
     keymaps = {
       ["<C-l>"] = {
         callback = function()
-          refresh_generation = refresh_generation + 1
+          require("config.gitdiff").invalidate()
           require("oil.actions").refresh.callback()
         end,
         desc = "Refresh, recomputing the git marks",

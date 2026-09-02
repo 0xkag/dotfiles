@@ -173,6 +173,82 @@ do
   vim.fn.delete(sub, "rf")
 end
 
+-- Listings are cached per repo: every view asks for the same one on every
+-- redraw (Oil per directory change, the pickers per open, the tree per refresh,
+-- ]g per press), so one listing has to serve them all until the base changes or
+-- the worktree may have. The editor cannot see a git command run in a shell, so
+-- the cache also starts over on the events that bracket one: a write, a :!
+-- command, leaving a terminal, regaining focus, and the gitsigns and Oil
+-- mutation events.
+do
+  local spawns = 0
+  local git_fields = gitdiff.git_fields
+  gitdiff.git_fields = function(...)
+    spawns = spawns + 1
+    return git_fields(...)
+  end
+  local toplevels = 0
+  local git_in = gitdiff.git_in
+  gitdiff.git_in = function(dir, args)
+    if args[1] == "rev-parse" then
+      toplevels = toplevels + 1
+    end
+    return git_in(dir, args)
+  end
+  local function spawned(fn)
+    local before = spawns
+    fn()
+    return spawns - before
+  end
+  local function list()
+    gitdiff.changed_files(root)
+  end
+
+  gitdiff.set_base(nil)
+  check("a first listing spawns git", spawned(list) > 0, spawns)
+  check("a second listing is served from the cache", spawned(list) == 0, spawns)
+  check("status_by_path shares the listing", spawned(function()
+    gitdiff.status_by_path(root)
+  end) == 0, spawns)
+  check("the toplevel of a directory is resolved once", toplevels == 1, toplevels)
+
+  local version = gitdiff.version()
+  gitdiff.set_base("origin/master")
+  check("a base change bumps the version", gitdiff.version() ~= version, gitdiff.version())
+  check("a base change starts the cache over", spawned(list) > 0, spawns)
+  check("and caches again", spawned(list) == 0, spawns)
+  check("committed_files is cached too", spawned(function()
+    gitdiff.committed_files(root)
+    gitdiff.committed_files(root)
+  end) == 1, spawns)
+
+  version = gitdiff.version()
+  gitdiff.invalidate()
+  check("invalidate bumps the version", gitdiff.version() ~= version, gitdiff.version())
+  check("invalidate starts the cache over", spawned(list) > 0, spawns)
+  toplevels = 0
+  gitdiff.status_by_path(root)
+  check("invalidate resolves the toplevel again", toplevels == 1, toplevels)
+
+  for _, event in ipairs({ "BufWritePost", "FocusGained", "ShellCmdPost", "TermLeave" }) do
+    vim.api.nvim_exec_autocmds(event, {})
+    check(event .. " starts the cache over", spawned(list) > 0, spawns)
+  end
+  for _, pattern in ipairs({ "GitSignsChanged", "OilActionsPost" }) do
+    vim.api.nvim_exec_autocmds("User", { pattern = pattern })
+    check("User " .. pattern .. " starts the cache over", spawned(list) > 0, spawns)
+  end
+
+  -- A listing that failed is remembered too, or a bad base would cost a spawn
+  -- and an error on every redraw until the base is fixed.
+  gitdiff.set_base("no-such-ref")
+  check("a failed listing spawns once", spawned(list) == 1, spawns)
+  check("and is not retried until the cache starts over", spawned(list) == 0, spawns)
+
+  gitdiff.git_fields, gitdiff.git_in = git_fields, git_in
+  gitdiff.set_base(nil)
+end
+
 vim.fn.delete(repo, "rf")
 
 if #failures > 0 then
