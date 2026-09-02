@@ -399,7 +399,7 @@ pipx inject python-lsp-server pylsp-rope
 
 If a project's pyenv already has `python-lsp-server` + `pylsp-rope` installed, Neovim uses that project's direct `bin/pylsp` before the pipx fallback. Rope then sees the project's installed deps, which can improve cross-file refactoring accuracy. To set this up inside a project venv: `pip install python-lsp-server pylsp-rope`.
 
-`SPC cm` (and the once-per-filetype warning) checks the same resolved `pylsp` path that LSP startup uses and warns if either piece is missing; `:checkhealth config` lists it too. Ruff is already on PATH via flox.
+`SPC cm` (and the once-per-filetype warning) checks the same resolved `pylsp` path that LSP startup uses and warns if either piece is missing; `:checkhealth config` lists it too. The pipx fallback is looked up under `$PIPX_HOME` when that is set, else pipx's default `~/.local/share/pipx`. Ruff is already on PATH via flox.
 
 ### Python LSP footprint
 

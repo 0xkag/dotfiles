@@ -155,8 +155,11 @@ local function executable_in_prefix(prefix, name)
   return nil
 end
 
+-- The pipx venv of python-lsp-server, under $PIPX_HOME the way pipx itself
+-- resolves it, or pipx's default location.
 local function pipx_pylsp_prefix()
-  local prefix = vim.fn.expand("~/.local/share/pipx/venvs/python-lsp-server")
+  local pipx_home = vim.env.PIPX_HOME or vim.fs.joinpath(vim.env.HOME or vim.fn.expand("~"), ".local/share/pipx")
+  local prefix = vim.fs.joinpath(pipx_home, "venvs", "python-lsp-server")
   if uv.fs_stat(vim.fs.joinpath(prefix, "bin", "pylsp")) then
     return prefix
   end
