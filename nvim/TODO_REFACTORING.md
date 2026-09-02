@@ -393,18 +393,16 @@ Keep, and do not migrate:
   listchars belong with options. Payoff: each group becomes requireable on
   its own (grep no longer pulls telescope's entry maker into scope), and the
   require cycle goes. No runtime change.
-- `lua/config/deps.lua` (479 lines) plus `tools.lua`: replace the startup
-  sweep and `:NvimDeps` with a `vim.health` module so `:checkhealth config`
-  does the job at zero startup cost; keep the once-per-filetype warning if
-  wanted; derive `startup_features` by filtering `all_features`. The three
-  hand-kept lists already drift: cssls / ansiblels / dockerls / taplo are
-  configured but never checked, `python_lint` advertises ruff though nvim-lint
-  never runs it. Payoff (measured 2026-09-02): the startup sweep runs 500 ms
-  after VimEnter and, with the tool cache cold as it is on every launch,
-  blocks for 172 ms (28 features; the mise-managed tools cost ~17 ms each),
-  so the editor freezes for that long just as typing starts. `:checkhealth
-  config` moves it to on demand, and one feature list ends the drift. The
-  highest payoff in this section.
+- Done 2026-09-02: `lua/config/deps.lua` is one sorted feature table read two
+  ways, the once-per-filetype warning (kept; `<leader>cm` forces it for the
+  current buffer) and `:checkhealth config` via `lua/config/health.lua`. The
+  startup sweep, `:NvimDeps` and the three hand-kept lists are gone; the
+  servers no list checked (ansiblels, cssls, dockerls, taplo) have features,
+  and the linter features take their candidates from `config.linters`, so
+  ruff is no longer advertised as a linter. Payoff (measured): the sweep ran
+  500 ms after VimEnter and blocked for 172 ms with the tool cache cold as it
+  is on every launch (28 features; the mise-managed tools cost ~17 ms each).
+  That freeze is gone; the same probe now runs on demand.
 - Duplicated helpers to collapse: PATH prepend (`env.lua` vs `python.lua`);
   "buffer dir or cwd" (shared, python, git, terraform); `executable()`
   wrappers (deps, lint) and raw `vim.fn.executable` calls that bypass the
