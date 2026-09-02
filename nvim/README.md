@@ -773,6 +773,10 @@ workspace that walk is itself expensive.
   (`inotify-tools port` on FreeBSD). Install it on your normal `PATH` (flox,
   system package manager) rather than via Mason: it is a system tool, not a
   language server.
+- A file over 1.5 MB, or averaging over 1000 bytes a line, opens as the
+  `bigfile` filetype (snacks.bigfile) with a warning saying so: no treesitter,
+  LSP or folds, regex syntax only. A 3.2 MB Lua table opens in 0.6 s instead of
+  2.2 s and redraws in 0.17 s instead of 1.7 s.
 
 ## Org defaults
 
