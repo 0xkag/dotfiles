@@ -253,7 +253,13 @@ return {
               },
               workspace = {
                 checkThirdParty = false,
-                library = vim.api.nvim_get_runtime_file("", true),
+                -- The runtime and libuv types only. nvim_get_runtime_file("",
+                -- true) handed lua_ls every plugin directory to index on each
+                -- start; lazydev.nvim is the on-demand way back to plugin types.
+                library = {
+                  vim.env.VIMRUNTIME,
+                  "${3rd}/luv/library",
+                },
               },
             },
           },
