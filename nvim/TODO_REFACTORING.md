@@ -83,7 +83,7 @@ Fixed one commit each; tick the box in the fixing commit.
   0.13) at two sites in `lua/plugins/lsp.lua`; `vim.highlight.on_yank` in
   `lua/config/autocmds.lua` (renamed `vim.hl.on_yank`). Fix: `client:stop()`
   per client; `vim.hl`.
-- [ ] **8. Smaller mismatches.** (a) Oil's status column does not refresh on
+- [x] **8. Smaller mismatches.** (a) Oil's status column does not refresh on
   `<C-l>`: its cache key is directory plus diff-base generation, so a refresh
   changes neither, contradicting the README's "correct on any redraw you ask
   for". Bump a local counter from the refresh mapping. (b) neo-tree's
