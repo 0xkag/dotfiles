@@ -219,10 +219,11 @@ terminal, lsp, git, neotree.
 
 Safe drops:
 
-- `mason-lspconfig.nvim`: with `automatic_enable = false` it only registers
-  `:LspInstall` / `:LspUninstall` and schedules a registry refresh. Listing it
-  and mason as dependencies of nvim-lspconfig also defeats mason's own `cmd`
-  laziness. `env.lua` already puts `mason/bin` on PATH without the plugin.
+- Done 2026-09-01: `mason-lspconfig.nvim` dropped. With `automatic_enable =
+  false` it only registered `:LspInstall` / `:LspUninstall` and scheduled a
+  registry refresh, and listing it and mason as dependencies of nvim-lspconfig
+  defeated mason's own `cmd` laziness. `env.lua` already puts `mason/bin` on
+  PATH without the plugin.
 - `mini.comment` plus `nvim-ts-context-commentstring`: 0.12's built-in `gc` /
   `gcc` is injection-aware (resolves the treesitter language at the cursor).
   Same keys.

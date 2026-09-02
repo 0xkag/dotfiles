@@ -32,8 +32,6 @@ return {
     event = "VeryLazy",
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
-      "mason-org/mason-lspconfig.nvim",
-      "mason-org/mason.nvim",
     },
     config = function()
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
@@ -899,10 +897,6 @@ return {
 
         vim.notify("Pyright: workspace diagnostics enabled for this session.", vim.log.levels.INFO)
       end, { desc = "Enable pyright workspace-wide diagnostics for this session" })
-
-      require("mason-lspconfig").setup({
-        automatic_enable = false,
-      })
     end,
   },
 }
