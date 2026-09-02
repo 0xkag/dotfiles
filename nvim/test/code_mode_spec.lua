@@ -171,6 +171,58 @@ do
   check("backslash trims then appends", out[4] == "cmd three \\", out[4])
 end
 
+-- Visual actions must act on the LIVE selection: an x-mode Lua mapping fires
+-- while still in visual mode, before the '< '> marks are updated. Drive them
+-- through a real x-map, with a stale mark pair left elsewhere to catch a
+-- mark-based reading.
+local markdown = require("config.code_mode.markdown")
+local function run_visual(fn, select_keys)
+  vim.keymap.set("x", "<Plug>(code_mode_spec_visual)", fn)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", false)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(select_keys, true, false, true), "x", false)
+  vim.api.nvim_feedkeys(
+    vim.api.nvim_replace_termcodes("\\<Plug>(code_mode_spec_visual)", true, true, true), "xt", false)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", false)
+end
+
+-- markdown_bold_visual(): wraps exactly the selected span.
+do
+  set_buf({ "hello world", "second line", "third line" }, 1)
+  vim.cmd("normal! 1GV\27")
+  run_visual(markdown.markdown_bold_visual, "3G0v4l")
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  check("markdown bold wraps the live selection", lines[3] == "**third** line", lines[3])
+  check("markdown bold leaves the stale-marked line", lines[1] == "hello world", lines[1])
+end
+
+-- markdown_blockquote(): visual prefixes the selected lines; normal mode
+-- prefixes the cursor line even when old visual marks exist.
+do
+  set_buf({ "one", "two", "three" }, 1)
+  run_visual(markdown.markdown_blockquote, "2GVj")
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  check("blockquote visual skips unselected", lines[1] == "one", lines[1])
+  check("blockquote visual prefixes first", lines[2] == "> two", lines[2])
+  check("blockquote visual prefixes last", lines[3] == "> three", lines[3])
+
+  vim.api.nvim_win_set_cursor(0, { 1, 0 })
+  markdown.markdown_blockquote()
+  lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  check("blockquote normal prefixes cursor line", lines[1] == "> one", lines[1])
+  check("blockquote normal ignores old marks", lines[2] == "> two", lines[2])
+end
+
+-- shell_add_backslashes_visual(): only the selected lines get a continuation.
+do
+  set_buf({ "cmd one", "cmd two", "cmd three" }, 1)
+  vim.cmd("normal! 2GVj\27")
+  run_visual(shell.shell_add_backslashes_visual, "1GV")
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  check("shell backslash visual hits selected line", lines[1] == "cmd one \\", lines[1])
+  check("shell backslash visual skips stale line 2", lines[2] == "cmd two", lines[2])
+  check("shell backslash visual skips stale line 3", lines[3] == "cmd three", lines[3])
+end
+
 if #failures > 0 then
   io.write("\n" .. #failures .. " failed\n")
   vim.cmd("cquit 1")

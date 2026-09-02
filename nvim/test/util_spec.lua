@@ -89,23 +89,52 @@ do
   check("project_root falls back to cwd", util.project_root(0) == util.cwd(), util.project_root(0))
 end
 
--- visual_selection_text(): linewise (V) joins whole lines; charwise pulls the
--- exact span. Drive it through real buffer marks.
+-- Visual helpers must read the LIVE selection. An x-mode Lua mapping fires
+-- while still in visual mode, and the '< '> marks are only updated on leaving
+-- it, so a mark-based helper acts on the previous selection. Drive each helper
+-- through a real x-map the way a user would.
+local function plug(name, fn)
+  vim.keymap.set("x", "<Plug>(util_spec_" .. name .. ")", fn)
+  return function(select_keys)
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", false)
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(select_keys, true, false, true), "x", false)
+    vim.api.nvim_feedkeys(
+      vim.api.nvim_replace_termcodes("\\<Plug>(util_spec_" .. name .. ")", true, true, true), "xt", false)
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", false)
+  end
+end
+
 do
   vim.api.nvim_buf_set_lines(0, 0, -1, false, { "hello world", "second line", "third" })
-  -- Linewise selection of lines 1..2 via the '< '> marks + visualmode V.
-  vim.api.nvim_buf_set_mark(0, "<", 1, 0, {})
-  vim.api.nvim_buf_set_mark(0, ">", 2, 0, {})
-  vim.fn.setreg("/", "") -- unrelated, keep state clean
-  -- Force visualmode() to report 'V' by entering and leaving linewise visual.
-  vim.cmd("normal! 1GVj\27")
-  local linewise = util.visual_selection_text()
-  check("visual linewise joins lines", linewise == "hello world\nsecond line", linewise)
+  local captured
+  local capture = plug("text", function()
+    captured = util.visual_selection_text()
+  end)
 
-  -- Charwise selection: columns 0..4 on line 1 ("hello").
-  vim.cmd("normal! 1G0v4l\27")
-  local charwise = util.visual_selection_text()
-  check("visual charwise span", charwise == "hello", charwise)
+  -- Leave a stale mark pair on line 2 so a mark-based reading is caught.
+  vim.cmd("normal! 2GV\27")
+
+  capture("1G0v4l")
+  check("visual charwise span is live", captured == "hello", captured)
+
+  capture("1GVj")
+  check("visual linewise joins live lines", captured == "hello world\nsecond line", captured)
+
+  capture("2G$v0")
+  check("visual charwise backwards is normalised", captured == "second line", captured)
+
+  check("visual_range is nil outside visual mode", util.visual_range() == nil, vim.inspect(util.visual_range()))
+end
+
+-- squeeze_spaces_visual(): only the selected lines are squeezed.
+do
+  vim.api.nvim_buf_set_lines(0, 0, -1, false, { "a  b", "c   d", "e  f" })
+  vim.cmd("normal! 1GV\27")
+  plug("squeeze", util.squeeze_spaces_visual)("2GVj")
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  check("squeeze visual leaves unselected line", lines[1] == "a  b", lines[1])
+  check("squeeze visual squeezes first selected", lines[2] == "c d", lines[2])
+  check("squeeze visual squeezes last selected", lines[3] == "e f", lines[3])
 end
 
 -- find_files(): picks git_files inside a repo and find_files outside one, and

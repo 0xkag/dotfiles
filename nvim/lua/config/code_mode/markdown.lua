@@ -2,29 +2,12 @@
 local M = {}
 
 local shared = require("config.code_mode.shared")
+local util = require("config.util")
 
+-- The live selection, or nil when not in visual mode; see util.visual_range
+-- for why the '< '> marks are not read here.
 local function visual_positions()
-  local start_pos = vim.api.nvim_buf_get_mark(0, "<")
-  local end_pos = vim.api.nvim_buf_get_mark(0, ">")
-
-  local start_row, start_col = start_pos[1], start_pos[2]
-  local end_row, end_col = end_pos[1], end_pos[2]
-
-  if start_row == 0 or end_row == 0 then
-    return nil
-  end
-
-  if start_row > end_row or (start_row == end_row and start_col > end_col) then
-    start_row, end_row = end_row, start_row
-    start_col, end_col = end_col, start_col
-  end
-
-  return {
-    start_row = start_row,
-    start_col = start_col,
-    end_row = end_row,
-    end_col = end_col,
-  }
+  return util.visual_range()
 end
 
 local function surround_visual_selection(prefix, suffix)

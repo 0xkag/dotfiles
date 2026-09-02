@@ -165,30 +165,49 @@ function M.listchars_ascii()
   M.listchars_profile("ascii")
 end
 
-local function normalize_range(start_pos, end_pos)
-  if start_pos[1] > end_pos[1] or (start_pos[1] == end_pos[1] and start_pos[2] > end_pos[2]) then
-    return end_pos, start_pos
-  end
-
-  return start_pos, end_pos
-end
-
-function M.visual_selection_text()
-  local start_pos = vim.api.nvim_buf_get_mark(0, "<")
-  local end_pos = vim.api.nvim_buf_get_mark(0, ">")
-  if start_pos[1] == 0 or end_pos[1] == 0 then
+-- The live visual selection as 1-based rows and 0-based columns (the mark
+-- convention), start before end, plus the visual mode letter. nil outside
+-- visual mode.
+--
+-- Read getpos("v") / getpos(".") rather than the '< '> marks: an x-mode Lua
+-- mapping fires while still in visual mode, and the marks are only updated on
+-- leaving it, so a mark-based reading acts on the previous selection.
+function M.visual_range()
+  local mode = vim.fn.mode()
+  if not mode:match("^[vV\22sS\19]") then
     return nil
   end
 
-  start_pos, end_pos = normalize_range(start_pos, end_pos)
+  local anchor = vim.fn.getpos("v")
+  local cursor = vim.fn.getpos(".")
+  local start_row, start_col, end_row, end_col = anchor[2], anchor[3] - 1, cursor[2], cursor[3] - 1
+  if start_row > end_row or (start_row == end_row and start_col > end_col) then
+    start_row, end_row = end_row, start_row
+    start_col, end_col = end_col, start_col
+  end
 
-  local mode = vim.fn.visualmode()
+  return {
+    end_col = end_col,
+    end_row = end_row,
+    mode = mode,
+    start_col = start_col,
+    start_row = start_row,
+  }
+end
+
+function M.visual_selection_text()
+  local range = M.visual_range()
+  if not range then
+    return nil
+  end
+
   local lines
-
-  if mode == "V" then
-    lines = vim.api.nvim_buf_get_lines(0, start_pos[1] - 1, end_pos[1], false)
+  if range.mode == "V" or range.mode == "S" then
+    lines = vim.api.nvim_buf_get_lines(0, range.start_row - 1, range.end_row, false)
   else
-    lines = vim.api.nvim_buf_get_text(0, start_pos[1] - 1, start_pos[2], end_pos[1] - 1, end_pos[2] + 1, {})
+    local last = vim.api.nvim_buf_get_lines(0, range.end_row - 1, range.end_row, false)[1] or ""
+    local end_col = math.min(range.end_col + 1, #last)
+    lines = vim.api.nvim_buf_get_text(0, range.start_row - 1, range.start_col, range.end_row - 1, end_col, {})
   end
 
   if not lines or #lines == 0 then
@@ -548,7 +567,10 @@ function M.squeeze_spaces_line()
 end
 
 function M.squeeze_spaces_visual()
-  M.squeeze_spaces(vim.fn.line("'<"), vim.fn.line("'>"))
+  local range = M.visual_range()
+  if range then
+    M.squeeze_spaces(range.start_row, range.end_row)
+  end
 end
 
 return M
