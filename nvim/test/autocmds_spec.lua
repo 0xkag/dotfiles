@@ -74,6 +74,40 @@ do
   vim.highlight = saved
 end
 
+-- Insert mode shortens the key timeout so `f` shows up promptly when it is not
+-- the start of the `fd` escape chord; leaving insert restores whatever the
+-- normal-mode value was, so leader and localleader chords keep their time.
+-- Headless feedkeys runs insert mode like :normal, entering and leaving within
+-- the call, so both values are observed from autocmds registered after the
+-- config's own (autocmds run in definition order).
+do
+  local seen_enter, seen_leave
+  local group = vim.api.nvim_create_augroup("autocmds_spec_insert", { clear = true })
+  vim.api.nvim_create_autocmd("InsertEnter", {
+    group = group,
+    callback = function()
+      seen_enter = vim.o.timeoutlen
+    end,
+  })
+  vim.api.nvim_create_autocmd("InsertLeave", {
+    group = group,
+    callback = function()
+      seen_leave = vim.o.timeoutlen
+    end,
+  })
+
+  vim.cmd("enew")
+  vim.o.timeoutlen = 700
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("ia<Esc>", true, false, true), "x", false)
+  check("insert mode shortens timeoutlen", seen_enter == 150, seen_enter)
+  check("leaving insert restores the previous timeoutlen", seen_leave == 700, seen_leave)
+  check("normal mode ends with the previous timeoutlen", vim.o.timeoutlen == 700, vim.o.timeoutlen)
+
+  vim.o.timeoutlen = 600
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("ib<Esc>", true, false, true), "x", false)
+  check("the restored value follows the current normal-mode setting", seen_leave == 600, seen_leave)
+end
+
 if #failures > 0 then
   io.write("\n" .. #failures .. " failed\n")
   vim.cmd("cquit 1")

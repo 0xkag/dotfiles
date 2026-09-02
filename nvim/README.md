@@ -40,7 +40,7 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 - `Tab` / `Shift-Tab` select completion items or move through snippets
 - `Enter` confirms only an explicitly selected completion item
 - `Esc` or `Ctrl-g` aborts completion when the popup menu is open
-- `fd` exits insert mode
+- `fd` exits insert mode; insert mode runs on a 150 ms key timeout so a lone `f` shows up promptly, while normal mode keeps 500 ms for leader chords
 - `Y` yanks to end of line
 - `gl` and `gL` align text
 - global `textwidth` is `78`

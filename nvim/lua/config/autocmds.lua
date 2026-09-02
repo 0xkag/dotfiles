@@ -74,6 +74,32 @@ autocmd("TextYankPost", {
   end,
 })
 
+-- `fd` leaves insert mode (keymaps.lua), so a typed `f` is held back for
+-- timeoutlen in case a `d` follows. 500 ms is right for leader and localleader
+-- chords in normal mode but a visible stall when `f` is just a letter, so
+-- insert mode runs on a shorter timeout (Spacemacs' evil-escape uses 100 ms)
+-- and leaving insert restores whatever the value was.
+local insert_timeoutlen = 150
+local normal_timeoutlen = nil
+
+autocmd("InsertEnter", {
+  group = general,
+  callback = function()
+    normal_timeoutlen = vim.o.timeoutlen
+    vim.o.timeoutlen = insert_timeoutlen
+  end,
+})
+
+autocmd("InsertLeave", {
+  group = general,
+  callback = function()
+    if normal_timeoutlen then
+      vim.o.timeoutlen = normal_timeoutlen
+      normal_timeoutlen = nil
+    end
+  end,
+})
+
 autocmd({ "BufRead", "BufNewFile" }, {
   group = general,
   pattern = "*.cls",
