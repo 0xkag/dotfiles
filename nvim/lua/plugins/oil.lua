@@ -6,8 +6,22 @@ local util = require("config.util")
 local marks = {}
 local marks_key = nil
 
+-- Redraw a buffer's column once its listing lands. Oil re-renders from the
+-- entries it already has (no second directory listing), but clears the modified
+-- flag doing so, so a buffer holding unsaved edits is left alone and its marks
+-- wait for the user's own <C-l>.
+local function rerender(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].modified then
+    return
+  end
+  require("oil.view").render_buffer_async(bufnr, { refetch = false })
+end
+
 local function marks_for(bufnr)
   local gitdiff = require("config.gitdiff")
+  if bufnr == 0 then
+    bufnr = vim.api.nvim_get_current_buf()
+  end
   local dir = require("oil").get_current_dir(bufnr)
   local key = (dir or "") .. "\0" .. gitdiff.version()
   if marks_key == key then
@@ -15,8 +29,15 @@ local function marks_for(bufnr)
   end
 
   -- Quiet: a directory editor can be pointed anywhere, and being outside a repo
-  -- is normal rather than something to complain about on every redraw.
-  marks, marks_key = dir and gitdiff.status_by_path(dir, true) or {}, key
+  -- is normal rather than something to complain about on every redraw. The
+  -- listing runs in the background, so a directory renders unmarked first and
+  -- is redrawn once it lands.
+  marks, marks_key = dir and gitdiff.status_by_path(dir, {
+    quiet = true,
+    on_update = function()
+      rerender(bufnr)
+    end,
+  }) or {}, key
   return marks
 end
 

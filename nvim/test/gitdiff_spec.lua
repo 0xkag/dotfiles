@@ -249,6 +249,108 @@ do
   gitdiff.set_base(nil)
 end
 
+-- status_by_path() with an on_update callback lists in the background: it
+-- answers from the cache when it can, and otherwise returns what it knows now
+-- (nothing), starts one listing however many views ask, and calls every
+-- callback with the marks once it lands. Without a callback it blocks, for the
+-- callers that need the answer now (]g, SPC gc). `quiet` keeps a failed listing
+-- off the screen either way, since a redraw is no place for an error.
+do
+  local sync_spawns, async_spawns = 0, 0
+  local git_fields = gitdiff.git_fields
+  gitdiff.git_fields = function(...)
+    sync_spawns = sync_spawns + 1
+    return git_fields(...)
+  end
+  local git_fields_async = gitdiff.git_fields_async
+  gitdiff.git_fields_async = function(...)
+    async_spawns = async_spawns + 1
+    return git_fields_async(...)
+  end
+  local function await(fn)
+    vim.wait(2000, fn)
+  end
+
+  gitdiff.set_base("origin/master")
+  local landed = {}
+  local function collect()
+    table.insert(landed, true)
+  end
+  local first = gitdiff.status_by_path(root, { on_update = collect })
+  check("an uncached async ask answers empty at once", vim.tbl_isempty(first), vim.inspect(first))
+  check("and does not block on git", sync_spawns == 0, sync_spawns)
+  local again = gitdiff.status_by_path(root, { on_update = collect })
+  check("a second ask while in flight answers empty too", vim.tbl_isempty(again), vim.inspect(again))
+  local version = gitdiff.version()
+  await(function()
+    return #landed == 2
+  end)
+  check("both callbacks run when the listing lands", #landed == 2, #landed)
+  check("the listing ran once for both", async_spawns == 2, async_spawns)
+  check("the landing bumps the version", gitdiff.version() ~= version, gitdiff.version())
+
+  local called = false
+  local cached = gitdiff.status_by_path(root, {
+    on_update = function()
+      called = true
+    end,
+  })
+  check("a later ask is served from the cache", cached[root .. "/" .. spaced] == "M", vim.inspect(cached))
+  check("without a callback", not called)
+  check("and without git", sync_spawns == 0 and async_spawns == 2, sync_spawns .. "/" .. async_spawns)
+
+  -- A base change mid-flight makes the landing stale: it is dropped, and the
+  -- callbacks still run so the views ask again.
+  gitdiff.invalidate()
+  landed = {}
+  gitdiff.status_by_path(root, { on_update = collect })
+  gitdiff.set_base(nil)
+  await(function()
+    return #landed == 1
+  end)
+  check("a stale landing still calls back", #landed == 1, #landed)
+  local fresh = gitdiff.status_by_path(root, { on_update = collect })
+  check("but is not cached", vim.tbl_isempty(fresh), vim.inspect(fresh))
+  await(function()
+    return #landed == 2
+  end)
+  local relisted = gitdiff.status_by_path(root, { on_update = collect })
+  check("the re-ask lands with the new base", relisted[root .. "/" .. accented] == "M" and relisted[root .. "/" .. spaced] == nil, vim.inspect(relisted))
+
+  -- Failures: quiet on the redraw paths, an error for the explicit ones.
+  gitdiff.set_base("no-such-ref")
+  notes = {}
+  local silent = gitdiff.status_by_path(root, { quiet = true })
+  check("a quiet blocking ask on a bad base is silent", #notes == 0 and vim.tbl_isempty(silent), vim.inspect(notes))
+  gitdiff.invalidate()
+  local done = false
+  gitdiff.status_by_path(root, {
+    quiet = true,
+    on_update = function()
+      done = true
+    end,
+  })
+  await(function()
+    return done
+  end)
+  check("a quiet async failure still calls back", done)
+  check("and stays silent", #notes == 0, vim.inspect(notes))
+  gitdiff.invalidate()
+  done = false
+  gitdiff.status_by_path(root, {
+    on_update = function()
+      done = true
+    end,
+  })
+  await(function()
+    return done
+  end)
+  check("a loud async failure notifies at ERROR", #notes == 1 and notes[1].level == vim.log.levels.ERROR, vim.inspect(notes))
+
+  gitdiff.git_fields, gitdiff.git_fields_async = git_fields, git_fields_async
+  gitdiff.set_base(nil)
+end
+
 vim.fn.delete(repo, "rf")
 
 if #failures > 0 then

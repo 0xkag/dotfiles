@@ -87,6 +87,9 @@ Three components split the work, and it is worth knowing which one you are in:
   reports a change; Oil's `<C-l>` drops it by hand. Submodules are compared by
   recorded commit only (`--ignore-submodules=dirty`), which is what makes a
   listing in `~/.dotfiles` cost 9 ms rather than 137.
+- The listing runs in the background. A picker or Oil buffer opens at once,
+  unmarked if nothing is cached, and is redrawn when the listing lands; an Oil
+  buffer holding unsaved edits is left alone, and its marks wait for `<C-l>`.
 - Oil is the default file explorer in place of `netrw`, so `:e somedir/` opens it.
 - `Ctrl-g` closes all three.
 - Two lookalikes that are not Telescope: the small prompt `SPC gM` opens is

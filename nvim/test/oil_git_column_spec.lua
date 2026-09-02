@@ -41,6 +41,16 @@ package.preload["oil"] = function()
     setup = function() end,
   }
 end
+-- The redraw the column asks for once a listing lands.
+local rerenders, rerender_opts = 0, nil
+package.preload["oil.view"] = function()
+  return {
+    render_buffer_async = function(_, opts)
+      rerenders = rerenders + 1
+      rerender_opts = opts
+    end,
+  }
+end
 vim.notify = function() end
 
 -- A real repo: commit B changes a file and leaves the worktree clean, so only a
@@ -98,8 +108,22 @@ local function highlight(name)
   return type(out) == "table" and out[2] or nil
 end
 
+-- The listing runs in the background: the first render of a directory has no
+-- marks, and the column asks Oil to redraw from its cached entries (no second
+-- directory listing) once it lands.
+local function settle()
+  local before = rerenders
+  vim.wait(2000, function()
+    return rerenders > before
+  end)
+  return rerenders - before
+end
+
 -- At the index base: worktree changes only.
 do
+  check("the first render is blank while git runs", mark("worktree_mod") == "", "[" .. tostring(mark("worktree_mod")) .. "]")
+  check("the landing asks oil to redraw once", settle() == 1, rerenders)
+  check("from oil's cached entries", rerender_opts and rerender_opts.refetch == false, vim.inspect(rerender_opts))
   check("a modified file is marked", mark("worktree_mod") == "M", mark("worktree_mod"))
   check("it carries a highlight", highlight("worktree_mod") == "TelescopeResultsDiffChange", highlight("worktree_mod"))
   check("an untracked file is marked", mark("untracked") == "?", mark("untracked"))
@@ -114,17 +138,22 @@ end
 -- sharing the base with the pickers and the tree.
 do
   gitdiff.set_base("origin/master")
+  render("committed_mod")
+  settle()
   check("a committed change is marked against a ref base", mark("committed_mod") == "M", mark("committed_mod"))
   check("an unchanged file is still blank", mark("untouched") == "", "[" .. tostring(mark("untouched")) .. "]")
 end
 
--- One git call per directory and base, not one per row.
+-- One listing per directory and base, not one per row. Counted at the spawn:
+-- the listing's first git command, not the untracked-files follow-up.
 do
   local listings = 0
-  local changed_files = gitdiff.changed_files
-  gitdiff.changed_files = function(...)
-    listings = listings + 1
-    return changed_files(...)
+  local git_fields_async = gitdiff.git_fields_async
+  gitdiff.git_fields_async = function(dir, args, ...)
+    if args[1] ~= "ls-files" then
+      listings = listings + 1
+    end
+    return git_fields_async(dir, args, ...)
   end
 
   for _ = 1, 6 do
@@ -138,6 +167,7 @@ do
   check("a base change recomputes once", listings == 1, listings)
   render("untouched")
   check("and only once", listings == 1, listings)
+  settle()
 
   -- <C-l> is oil's refresh. A base change redraws the tree on its own but not
   -- oil, whose buffer may hold unsaved edits, so the refresh the user asks for
@@ -163,7 +193,23 @@ do
   check("<C-l> recomputes the marks", listings == 2, listings)
   render("untouched")
   check("and only once per refresh", listings == 2, listings)
-  gitdiff.changed_files = changed_files
+  settle()
+
+  -- A buffer holding unsaved edits is never redrawn from under them: Oil's
+  -- rerender clears the modified flag, which is exactly the bulk rename the
+  -- column must not destroy. The marks wait for the user's own <C-l>.
+  vim.bo.modified = true
+  gitdiff.invalidate()
+  local version = gitdiff.version()
+  local before = rerenders
+  render("worktree_mod")
+  vim.wait(2000, function()
+    return gitdiff.version() ~= version
+  end)
+  check("the listing still lands for a modified buffer", gitdiff.version() ~= version, gitdiff.version())
+  check("but the buffer is not redrawn", rerenders == before, rerenders - before)
+  vim.bo.modified = false
+  gitdiff.git_fields_async = git_fields_async
 end
 
 -- parse has to strip the column back off a line, since oil reads edits out of

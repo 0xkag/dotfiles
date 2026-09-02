@@ -172,6 +172,20 @@ do
     }
   end
 
+  -- The picker the marks redraw once the listing lands.
+  local refreshed = 0
+  package.preload["telescope.actions.state"] = function()
+    return {
+      get_current_picker = function()
+        return {
+          refresh = function()
+            refreshed = refreshed + 1
+          end,
+        }
+      end,
+    }
+  end
+
   -- A real repo: the marks come from git, not from a fixture.
   local repo = vim.fn.tempname()
   vim.fn.mkdir(repo, "p")
@@ -212,6 +226,15 @@ do
     return text, style
   end
 
+  -- The listing runs in the background so the picker opens at once; the
+  -- entries are redrawn when it lands.
+  local unmarked = shown("tracked")
+  check("the picker opens before the marks are known", unmarked == "  IC tracked", unmarked)
+  vim.wait(2000, function()
+    return refreshed > 0
+  end)
+  check("the landing refreshes the picker once", refreshed == 1, refreshed)
+
   local modified, modified_style = shown("tracked")
   check("a modified file is marked", modified == "M IC tracked", modified)
   check("the mark is highlighted as a change", modified_style[1][2] == "TelescopeResultsDiffChange", modified_style[1][2])
@@ -234,10 +257,18 @@ do
   check("an unchanged file gets a blank column", clean == "  IC untouched", clean)
   check("an unchanged file adds no highlight", #clean_style == 1, #clean_style)
 
+  -- A second picker on the same repo is served from the cache: marked at
+  -- once, with no refresh to wait for.
+  util.find_files({ cwd = repo, title = "Project Files" })
+  picker = calls[2]
+  local cached = shown("tracked")
+  check("a second picker is marked at once", cached == "M IC tracked", cached)
+  check("and needs no refresh", refreshed == 1, refreshed)
+
   local plain = vim.fn.tempname()
   vim.fn.mkdir(plain, "p")
   util.find_files({ cwd = plain })
-  check("find_files falls back outside a repo", calls[2] and calls[2].picker == "find_files", calls[2] and calls[2].picker)
+  check("find_files falls back outside a repo", calls[3] and calls[3].picker == "find_files", calls[3] and calls[3].picker)
 end
 
 if #failures > 0 then
