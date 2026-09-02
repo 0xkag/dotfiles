@@ -74,7 +74,7 @@ local git_status_width = 2
 -- a separate picker. Wrapping the built-in file entry maker is what keeps
 -- devicons and path highlighting; the highlight ranges it returns are shifted
 -- right by the width of the column added in front of them.
-local function gen_from_file_with_status(opts, marks)
+local function gen_from_file_with_status(opts, marks_of)
   local entry_maker = require("telescope.make_entry").gen_from_file(opts)
 
   return function(line)
@@ -86,7 +86,7 @@ local function gen_from_file_with_status(opts, marks)
     local display = entry.display
     entry.display = function(e, picker)
       local text, style = display(e, picker)
-      local mark = marks[to_absolute(e.value, opts.cwd or M.cwd())] or ""
+      local mark = marks_of()[to_absolute(e.value, opts.cwd or M.cwd())] or ""
 
       local shifted = {}
       for i, item in ipairs(style or {}) do
@@ -99,6 +99,20 @@ local function gen_from_file_with_status(opts, marks)
       return string.format("%-" .. git_status_width .. "s", mark) .. text, shifted
     end
     return entry
+  end
+end
+
+-- Redraw an open picker's entries in place: telescope re-runs the finder over
+-- the current prompt, which is what makes the entry maker render again.
+local function refresh_picker(prompt_bufnr)
+  if not prompt_bufnr or not vim.api.nvim_buf_is_valid(prompt_bufnr) then
+    return
+  end
+  local ok, picker = pcall(function()
+    return require("telescope.actions.state").get_current_picker(prompt_bufnr)
+  end)
+  if ok and picker then
+    picker:refresh()
   end
 end
 
@@ -120,8 +134,26 @@ function M.find_files(opts)
       prompt_title = (opts.title or "Git Files") .. " (vs " .. gitdiff.label() .. ")",
       show_untracked = true,
     }
-    git_opts.entry_maker = gen_from_file_with_status(git_opts, gitdiff.status_by_path(cwd))
+
+    -- The marks come from a listing that may still be running: the picker
+    -- opens at once with whatever is cached and is redrawn when the listing
+    -- lands. Its prompt buffer is known once it is open, which is before any
+    -- landing can be delivered.
+    local marks, prompt_bufnr = {}, nil
+    local function fetch_marks()
+      marks = gitdiff.status_by_path(cwd, {
+        on_update = function()
+          fetch_marks()
+          refresh_picker(prompt_bufnr)
+        end,
+      })
+    end
+    fetch_marks()
+    git_opts.entry_maker = gen_from_file_with_status(git_opts, function()
+      return marks
+    end)
     builtin.git_files(git_opts)
+    prompt_bufnr = vim.api.nvim_get_current_buf()
     return
   end
 

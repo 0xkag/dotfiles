@@ -205,7 +205,7 @@ local function jump_changed(reverse)
     -- quirk that bit the first version -- find_existing_worktree deliberately
     -- returns nothing when handed the worktree root itself, which is what
     -- state.path usually is.
-    for path in pairs(require("config.gitdiff").status_by_path(state.path, true)) do
+    for path in pairs(require("config.gitdiff").status_by_path(state.path, { quiet = true })) do
       add(path)
     end
 

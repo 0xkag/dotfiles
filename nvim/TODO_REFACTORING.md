@@ -165,10 +165,13 @@ Plan:
   `ShellCmdPost`, `TermLeave`, `User GitSignsChanged`, `User OilActionsPost`,
   neo-tree's `GIT_STATUS_CHANGED`), and on Oil's `<C-l>`. A failed listing is
   cached too, and `repo_toplevel` is memoized per directory alongside.
-- [ ] Switch `status_by_path` to async `vim.system` with a callback that redraws
-  the caller (picker refresh, Oil render). The tree's base marks stay
-  synchronous: `diff --name-status <base> HEAD` never touches the worktree
-  and costs 2 ms.
+- [x] `status_by_path(dir, { on_update })` lists in the background: it answers
+  from the cache or with nothing, runs one listing however many views ask, and
+  tells each callback to ask again once it lands. Oil redraws from its cached
+  entries (`render_buffer_async` with `refetch = false`) unless the buffer
+  holds unsaved edits; the file pickers call `picker:refresh()`. `]g` and
+  `SPC gc` keep the blocking form, and the tree's base marks stay synchronous:
+  `diff --name-status <base> HEAD` never touches the worktree and costs 2 ms.
 - [ ] Use telescope's async job previewer for `SPC gc`.
 - [ ] Cache `default_branch` per repo; route `git()` through `repo_toplevel` so
   it works from `oil://` and neo-tree buffers.

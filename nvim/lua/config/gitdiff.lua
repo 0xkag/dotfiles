@@ -22,12 +22,28 @@ end
 -- the default core.quotePath, in diff --name-status too, and a listing keyed by
 -- those strings never matches the file it describes. Note that systemlist()
 -- turns NUL into a newline, so this reads the raw bytes instead.
+local function split_fields(stdout)
+  return vim.split(stdout or "", "\0", { plain = true, trimempty = true })
+end
+
 function M.git_fields(dir, args)
   local cmd = { "git", "-C", dir }
   vim.list_extend(cmd, args)
   local result = vim.system(cmd, { text = false }):wait()
-  local fields = vim.split(result.stdout or "", "\0", { plain = true, trimempty = true })
-  return fields, result.code, result.stderr or ""
+  return split_fields(result.stdout), result.code, result.stderr or ""
+end
+
+-- The same in the background: `callback(fields, code, stderr)` runs on the main
+-- loop once git exits.
+function M.git_fields_async(dir, args, callback)
+  local cmd = { "git", "-C", dir }
+  vim.list_extend(cmd, args)
+  vim.system(cmd, { text = false }, function(result)
+    local fields = split_fields(result.stdout)
+    vim.schedule(function()
+      callback(fields, result.code, result.stderr or "")
+    end)
+  end)
 end
 
 -- Parse `diff --name-status -z` fields into { path, status } records. Each
@@ -164,50 +180,85 @@ end
 -- A submodule whose commit moved is a change to this repo and is still listed.
 local submodules = "--ignore-submodules=dirty"
 
--- Every file changed against the active diff base, as { path, status } with
--- repo-relative paths, sorted by path. At the index base that is git status
--- (staged, unstaged, and untracked); against a ref it is git diff
--- --name-status plus the untracked files, which a diff cannot see but are
--- still part of what this branch changed. Renames report the new path.
-local function list_changed(root)
-  local files
+-- The git command that lists the changes at the active base, with its parser.
+-- Untracked files are invisible to git diff, so against a ref they come from a
+-- second command; git status already includes them.
+local untracked_args = { "ls-files", "-z", "--others", "--exclude-standard" }
 
+local function changed_command()
   if base_ref then
-    local fields, code, err = M.git_fields(root, { "diff", "--name-status", "-z", submodules, base_ref })
-    if code ~= 0 then
-      vim.notify("git diff --name-status failed: " .. vim.trim(err), vim.log.levels.ERROR)
-      return nil
-    end
-    files = parse_name_status(fields)
-
-    -- Untracked files are invisible to git diff, so list them separately.
-    local others, others_code = M.git_fields(root, { "ls-files", "-z", "--others", "--exclude-standard" })
-    if others_code == 0 then
-      for _, path in ipairs(others) do
-        table.insert(files, { path = path, status = "??" })
-      end
-    end
-  else
-    local fields, code, err = M.git_fields(root, { "status", "--porcelain", "-z", submodules })
-    if code ~= 0 then
-      vim.notify("git status --porcelain failed: " .. vim.trim(err), vim.log.levels.ERROR)
-      return nil
-    end
-    files = parse_porcelain(fields)
+    return { "diff", "--name-status", "-z", submodules, base_ref }, parse_name_status
   end
+  return { "status", "--porcelain", "-z", submodules }, parse_porcelain
+end
 
+local function report_failure(args, err, quiet)
+  if not quiet then
+    vim.notify("git " .. args[1] .. " " .. args[2] .. " failed: " .. vim.trim(err), vim.log.levels.ERROR)
+  end
+end
+
+-- The sorted listing from the parsed changes plus the untracked paths.
+local function assemble(files, others)
+  for _, path in ipairs(others or {}) do
+    table.insert(files, { path = path, status = "??" })
+  end
   table.sort(files, function(a, b)
     return a.path < b.path
   end)
   return files
 end
 
+-- Every file changed against the active diff base, as { path, status } with
+-- repo-relative paths, sorted by path. At the index base that is git status
+-- (staged, unstaged, and untracked); against a ref it is git diff
+-- --name-status plus the untracked files, which a diff cannot see but are
+-- still part of what this branch changed. Renames report the new path.
+local function list_changed(root, quiet)
+  local args, parse = changed_command()
+  local fields, code, err = M.git_fields(root, args)
+  if code ~= 0 then
+    report_failure(args, err, quiet)
+    return nil
+  end
+
+  local others = nil
+  if base_ref then
+    local other_fields, others_code = M.git_fields(root, untracked_args)
+    others = others_code == 0 and other_fields or nil
+  end
+  return assemble(parse(fields), others)
+end
+
+-- list_changed in the background; `callback(files)` gets nil on failure.
+local function list_changed_async(root, quiet, callback)
+  local args, parse = changed_command()
+  local with_untracked = base_ref ~= nil
+  M.git_fields_async(root, args, function(fields, code, err)
+    if code ~= 0 then
+      report_failure(args, err, quiet)
+      callback(nil)
+      return
+    end
+
+    local files = parse(fields)
+    if not with_untracked then
+      callback(assemble(files))
+      return
+    end
+    M.git_fields_async(root, untracked_args, function(other_fields, others_code)
+      callback(assemble(files, others_code == 0 and other_fields or nil))
+    end)
+  end)
+end
+
 -- The cached changed_files listing for `root`, listed on the first ask since
 -- the last invalidation. Shared between callers, so treat it as read-only.
-function M.changed_files(root)
+-- `quiet` keeps a failure off the screen, for callers redrawing a view.
+function M.changed_files(root, quiet)
   local listing = listing_for(root)
   if listing.changed == nil then
-    listing.changed = list_changed(root) or false
+    listing.changed = list_changed(root, quiet) or false
   end
   return listing.changed or nil
 end
@@ -277,21 +328,62 @@ function M.status_highlight(mark)
   return status_highlights[mark] or "TelescopeResultsDiffChange"
 end
 
+local function marks_for(root, files)
+  local marks = {}
+  for _, file in ipairs(files or {}) do
+    marks[vim.fs.joinpath(root, file.path)] = M.status_mark(file.status)
+  end
+  return marks
+end
+
 -- Absolute path -> status mark for everything changed against the active base,
--- for decorating file views that list far more than the changed files. `quiet`
--- is passed through for callers that may be pointed outside a repo, such as a
--- directory editor.
-function M.status_by_path(dir, quiet)
-  local root = M.repo_toplevel(dir, quiet)
+-- for decorating file views that list far more than the changed files.
+-- `opts.quiet` is for callers that may be pointed outside a repo or redraw on a
+-- bad base, such as a directory editor, and keeps both failures silent.
+--
+-- With `opts.on_update` the listing runs in the background: the call answers
+-- from the cache when it can and otherwise returns what is known now, nothing,
+-- and the callback is told once the listing has landed and should ask again.
+-- However many views ask meanwhile, one listing runs and every callback is
+-- told. A landing bumps the version, so a view that cached the empty answer
+-- knows to ask again too. Without a callback the call blocks, for the callers
+-- that need the answer now, such as a jump.
+function M.status_by_path(dir, opts)
+  opts = opts or {}
+  local root = M.repo_toplevel(dir, opts.quiet)
   if not root then
     return {}
   end
 
-  local marks = {}
-  for _, file in ipairs(M.changed_files(root) or {}) do
-    marks[vim.fs.joinpath(root, file.path)] = M.status_mark(file.status)
+  local listing = listing_for(root)
+  if listing.changed ~= nil then
+    return marks_for(root, listing.changed or nil)
   end
-  return marks
+  if not opts.on_update then
+    return marks_for(root, M.changed_files(root, opts.quiet))
+  end
+
+  -- Callbacks collect on the listing record while it is in flight. A stale
+  -- landing, one issued before the base changed or the cache was dropped, is
+  -- not stored, but its callbacks still run so the views ask again and get the
+  -- fresh one.
+  if listing.pending then
+    table.insert(listing.pending, opts.on_update)
+    return {}
+  end
+  listing.pending = { opts.on_update }
+  list_changed_async(root, opts.quiet, function(files)
+    local callbacks = listing.pending
+    listing.pending = nil
+    if listings[root] == listing then
+      listing.changed = files or false
+      version = version + 1
+    end
+    for _, callback in ipairs(callbacks) do
+      callback()
+    end
+  end)
+  return {}
 end
 
 -- The worktree changes behind the editor's back through git commands it never
