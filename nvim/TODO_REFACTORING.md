@@ -79,7 +79,7 @@ Fixed one commit each; tick the box in the fixing commit.
   early return when the project is already at the head, `pcall` the write and
   notify once, write via temp file plus rename, keep missing directories and
   filter them only at display time. Spec: the read/write/dedupe logic.
-- [ ] **7. Deprecated calls.** `vim.lsp.stop_client` (warns now, removed in
+- [x] **7. Deprecated calls.** `vim.lsp.stop_client` (warns now, removed in
   0.13) at two sites in `lua/plugins/lsp.lua`; `vim.highlight.on_yank` in
   `lua/config/autocmds.lua` (renamed `vim.hl.on_yank`). Fix: `client:stop()`
   per client; `vim.hl`.

@@ -70,7 +70,7 @@ apply_cmp_fallbacks()
 autocmd("TextYankPost", {
   group = general,
   callback = function()
-    vim.highlight.on_yank({ higroup = "IncSearch", timeout = 150 })
+    vim.hl.on_yank({ higroup = "IncSearch", timeout = 150 })
   end,
 })
 

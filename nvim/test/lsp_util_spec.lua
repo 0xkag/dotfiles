@@ -156,6 +156,25 @@ do
   check("strip tolerates nil", lsp_util.strip_pylsp_capabilities(nil) == nil)
 end
 
+-- stop_clients(): stops each client through its own method. vim.lsp.stop_client
+-- is deprecated on 0.12 (removed in 0.13) and warned on every ,br / ,bs / ,qr.
+do
+  local stopped = {}
+  local function fake(id)
+    return {
+      id = id,
+      stop = function(self, force)
+        table.insert(stopped, { id = self.id, force = force })
+      end,
+    }
+  end
+  lsp_util.stop_clients({ fake(1), fake(2) })
+  check("stop_clients stops every client", #stopped == 2, vim.inspect(stopped))
+  check("stop_clients stops the first by id", stopped[1] and stopped[1].id == 1, vim.inspect(stopped))
+  check("stop_clients forces the stop", stopped[1] and stopped[1].force == true and stopped[2].force == true, vim.inspect(stopped))
+  check("stop_clients tolerates an empty list", (pcall(lsp_util.stop_clients, {})))
+end
+
 if #failures > 0 then
   io.write("\n" .. #failures .. " failed\n")
   vim.cmd("cquit 1")
