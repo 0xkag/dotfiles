@@ -173,11 +173,12 @@ Plan:
   `SPC gc` keep the blocking form, and the tree's base marks stay synchronous:
   `diff --name-status <base> HEAD` never touches the worktree and costs 2 ms.
 - [ ] Use telescope's async job previewer for `SPC gc`.
-- [ ] Cache `default_branch` per repo; route `git()` through `repo_toplevel` so
-  it works from `oil://` and neo-tree buffers.
-- [ ] Verify a ref before storing it as the base (`rev-parse --verify --quiet
-  <ref>^{commit}`); honour the `quiet` flag in `changed_files` so an invalid
-  base does not notify at ERROR on every redraw.
+- [x] Cache `default_branch` per repo (eight `symbolic-ref` spawns over one
+  `SPC gm` cycle became one); route `git()` through `repo_toplevel` so it
+  works from `oil://` and neo-tree buffers.
+- [x] Verify a ref before storing it as the base (`rev-parse --verify --quiet
+  <ref>^{commit}`); `changed_files` honours `quiet`, so a redraw on a bad base
+  is silent (landed with the background listing).
 - [x] Key the marks the way the view spells its paths: `status_by_path` and the
   new `committed_by_path` respell every key under the caller's directory (a
   symlink above the repo or inside it), since `--show-toplevel` is physical
