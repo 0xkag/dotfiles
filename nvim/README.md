@@ -227,12 +227,16 @@ Neogit is the magit-equivalent UI; gitsigns drives the gutter, hunks, and blame.
 - Automatic linting is enabled on read and write when a supported linter exists
 - Current machine support includes `shellcheck`, `yamllint`, `ruff`, `mypy`, fallback `pylint` or `flake8`, and `tflint`
 - tflint is scoped to the edited file's module: the on-read/on-write linter is
-  overridden (`lua/plugins/lint.lua`) to run `tflint --chdir=<file's dir>
-  --filter=<file>` instead of nvim-lint's default `tflint --recursive`. The
-  default scans the whole repo on every read/save, so editing several files in
-  a large repo spawns many concurrent full-repo scans that saturate the CPU;
-  the scoped form lints just the active module. For a wider run use `,cl` (see
-  Terraform keybindings), which runs `tflint` from the project root
+  overridden (`lua/config/tflint.lua`, wired in `lua/plugins/lint.lua`) to run
+  `tflint` with the file's directory as its working directory instead of
+  nvim-lint's default `tflint --recursive`. The default scans the whole repo on
+  every read/save, so editing several files in a large repo spawns many
+  concurrent full-repo scans that saturate the CPU; the scoped form lints just
+  the active module, and the parser keeps only the issues in the edited file.
+  (An earlier form passed `--chdir=<abs dir> --filter=<file>`, which tflint
+  silently matched against nothing, so it reported no issues at all.) For a
+  wider run use `,cl` (see Terraform keybindings), which runs `tflint` from the
+  project root
 - terraform diagnostics are layered, and a bare invalid interpolation like
   `${foobar}` is intentionally not underlined live. terraform-ls's enhanced
   validation (on by default) resolves references only within `var.*` and
