@@ -125,6 +125,14 @@ local gitdiff = require("config.gitdiff")
 local spec = require("plugins.neotree")
 spec.config(nil, spec.opts)
 
+-- Oil is the default file explorer (`:e somedir/` opens it), so neo-tree must
+-- not also claim netrw's directory buffers.
+check(
+  "neo-tree leaves directory buffers to oil",
+  spec.opts.filesystem.hijack_netrw_behavior == "disabled",
+  spec.opts.filesystem.hijack_netrw_behavior
+)
+
 -- Count the git calls the marks cost, to prove the cache holds.
 local listings = 0
 local committed_files = gitdiff.committed_files

@@ -365,7 +365,9 @@ return {
         hide_dotfiles = false,
         hide_gitignored = false,
       },
-      hijack_netrw_behavior = "open_current",
+      -- Oil is the default file explorer (`:e somedir/` opens it), so the tree
+      -- must not also claim netrw's directory buffers.
+      hijack_netrw_behavior = "disabled",
       use_libuv_file_watcher = true,
     },
     window = {
