@@ -22,6 +22,46 @@ Baseline measurements:
 | Startup, opening a `.py` file        | 85-95 ms                               |
 | `nvim/test/run.sh`                   | 16 specs, 313 checks, pass in 0.56 s   |
 | `Lazy! load all`, `:checkhealth`     | clean apart from lazy's luarocks note  |
+| Startup, empty buffer (2026-09-02)   | 30-31 ms                               |
+| `nvim/test/run.sh` (2026-09-02)      | 26 specs, 662 checks                   |
+
+## Status and working method
+
+Last updated 2026-09-02. This file is the single source of truth for the
+refactoring; a fresh session needs nothing from earlier ones.
+
+Done: section 1 (all eight defects), 2.1, 2.3, the 2.4 decisions, the safe
+drops in 3, the `deps.lua` -> `:checkhealth config` item in 4, and the
+python.lua and `configure_cmp` specs in 5. Deferred by decision: 2.2, 2.5 and
+the NFS `directory` / `undodir` move, because NFS is out of scope for the
+editor setup. Open: 2.6; the at-risk and consider lists in 3; the rest of 4;
+the rest of 5; 6. Each open item ends with a "Payoff:" sentence, measured
+where a measurement was cheap and estimated otherwise; structural payoffs
+count as much as performance ones.
+
+How each item was done, and should be:
+
+- One item per commit, subject `nvim: Phrase`, body per
+  `~/.dotfiles/_ai/memories/commit-message-format.md`. Tick or annotate the
+  item here in the same commit, with the measurement and any corrected claim.
+- Behaviour changes are spec-first: write or extend a spec under `nvim/test/`
+  so it fails for the stated reason, then change the code. Run one spec with
+  `nvim/test/run.sh <name>` and everything with `nvim/test/run.sh`. Specs are
+  self-contained (`-u NONE`, real repos and modules, plugins stubbed through
+  `package.preload`); `gitdiff_spec.lua` and `python_env_spec.lua` are the
+  fullest examples.
+- Verify live before committing when a plugin is involved: run the real config
+  headless with `XDG_CONFIG_HOME=~/.dotfiles nvim --headless -c "luafile
+  <probe.lua>"`, writing results to a file and ending with `qa!`. In a sandbox
+  with a read-only state dir also point `XDG_STATE_HOME` and `XDG_CACHE_HOME`
+  anywhere writable and `MISE_STATE_DIR` at the real mise state dir, or nvim
+  logs to cwd and mise refuses its config.
+- Work in `~/.dotfiles` on master, no branches or worktrees: `~/.config/nvim`
+  is a symlink to `~/.dotfiles/nvim`, so a worktree's specs would test the
+  deployed copy anyway (see `DEBUGGING_NVIM.md`).
+- Measure before claiming a payoff. Several claims here turned out wrong on
+  measurement (symlinked buffer names, `K` as a restatement) and are corrected
+  in place rather than deleted, so the record stays honest.
 
 ## 1. Defects
 
@@ -100,7 +140,11 @@ NFS home and in a monorepo.
 
 ### 2.1 Tool probing
 
-Status: done 2026-09-01. `tools.status` is memoized per PATH with `invalidate()` for `:NvimDeps`, `notify_once` latches before checking, lint resolves the current filetype only (`config/linters.lua`), and `grepprg` uses a plain executable check. Kept for the record:
+Status: done 2026-09-01. `tools.status` is memoized per PATH with
+`invalidate()` for the explicit audits (`:checkhealth config`, `<leader>cm`),
+`notify_once` latches before checking, lint resolves the current filetype only
+(`config/linters.lua`), and `grepprg` uses a plain executable check. Kept for
+the record:
 
 `lua/config/tools.lua` `status()` is uncached. `lua/config/env.lua` puts the
 mise shims dir first on PATH, so any mise-managed tool resolves to a shim and
@@ -218,8 +262,9 @@ Plan:
 
 Status 2026-09-01: done for the `gr` defaults (deleted in keymaps.lua), the
 insert-mode timeout (150 ms via InsertEnter / InsertLeave, restoring the
-normal-mode value), `lazyredraw` (dropped), treesitter folding (the global foldexpr is
-`config.treesitter.foldexpr`, which folds only buffers `attach` marked; note
+normal-mode value), `lazyredraw` (dropped), treesitter folding (the global
+foldexpr is `config.treesitter.foldexpr`, which folds only buffers `attach`
+marked; note
 that Neovim 0.12's own ftplugins, `ftplugin/lua.lua` for one, set a
 window-local `v:lua.vim.treesitter.foldexpr()` themselves, which the guard
 cannot and need not override) and the lua_ls library
@@ -283,9 +328,10 @@ the event wins, dragging plenary and ui-select in at UIEnter -- a tiny
 `vim.ui.select` shim that loads telescope on demand is cheaper), orgmode (`ft`
 plus `cmd` plus `keys` instead of VeryLazy), cyberdream (`lazy = true`; lazy's
 colorscheme handler loads it on demand, and `colors/cyberpunk.lua` is what
-actually gets applied), snacks (VeryLazy once bigfile is settled), flash and
-hydra (`keys`). Ungrouped autocmds: deps, python, treesitter, kulala,
-terminal, lsp, git, neotree.
+actually gets applied), flash and hydra (`keys`). snacks stays eager
+(`lazy = false`, 0.57 ms): bigfile's filetype pattern has to be registered
+before the first buffer is read. Ungrouped autocmds: deps, python,
+treesitter, kulala, terminal, lsp, git, neotree.
 
 Payoff (measured 2026-09-02, dependencies included): loading telescope costs
 8.8 ms, hydra 8.4 ms, orgmode 3.5 ms, flash 0.7 ms; lualine (5.2 ms) is the
@@ -324,8 +370,9 @@ At risk:
   one dependency with no maintainer goes, along with its 8.4 ms VeryLazy load
   (measured 2026-09-02); the replacement is code you own. Risk reduction, not
   speed.
-- `toggleterm.nvim` is dormant (last commit 2024-12) but works; `Snacks.terminal`
-  could replace it in ~40 lines across `terminal.lua`, `code_mode/shared.lua`,
+- `toggleterm.nvim` is dormant (last commit 2024-12) but works;
+  `Snacks.terminal` could replace it in ~40 lines across `terminal.lua`,
+  `code_mode/shared.lua`,
   and `code_mode/markdown.lua`. Payoff: one fewer dormant dependency, no
   user-visible change. Low; do it when toggleterm breaks.
 
@@ -452,18 +499,18 @@ Keep, and do not migrate:
 Strong where they exist, all real-repo and real-module. Gaps:
 
 - No spec for conform's Python formatter function,
-  `lsp_watch.install_git_head_refresh` / `cleanup`, `prepare_for_expand` /
-  `rollback_expand`. Closed since the
-  analysis: the tflint parser, `config/treesitter.lua`, `projects.lua`,
-  `config/tools.lua`, `config/linters.lua`, `config/deps.lua` and the `gr`
-  keymaps each have a spec (2026-09-01); `config/python.lua` has
-  `python_env_spec` (2026-09-02), run against a fake pyenv, fake prefixes and
-  a pipx home pointed at scratch through the newly honoured `$PIPX_HOME`.
+  `lsp_watch.install_git_head_refresh` / `cleanup`, and `prepare_for_expand` /
+  `rollback_expand`. Closed since the analysis: the tflint parser,
+  `config/treesitter.lua`, `projects.lua`, `config/tools.lua`,
+  `config/linters.lua`, `config/deps.lua`, the `gr` keymaps and the big-file
+  guard each have a spec (2026-09-01/02); `config/python.lua` has
+  `python_env_spec` (2026-09-02), run against a fake pyenv, fake prefixes and a
+  pipx home pointed at scratch through the newly honoured `$PIPX_HOME`;
   `configure_cmp` is covered in `completion_spec` through a fake cmp table
   (2026-09-02), and the first run caught a live defect: `manual and false or
-  {...}` yields the table for every mode, so manual completion had been
-  firing on every keystroke since it was written. Payoff: defects 1, 4 and 6
-  all lived in modules without a spec, and the 2.3 rewrite could change every
+  {...}` yields the table for every mode, so manual completion had been firing
+  on every keystroke since it was written. Payoff: defects 1, 4 and 6 all
+  lived in modules without a spec, and the 2.3 rewrite could change every
   listing call because the specs ran instead of a manual check.
 - Untested gitdiff cases: `default_branch` via `origin/HEAD` or `main`,
   detached HEAD. Closed: quoted / space / non-ASCII paths and rename records
@@ -483,11 +530,11 @@ Strong where they exist, all real-repo and real-module. Gaps:
   `config.*` from `~/.config/nvim`. Payoff: a spec run by its header from a
   worktree stops testing the deployed copy and reporting green for the wrong
   code.
-- Shared helpers: `check()` is defined twenty-four times, an inline `git()`
-  five times -> `test/helpers.lua`. `diagnostic_float_spec` / `reflow_spec` leave
-  `vim.notify` unstubbed. `code_mode_spec` says default `sw=2` (it is 8).
+- Shared helpers: `check()` is defined twenty-six times, an inline `git()`
+  five times -> `test/helpers.lua`. `diagnostic_float_spec` / `reflow_spec`
+  leave `vim.notify` unstubbed. `code_mode_spec` says default `sw=2` (it is 8).
   Payoff: one `check()` to improve (a failure diff, say) instead of
-  twenty-four, and quieter runs; no behaviour change.
+  twenty-six, and quieter runs; no behaviour change.
 
 ## 6. Documentation
 
@@ -517,8 +564,8 @@ reader to a key or tool that does something else.
 | ruff is a linter                                      | nvim-lint excludes ruff; diagnostics come from the LSP only |
 | JSON / Markdown / YAML use `prettierd` then `prettier` | prettier only                                              |
 | `,gA` searches project types                          | same call as `,gs`                                          |
-| css-lsp in the dependency table                       | no `css_lsp` feature in deps.lua                            |
-| five specs listed                                     | twenty-four in `test/`                                      |
+| ~~css-lsp in the dependency table~~                   | `css_lsp` feature added with the checkhealth move           |
+| five specs listed                                     | twenty-six in `test/`                                       |
 | direct `-u NONE -l` is self-contained                 | resolves the deployed copy; only `run.sh` pins the checkout |
 | "Migration Notes" title                               | the tracker was retired                                     |
 | ~~Oil is the default explorer~~                       | true since defect 8b was fixed                              |
