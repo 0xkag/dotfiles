@@ -104,19 +104,20 @@ local function base_marks_for(state)
   end
 
   base_marks, base_marks_key, base_marks_stale = {}, key, false
-  local top = root and gitdiff.repo_toplevel(root, true)
-  if not top then
+  if not root then
     return base_marks
   end
 
-  for _, file in ipairs(gitdiff.committed_files(top)) do
-    local path = vim.fs.joinpath(top, file.path)
-    base_marks[path] = gitdiff.status_mark(file.status)
+  -- Keyed the way the tree spells its paths, which is what makes a tree rooted
+  -- at a symlink (~/.config/nvim) find its marks; quiet, since a tree can be
+  -- pointed anywhere.
+  for path, mark in pairs(gitdiff.committed_by_path(root, true)) do
+    base_marks[path] = mark
 
     -- Bubble up, so a collapsed directory still shows that something under it
     -- changed since the base, the way neo-tree bubbles its own statuses.
     local parent = vim.fs.dirname(path)
-    while parent and #parent > #top do
+    while parent and #parent > #root do
       base_marks[parent] = base_marks[parent] or "M"
       parent = vim.fs.dirname(parent)
     end

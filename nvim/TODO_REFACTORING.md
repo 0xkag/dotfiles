@@ -178,14 +178,18 @@ Plan:
 - [ ] Verify a ref before storing it as the base (`rev-parse --verify --quiet
   <ref>^{commit}`); honour the `quiet` flag in `changed_files` so an invalid
   base does not notify at ERROR on every redraw.
-- [ ] Realpath both sides of every path comparison (or compare repo-relative
-  paths): `--show-toplevel` returns a physical path while buffer names and
-  `state.path` can be symlinked (`~/.config/nvim` -> `~/.dotfiles/nvim`), and
-  `SPC gC`'s prefix filter drops every hunk the same way.
-- [ ] `util.is_git_repo` checks only `cwd/.git`; use `gitdiff.repo_toplevel` so
-  a nested project root inside a monorepo still gets marks.
-- [ ] neotree.lua calls `repo_toplevel` before `committed_files` short-circuits
-  at the index base: one wasted rev-parse per refresh.
+- [x] Key the marks the way the view spells its paths: `status_by_path` and the
+  new `committed_by_path` respell every key under the caller's directory (a
+  symlink above the repo or inside it), since `--show-toplevel` is physical
+  while an Oil directory, a tree root or a `:cd` keeps the symlinked spelling
+  (`~/.config/nvim` -> `~/.dotfiles/nvim`). The original claim about buffer
+  names was wrong: Neovim resolves symlinks when it names a buffer, for
+  `:edit` and `setqflist` filenames alike (verified on 0.12.2), so `SPC gC`'s
+  prefix filter was never affected and needs no realpath.
+- [x] `util.is_git_repo` asks `gitdiff.repo_toplevel` rather than looking for
+  `cwd/.git`, so a nested project root inside a monorepo gets marks.
+- [x] `committed_by_path` returns before asking git at the index base; the tree
+  used to resolve the toplevel first and throw it away on every refresh.
 - [ ] Two "changed" sets exist: tree rows use `committed_files` (base..HEAD),
   everything else uses `changed_files` (base..worktree). Extract one
   name-status parser and either unify or document the difference.

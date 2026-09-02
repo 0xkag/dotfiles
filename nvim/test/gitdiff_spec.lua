@@ -351,6 +351,51 @@ do
   gitdiff.set_base(nil)
 end
 
+-- Marks are keyed the way the caller spells the directory. git reports the
+-- physical toplevel, while a buffer name, an Oil directory or a tree root can
+-- reach the same files through a symlink (~/.config/nvim -> ~/.dotfiles/nvim),
+-- and a lookup by the caller's spelling then finds nothing. The respelling
+-- covers a symlink above the repo and one inside it. committed_by_path() is the
+-- same service for the tree's base marks, and at the index base it has nothing
+-- to list, so it asks git nothing at all.
+do
+  gitdiff.set_base("origin/master")
+  local link = vim.fn.tempname()
+  vim.uv.fs_symlink(root, link)
+  local marks = gitdiff.status_by_path(link)
+  check("marks under a symlinked repo are keyed by the link", marks[link .. "/" .. spaced] == "M", vim.inspect(marks))
+  check("and not by the physical path", marks[root .. "/" .. spaced] == nil, marks[root .. "/" .. spaced])
+  local committed = gitdiff.committed_by_path(link)
+  check("committed marks are keyed the same way", committed[link .. "/" .. spaced] == "M", vim.inspect(committed))
+  check("committed marks stop at the commits", committed[link .. "/" .. accented] == nil, committed[link .. "/" .. accented])
+
+  vim.fn.mkdir(root .. "/realdir", "p")
+  vim.fn.writefile({ "x" }, root .. "/realdir/x.txt")
+  vim.uv.fs_symlink("realdir", root .. "/linkdir")
+  gitdiff.invalidate()
+  marks = gitdiff.status_by_path(root .. "/linkdir")
+  check("a symlinked directory inside the repo is respelled too", marks[root .. "/linkdir/x.txt"] == "?", vim.inspect(marks))
+  check("files outside it keep the physical path", marks[root .. "/" .. spaced] == "M", marks[root .. "/" .. spaced])
+
+  gitdiff.set_base(nil)
+  local rev_parses = 0
+  local git_in = gitdiff.git_in
+  gitdiff.git_in = function(dir, args)
+    if args[1] == "rev-parse" then
+      rev_parses = rev_parses + 1
+    end
+    return git_in(dir, args)
+  end
+  local none = gitdiff.committed_by_path(link, true)
+  check("committed_by_path at the index base is empty", vim.tbl_isempty(none), vim.inspect(none))
+  check("and asks git nothing", rev_parses == 0, rev_parses)
+  gitdiff.git_in = git_in
+
+  vim.fn.delete(link)
+  vim.fn.delete(root .. "/linkdir")
+  vim.fn.delete(root .. "/realdir", "rf")
+end
+
 vim.fn.delete(repo, "rf")
 
 if #failures > 0 then

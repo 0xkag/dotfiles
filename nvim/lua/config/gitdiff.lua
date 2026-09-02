@@ -1,6 +1,7 @@
 local M = {}
 
 local util = require("config.util")
+local uv = vim.uv or vim.loop
 
 -- The diff base the project-wide views share. <leader>gm and <leader>gM set it
 -- through gitsigns; the change lists and the file pickers read it from here so
@@ -328,18 +329,61 @@ function M.status_highlight(mark)
   return status_highlights[mark] or "TelescopeResultsDiffChange"
 end
 
-local function marks_for(root, files)
+-- `path`, physical and under the repo toplevel, spelled the way the caller
+-- spells `dir`, whose physical form is `physical`. git reports the physical
+-- toplevel, while a buffer name, an Oil directory or a tree root can reach the
+-- same files through a symlink (~/.config/nvim -> ~/.dotfiles/nvim), above the
+-- repo or inside it, and a lookup by the caller's spelling would then find
+-- nothing. Paths outside `dir` keep the physical spelling.
+local function respell(path, dir, physical)
+  if dir == physical then
+    return path
+  end
+  if path == physical then
+    return dir
+  end
+  if vim.startswith(path, physical .. "/") then
+    return dir .. path:sub(#physical + 1)
+  end
+  return path
+end
+
+-- Absolute path -> mark for `files`, keyed the way the caller spells `dir`.
+local function marks_for(root, files, dir)
+  if #dir > 1 then
+    dir = (dir:gsub("/+$", ""))
+  end
+  local physical = uv.fs_realpath(dir) or dir
+
   local marks = {}
   for _, file in ipairs(files or {}) do
-    marks[vim.fs.joinpath(root, file.path)] = M.status_mark(file.status)
+    marks[respell(vim.fs.joinpath(root, file.path), dir, physical)] = M.status_mark(file.status)
   end
   return marks
 end
 
+-- Absolute path -> status mark for what this branch committed since the base,
+-- keyed like status_by_path, for the tree's base marks. Blocking, since it
+-- never touches the worktree and is cheap. At the index base there is nothing
+-- to list, and git is not asked at all.
+function M.committed_by_path(dir, quiet)
+  if not base_ref then
+    return {}
+  end
+
+  dir = dir or util.project_root(0)
+  local root = M.repo_toplevel(dir, quiet)
+  if not root then
+    return {}
+  end
+  return marks_for(root, M.committed_files(root), dir)
+end
+
 -- Absolute path -> status mark for everything changed against the active base,
--- for decorating file views that list far more than the changed files.
--- `opts.quiet` is for callers that may be pointed outside a repo or redraw on a
--- bad base, such as a directory editor, and keeps both failures silent.
+-- for decorating file views that list far more than the changed files. The
+-- keys follow the caller's spelling of `dir` (see respell). `opts.quiet` is for
+-- callers that may be pointed outside a repo or redraw on a bad base, such as
+-- a directory editor, and keeps both failures silent.
 --
 -- With `opts.on_update` the listing runs in the background: the call answers
 -- from the cache when it can and otherwise returns what is known now, nothing,
@@ -350,6 +394,7 @@ end
 -- that need the answer now, such as a jump.
 function M.status_by_path(dir, opts)
   opts = opts or {}
+  dir = dir or util.project_root(0)
   local root = M.repo_toplevel(dir, opts.quiet)
   if not root then
     return {}
@@ -357,10 +402,10 @@ function M.status_by_path(dir, opts)
 
   local listing = listing_for(root)
   if listing.changed ~= nil then
-    return marks_for(root, listing.changed or nil)
+    return marks_for(root, listing.changed or nil, dir)
   end
   if not opts.on_update then
-    return marks_for(root, M.changed_files(root, opts.quiet))
+    return marks_for(root, M.changed_files(root, opts.quiet), dir)
   end
 
   -- Callbacks collect on the listing record while it is in flight. A stale
