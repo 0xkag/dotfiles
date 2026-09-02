@@ -98,7 +98,7 @@ Three components split the work, and it is worth knowing which one you are in:
 - `SPC pg` or `SPC p/` greps in the current project
 - `SPC pt` opens the project tree -- the same action as `SPC pe`, kept as a synonym
 - `SPC od` opens the current directory in Oil, `SPC oD` the project root; both carry a git status column marked against the active diff base, the same marks the pickers and the tree use
-- Oil's column does *not* redraw itself when `SPC gm` changes the base: an Oil buffer can be holding unsaved filesystem edits and a refresh discards them, so `<C-l>` (Oil's refresh) is left to you
+- Oil's column does *not* redraw itself when `SPC gm` changes the base: an Oil buffer can be holding unsaved filesystem edits and a refresh discards them, so `<C-l>` (Oil's refresh, which also recomputes the marks) is left to you
 - Project switching saves the current session, changes directory, and restores the target project session when one exists
 - In the project picker, `<C-d>` in insert mode or `dd` in normal mode removes the selected project from history
 - The tree marks changed files: `M` modified, `R` renamed, `?` untracked, `*` unstaged, `+` staged, `✚` added, `✖` deleted, bubbled up onto parent directories
@@ -536,7 +536,7 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
   - visual `,=r` format selection
   - `,=o` organize imports
   - `,xh`, `,xl`, `,xL` highlight references and refresh/run code lenses
-  - `,Tl` toggles inlay hints when the server supports them
+  - `,Tl` toggles inlay hints when the server supports them; pyright advertises none, so in Python buffers the toggle has nothing to show (basedpyright would supply them)
   - in Python buffers, `,tt`, `,tf`, `,tl`, `,ts`, `,to`, `,tO`, `,tx` mirror the test workflow under localleader
 
 ## Language localleader
