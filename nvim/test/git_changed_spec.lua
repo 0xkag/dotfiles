@@ -173,13 +173,21 @@ local function status_of(list, path)
   return nil
 end
 
--- Rendering the previewer's diff for one entry, the way telescope would.
+-- Rendering the previewer's diff for one entry, the way telescope would. The
+-- diff runs in the background so moving through the list never waits on git:
+-- the buffer is empty right after define_preview and filled once it lands.
+-- Returns the landed text, what was there at once, and the landed filetype.
 local function preview_lines(entry)
   local buf = vim.api.nvim_create_buf(false, true)
   picked.previewer.define_preview({ state = { bufnr = buf } }, entry)
+  local at_once = table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), "\n")
+  vim.wait(2000, function()
+    return vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1] ~= ""
+  end)
   local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+  local filetype = vim.bo[buf].filetype
   vim.api.nvim_buf_delete(buf, { force = true })
-  return table.concat(lines, "\n")
+  return table.concat(lines, "\n"), at_once, filetype
 end
 
 -- At the index base the list is git status: staged, unstaged, and untracked.
@@ -196,9 +204,11 @@ do
   check("index base reports untracked", status_of(list, "new") == "??", status_of(list, "new"))
 
   local entry = list[2]
-  local diff = preview_lines(entry)
+  local diff, at_once, filetype = preview_lines(entry)
   check("entry resolves to an absolute path", entry.path == root .. "/mod", entry.path)
+  check("the preview does not block on git", at_once == "", at_once)
   check("index base preview diffs the worktree", diff:find("+mod changed", 1, true) ~= nil, diff)
+  check("the landed preview is a diff buffer", filetype == "diff", filetype)
 end
 
 -- Against a ref the list is git diff --name-status plus untracked files, so it

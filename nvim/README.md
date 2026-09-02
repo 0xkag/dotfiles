@@ -116,6 +116,7 @@ Three components split the work, and it is worth knowing which one you are in:
 - Against a ref base the tree also marks what this branch *committed* since that base -- files a `git status` cannot see because the worktree is clean -- in a dimmer `NeoTreeGitBase` highlight, so "already committed" reads differently from "not committed yet" without a second column; a collapsed directory bubbles up a mark when something under it changed
 - `]g` / `[g` inside the tree jump to the next and previous changed file over that same set -- worktree changes, untracked files, and anything committed since the base; neo-tree's own versions read its status table, which cannot see the base marks and skips untracked files, so they are replaced
 - Worktree status wins where both apply, since not-yet-committed is the more urgent fact; the base marks are recomputed on a tree refresh and whenever `SPC gm` changes the base (an open tree redraws itself), one `git diff` per refresh rather than per row
+- Two change sets are in play, on purpose: the tree's base marks come from `git diff <base> HEAD` (what this branch committed), because neo-tree's own status already covers the worktree, while the pickers, Oil, `]g` and `SPC gc` list `<base>..worktree` (everything that differs). Both read the same `--name-status` output, so a row agrees with the picker entry for the same file
 - Inside any Telescope picker, `<C-h>` (or Telescope's own `<C-/>`) lists that picker's mappings; they are buffer-local to the prompt buffer, so `SPC ?` and `SPC hk` never show them
 - Picker mappings worth knowing: `<C-q>` sends every result to the quickfix list and opens it, `<Tab>` multi-selects and `<M-q>` sends only the selection, `<C-x>` / `<C-v>` / `<C-t>` open in a split, vsplit, or tab, and `q` or `<C-g>` closes
 
@@ -220,6 +221,10 @@ Neogit is the magit-equivalent UI; gitsigns drives the gutter, hunks, and blame.
   (which its scan skips), or tracked changes that the scan never reached
   because neither nvim's cwd nor any attached buffer was in the repo -- the
   last case warns and tells you to cd there or open a file from it
+- listing a large repo is `git status` at the index base; `git config
+  core.untrackedCache true` (and `core.fsmonitor true` where the daemon runs)
+  keeps that fast. Submodules are already compared by commit only, which is
+  most of the cost in `~/.dotfiles`
 - `:GitsignsBase <ref>` diff the gutter against any ref; `:GitsignsBase` with
   no argument resets to the index
 
