@@ -75,6 +75,39 @@ do
   check("count_edits empty total", t3 == 0, t3)
 end
 
+-- lazy_cmd(): a vim.lsp.config `cmd` function that resolves the command per
+-- root at start time. vim.lsp.config has no on_new_config hook, so a command
+-- that depends on the workspace (a project venv's pylsp over the pipx one) has
+-- to be resolved here; a static `cmd` is evaluated once, with no root.
+do
+  local started = {}
+  local rpc_start = vim.lsp.rpc.start
+  vim.lsp.rpc.start = function(cmd, dispatchers)
+    table.insert(started, { cmd = cmd, dispatchers = dispatchers })
+    return "client-" .. #started
+  end
+
+  local roots = {}
+  local cmd = lsp_util.lazy_cmd(function(root_dir)
+    table.insert(roots, root_dir)
+    return { "/venv/" .. tostring(root_dir) .. "/bin/pylsp" }
+  end)
+  check("lazy_cmd returns a function", type(cmd) == "function", type(cmd))
+
+  local dispatchers = { notification = function() end }
+  local result = cmd(dispatchers, { root_dir = "/proj/a" })
+  check("lazy_cmd resolves with the config root", roots[1] == "/proj/a", vim.inspect(roots))
+  check("lazy_cmd starts the resolved command", started[1] and started[1].cmd[1] == "/venv//proj/a/bin/pylsp", vim.inspect(started))
+  check("lazy_cmd passes the dispatchers through", started[1] and started[1].dispatchers == dispatchers)
+  check("lazy_cmd returns the rpc client", result == "client-1", result)
+
+  cmd(dispatchers, { root_dir = "/proj/b" })
+  check("lazy_cmd resolves again for another root", roots[2] == "/proj/b", vim.inspect(roots))
+  check("lazy_cmd resolves a nil root", cmd(dispatchers, {}) == "client-3" and roots[3] == nil, vim.inspect(roots))
+
+  vim.lsp.rpc.start = rpc_start
+end
+
 if #failures > 0 then
   io.write("\n" .. #failures .. " failed\n")
   vim.cmd("cquit 1")
