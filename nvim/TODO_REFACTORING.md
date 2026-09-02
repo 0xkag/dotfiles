@@ -230,14 +230,14 @@ re-enabling snacks `bigfile` (explicitly disabled in ui.lua; it turns syntax
 off above 1.5 MB), and the `[d` / `]d` / `K` / `Y` maps that restate defaults
 (harmless, and they carry which-key descriptions).
 
-Payoff of each decision. NFS `directory` / `undodir`: deferred with 2.2 for
-the same reason; on a networked home it keeps swap and undo writes off the
-network on every change, on local disk it changes nothing. snacks `bigfile`:
-a multi-megabyte generated file opens at once instead of hanging while
-treesitter parses it (folding is guarded per buffer now, highlighting is
-not); the cost is syntax off above 1.5 MB in exactly those files. Estimate:
-seconds saved per such file, none otherwise. The `[d` / `]d` / `K` / `Y`
-maps: nothing measurable either way, four lines and their which-key labels.
+Decisions (2026-09-02). NFS `directory` / `undodir`: deferred with 2.2, since
+NFS is out of scope for the editor setup; on a networked home it would keep
+swap and undo writes off the network, on local disk it changes nothing. snacks
+`bigfile`: re-enabled. Measured on a 3.2 MB Lua table, opening went from 2.2 s
+to 0.6 s and one jump-to-end redraw from 1.7 s to 0.17 s, because the buffer
+gets the `bigfile` filetype before the treesitter hook or an LSP server sees
+it; the cost is regex syntax only, above 1.5 MB or 1000 bytes a line, in
+exactly those files. The `[d` / `]d` / `K` / `Y` maps: pending below.
 
 Kept for the record:
 
