@@ -59,7 +59,7 @@ Fixed one commit each; tick the box in the fixing commit.
   `-z` on all three commands and split on NUL (porcelain `-z` emits
   `XY new\0old\0` for renames; name-status `-z` emits `R100\0old\0new\0`).
   Spec: files with spaces and non-ASCII names, plus a rename, in a real repo.
-- [ ] **4. Dead `on_new_config` hooks.** `vim.lsp.config` has no such field.
+- [x] **4. Dead `on_new_config` hooks.** `vim.lsp.config` has no such field.
   pylsp's `cmd` in `lua/plugins/lsp.lua` is therefore resolved once at startup
   with no root, so the README's "project venv pylsp wins over pipx" never
   happens. Fix: `cmd = function(dispatchers, config)` that resolves

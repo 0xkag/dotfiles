@@ -69,4 +69,15 @@ function M.count_edits(result)
   return files, total
 end
 
+-- A vim.lsp.config `cmd` function that resolves the server command per root
+-- when the client starts. vim.lsp.config has no on_new_config hook, so a
+-- command that depends on the workspace, such as a project venv's pylsp over
+-- the pipx one, cannot be a static list: that is evaluated once, with no root.
+-- `resolve(root_dir)` returns the argv list.
+function M.lazy_cmd(resolve)
+  return function(dispatchers, config)
+    return vim.lsp.rpc.start(resolve(config.root_dir), dispatchers)
+  end
+end
+
 return M

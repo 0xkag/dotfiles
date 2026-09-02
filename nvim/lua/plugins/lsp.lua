@@ -266,10 +266,9 @@ return {
         },
         marksman = {},
         pylsp = {
-          cmd = python_env.pylsp_cmd(),
-          on_new_config = function(new_config, root_dir)
-            new_config.cmd = python_env.pylsp_cmd(root_dir)
-          end,
+          -- Resolved per root when the client starts, so a project venv's pylsp
+          -- wins over the pipx one (see python_env.pylsp_cmd).
+          cmd = lsp_util.lazy_cmd(python_env.pylsp_cmd),
           -- pylsp advertises capabilities for every plugin even when disabled via
           -- settings. Strip the ones pyright/ruff own so other clients win rename,
           -- hover, definitions, etc. Leaves codeActionProvider (rope refactors).
@@ -328,9 +327,6 @@ return {
               desc = "Reconfigure pyright with the provided python path",
               nargs = 1,
             })
-          end,
-          on_new_config = function(new_config, root_dir)
-            refresh_pyright_config(new_config, root_dir)
           end,
           settings = python_env.pyright_settings(),
         },
