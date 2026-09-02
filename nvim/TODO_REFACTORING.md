@@ -225,13 +225,18 @@ Safe drops:
   defeated mason's own `cmd` laziness. `env.lua` already puts `mason/bin` on
   PATH without the plugin.
 - `mini.comment` plus `nvim-ts-context-commentstring`: 0.12's built-in `gc` /
-  `gcc` is injection-aware (resolves the treesitter language at the cursor).
-  Same keys.
-- The nvim-treesitter master-branch fallback in `lua/plugins/treesitter.lua`
-  is unreachable (the lock pins `main`); `parser_by_filetype` in
-  `lua/config/treesitter.lua` is unreachable (`get_lang` never returns nil).
-- `register("terraform", "tf")`: no `tf` filetype exists; main already
-  registers `terraform-vars`.
+  `gcc` is injection-aware (resolves the treesitter language at the cursor),
+  same keys. One behaviour differs, checked 2026-09-01 under `nvim --clean`:
+  over a range the built-in puts the bare leader on blank lines (`--`), where
+  mini.comment's `ignore_blank_line = true` leaves them empty. Pending a
+  decision on whether that is acceptable; a lone blank line is left alone by
+  both.
+- Done 2026-09-01: the nvim-treesitter master-branch fallback in
+  `lua/plugins/treesitter.lua` (unreachable, the lock pins `main`), the
+  `parser_by_filetype` table in `lua/config/treesitter.lua` (unreachable,
+  `get_lang` never returns nil) and `register("terraform", "tf")` (no `tf`
+  filetype exists) are gone. `missing_for_filetype` now reports only parsers
+  this config lists, so a tftpl buffer no longer asks for a `tftpl` parser.
 
 At risk:
 
