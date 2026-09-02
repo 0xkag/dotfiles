@@ -11,6 +11,16 @@ local function edit_path(path)
   vim.cmd.edit(vim.fn.fnameescape(path))
 end
 
+-- Neovim 0.11 ships grn / grr / gri / gra / grt as default LSP mappings. This
+-- config maps `gr` itself (references, Spacemacs muscle memory), and with both
+-- present every `gr` waits the full timeoutlen for a possible third key. The
+-- same actions live under `,r`, `,g` and `,a`, so the defaults go; `gO` has no
+-- such clash and stays.
+for _, lhs in ipairs({ "grn", "grr", "gri", "grt" }) do
+  pcall(vim.keymap.del, "n", lhs)
+end
+pcall(vim.keymap.del, { "n", "x" }, "gra")
+
 map("i", "fd", "<Esc>", { desc = "Escape insert", silent = true })
 map("c", "<C-a>", "<Home>", { desc = "Cmdline start", silent = true })
 map("c", "<C-e>", "<End>", { desc = "Cmdline end", silent = true })
