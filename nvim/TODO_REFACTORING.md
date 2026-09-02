@@ -27,7 +27,7 @@ Baseline measurements:
 
 Fixed one commit each; tick the box in the fixing commit.
 
-- [ ] **1. Scoped tflint produces zero diagnostics.** `lua/plugins/lint.lua`
+- [x] **1. Scoped tflint produces zero diagnostics.** `lua/plugins/lint.lua`
   passes an absolute `--chdir` plus `--filter=<basename>`. tflint matches
   nothing in that combination: on a fixture that yields three warnings with
   `--chdir=<abs>` alone, adding `--filter=main.tf` yields none. Broken since the
