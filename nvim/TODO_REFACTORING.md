@@ -224,13 +224,11 @@ Safe drops:
   registry refresh, and listing it and mason as dependencies of nvim-lspconfig
   defeated mason's own `cmd` laziness. `env.lua` already puts `mason/bin` on
   PATH without the plugin.
-- `mini.comment` plus `nvim-ts-context-commentstring`: 0.12's built-in `gc` /
-  `gcc` is injection-aware (resolves the treesitter language at the cursor),
-  same keys. One behaviour differs, checked 2026-09-01 under `nvim --clean`:
-  over a range the built-in puts the bare leader on blank lines (`--`), where
-  mini.comment's `ignore_blank_line = true` leaves them empty. Pending a
-  decision on whether that is acceptable; a lone blank line is left alone by
-  both.
+- Decided 2026-09-01: keep `mini.comment` plus `nvim-ts-context-commentstring`.
+  0.12's built-in `gc` / `gcc` is injection-aware and uses the same keys, but
+  checked under `nvim --clean` it puts the bare leader on blank lines inside a
+  range (`--`), where mini.comment's `ignore_blank_line = true` leaves them
+  empty. That behaviour is wanted, so the two plugins stay.
 - Done 2026-09-01: the nvim-treesitter master-branch fallback in
   `lua/plugins/treesitter.lua` (unreachable, the lock pins `main`), the
   `parser_by_filetype` table in `lua/config/treesitter.lua` (unreachable,
