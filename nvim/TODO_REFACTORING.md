@@ -51,7 +51,7 @@ Fixed one commit each; tick the box in the fixing commit.
   drive a real x-map with `nvim_feedkeys` the way `reflow_spec` does; the
   existing `util_spec` visual test primes the marks by leaving visual mode, so
   it cannot catch this.
-- [ ] **3. Git paths are never unquoted.** `lua/config/gitdiff.lua` parses
+- [x] **3. Git paths are never unquoted.** `lua/config/gitdiff.lua` parses
   `git status --porcelain` and `git diff --name-status` without `-z`. Porcelain
   v1 C-quotes any path containing whitespace, and all three commands
   octal-escape non-ASCII under the default `core.quotePath`, so those files
