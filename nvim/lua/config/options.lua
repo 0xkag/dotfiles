@@ -131,8 +131,10 @@ opt.fillchars = {
 }
 vim.cmd("set formatoptions+=c")
 vim.cmd("set formatoptions+=l")
+-- Folding is by treesitter, but only in buffers it attached to: the foldexpr
+-- answers "0" for any other buffer (see config.treesitter.foldexpr).
 opt.foldmethod = "expr"
-opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+opt.foldexpr = "v:lua.require'config.treesitter'.foldexpr()"
 opt.foldenable = true
 opt.foldlevel = 99
 opt.foldlevelstart = 99
