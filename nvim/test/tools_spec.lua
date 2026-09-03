@@ -102,6 +102,37 @@ do
   check("invalidate re-probes", mise_calls() == 4, mise_calls())
 end
 
+-- python.lua asks about the pylsp path pylsp_cmd chose, which can be a shim
+-- itself; `mise which` takes a tool's name, so the probe passes the basename.
+do
+  local status = tools.status(shims .. "/managed")
+  check("a shim named by its path resolves too", status.available == true and status.path == real .. "/managed", vim.inspect(status, { newline = " " }))
+  check("by asking mise for the name", mise_calls() == 5 and vim.fn.readfile(log)[5] == "which managed", vim.inspect(vim.fn.readfile(log)))
+end
+
+-- config.tools is the one door to "is this tool here". A raw
+-- vim.fn.executable says yes to an inactive mise shim, since the shim is a
+-- file on PATH, so a module asking it directly sees a glow or a pyenv the rest
+-- of the config knows is missing. options.lua stays plain on purpose: it sets
+-- grepprg before lazy loads, and verifying an rg shim there would spawn mise
+-- on the startup path.
+do
+  local offenders = {}
+  for _, file in ipairs(vim.fn.globpath(here .. "/lua", "**/*.lua", false, true)) do
+    local name = file:sub(#here + 6)
+    if name ~= "config/tools.lua" and name ~= "config/options.lua" then
+      for _, line in ipairs(vim.fn.readfile(file)) do
+        if line:find("vim.fn.executable(", 1, true) then
+          table.insert(offenders, name)
+          break
+        end
+      end
+    end
+  end
+  table.sort(offenders)
+  check("no module asks vim.fn.executable directly", #offenders == 0, table.concat(offenders, ", "))
+end
+
 vim.env.PATH = original_path
 vim.fn.delete(scratch, "rf")
 

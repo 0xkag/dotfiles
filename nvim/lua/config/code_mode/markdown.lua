@@ -2,6 +2,7 @@
 local M = {}
 
 local shared = require("config.code_mode.shared")
+local tools = require("config.tools")
 local util = require("config.util")
 
 -- The live selection, or nil when not in visual mode; see util.visual_range
@@ -127,7 +128,7 @@ function M.markdown_insert_checkbox()
 end
 
 function M.markdown_view_glow()
-  if vim.fn.executable("glow") ~= 1 then
+  if not tools.available("glow") then
     vim.notify("glow is not installed.", vim.log.levels.WARN)
     return
   end

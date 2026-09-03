@@ -1,6 +1,8 @@
 local augroup = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
 
+local tools = require("config.tools")
+
 local general = augroup("user_general", { clear = true })
 local writing = augroup("user_writing", { clear = true })
 local coding = augroup("user_coding", { clear = true })
@@ -220,7 +222,7 @@ autocmd({ "BufReadPre", "BufNewFile" }, {
   group = binary,
   pattern = "*.bin",
   callback = function(event)
-    if vim.fn.executable("xxd") ~= 1 then
+    if not tools.available("xxd") then
       vim.notify("Install xxd to use binary editing for *.bin files.", vim.log.levels.WARN)
       return
     end
@@ -233,7 +235,7 @@ autocmd("BufReadPost", {
   group = binary,
   pattern = "*.bin",
   callback = function(event)
-    if not vim.bo[event.buf].binary or vim.fn.executable("xxd") ~= 1 then
+    if not vim.bo[event.buf].binary or not tools.available("xxd") then
       return
     end
 
@@ -246,7 +248,7 @@ autocmd("BufWritePre", {
   group = binary,
   pattern = "*.bin",
   callback = function(event)
-    if not vim.bo[event.buf].binary or vim.fn.executable("xxd") ~= 1 then
+    if not vim.bo[event.buf].binary or not tools.available("xxd") then
       return
     end
 
@@ -258,7 +260,7 @@ autocmd("BufWritePost", {
   group = binary,
   pattern = "*.bin",
   callback = function(event)
-    if not vim.bo[event.buf].binary or vim.fn.executable("xxd") ~= 1 then
+    if not vim.bo[event.buf].binary or not tools.available("xxd") then
       return
     end
 

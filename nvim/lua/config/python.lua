@@ -1,5 +1,6 @@
 local M = {}
 
+local tools = require("config.tools")
 local uv = vim.uv or vim.loop
 
 local cached_prefixes = {}
@@ -120,7 +121,7 @@ local function version_from_file(version_file)
 end
 
 local function prefix_for_dir(start_dir)
-  if vim.fn.executable("pyenv") ~= 1 then
+  if not tools.available("pyenv") then
     return nil
   end
 
@@ -352,7 +353,7 @@ local function shebang_python(path)
   end
 
   local python = first:match("^#!%s*(%S+)")
-  if python and python:match("python") and vim.fn.executable(python) == 1 then
+  if python and python:match("python") and tools.available(python) then
     return python
   end
 
@@ -377,7 +378,7 @@ function M.pylsp_status(target)
   local cmd = M.pylsp_cmd(target)
   local pylsp = cmd[1]
 
-  if vim.fn.executable(pylsp) ~= 1 then
+  if not tools.available(pylsp) then
     return {
       available = false,
       detail = "pylsp (pipx install python-lsp-server)",
@@ -386,7 +387,7 @@ function M.pylsp_status(target)
   end
 
   local python = python_for_pylsp(pylsp, target)
-  if not python or vim.fn.executable(python) ~= 1 then
+  if not python or not tools.available(python) then
     return {
       available = false,
       detail = "pylsp-rope (cannot resolve Python for " .. pylsp .. ")",

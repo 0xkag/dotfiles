@@ -306,10 +306,6 @@ local filetype_features = {
   zsh = { "shell_lsp", "shell_format", "shell_lint" },
 }
 
-local function executable(bin)
-  return bin ~= nil and bin ~= "" and tools.available(bin)
-end
-
 -- ok, the missing tools (or what stands in for them), and the tools found.
 local function check_feature(feature, bufnr)
   if type(feature.check) == "function" then
@@ -319,7 +315,7 @@ local function check_feature(feature, bufnr)
 
   local found, missing = {}, {}
   for _, bin in ipairs(feature.bins) do
-    if executable(bin) then
+    if tools.available(bin) then
       table.insert(found, bin)
     else
       table.insert(missing, tools.status(bin).detail or bin)

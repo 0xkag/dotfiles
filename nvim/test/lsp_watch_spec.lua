@@ -17,19 +17,22 @@ end
 local uv = vim.uv or vim.loop
 local lsp_watch = require("config.lsp_watch")
 
--- backend(): mirrors the _watchfiles.lua selection under faked has/executable.
+-- backend(): mirrors the _watchfiles.lua selection under a faked has and tool
+-- probe. The probe is config.tools, not vim.fn.executable, so an inactive mise
+-- shim cannot pass for inotifywait.
 do
-  local orig_has, orig_exe = vim.fn.has, vim.fn.executable
-  local function fake(has_map, exe_map)
+  local tools = require("config.tools")
+  local orig_has, orig_status = vim.fn.has, tools.status
+  local function fake(has_map, tool_map)
     vim.fn.has = function(f)
       return has_map[f] or 0
     end
-    vim.fn.executable = function(b)
-      return exe_map[b] or 0
+    tools.status = function(bin)
+      return { available = tool_map[bin] == 1, bin = bin }
     end
   end
   local function restore()
-    vim.fn.has, vim.fn.executable = orig_has, orig_exe
+    vim.fn.has, tools.status = orig_has, orig_status
   end
 
   fake({ mac = 1 }, {})
