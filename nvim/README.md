@@ -525,13 +525,10 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
   - `,gp` jump back
   - `,gn` jump forward
   - `,ge` buffer diagnostics
-  - `,gA` search project types
   - `,gM` document symbols
   - `,gi` implementation
   - `,gr` references
-  - `,gR` references alias
   - `,gs` workspace symbols
-  - `,gS` all workspace symbols
   - `,gkk`, `,gks`, `,gku` open type hierarchy, subtype hierarchy, and supertype hierarchy
   - `,f<`, `,f>` open incoming and outgoing call hierarchies
   - `,Fa`, `,Fr`, `,Fs` manage and browse LSP workspace folders
@@ -634,7 +631,7 @@ attached. Built-in `gf` is not sufficient here because it cannot expand
 ## Vim-style editing helpers
 
 - `list` is enabled globally
-- `SPC tvt` toggles `list`
+- `SPC tvt` toggles `list`; `SPC tl` is an alias
 - `SPC tva` switches to the old ASCII listchars profile
 - `SPC tvu` switches to the old Unicode listchars profile
 - wrapped lines show `+++ ` as the `showbreak` marker
