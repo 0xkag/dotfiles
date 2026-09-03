@@ -27,23 +27,26 @@ Baseline measurements:
 
 ## Status and working method
 
-Last updated 2026-09-02. This file is the single source of truth for the
+Last updated 2026-09-13. This file is the single source of truth for the
 refactoring; a fresh session needs nothing from earlier ones.
 
 Done: section 1 (all eight defects), 2.1, 2.3, the 2.4 decisions, the safe
-drops in 3, the `deps.lua` -> `:checkhealth config` item in 4, and the
-python.lua and `configure_cmp` specs in 5. Deferred by decision: 2.2, 2.5 and
-the NFS `directory` / `undodir` move, because NFS is out of scope for the
-editor setup. Open: 2.6; the at-risk and consider lists in 3; the rest of 4;
-the rest of 5; 6. Each open item ends with a "Payoff:" sentence, measured
-where a measurement was cheap and estimated otherwise; structural payoffs
-count as much as performance ones.
+drops and the zsh row in 3, the `deps.lua` -> `:checkhealth config` item, the
+keymap hygiene item and the executable half of the duplicated-helpers item in
+4, the python.lua and `configure_cmp` specs in 5, and the `nvim.log` ignore
+and every README drift row in 6. Deferred by decision: 2.2, 2.5 and the NFS
+`directory` / `undodir` move, because NFS is out of scope for the editor
+setup. Open: 2.6; the at-risk list and the rest of the consider list in 3;
+the rest of 4; the rest of 5; the README reorganisation in 6. Each open item
+ends with a "Payoff:" sentence, measured where a measurement was cheap and
+estimated otherwise; structural payoffs count as much as performance ones.
 
 How each item was done, and should be:
 
 - One item per commit, subject `nvim: Phrase`, body per
   `~/.dotfiles/_ai/memories/commit-message-format.md`. Tick or annotate the
-  item here in the same commit, with the measurement and any corrected claim.
+  item here in the same commit, with the measurement and any corrected claim,
+  and refresh the Status paragraph above in that same commit.
 - Behaviour changes are spec-first: write or extend a spec under `nvim/test/`
   so it fails for the stated reason, then change the code. Run one spec with
   `nvim/test/run.sh <name>` and everything with `nvim/test/run.sh`. Specs are
@@ -571,24 +574,26 @@ Strong where they exist, all real-repo and real-module. Gaps:
   zero-byte files came from. Payoff: a clean `git status` after any run with
   an unwritable state dir; one line.
 
-README drift found (verify each when reorganising). Payoff of fixing the
-open rows: each one is a statement the README makes today that sends a
-reader to a key or tool that does something else.
+README drift found. All rows fixed by 2026-09-03, each verified against the
+code first; the `SPC C` / `SPC Y` row's code column was itself wrong and is
+corrected below. Payoff, as recorded when the rows were open: each one was a
+statement the README made that sent a reader to a key or tool that does
+something else.
 
 | README claim                                          | Code                                                        |
 |-------------------------------------------------------|-------------------------------------------------------------|
-| `SPC C` / `SPC Y` "remain disabled reference comments" | removed from keymaps.lua; comment says revive from history  |
-| `SPC m h s` opens signature help                      | `,hs`; `SPC m` is the multicursor group                     |
-| `SPC r` is "tests"                                    | which-key group is "run"                                    |
-| ruff is a linter                                      | nvim-lint excludes ruff; diagnostics come from the LSP only |
-| JSON / Markdown / YAML use `prettierd` then `prettier` | prettier only                                              |
+| ~~`SPC C` / `SPC Y` "remain disabled reference comments"~~ | both are live; the clip-in/clip-out shell fallback is what went to history |
+| ~~`SPC m h s` opens signature help~~                  | `,hs`; `SPC m` is the multicursor group                     |
+| ~~`SPC r` is "tests"~~                                | which-key group is "run"; README says run (tests)           |
+| ~~ruff is a linter~~                                  | nvim-lint excludes ruff; diagnostics come from the LSP only |
+| ~~JSON / Markdown / YAML use `prettierd` then `prettier`~~ | prettier only                                               |
 | ~~`,gA` searches project types~~                      | the key and the claim are gone                              |
 | ~~css-lsp in the dependency table~~                   | `css_lsp` feature added with the checkhealth move           |
-| five specs listed                                     | twenty-six in `test/`                                       |
-| direct `-u NONE -l` is self-contained                 | resolves the deployed copy; only `run.sh` pins the checkout |
-| "Migration Notes" title                               | the tracker was retired                                     |
+| ~~five specs listed~~                                 | twenty-six in `test/`; README names the areas, not the files |
+| ~~direct `-u NONE -l` is self-contained~~             | resolves the deployed copy; only `run.sh` pins the checkout |
+| ~~"Migration Notes" title~~                           | the tracker was retired; now "Neovim Configuration"         |
 | ~~Oil is the default explorer~~                       | true since defect 8b was fixed                              |
-| FORMATTING_NOTES: `,=` maps live in keymaps.lua       | they are in lsp.lua                                         |
+| ~~FORMATTING_NOTES: `,=` maps live in keymaps.lua~~   | they are in lsp.lua                                         |
 | ~~tflint is scoped with `--filter`~~                  | README now describes the fix (defect 1)                     |
 | ~~Oil marks are right on any redraw you ask for~~     | true since defect 8a was fixed                              |
 | ~~project venv pylsp wins over pipx~~                 | true since defect 4 was fixed                               |

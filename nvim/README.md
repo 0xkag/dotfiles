@@ -1,4 +1,4 @@
-# Neovim Migration Notes
+# Neovim Configuration
 
 This configuration is a Spacemacs-style Neovim setup centered on modal editing,
 leader-key discovery, LSP, search, git, tests, terminals, and writing support.
@@ -59,7 +59,7 @@ For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 - `SPC o` open, org, outline, and terminals
 - `SPC p` project
 - `SPC q` quit and sessions
-- `SPC r` tests
+- `SPC r` run (tests)
 - `SPC s` search
 - `SPC t` toggles
 - `SPC w` windows
@@ -238,7 +238,7 @@ Neogit is the magit-equivalent UI; gitsigns drives the gutter, hunks, and blame.
   `updatetime`, 200ms). `SPC td` toggles this auto-float for the session
   (`lua/config/diagnostic_float.lua`); `SPC ex` always shows it on demand
 - Automatic linting is enabled on read and write when a supported linter exists
-- Current machine support includes `shellcheck`, `yamllint`, `ruff`, `mypy`, fallback `pylint` or `flake8`, and `tflint`
+- Current machine support includes `shellcheck`, `yamllint`, `mypy`, fallback `pylint` or `flake8`, and `tflint`; ruff's diagnostics come from its LSP server, not from nvim-lint
 - tflint is scoped to the edited file's module: the on-read/on-write linter is
   overridden (`lua/config/tflint.lua`, wired in `lua/plugins/lint.lua`) to run
   `tflint` with the file's directory as its working directory instead of
@@ -275,7 +275,7 @@ Neogit is the magit-equivalent UI; gitsigns drives the gutter, hunks, and blame.
 - Nothing auto-formats on save; formatting is always explicit
 - Formatter selection is per-filetype in `lua/plugins/python.lua` `formatters_by_ft`:
   - Python is a function that probes availability at call time: `ruff_organize_imports` + `ruff_format` when ruff is on `PATH`, falling back to `black` then `yapf`
-  - Shell uses `shfmt`; Go uses `gofmt` + `goimports`; JavaScript/TypeScript/JSON/Markdown/YAML use `prettierd` then `prettier`; Lua uses `stylua`; Rust uses `rustfmt`; Terraform uses `terraform_fmt`; TOML uses `taplo`
+  - Shell uses `shfmt`; Go uses `gofmt` + `goimports`; JavaScript/TypeScript use `prettierd` then `prettier`; JSON/Markdown/YAML use `prettier`; Lua uses `stylua`; Rust uses `rustfmt`; Terraform uses `terraform_fmt`; TOML uses `taplo`
 - `:ConformInfo` shows which formatters conform sees for the current buffer
 
 ### `gq` vs `gQ` / `<localleader>=`
@@ -432,7 +432,7 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
 - `:NvimCompletionDelay 1.5` sets quiet-auto delay in seconds for this session
 - Argument / signature help uses the native `vim.lsp.buf.signature_help` float, which highlights the active parameter as you type
   - `<C-k>` opens the signature-help float in both insert and normal mode
-  - `SPC m h s` (`<localleader>hs`) also opens it in normal mode
+  - `,hs` (`<localleader>hs`) also opens it in normal mode
   - Automatic signature help is off by default; when enabled, it fires on `(` only, not on every comma
   - Signature help floats are non-focusable and close on cursor movement, so they should not require `:q`
 - Expand a function call with placeholders using LSP signature data; Tab jumps through placeholders:
@@ -458,7 +458,7 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
 - `SPC cp` or `:PyenvInfo` shows the Python environment Neovim is using for the current buffer
 - The activated `pyenv` environment is used for Python linting, formatting, and test tools spawned by Neovim
 - Formatting is manual only; nothing autoformats on save
-- Python linting prefers `ruff` plus `mypy`, then falls back to `pylint`, then `flake8`
+- Python linting runs `mypy`, falling back to `pylint`, then `flake8`; ruff's diagnostics come from the ruff LSP server, so nvim-lint does not run it
 - Python formatting prefers `ruff_organize_imports` plus `ruff_format`, then falls back to `black`, then `yapf`
 - Python tests run through the same interpreter Neovim resolves for the current project
 - Python debugging expects `ipdb` in that same interpreter and reports it through `SPC cm` and `:checkhealth config` if it is missing
@@ -798,15 +798,24 @@ workspace that walk is itself expensive.
   nonzero if any fail
 - Run specific specs by name, e.g. `nvim/test/run.sh reflow` for
   `nvim/test/reflow_spec.lua`
-- Each spec is self-contained (`nvim --headless -u NONE -l <spec>`): it sets its
-  own `package.path`, requires the module under test, prints `ok` / `FAIL` lines,
-  and calls `cquit 1` on failure so the runner sees a nonzero exit
-- Current specs cover the pure logic that backs the keymaps: `reflow_spec`
-  (`config.reflow`), `util_spec` (root/grep/global parsers, visual selection,
-  whitespace squeeze), `completion_spec` (the completion mode state machine),
-  `code_mode_spec` (Go/Java/Python test-target detection, indentation, shell
-  template rendering), and `lsp_util_spec` (signature-label and workspace-edit
-  helpers)
+- Each spec is self-contained in what it loads: `-u NONE`, its own
+  `package.path`, real repos and modules, plugins stubbed through
+  `package.preload`; it prints `ok` / `FAIL` lines and calls `cquit 1` on
+  failure so the runner sees a nonzero exit
+- Run specs through `run.sh`, not with a bare `nvim --headless -u NONE -l
+  <spec>`: Neovim's runtimepath loader wins over `package.path`, and
+  `~/.config/nvim` is on the runtimepath even under `-u NONE`, so a direct run
+  resolves `config.*` from the deployed copy rather than the checkout; `run.sh`
+  prepends the checkout's `nvim/` to the runtimepath first (see
+  [DEBUGGING_NVIM.md](./DEBUGGING_NVIM.md:1))
+- The specs cover the pure helpers behind the keymaps (reflow, util,
+  completion, code_mode, lsp_util), the git layer (gitdiff, the base and changed
+  listings, the Oil column, the tree marks), the tool and dependency layer
+  (tools, linters, deps, tflint, the Python environment, treesitter parsers) and
+  the smaller guards (autocmds, big files, the diagnostic float, keymaps,
+  which-key key names, the semantic-token guard, lsp_watch, projects); each
+  file's header comment says what it covers and how the module used to fail, so
+  `ls nvim/test` is the list
 - The language helpers behind `config.code_mode` live in per-language
   submodules under `lua/config/code_mode/` (`go`, `java`, `markdown`, `shell`,
   `python_debug`, `terraform`, `git_editor`, plus `shared`); when adding a pure
@@ -846,8 +855,10 @@ live in git history.
 - Remote editing is deferred; Oil SSH is the leading future option (`netrw` is
   intentionally disabled) — see
   [REMOTE_AND_RUNBOOK_NOTES.md](./REMOTE_AND_RUNBOOK_NOTES.md:1)
-- The legacy clipboard fallback aliases remain disabled reference comments in
-  `lua/config/keymaps.lua`; decide later whether to revive them as a toggle
+- The Vim-era clip-in / clip-out shell clipboard fallback is gone from
+  `lua/config/keymaps.lua`; revive it from git history if a host without a
+  clipboard provider ever needs it (`SPC C` and `SPC Y` are live aliases, not
+  part of it)
 - The file tree's diff-base marks are ours, not neo-tree's: upstream accepts
   `:Neotree git_base=<ref>` and diffs `<base>..HEAD` for the same purpose, but
   at the tip of `v3.x` (`ebd6676`) every row fails to render with
