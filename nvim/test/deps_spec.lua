@@ -90,6 +90,19 @@ do
   check("and is not probed again", probes == before, probes - before)
 end
 
+-- zsh is not a shell the shell tools handle: shellcheck and shfmt parse
+-- bash and POSIX sh only, and bash-language-server attaches to bash and sh.
+-- So a zsh buffer has nothing to check, and conform runs no formatter on it.
+do
+  notifications = {}
+  deps.check_current_buffer(buffer_of("zsh"), { force = true })
+  check("zsh has no dependency checks", #notifications == 1 and notifications[1].msg == "No dependency checks for filetype zsh", vim.inspect(notifications))
+  local conform = require("plugins.python")[1]
+  check("the conform spec is the first plugins.python entry", conform[1] == "stevearc/conform.nvim", conform[1])
+  check("conform formats bash with shfmt", vim.deep_equal(conform.opts.formatters_by_ft.bash, { "shfmt" }), vim.inspect(conform.opts.formatters_by_ft.bash))
+  check("conform has no zsh formatter", conform.opts.formatters_by_ft.zsh == nil, vim.inspect(conform.opts.formatters_by_ft.zsh))
+end
+
 -- An explicit check of the current buffer bypasses the latch and says so when
 -- everything is there, since the user asked.
 do

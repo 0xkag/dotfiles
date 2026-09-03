@@ -303,7 +303,6 @@ local filetype_features = {
   typescriptreact = { "js_lsp", "js_format" },
   yaml = { "yaml_lsp", "yaml_lint" },
   ["yaml.ansible"] = { "ansible_lsp", "yaml_lint" },
-  zsh = { "shell_lsp", "shell_format", "shell_lint" },
 }
 
 -- ok, the missing tools (or what stands in for them), and the tools found.

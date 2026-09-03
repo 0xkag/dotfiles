@@ -6,14 +6,14 @@ local M = {}
 
 -- Candidates in preference order; the first one available is used. Ruff is
 -- absent from the Python list on purpose: its diagnostics come from the ruff
--- LSP server (see lsp.lua), and running it here too would duplicate them.
+-- LSP server (see lsp.lua), and running it here too would duplicate them. zsh
+-- is absent because shellcheck does not parse it.
 local candidates_by_ft = {
   bash = { "shellcheck" },
   python = { "mypy", "pylint", "flake8" },
   sh = { "shellcheck" },
   terraform = { "tflint" },
   yaml = { "yamllint" },
-  zsh = { "shellcheck" },
 }
 
 -- The linters for `ft`: a one-element list, an empty list when none of its
