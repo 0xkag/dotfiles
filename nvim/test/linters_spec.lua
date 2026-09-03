@@ -45,14 +45,16 @@ do
   check("python with nothing installed is empty", same(got, {}), vim.inspect(got))
 end
 
--- Shells share shellcheck; the other filetypes have one linter each.
+-- bash and sh share shellcheck; zsh gets nothing, since shellcheck does not
+-- parse it; the other filetypes have one linter each.
 do
-  for _, ft in ipairs({ "bash", "sh", "zsh" }) do
+  for _, ft in ipairs({ "bash", "sh" }) do
     local got = linters.for_filetype(ft, only({ shellcheck = true }))
     check(ft .. " uses shellcheck", same(got, { "shellcheck" }), vim.inspect(got))
     got = linters.for_filetype(ft, only({}))
     check(ft .. " without shellcheck is empty", same(got, {}), vim.inspect(got))
   end
+  check("zsh has no linter even with shellcheck installed", linters.for_filetype("zsh", only({ shellcheck = true })) == nil, vim.inspect(linters.for_filetype("zsh", only({ shellcheck = true }))))
   check("terraform uses tflint", same(linters.for_filetype("terraform", only({ tflint = true })), { "tflint" }))
   check("terraform without tflint is empty", same(linters.for_filetype("terraform", only({})), {}))
   check("yaml uses yamllint", same(linters.for_filetype("yaml", only({ yamllint = true })), { "yamllint" }))
@@ -86,7 +88,7 @@ end
 do
   check(
     "filetypes lists every configured filetype",
-    same(linters.filetypes(), { "bash", "python", "sh", "terraform", "yaml", "zsh" }),
+    same(linters.filetypes(), { "bash", "python", "sh", "terraform", "yaml" }),
     vim.inspect(linters.filetypes())
   )
 end

@@ -55,7 +55,6 @@ return {
         toml = { "taplo" },
         typescript = { "prettierd", "prettier", stop_after_first = true },
         yaml = { "prettier", stop_after_first = true },
-        zsh = { "shfmt" },
       },
     },
   },

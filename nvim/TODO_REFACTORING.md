@@ -394,10 +394,13 @@ Consider:
   1-3 s of CPU per Python read and write, in the background but competing
   with the LSP servers, becomes sub-second re-checks with `dmypy` or half as
   many spawns with write-only; the duplicated type diagnostics go either way.
-- shellcheck / shfmt are configured for zsh, which neither tool parses.
-  Payoff: one wasted spawn per zsh read and write, and no more diagnostics
-  about zsh syntax that shellcheck cannot parse; correctness of the list, not
-  speed.
+- Done 2026-09-02: shellcheck / shfmt were configured for zsh, which neither
+  tool parses; zsh is out of `config.linters`, conform's table and deps'
+  filetype table (bash-language-server attaches to bash and sh only, so a
+  zsh buffer had nothing real to check either). linters_spec and deps_spec
+  hold it. Payoff: one wasted spawn per zsh read and write, and no more
+  diagnostics about zsh syntax that shellcheck cannot parse; correctness of
+  the list, not speed.
 - `snacks.bufdelete` could replace `mini.bufremove`; `snacks.rename` would
   give LSP file-rename on Oil moves. Payoff: `bufdelete` saves nothing
   (mini.bufremove is a module of the already-loaded mini.nvim); `rename` is
