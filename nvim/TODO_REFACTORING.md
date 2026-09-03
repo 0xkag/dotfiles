@@ -566,10 +566,10 @@ Strong where they exist, all real-repo and real-module. Gaps:
   terraform-ls-delta}.md`, `docs/backlog.md`. Payoff: a key is found in
   `docs/keys.md` without scrolling past design history, and each design note
   gets a stable link; estimate ~150 lines of README from 848.
-- Add `nvim.log` to `.gitignore`: nvim falls back to logging in cwd when the
-  state dir is not writable, which is where the stray zero-byte files came
-  from. Payoff: a clean `git status` after any run with an unwritable state
-  dir; one line.
+- Done 2026-09-02: `nvim.log` is in `.gitignore`. nvim falls back to logging
+  in cwd when the state dir is not writable, which is where the stray
+  zero-byte files came from. Payoff: a clean `git status` after any run with
+  an unwritable state dir; one line.
 
 README drift found (verify each when reorganising). Payoff of fixing the
 open rows: each one is a statement the README makes today that sends a
