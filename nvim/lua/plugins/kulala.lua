@@ -36,6 +36,14 @@ return {
         map("<localleader>s", function()
           require("kulala").show_stats()
         end, "Show stats")
+
+        -- `,r`, `,a` and `,i` share their key with the global refactor, action
+        -- and insert/import groups, whose label which-key would show instead.
+        require("config.code_mode.shared").register_git_editor_labels(event.buf, {
+          { "<localleader>a", desc = "run all requests", buffer = event.buf },
+          { "<localleader>i", desc = "inspect request", buffer = event.buf },
+          { "<localleader>r", desc = "run request", buffer = event.buf },
+        })
       end,
     })
   end,
