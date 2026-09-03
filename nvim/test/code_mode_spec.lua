@@ -223,6 +223,54 @@ do
   check("shell backslash visual skips stale line 3", lines[3] == "cmd three", lines[3])
 end
 
+-- markdown.markdown_view_glow(): asks config.tools whether glow is here. glow
+-- is mise-managed, so PATH holds a shim for it whether or not an install is
+-- active behind it; a raw vim.fn.executable says yes to the shim and glow then
+-- fails inside the terminal it was given.
+do
+  local scratch = vim.fn.tempname()
+  local shims = scratch .. "/.local/share/mise/shims"
+  local bin = scratch .. "/bin"
+  vim.fn.mkdir(shims, "p")
+  vim.fn.mkdir(bin, "p")
+  local function script(path, lines)
+    vim.fn.writefile(vim.list_extend({ "#!/bin/sh" }, lines), path)
+    vim.fn.setfperm(path, "rwxr-xr-x")
+  end
+  script(shims .. "/glow", { "exit 0" })
+  script(bin .. "/mise", { "exit 1" })
+  local original_path = vim.env.PATH
+  vim.env.PATH = bin .. ":" .. shims .. ":" .. original_path
+
+  local terminals = 0
+  package.preload["toggleterm.terminal"] = function()
+    return {
+      Terminal = {
+        new = function()
+          terminals = terminals + 1
+          return { toggle = function() end }
+        end,
+      },
+    }
+  end
+  local notices = {}
+  local original_notify = vim.notify
+  vim.notify = function(msg)
+    table.insert(notices, msg)
+  end
+
+  local markdown = require("config.code_mode.markdown")
+  check("an inactive glow shim looks executable", vim.fn.executable("glow") == 1)
+  markdown.markdown_view_glow()
+  check("glow behind an inactive shim is reported missing", notices[1] == "glow is not installed.", vim.inspect(notices))
+  check("and no terminal is opened for it", terminals == 0, terminals)
+
+  vim.notify = original_notify
+  vim.env.PATH = original_path
+  package.preload["toggleterm.terminal"] = nil
+  vim.fn.delete(scratch, "rf")
+end
+
 if #failures > 0 then
   io.write("\n" .. #failures .. " failed\n")
   vim.cmd("cquit 1")

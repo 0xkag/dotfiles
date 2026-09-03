@@ -52,7 +52,7 @@ local function probe(bin)
       }
     end
 
-    local result = vim.system({ "mise", "which", bin }, { text = true }):wait()
+    local result = vim.system({ "mise", "which", vim.fs.basename(bin) }, { text = true }):wait()
     if result.code ~= 0 then
       return {
         available = false,

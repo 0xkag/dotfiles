@@ -463,6 +463,13 @@ Keep, and do not migrate:
   real bug class today: the raw `vim.fn.executable` calls miss mise shims, so
   python.lua and lsp_watch can see a tool the rest of the config does not.
   Otherwise readability; no runtime change.
+  Done 2026-09-02 for the executable checks: autocmds, markdown, lsp_watch
+  and python ask `tools.available`, deps lost its `executable()` wrapper,
+  `tools` passes the basename to `mise which` so a shim named by its path
+  resolves, and tools_spec fails on any new raw call (options.lua keeps its
+  plain `grepprg` check on purpose, before lazy loads). The live case was
+  glow: mise-managed here, so a raw check reported it present while the shim
+  was inactive and the terminal failed. The rest of this item is open.
 - `code_mode`: actions live per language but keymaps come from four places
   (code_mode/init.lua, plugins/python.lua `,t*`, kulala.lua, lsp.lua). Give
   each module one shape, `{ filetypes, actions, keymaps(buf) }`, and have

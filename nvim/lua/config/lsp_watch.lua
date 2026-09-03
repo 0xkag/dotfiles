@@ -17,6 +17,7 @@
 -- test/lsp_watch_spec.lua.
 local M = {}
 
+local tools = require("config.tools")
 local uv = vim.uv or vim.loop
 
 -- Directory count above which the watchdirs backend is considered too expensive
@@ -43,7 +44,7 @@ function M.backend()
   if vim.fn.has("win32") == 1 or vim.fn.has("mac") == 1 then
     return "fsevent"
   end
-  if vim.fn.executable("inotifywait") == 1 then
+  if tools.available("inotifywait") then
     return "inotify"
   end
   return "watchdirs"
