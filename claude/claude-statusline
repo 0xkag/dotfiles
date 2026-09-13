@@ -6,13 +6,12 @@ user=$(whoami)
 host=$(hostname -s)
 git_info=$(cd "$cwd" 2>/dev/null && git rev-parse --abbrev-ref HEAD 2>/dev/null | sed 's/.*/git:(\0)/')
 
-# Session telemetry (model, effort, thinking, cost, tokens, context %) pulled
-# from the statusline JSON in a single jq pass.  Fields absent on older Claude
-# Code versions render as empty/zero and their segments are skipped.
-IFS='|' read -r model effort thinking cost used max pct wt < <(echo "$input" | jq -r '
+# Session telemetry (model, effort, cost, tokens, context %) pulled from the
+# statusline JSON in a single jq pass.  Fields absent on older Claude Code
+# versions render as empty/zero and their segments are skipped.
+IFS='|' read -r model effort cost used max pct wt < <(echo "$input" | jq -r '
     [(.model.display_name // .model.id // ""),
      (.effort.level // ""),
-     (if .thinking.enabled then "on" else "" end),
      (.cost.total_cost_usd // 0),
      ((.context_window.current_usage // {})
         | (.input_tokens // 0) + (.output_tokens // 0)
@@ -28,7 +27,6 @@ telemetry=''
 [ -n "$wt" ] && telemetry+=" wt=[${wt}]"
 [ -n "$model" ] && telemetry+=" m=[${model}]"
 [ -n "$effort" ] && telemetry+=" e=[${effort}]"
-[ -n "$thinking" ] && telemetry+=' [thinking]'
 [ -n "$cost" ] && [ "$cost" != 0 ] && telemetry+=$(printf ' [$%.2f]' "$cost")
 
 ctx=''
