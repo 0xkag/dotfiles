@@ -36,11 +36,30 @@ config` item, the keymap hygiene item and the executable half of the
 duplicated-helpers item in 4, the python.lua and `configure_cmp` specs in 5,
 and the `nvim.log` ignore and every README drift row in 6. Deferred by
 decision: 2.2, 2.5 and the NFS `directory` / `undodir` move, because NFS is
-out of scope for the editor setup. Open: 2.6; the at-risk list and the rest
-of the consider list in 3; the rest of 4; the rest of 5; the README
-reorganisation in 6. Each open item ends with a "Payoff:" sentence, measured
-where a measurement was cheap and estimated otherwise; structural payoffs
-count as much as performance ones.
+out of scope for the editor setup. Open: 2.6 (analysed 2026-09-13, verdict
+recorded there, execution deferred); the at-risk list and the rest of the
+consider list in 3; the rest of 4; the rest of 5; the README reorganisation in
+6. Each open item ends with a "Payoff:" sentence, measured where a measurement
+was cheap and estimated otherwise; structural payoffs count as much as
+performance ones.
+
+Order of the remaining work, decided 2026-09-13 once 2.6 was parked: with no
+open item carrying a measured payoff, the rest is structure and
+maintainability, in three tiers.
+
+- Tier 1, what makes later changes safe or cheap: the lsp.lua split (section
+  4; the server table as data first, since that is the piece a spec can load
+  at once, then rename and signature), the rest of the duplicated helpers
+  (PATH prepend, buffer-dir-or-cwd, `vim.uv or vim.loop` in eleven files, the
+  which-key desc rows, the terminal-mode maps in two files), then the util.lua
+  split for the require cycle.
+- Tier 2, insurance against upstream drift: real-plugin specs for neo-tree and
+  Oil (section 5), `test/helpers.lua`, and the hydra replacement (section 3),
+  the one dependency with no maintainer.
+- Tier 3, felt improvements that are not structure: snacks.rename on Oil
+  moves, mini.icons for the PuTTY profile, basedpyright for `,Tl`; then the
+  options.lua cleanups and the code_mode single shape; the README
+  reorganisation last. toggleterm waits until it breaks; 2.6 stays deferred.
 
 How each item was done, and should be:
 
@@ -344,6 +363,39 @@ they are ~21 ms of work right after the UI appears, which the tighter triggers
 move to first use. cyberdream loads at startup today (2.1 ms), so that item is
 worth at most that. Grouping the autocmds has no runtime payoff; it is what
 makes `:autocmd` readable and a re-source clean.
+
+Analysis 2026-09-13, execution deferred. Each change is a few lines in a
+plugin spec and reverts on its own; the risk is not the edit but that each
+plugin has one place where lazy silently means "off until first use":
+
+- telescope: `cmd` and `keys` cover the pickers, but `vim.ui.select` is not
+  telescope's until the plugin loads, and six call sites (lsp.lua,
+  projects.lua) rely on it. Needs a shim of about eight lines that loads
+  telescope on the first call and re-dispatches; the one piece of new code.
+- flash: `keys` exist, but `opts = {}` enables its `f` / `t` / `;` / `,` char
+  motions, which exist only once loaded; those keys go in `keys` too, or the
+  feature is off until the first `s`.
+- hydra: its config defines `*`, `#`, `<leader>sh` and the visual `*` / `#`;
+  `keys` with those five triggers works, with one live check that the first
+  press goes through hydra's own map rather than lazy's placeholder.
+- orgmode: the org filetype is native, so `ft = org` alone is safe for files;
+  `<leader>oa` / `<leader>oc` are orgmode's own global defaults from setup,
+  not this config's, so they go in `keys` or vanish until an org file has been
+  opened.
+- cyberdream: `lazy = true` is safe, and it stays installed: `:colorscheme
+  cyberdream` is a documented alternative (README, theme_review, init.lua's
+  install fallback) and lazy's colorscheme handler loads it on that command.
+- autocmd grouping: ten autocmds in eight files; no runtime risk.
+
+Verdict: not worth it as a performance item. The 21 ms lands after the first
+frame, on a 30 ms startup, and nothing waits on it unless a key is pressed in
+that window; the change buys four "off until first use" traps and a shim.
+Worth doing on their own merits when convenient: cyberdream `lazy = true` (2
+ms at startup, no trap) and the autocmd grouping (readability, clean
+re-source). If executed anyway: two commits, those two first, then the four
+trigger changes together with a headless probe per plugin proving it is not
+loaded at startup and that its first key still works; a spec can cover the
+shim and the spec tables only.
 
 ## 3. Plugin stack
 
