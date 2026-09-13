@@ -178,7 +178,7 @@ export MISE_DISABLE_TOOLS=$(bash ~/.dotfiles/mise/check-tools --cached)
 if command -v pyenv &> /dev/null; then
     # ...... there is a --path only argument for this, but do the full thing
     # (which installs completion also since it doesn't matter)
-    eval "$(pyenv init -)"
+    eval "$(pyenv init --no-rehash -)"
     eval "$(pyenv virtualenv-init -)"
 fi
 
