@@ -16,10 +16,18 @@ local candidates_by_ft = {
   yaml = { "yamllint" },
 }
 
+-- Linters that run on write only. mypy takes 1-3 s a run and, on a file as it
+-- stands, only repeats what pyright already reports; a read gets nothing rather
+-- than the next candidate, which would cost the same.
+local write_only = {
+  mypy = true,
+}
+
 -- The linters for `ft`: a one-element list, an empty list when none of its
--- candidates is available, or nil for a filetype with no linters configured so
--- the caller can leave nvim-lint's table untouched for it.
-function M.for_filetype(ft, available)
+-- candidates is available (or the pick is write-only and `opts.on_read`), or
+-- nil for a filetype with no linters configured so the caller can leave
+-- nvim-lint's table untouched for it.
+function M.for_filetype(ft, available, opts)
   local candidates = candidates_by_ft[ft]
   if not candidates then
     return nil
@@ -27,6 +35,9 @@ function M.for_filetype(ft, available)
 
   for _, bin in ipairs(candidates) do
     if available(bin) then
+      if opts and opts.on_read and write_only[bin] then
+        return {}
+      end
       return { bin }
     end
   end

@@ -21,22 +21,33 @@ return {
     -- Resolve the linters for the buffer's filetype right before linting it,
     -- against the session's cached tool probes (config.linters, config.tools).
     -- The old code rebuilt every filetype's list, probing all seven tools, on
-    -- each read and write of any buffer.
-    local function try_lint()
+    -- each read and write of any buffer. A read says so, since mypy runs on
+    -- write only; <leader>el lints as a write does.
+    local function try_lint(opts)
       local ft = vim.bo.filetype
-      local selected = linters.for_filetype(ft, tools.available)
+      local selected = linters.for_filetype(ft, tools.available, opts)
       if selected then
         lint.linters_by_ft[ft] = selected
       end
       lint.try_lint()
     end
 
-    vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
+    vim.api.nvim_create_autocmd("BufReadPost", {
       group = lint_group,
-      callback = try_lint,
+      callback = function()
+        try_lint({ on_read = true })
+      end,
+    })
+    vim.api.nvim_create_autocmd("BufWritePost", {
+      group = lint_group,
+      callback = function()
+        try_lint()
+      end,
     })
 
-    vim.keymap.set("n", "<leader>el", try_lint, {
+    vim.keymap.set("n", "<leader>el", function()
+      try_lint()
+    end, {
       desc = "Lint buffer",
       silent = true,
     })

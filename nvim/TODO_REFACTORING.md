@@ -31,15 +31,16 @@ Last updated 2026-09-13. This file is the single source of truth for the
 refactoring; a fresh session needs nothing from earlier ones.
 
 Done: section 1 (all eight defects), 2.1, 2.3, the 2.4 decisions, the safe
-drops and the zsh row in 3, the `deps.lua` -> `:checkhealth config` item, the
-keymap hygiene item and the executable half of the duplicated-helpers item in
-4, the python.lua and `configure_cmp` specs in 5, and the `nvim.log` ignore
-and every README drift row in 6. Deferred by decision: 2.2, 2.5 and the NFS
-`directory` / `undodir` move, because NFS is out of scope for the editor
-setup. Open: 2.6; the at-risk list and the rest of the consider list in 3;
-the rest of 4; the rest of 5; the README reorganisation in 6. Each open item
-ends with a "Payoff:" sentence, measured where a measurement was cheap and
-estimated otherwise; structural payoffs count as much as performance ones.
+drops, the zsh row and mypy write-only in 3, the `deps.lua` -> `:checkhealth
+config` item, the keymap hygiene item and the executable half of the
+duplicated-helpers item in 4, the python.lua and `configure_cmp` specs in 5,
+and the `nvim.log` ignore and every README drift row in 6. Deferred by
+decision: 2.2, 2.5 and the NFS `directory` / `undodir` move, because NFS is
+out of scope for the editor setup. Open: 2.6; the at-risk list and the rest
+of the consider list in 3; the rest of 4; the rest of 5; the README
+reorganisation in 6. Each open item ends with a "Payoff:" sentence, measured
+where a measurement was cheap and estimated otherwise; structural payoffs
+count as much as performance ones.
 
 How each item was done, and should be:
 
@@ -392,11 +393,15 @@ Consider:
   parity. `ty` is lighter but still incomplete as a checker in 2026. Payoff:
   inlay hints and semantic highlighting in Python, and a toggle that today
   does nothing starts working; same engine, so diagnostics do not change.
-- mypy via nvim-lint duplicates pyright's type diagnostics and spawns per read
-  and per write (1-3 s); consider `dmypy` or `BufWritePost` only. Payoff:
-  1-3 s of CPU per Python read and write, in the background but competing
-  with the LSP servers, becomes sub-second re-checks with `dmypy` or half as
-  many spawns with write-only; the duplicated type diagnostics go either way.
+- Done 2026-09-13, write-only: mypy via nvim-lint duplicated pyright's type
+  diagnostics and spawned per read and per write (1-3 s). `config.linters`
+  marks it write-only and a read of a Python buffer gets no linter rather
+  than pylint, which would cost the same; `<leader>el` still runs it on
+  demand; linters_spec covers the pick and the BufReadPost / BufWritePost
+  wiring against a stubbed nvim-lint. `dmypy` was not taken: it needs a
+  custom linter definition and a daemon per project, for a gain on write
+  only. Payoff as planned: half the spawns; the duplicated type diagnostics
+  on read are gone.
 - Done 2026-09-02: shellcheck / shfmt were configured for zsh, which neither
   tool parses; zsh is out of `config.linters`, conform's table and deps'
   filetype table (bash-language-server attaches to bash and sh only, so a
