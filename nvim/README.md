@@ -362,7 +362,7 @@ Toggle with `<leader>tR`. Matches spacemacs `SPC s e` iedit feel for the in-buff
 
 Workspace rename routes to pyright even though pylsp is also attached. pylsp advertises `renameProvider` for every plugin slot regardless of whether the plugin is enabled in settings, so a naive `vim.lsp.get_clients({ method = "textDocument/rename" })` would hand the request to pylsp, which then returns nil (no rename plugin is actually wired up). Two things prevent this:
 
-- pylsp's `on_init` in `lua/plugins/lsp.lua` (via `strip_pylsp_capabilities` in `lua/config/lsp_util.lua`) strips `renameProvider`, `hoverProvider`, `definitionProvider`, `referencesProvider`, `documentSymbolProvider`, `workspaceSymbolProvider`, `completionProvider`, `signatureHelpProvider`, `declarationProvider`, `typeDefinitionProvider`, `implementationProvider`, and `documentHighlightProvider` from `client.server_capabilities` once, when the client initialises and before any `LspAttach` handler reads them. Only `codeActionProvider` is left, matching pylsp's actual job (rope refactors)
+- pylsp's `on_init` in `lua/config/lsp_servers.lua` (via `strip_pylsp_capabilities` in `lua/config/lsp_util.lua`) strips `renameProvider`, `hoverProvider`, `definitionProvider`, `referencesProvider`, `documentSymbolProvider`, `workspaceSymbolProvider`, `completionProvider`, `signatureHelpProvider`, `declarationProvider`, `typeDefinitionProvider`, `implementationProvider`, and `documentHighlightProvider` from `client.server_capabilities` once, when the client initialises and before any `LspAttach` handler reads them. Only `codeActionProvider` is left, matching pylsp's actual job (rope refactors)
 - `rename_with_preview` additionally prefers a client named `pyright` when multiple rename-capable clients remain, as belt-and-suspenders for non-Python stacks that might add another rename provider
 
 If you add a new pylsp plugin that provides one of the stripped capabilities, remove the matching line from `strip_pylsp_capabilities` and restart the LSP.
@@ -413,7 +413,7 @@ About **350-650 MB total** for the LSP stack. Subprocess spawns per save: mypy v
 
 First-attach latency is ~1-2 s to warm all three LSPs in the background; the cursor is never blocked (thanks to the earlier `ipdb` probe fix). Rope's project index builds on first code action per session, not per attach.
 
-If memory pressure becomes a concern, drop pylsp first — it is only required for refactoring and can be disabled in `lua/plugins/lsp.lua` until needed. Pyright's `diagnosticMode = "openFilesOnly"` is already set to limit its workspace scan, which helps on NFS homedirs.
+If memory pressure becomes a concern, drop pylsp first — it is only required for refactoring and can be disabled in `lua/config/lsp_servers.lua` until needed. Pyright's `diagnosticMode = "openFilesOnly"` is already set to limit its workspace scan, which helps on NFS homedirs.
 
 ## Completion and signature help
 
@@ -664,7 +664,7 @@ attached. Built-in `gf` is not sufficient here because it cannot expand
 - Tool probes are cached for the session, keyed by `PATH` so a pyenv activation re-probes; `SPC cm` and `:checkhealth config` always probe afresh, so a tool installed mid-session shows up there first
 - `SPC cm` checks dependencies for the current buffer, and reports success too
 - `SPC cM` runs the full configured dependency audit as `:checkhealth config`
-- The one feature table in `lua/config/deps.lua` also covers the servers `lsp.lua` configures (ansiblels, cssls, dockerls, taplo) and takes linter names from `lua/config/linters.lua`, so it cannot advertise a linter nvim-lint would not run
+- The one feature table in `lua/config/deps.lua` also covers the servers `lua/config/lsp_servers.lua` configures (ansiblels, cssls, dockerls, taplo) and takes linter names from `lua/config/linters.lua`, so it cannot advertise a linter nvim-lint would not run
 
 ## LSP installs
 

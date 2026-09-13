@@ -2,7 +2,7 @@
 
 Background for the reflow/restyle layering in `lua/config/reflow.lua`, the
 `gq` / `gQ` mappings in `lua/config/keymaps.lua` and the `,=` family in
-`lua/plugins/lsp.lua` (LspAttach). See also the Formatting section in
+`lua/config/lsp_keymaps.lua` (LspAttach). See also the Formatting section in
 [README.md](./README.md:1).
 
 ## Two operations

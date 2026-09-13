@@ -11,7 +11,7 @@
 -- The full audit used to run 500 ms after VimEnter and block for 172 ms with a
 -- cold tool cache (28 features, the mise-managed tools at ~17 ms each). It is
 -- now `:checkhealth config`, on demand, and the one feature table also covers
--- the servers lsp.lua configures and the linters config.linters runs, which
+-- the servers lsp_servers.lua configures and the linters config.linters runs, which
 -- three hand-kept lists used to disagree about.
 local here = debug.getinfo(1, "S").source:sub(2):gsub("/test/deps_spec.lua$", "")
 package.path = here .. "/lua/?.lua;" .. here .. "/lua/?/init.lua;" .. package.path
@@ -170,7 +170,7 @@ do
   check("the per-buffer parser check is not in the report", find(report.ok, "^Treesitter parser:") == nil and find(report.warn, "^Treesitter parser:") == nil)
   check("configured parsers are", find(report.ok, "^Treesitter parsers") ~= nil, vim.inspect(report.ok))
 
-  -- The servers lsp.lua configures that no list checked, and the linters as
+  -- The servers lsp_servers.lua configures that no list checked, and the linters as
   -- config.linters actually runs them (mypy first; ruff is the LSP's job).
   for _, bin in ipairs({ "ansible%-language%-server", "vscode%-css%-language%-server", "docker%-langserver", "taplo" }) do
     check("checkhealth covers " .. bin:gsub("%%", ""), find(report.ok, bin) ~= nil, bin)

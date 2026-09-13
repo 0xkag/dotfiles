@@ -1,5 +1,5 @@
 -- Headless test for keymap hygiene: config.keymaps, and the buffer-local maps
--- lsp.lua and kulala.lua add.
+-- kulala.lua adds.
 -- Run: nvim/test/run.sh keymaps
 --
 -- Neovim 0.11 ships grn / grr / gri / gra / grt as default LSP mappings. This
@@ -55,24 +55,13 @@ check("gr is mapped", mapped("gr"), vim.fn.maparg("gr", "n"))
 check("gd is mapped", mapped("gd"), vim.fn.maparg("gd", "n"))
 
 -- Maps that restate Neovim's own defaults are not repeated: `Y` is `y$` since
--- 0.6, and `[d` / `]d` jump diagnostics since 0.11 (with the same
--- vim.diagnostic.jump call). `K` is not one of them: the config's hover adds a
--- rounded border and its own close events, so it stays. The diagnostic jumps
--- live in lsp.lua's plugin config, which no spec loads, so that file is read.
+-- 0.6. The LSP buffer keys (`[d` / `]d` left to Neovim, `K` kept for its
+-- border, the retired `,gA` `,gR` `,gS` `,gt`) are config.lsp_keymaps now and
+-- lsp_keymaps_spec drives them against a fake client.
 check("Y keeps Neovim's default mapping", vim.fn.maparg("Y", "n", false, true).desc == ":help Y-default", vim.inspect(vim.fn.maparg("Y", "n", false, true)))
-local lsp_source = table.concat(vim.fn.readfile(here .. "/lua/plugins/lsp.lua"), "\n")
-check("lsp.lua does not remap [d", not lsp_source:find('"[d"', 1, true))
-check("lsp.lua does not remap ]d", not lsp_source:find('"]d"', 1, true))
-check("lsp.lua keeps its own K hover", lsp_source:find('map("n", "K", hover', 1, true) ~= nil)
 
--- One key per action. `,gt` repeated the documented `,gd`, `,gR` and `,gS`
--- repeated `,gr` and `,gs` under names ("peek", "all") telescope cannot
--- honour, and `,gA` promised a type search while running the same workspace
--- symbol picker as `,gs`. `<leader>tl` is a wanted alias of `SPC tvt`, and
+-- One key per action. `<leader>tl` is a wanted alias of `SPC tvt`, and
 -- documented as one, so it stays.
-for _, lhs in ipairs({ "gA", "gR", "gS", "gt" }) do
-  check("lsp.lua does not map ,"  .. lhs, not lsp_source:find('"<localleader>' .. lhs .. '"', 1, true))
-end
 do
   local tvt = vim.fn.maparg("<leader>tvt", "n", false, true)
   local tl = vim.fn.maparg("<leader>tl", "n", false, true)
