@@ -32,27 +32,26 @@ refactoring; a fresh session needs nothing from earlier ones.
 
 Done: section 1 (all eight defects), 2.1, 2.3, the 2.4 decisions, the safe
 drops, the zsh row and mypy write-only in 3, the `deps.lua` -> `:checkhealth
-config` item, the keymap hygiene item and the executable and `buf_map` parts
-of the duplicated-helpers item in 4, the python.lua and `configure_cmp` specs
-in 5, and the `nvim.log` ignore and every README drift row in 6. Deferred by
-decision: 2.2, 2.5 and the NFS `directory` / `undodir` move, because NFS is
-out of scope for the editor setup. Open: 2.6 (analysed 2026-09-13, verdict
-recorded there, execution deferred); the at-risk list and the rest of the
-consider list in 3; the rest of 4; the rest of 5; the README reorganisation in
-6. Each open item ends with a "Payoff:" sentence, measured where a measurement
-was cheap and estimated otherwise; structural payoffs count as much as
-performance ones.
+config` item, the keymap hygiene item, the lsp.lua split and the executable
+and `buf_map` parts of the duplicated-helpers item in 4, the python.lua,
+`configure_cmp` and LSP-layer specs in 5, and the `nvim.log` ignore and every
+README drift row in 6. Deferred by decision: 2.2, 2.5 and the NFS `directory`
+/ `undodir` move, because NFS is out of scope for the editor setup. Open: 2.6
+(analysed 2026-09-13, verdict recorded there, execution deferred); the at-risk
+list and the rest of the consider list in 3; the rest of 4; the rest of 5; the
+README reorganisation in 6. Each open item ends with a "Payoff:" sentence,
+measured where a measurement was cheap and estimated otherwise; structural
+payoffs count as much as performance ones.
 
 Order of the remaining work, decided 2026-09-13 once 2.6 was parked: with no
 open item carrying a measured payoff, the rest is structure and
 maintainability, in three tiers.
 
-- Tier 1, what makes later changes safe or cheap: the lsp.lua split (section
-  4; the server table as data first, since that is the piece a spec can load
-  at once, then rename and signature), the rest of the duplicated helpers
-  (PATH prepend, buffer-dir-or-cwd, `vim.uv or vim.loop` in eleven files, the
-  which-key desc rows, the terminal-mode maps in two files), then the util.lua
-  split for the require cycle.
+- Tier 1, what makes later changes safe or cheap: the lsp.lua split (done
+  2026-09-13), the rest of the duplicated helpers (PATH prepend,
+  buffer-dir-or-cwd, `vim.uv or vim.loop` in eleven files, the which-key desc
+  rows, the terminal-mode maps in two files), then the util.lua split for the
+  require cycle.
 - Tier 2, insurance against upstream drift: real-plugin specs for neo-tree and
   Oil (section 5), `test/helpers.lua`, and the hydra replacement (section 3),
   the one dependency with no maintainer.
@@ -495,6 +494,36 @@ Keep, and do not migrate:
   load without booting the 885-line closure, and a change to one concern
   (rename, signature) touches one file. No runtime change; the dead code is a
   few dozen lines.
+  Done 2026-09-13. `config/lsp_servers.lua` holds the server table as data
+  with `names()` for `vim.lsp.enable`; `config/lsp_rename.lua` the scoped
+  rename (multicursor scopes, client choice, inc-rename or count-and-confirm);
+  `config/lsp_signature.lua` the float, the "(" auto-popup and the call
+  templates, with `prepare_for_expand` / `rollback_expand` public;
+  `config/lsp_keymaps.lua` the global keys and the LspAttach set. lsp.lua is
+  92 lines: the three plugin specs, diagnostics config, `vim.lsp.config("*")`
+  for the cmp capabilities, the enable loop, and the LspDetach cleanup. Dead
+  code gone: `clients_for`, `ensure_clients`' `action`, the codelens /
+  inlay_hint existence guards. Each module has a spec (lsp_servers,
+  lsp_rename, lsp_signature, lsp_keymaps), and keymaps_spec no longer reads
+  lsp.lua's source. Two things the plan had wrong: `"*"` carries capabilities
+  only, because `vim.lsp.config` merges "*", nvim-lspconfig's `lsp/<name>.lua`
+  and this table with a plain deep-extend, so a function at a later layer
+  replaces an earlier one; the watch guard stays composed into each server's
+  on_init. And that composition replaces nvim-lspconfig's own on_init for
+  clangd and yamlls, as it always did (lua_ls ships one only as a commented
+  example; an earlier version of this note listed it wrongly). Checked and
+  closed the same day: neither loss needs a fix. clangd's hook reads the
+  pre-3.17 `offsetEncoding` extension from the initialize result; Neovim's
+  client offers the standard `positionEncodings` list (utf-8 first) and adopts
+  the server's reply itself, and clangd 15+ (2022) honours that negotiation,
+  so only a clangd older than 15 relied on the hook and mason installs nothing
+  that old. yamlls's hook only flags formatting support, which conform never
+  asks the LSP for here. Composing the rtp on_init back in would be three
+  lines of insurance against a case this setup does not have, so it is not
+  done. One defect found by lsp_rename_spec: `expand("<cword>")` raises E348
+  on a blank line rather than returning "", so the "No symbol under cursor"
+  notice behind `<leader>cr` was unreachable and the key errored there; the
+  call is pcall'd now.
 - `lua/config/util.lua` holds seven unrelated groups: root markers, telescope
   pickers and the mark entry maker, listchars, visual search/substitute,
   quickfix grep, GNU Global, whitespace squeeze. Split into `root.lua`,
@@ -581,9 +610,11 @@ Keep, and do not migrate:
 
 Strong where they exist, all real-repo and real-module. Gaps:
 
-- No spec for conform's Python formatter function,
-  `lsp_watch.install_git_head_refresh` / `cleanup`, and `prepare_for_expand` /
-  `rollback_expand`. Closed since the analysis: the tflint parser,
+- No spec for conform's Python formatter function and
+  `lsp_watch.install_git_head_refresh` / `cleanup`. Closed since the analysis:
+  `prepare_for_expand` / `rollback_expand` and the rest of the LSP layer
+  (lsp_servers, lsp_rename, lsp_signature, lsp_keymaps specs, 2026-09-13,
+  with the lsp.lua split); the tflint parser,
   `config/treesitter.lua`, `projects.lua`, `config/tools.lua`,
   `config/linters.lua`, `config/deps.lua`, the `gr` keymaps and the big-file
   guard each have a spec (2026-09-01/02); `config/python.lua` has
