@@ -409,7 +409,7 @@ Steady-state RAM per Python buffer is roughly:
 - pylsp: 100-200 MB (Python; rope index builds lazily on first code action)
 - ruff server: 30-50 MB (Rust)
 
-About **350-650 MB total** for the LSP stack. Subprocess spawns per save/read: mypy via `nvim-lint` (1-3 s, independent of LSPs); conform runs `ruff_format` + `ruff_organize_imports` on `<SPC cf>` (50-100 ms each). Ruff diagnostics are **not** spawned per save anymore — they come from the ruff LSP server.
+About **350-650 MB total** for the LSP stack. Subprocess spawns per save: mypy via `nvim-lint` (1-3 s, independent of LSPs; write only, since on read it would only repeat pyright); conform runs `ruff_format` + `ruff_organize_imports` on `<SPC cf>` (50-100 ms each). Ruff diagnostics are **not** spawned per save anymore — they come from the ruff LSP server.
 
 First-attach latency is ~1-2 s to warm all three LSPs in the background; the cursor is never blocked (thanks to the earlier `ipdb` probe fix). Rope's project index builds on first code action per session, not per attach.
 
@@ -458,7 +458,7 @@ If memory pressure becomes a concern, drop pylsp first — it is only required f
 - `SPC cp` or `:PyenvInfo` shows the Python environment Neovim is using for the current buffer
 - The activated `pyenv` environment is used for Python linting, formatting, and test tools spawned by Neovim
 - Formatting is manual only; nothing autoformats on save
-- Python linting runs `mypy`, falling back to `pylint`, then `flake8`; ruff's diagnostics come from the ruff LSP server, so nvim-lint does not run it
+- Python linting runs `mypy` on write only (`SPC el` runs it on demand), falling back to `pylint`, then `flake8`, which lint on read too; ruff's diagnostics come from the ruff LSP server, so nvim-lint does not run it
 - Python formatting prefers `ruff_organize_imports` plus `ruff_format`, then falls back to `black`, then `yapf`
 - Python tests run through the same interpreter Neovim resolves for the current project
 - Python debugging expects `ipdb` in that same interpreter and reports it through `SPC cm` and `:checkhealth config` if it is missing
