@@ -65,6 +65,19 @@ function M.current_indent(bufnr)
   return prefix or ""
 end
 
+-- A buffer-local mapper: `map(mode, lhs, rhs, desc)` sets a silent map in
+-- `buf` with that desc. One helper for the FileType, LspAttach and TermOpen
+-- handlers that each used to write this closure.
+function M.buf_map(buf)
+  return function(mode, lhs, rhs, desc)
+    vim.keymap.set(mode, lhs, rhs, {
+      buffer = buf,
+      desc = desc,
+      silent = true,
+    })
+  end
+end
+
 -- Register buffer-local which-key labels once which-key has loaded.
 --
 -- which-key shows a node's spec label in preference to the real keymap desc, and

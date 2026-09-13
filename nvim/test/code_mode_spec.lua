@@ -223,6 +223,42 @@ do
   check("shell backslash visual skips stale line 3", lines[3] == "cmd three", lines[3])
 end
 
+-- shared.buf_map(buf): the one buffer-local mapper. It used to be a closure
+-- written twelve times across code_mode, lsp, python, kulala and terminal.
+do
+  vim.cmd("enew")
+  local buf = vim.api.nvim_get_current_buf()
+  check("buf_map is a function", type(shared.buf_map) == "function", type(shared.buf_map))
+  local ok, err = pcall(function()
+    local map = shared.buf_map(buf)
+    map("n", "<localleader>zz", "<Nop>", "Nothing")
+    map({ "n", "x" }, "<localleader>zy", "<Nop>", "Nothing either")
+  end)
+  check("buf_map maps without error", ok, err)
+  local zz = vim.fn.maparg("<localleader>zz", "n", false, true)
+  check("the map is buffer-local", zz.buffer == 1, vim.inspect(zz))
+  check("the map is silent", zz.silent == 1, vim.inspect(zz))
+  check("the map carries its desc", zz.desc == "Nothing", vim.inspect(zz))
+  check("a mode list maps every mode", vim.fn.maparg("<localleader>zy", "x", false, true).buffer == 1, vim.inspect(vim.fn.maparg("<localleader>zy", "x", false, true)))
+  check("and only those modes", vim.fn.maparg("<localleader>zy", "i") == "", vim.fn.maparg("<localleader>zy", "i"))
+  check("it is not global", vim.fn.maparg("<localleader>zz", "n", false, true).buffer == 1 and #vim.tbl_filter(function(m)
+    return m.lhs:find("zz", 1, true) ~= nil
+  end, vim.api.nvim_get_keymap("n")) == 0)
+
+  -- No file writes the closure again.
+  local copies = {}
+  for _, file in ipairs(vim.fn.globpath(here .. "/lua", "**/*.lua", false, true)) do
+    for _, line in ipairs(vim.fn.readfile(file)) do
+      if line:find("local map = function(", 1, true) then
+        table.insert(copies, file:sub(#here + 6))
+        break
+      end
+    end
+  end
+  table.sort(copies)
+  check("no module writes its own buffer-local map closure", #copies == 0, table.concat(copies, ", "))
+end
+
 -- markdown.markdown_view_glow(): asks config.tools whether glow is here. glow
 -- is mise-managed, so PATH holds a shim for it whether or not an install is
 -- active behind it; a raw vim.fn.executable says yes to the shim and glow then

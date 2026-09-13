@@ -10,30 +10,24 @@ return {
     vim.api.nvim_create_autocmd("FileType", {
       pattern = { "http", "rest" },
       callback = function(event)
-        local map = function(lhs, rhs, desc)
-          vim.keymap.set("n", lhs, rhs, {
-            buffer = event.buf,
-            desc = desc,
-            silent = true,
-          })
-        end
+        local map = require("config.code_mode.shared").buf_map(event.buf)
 
-        map("<localleader>r", function()
+        map("n", "<localleader>r", function()
           require("kulala").run()
         end, "Run request")
-        map("<localleader>a", function()
+        map("n", "<localleader>a", function()
           require("kulala").run_all()
         end, "Run all requests")
-        map("<localleader>l", function()
+        map("n", "<localleader>l", function()
           require("kulala").replay()
         end, "Replay last request")
-        map("<localleader>o", function()
+        map("n", "<localleader>o", function()
           require("kulala").open()
         end, "Open response")
-        map("<localleader>i", function()
+        map("n", "<localleader>i", function()
           require("kulala").inspect()
         end, "Inspect request")
-        map("<localleader>s", function()
+        map("n", "<localleader>s", function()
           require("kulala").show_stats()
         end, "Show stats")
 

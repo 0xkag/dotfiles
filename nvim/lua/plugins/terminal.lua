@@ -30,20 +30,14 @@ return {
     vim.api.nvim_create_autocmd("TermOpen", {
       pattern = "term://*toggleterm#*",
       callback = function(event)
-        local map = function(lhs, rhs, desc)
-          vim.keymap.set("t", lhs, rhs, {
-            buffer = event.buf,
-            desc = desc,
-            silent = true,
-          })
-        end
+        local map = require("config.code_mode.shared").buf_map(event.buf)
 
-        map("<Esc>", [[<C-\><C-n>]], "Terminal normal mode")
-        map("<C-h>", [[<Cmd>wincmd h<CR>]], "Window left")
-        map("<C-j>", [[<Cmd>wincmd j<CR>]], "Window down")
-        map("<C-k>", [[<Cmd>wincmd k<CR>]], "Window up")
-        map("<C-l>", [[<Cmd>wincmd l<CR>]], "Window right")
-        map("<C-w>", [[<C-\><C-n><C-w>]], "Window command")
+        map("t", "<Esc>", [[<C-\><C-n>]], "Terminal normal mode")
+        map("t", "<C-h>", [[<Cmd>wincmd h<CR>]], "Window left")
+        map("t", "<C-j>", [[<Cmd>wincmd j<CR>]], "Window down")
+        map("t", "<C-k>", [[<Cmd>wincmd k<CR>]], "Window up")
+        map("t", "<C-l>", [[<Cmd>wincmd l<CR>]], "Window right")
+        map("t", "<C-w>", [[<C-\><C-n><C-w>]], "Window command")
       end,
     })
   end,

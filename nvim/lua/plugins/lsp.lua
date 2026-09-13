@@ -38,6 +38,7 @@ return {
       local completion = require("config.completion")
       local python_env = require("config.python")
       local lsp_util = require("config.lsp_util")
+      local shared = require("config.code_mode.shared")
 
       -- Bound a runaway loop in Neovim's semantic-tokens highlighter that a
       -- malformed token field (a wrapped-negative deltaStart seen from
@@ -560,13 +561,7 @@ return {
         callback = function(event)
           local builtin = require("telescope.builtin")
           local bufnr = event.buf
-          local map = function(mode, lhs, rhs, desc)
-            vim.keymap.set(mode, lhs, rhs, {
-              buffer = bufnr,
-              desc = desc,
-              silent = true,
-            })
-          end
+          local map = shared.buf_map(bufnr)
 
           map("n", "gd", function()
             builtin.lsp_definitions({ reuse_win = true })

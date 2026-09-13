@@ -34,13 +34,7 @@ function M.setup()
     group = group,
     pattern = "python",
     callback = function(event)
-      local map = function(mode, lhs, rhs, desc)
-        vim.keymap.set(mode, lhs, rhs, {
-          buffer = event.buf,
-          desc = desc,
-          silent = true,
-        })
-      end
+      local map = shared.buf_map(event.buf)
 
       map("n", "<leader>dd", M.python_debug_file, "Debug file")
       map("n", "<leader>dt", M.python_debug_nearest_test, "Debug nearest test")
@@ -57,26 +51,20 @@ function M.setup()
     group = group,
     pattern = "go",
     callback = function(event)
-      local map = function(lhs, rhs, desc)
-        vim.keymap.set("n", lhs, rhs, {
-          buffer = event.buf,
-          desc = desc,
-          silent = true,
-        })
-      end
+      local map = shared.buf_map(event.buf)
 
-      map("<localleader>ga", M.go_switch_test_file, "Alternate test/source")
-      map("<localleader>gc", M.go_coverage_package, "Coverage summary")
-      map("<localleader>ig", M.go_goto_imports, "Go to imports")
-      map("<localleader>ir", M.go_organize_imports, "Remove unused imports")
-      map("<localleader>tp", M.go_test_package, "Run package tests")
-      map("<localleader>tP", M.go_test_all, "Run all package tests")
-      map("<localleader>tt", M.go_test_nearest, "Run nearest test")
-      map("<localleader>tl", M.go_test_last, "Run last test command")
-      map("<localleader>xx", M.go_run_package, "Run package")
-      map("<localleader>xg", M.go_generate_file, "Generate for file")
-      map("<localleader>xG", M.go_generate_project, "Generate for project")
-      map("<localleader>ri", M.go_organize_imports, "Organize imports")
+      map("n", "<localleader>ga", M.go_switch_test_file, "Alternate test/source")
+      map("n", "<localleader>gc", M.go_coverage_package, "Coverage summary")
+      map("n", "<localleader>ig", M.go_goto_imports, "Go to imports")
+      map("n", "<localleader>ir", M.go_organize_imports, "Remove unused imports")
+      map("n", "<localleader>tp", M.go_test_package, "Run package tests")
+      map("n", "<localleader>tP", M.go_test_all, "Run all package tests")
+      map("n", "<localleader>tt", M.go_test_nearest, "Run nearest test")
+      map("n", "<localleader>tl", M.go_test_last, "Run last test command")
+      map("n", "<localleader>xx", M.go_run_package, "Run package")
+      map("n", "<localleader>xg", M.go_generate_file, "Generate for file")
+      map("n", "<localleader>xG", M.go_generate_project, "Generate for project")
+      map("n", "<localleader>ri", M.go_organize_imports, "Organize imports")
     end,
   })
 
@@ -84,22 +72,16 @@ function M.setup()
     group = group,
     pattern = "java",
     callback = function(event)
-      local map = function(lhs, rhs, desc)
-        vim.keymap.set("n", lhs, rhs, {
-          buffer = event.buf,
-          desc = desc,
-          silent = true,
-        })
-      end
+      local map = shared.buf_map(event.buf)
 
-      map("<localleader>ga", M.java_switch_test_file, "Alternate test/source")
-      map("<localleader>cc", M.java_build_project, "Build project")
-      map("<localleader>ta", M.java_run_all_tests, "Run all tests")
-      map("<localleader>tc", M.java_run_class_tests, "Run class tests")
-      map("<localleader>tt", M.java_run_nearest_test, "Run nearest test")
-      map("<localleader>tl", M.java_run_last_test, "Run last test command")
-      map("<localleader>x:", M.java_run_task, "Run build task")
-      map("<localleader>ri", M.java_organize_imports, "Organize imports")
+      map("n", "<localleader>ga", M.java_switch_test_file, "Alternate test/source")
+      map("n", "<localleader>cc", M.java_build_project, "Build project")
+      map("n", "<localleader>ta", M.java_run_all_tests, "Run all tests")
+      map("n", "<localleader>tc", M.java_run_class_tests, "Run class tests")
+      map("n", "<localleader>tt", M.java_run_nearest_test, "Run nearest test")
+      map("n", "<localleader>tl", M.java_run_last_test, "Run last test command")
+      map("n", "<localleader>x:", M.java_run_task, "Run build task")
+      map("n", "<localleader>ri", M.java_organize_imports, "Organize imports")
     end,
   })
 
@@ -107,13 +89,7 @@ function M.setup()
     group = group,
     pattern = "markdown",
     callback = function(event)
-      local map = function(mode, lhs, rhs, desc)
-        vim.keymap.set(mode, lhs, rhs, {
-          buffer = event.buf,
-          desc = desc,
-          silent = true,
-        })
-      end
+      local map = shared.buf_map(event.buf)
 
       map("n", "<localleader>-", M.markdown_insert_horizontal_rule, "Insert horizontal rule")
       map("n", "<localleader>h1", M.markdown_heading(1), "Heading level 1")
@@ -147,13 +123,7 @@ function M.setup()
     group = group,
     pattern = { "terraform", "terraform-vars" },
     callback = function(event)
-      local map = function(mode, lhs, rhs, desc)
-        vim.keymap.set(mode, lhs, rhs, {
-          buffer = event.buf,
-          desc = desc,
-          silent = true,
-        })
-      end
+      local map = shared.buf_map(event.buf)
 
       map("n", "<localleader>cc", M.terraform_validate, "Validate project")
       map("n", "<localleader>cl", M.terraform_lint, "Lint project")
@@ -166,13 +136,7 @@ function M.setup()
     group = group,
     pattern = { "bash", "sh", "zsh" },
     callback = function(event)
-      local map = function(mode, lhs, rhs, desc)
-        vim.keymap.set(mode, lhs, rhs, {
-          buffer = event.buf,
-          desc = desc,
-          silent = true,
-        })
-      end
+      local map = shared.buf_map(event.buf)
 
       map("n", "<localleader>i!", M.shell_insert_shebang, "Insert shebang")
       map("n", "<localleader>ic", M.shell_insert_case, "Insert case statement")
@@ -195,13 +159,7 @@ function M.setup()
     pattern = "gitrebase",
     callback = function(event)
       local buf = event.buf
-      local map = function(mode, lhs, rhs, desc)
-        vim.keymap.set(mode, lhs, rhs, {
-          buffer = buf,
-          desc = desc,
-          silent = true,
-        })
-      end
+      local map = shared.buf_map(buf)
 
       -- Core actions reuse the built-in gitrebase ftplugin's -range commands:
       -- normal mode acts on the current line, visual mode on the selection.
@@ -287,19 +245,13 @@ function M.setup()
     pattern = "gitcommit",
     callback = function(event)
       local buf = event.buf
-      local map = function(lhs, rhs, desc)
-        vim.keymap.set("n", lhs, rhs, {
-          buffer = buf,
-          desc = desc,
-          silent = true,
-        })
-      end
+      local map = shared.buf_map(buf)
 
       -- Match the gitrebase finish/abort keys for muscle memory. Uses window-close
       -- semantics (see M.gitcommit_finish) so it is safe in Neogit's in-session
       -- commit editor, which shares the gitcommit filetype.
-      map("<localleader>qq", M.gitcommit_finish, "Commit")
-      map("<localleader>qa", M.gitcommit_abort, "Abort commit")
+      map("n", "<localleader>qq", M.gitcommit_finish, "Commit")
+      map("n", "<localleader>qa", M.gitcommit_abort, "Abort commit")
 
       shared.register_git_editor_labels(buf, {
         { "<localleader>q", group = "finish", buffer = buf },

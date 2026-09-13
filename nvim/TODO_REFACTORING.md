@@ -32,9 +32,9 @@ refactoring; a fresh session needs nothing from earlier ones.
 
 Done: section 1 (all eight defects), 2.1, 2.3, the 2.4 decisions, the safe
 drops, the zsh row and mypy write-only in 3, the `deps.lua` -> `:checkhealth
-config` item, the keymap hygiene item and the executable half of the
-duplicated-helpers item in 4, the python.lua and `configure_cmp` specs in 5,
-and the `nvim.log` ignore and every README drift row in 6. Deferred by
+config` item, the keymap hygiene item and the executable and `buf_map` parts
+of the duplicated-helpers item in 4, the python.lua and `configure_cmp` specs
+in 5, and the `nvim.log` ignore and every README drift row in 6. Deferred by
 decision: 2.2, 2.5 and the NFS `directory` / `undodir` move, because NFS is
 out of scope for the editor setup. Open: 2.6 (analysed 2026-09-13, verdict
 recorded there, execution deferred); the at-risk list and the rest of the
@@ -532,7 +532,11 @@ Keep, and do not migrate:
   resolves, and tools_spec fails on any new raw call (options.lua keeps its
   plain `grepprg` check on purpose, before lazy loads). The live case was
   glow: mise-managed here, so a raw check reported it present while the shim
-  was inactive and the terminal failed. The rest of this item is open.
+  was inactive and the terminal failed. Done 2026-09-13 for the buffer-local
+  `map` closure: `shared.buf_map(buf)` returns the `(mode, lhs, rhs, desc)`
+  mapper, and the twelve copies (code_mode/init x8, lsp, python, kulala,
+  terminal) call it; code_mode_spec covers the mapper and fails if a module
+  writes the closure again. The rest of this item is open.
 - `code_mode`: actions live per language but keymaps come from four places
   (code_mode/init.lua, plugins/python.lua `,t*`, kulala.lua, lsp.lua). Give
   each module one shape, `{ filetypes, actions, keymaps(buf) }`, and have
