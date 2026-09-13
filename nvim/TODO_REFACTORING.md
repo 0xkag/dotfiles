@@ -582,15 +582,14 @@ Keep, and do not migrate:
   Missing `desc` on several keymaps.lua entries. Payoff: which-key and the
   README stop promising keys that do something else; each of `,gA`, `,gd`
   and `,gR` is a user-facing lie today.
-  Done 2026-09-02: `,gA`, `,gR`, `,gS` and `,gt` are gone and the README
-  keeps `,gs`, `,gr` and `,gd` (a real type search would be
-  `lsp_dynamic_workspace_symbols` with `symbols = { class, struct,
-  interface, enum }`, but telescope warns on every keystroke whose results
-  hold no such kind, so it is not worth the noise); `<leader>tl` stays as a
-  wanted alias of `SPC tvt` and the README now says so (it was removed on
-  2026-09-02 and put back the next day); kulala registers buffer-local labels
-  for `,r ,a ,i` the way the git editors do; every keymaps.lua map has a
-  desc; keymaps_spec holds each of these.
+  Done 2026-09-02: `,gA`, `,gR`, `,gS` and `,gt` are gone and the README keeps
+  `,gs`, `,gr` and `,gd` (a real type search would be
+  `lsp_dynamic_workspace_symbols` with `symbols = { class, struct, interface,
+  enum }`, but telescope warns on every keystroke whose results hold no such
+  kind, so it is not worth the noise); `<leader>tl` stays as a wanted alias of
+  `SPC tvt` and the README now says so; kulala registers buffer-local labels
+  for `,r ,a ,i` the way the git editors do; every keymaps.lua map has a desc;
+  keymaps_spec holds each of these.
 - `options.lua`: clipboard state and `_G.NvimClipMode` belong in
   `config/clipboard.lua`; three noexpandtab autocmd blocks -> one pattern;
   several options restate defaults; `colorcolumn=80` / `textwidth=78` vs
