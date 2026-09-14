@@ -22,20 +22,33 @@ shifts. Commit changes to this file alongside the config changes they track.
 
 ### Assessment timeline
 - **Original assessment: 2026-06-01** (repo at commit `e83e005`).
-- **Reassessment: 2026-07-29** (repo at commit `d185bcd`) — see the Appendix. All
-  ground-truth below was re-verified on 2026-07-29 and remains accurate.
+- **Reassessment: 2026-07-29** (repo at commit `d185bcd`) — see the Appendix.
+- **Reassessment: 2026-09-14** (repo at commit `71a9ad6`) — see the Appendix. All
+  ground-truth below was re-verified on 2026-09-14 on the AL2 host itself. Items
+  #16–#18 added.
 
-### Ground-truth (verified 2026-07-29)
-- **Installed:** `ripgrep 15.1.0`, `fzf 0.67.0`, `mise 2026.4.5`, `pygmentize`, `tmux`.
-- **Missing:** `fd`, `bat`, `delta`, `difftastic`, `eza`/`lsd`, `zoxide`, `atuin`, `direnv`, `starship`, `sesh`.
+### Ground-truth (verified 2026-09-14)
+- **Installed (provider in parens):** `ripgrep 15.1.0` (flox), `fzf 0.71.0` (mise
+  shim; a stale `0.67.0` download from `fzf/install` still sits in `_lib/fzf/bin/`
+  at the *end* of PATH — see #17), `mise 2026.4.5`, `flox 1.9.0` (rpm),
+  `nvim 0.12.2` (flox), `pygmentize` (pyenv), `tmux` (homedir build in
+  `~/.root/bin`, source in `_lib/_opt/tmux`), `tree 1.6` (rpm), `git 2.47.3`,
+  `OpenSSH 7.4p1`, `zsh 5.8.1`, `bash 4.2`. Host is Amazon Linux 2.
+- **Missing:** `fd`, `bat`, `delta`, `difftastic`, `eza`/`lsd`, `zoxide`, `atuin`,
+  `direnv`, `starship`, `sesh`.
+- **Versions vs. recommended keys:** git 2.47 supports every key in #3/#6
+  (`zdiff3` ≥2.35, `rebase.updateRefs` ≥2.38); OpenSSH 7.4 supports every key in
+  #1/#5 (`%C` ≥6.7, `ControlPersist` ≥5.6, `AddKeysToAgent` ≥7.2, `Include` ≥7.3).
 - **SSH:** no ControlMaster multiplexing (`ssh/config` is 12 lines: EscapeChar + ForwardAgent/X11 off) despite a socks-`ProxyCommand` work setup — highest-latency win.
-- **fzf:** `FZF_DEFAULT_COMMAND` unset → fzf uses its slow built-in walker and ignores `.gitignore`, even though `rg` is installed.
-- **mise:** deliberately **shim-based, not `eval`-activated** — `mise activate` is commented out (`_shell/shellinteractive:150-158`) in favor of a custom `MISE_DISABLE_TOOLS` exclusion system with per-prompt cached sync (`_mise_disable_sync`, `mise-refresh`, `mise-all`, `_shell/shellinteractive:160-202`; `_shell/shellenv:165-174`). This is intentional and sophisticated — see item #12. Reworked into a data-driven skip engine on 2026-07-01 (commit `b1e77d8`).
-- **nvim:** nvim-cmp + Telescope with **no** telescope-fzf-native (absent) and **no** nvim-dap (absent) — both match the documented `PICKER_NOTES.md` / `DEBUGGING_PYTHON.md` deferrals.
+- **fzf:** `FZF_DEFAULT_COMMAND` unset → fzf uses its slow built-in walker and ignores `.gitignore`, even though `rg` is installed. Shell integration is `source <(fzf --zsh)` / `eval "$(fzf --bash)"` (`~/.fzf.zsh`, `~/.fzf.bash`), so the key-binding scripts always match whichever binary wins PATH.
+- **mise:** deliberately **shim-based, not `eval`-activated** — `mise activate` is commented out (`_shell/shellinteractive:148-158`) in favor of a custom `MISE_DISABLE_TOOLS` exclusion system with per-prompt cached sync (`_mise_disable_sync`, `mise-refresh`, `mise-all`, `_shell/shellinteractive:160-202`; `_shell/shellenv:165-174`). This is intentional and sophisticated — see item #12. Reworked into a data-driven skip engine on 2026-07-01 (commit `b1e77d8`).
+- **Binary hierarchy (per host):** system packages → flox (only on hosts that use it; this one does) → mise → homedir builds (`~/.local`, `~/.root`). On non-flox hosts the middle tier is simply absent. `mise/check-tools` implements this: it probes PATH with every `*/shims` dir skipped ("system rpm, then flox, then a homedir build — whatever comes first wins", `check-tools:131-148`) and disables the mise copy per-tool policy. On this host flox supplies rg, nvim, glab, yq, mc, glow, pandoc, shellcheck, node, go. `flox activate` is deliberately off (`_shell/shellinteractive:143-147`); the env is injected by direct PATH/MANPATH/PKG_CONFIG_PATH entries in `_shell/shellenv`. Manifest lives in the site repo (`_sites/work/flox/manifest.toml`); an AL2 package list was committed to `_reqs/flox-al2.txt` on 2026-09-13 (`aad2f29`).
+- **nvim:** nvim-cmp + Telescope with **no** telescope-fzf-native (absent) and **no** nvim-dap (absent) — both match the documented `PICKER_NOTES.md` / `DEBUGGING_PYTHON.md` deferrals. `snacks.nvim` is now installed but only for the big-file guard. `nvim/TODO_REFACTORING.md` (2026-09-13) records explicit decisions: Telescope over snacks.picker/fzf-lua, nvim-cmp over blink.cmp ("revisit only when nvim-cmp breaks") — see #15.
 - **EDITOR is now `nvim`** (`_shell/shellinteractive:65`; switched 2026-06-30, commit `11f1e0b`) — raises the payoff of the nvim-side items.
+- **Shell startup (new, measured 2026-09-14 on the host):** `zsh -i -c exit` ≈ 0.53 s, bash ≈ 0.37 s. Of the zsh total, ~220 ms is three **no-op** `path-insert` calls (a Python script, run via the pyenv shim) from `_sites/work/_shell/shellenv` with empty lists; ~36 ms `kubectl completion zsh`; ~53 ms pyenv init + virtualenv-init; ~33 ms six `wd add!` calls; OMZ itself ≈ 30 ms and compinit ≈ 9 ms. See #16.
 
 ### Repo conventions a fresh agent needs
-- **Install model:** symlink-based via `_bin/dotfiles-install` (Python); external tools pinned as **git submodules under `_lib/`**. New CLI tools can also come from **`mise use -g <tool>`** (mise is installed and manages a tool set; see `mise/check-tools`).
+- **Install model:** symlink-based via `_bin/dotfiles-install` (Python); external tools pinned as **git submodules under `_lib/`**. Binaries follow a **per-host hierarchy arbitrated by `mise/check-tools`**: system packages → flox (hosts that use it) → mise → homedir builds (`~/.local`, `~/.root`). `mise/config.toml` is the **portable** tool list every host shares; the flox manifest (`_sites/work/flox/manifest.toml`) is per-site. For a *new* CLI tool (fd, bat, delta, zoxide…): add it to `mise/config.toml` so every host gets it, and on flox hosts optionally to the flox manifest too — `check-tools` then skips the mise copy wherever a higher tier already provides it. Run `mise-refresh` after installing. Add a `policy[...]` row in `check-tools` only if the default `newer` is wrong.
 - **Site overrides:** identity/host-specific config lives in `_sites/current/` (a symlink, currently → `work`). Machine-specific and identity-specific settings belong there, not in the shared files.
 - **Shell init chain:** `~/.zshrc`/`~/.bashrc` → `_shell/shellrc` → `_shell/shellenv` (env/PATH) + `_shell/shellinteractive` (aliases, fzf, editors). zsh specifics in `zsh/zshrc` (OMZ). Keep bash+zsh compatibility in `_shell/*`.
 - **Commit style:** `topic: Phrase` subject, `--` body bullets, 75-col wrap, ASCII-only, `Co-Authored-By` last (see `_ai/memories/commit-message-format.md`).
@@ -60,7 +73,10 @@ shifts. Commit changes to this file alongside the config changes they track.
 | 12 | per-project env: mise `[env]` (installed) vs direnv | shell | ★★☆☆☆ | small | augment | ⬜ |
 | 13 | `atuin` shared/encrypted history | shell | ★★★☆☆ | medium | ⚠️ swap | ⬜ |
 | 14 | git signing (SSH-key signing) | git | ★★☆☆☆ | tiny | augment | ⬜ |
-| 15 | nvim: blink.cmp, trouble.nvim, fidget | nvim | ★★☆☆☆ | medium | ⚠️ swap | ⬜ |
+| 15 | nvim: blink.cmp, trouble.nvim, fidget | nvim | ★★☆☆☆ | medium | ⚠️ swap | ❌ blink · ⬜ trouble/fidget |
+| 16 | shell startup: skip empty `path-insert`, cache kubectl completion | shell | ★★★☆☆ | tiny | augment | ⬜ |
+| 17 | fzf provider cleanup: stale `_lib/fzf/bin/fzf`, install step, pin | fzf | ★★☆☆☆ | tiny | augment | ⬜ |
+| 18 | mise/flox hygiene: `mise prune`, reconcile flox lists, ignore `*.local` | shell | ★☆☆☆☆ | tiny | augment | ⬜ |
 
 Status legend: ⬜ not started · 🚧 in progress · ✅ done · ❌ rejected
 
@@ -138,9 +154,12 @@ fi
 ```
 
 Keep the existing `ctrl-o`/`ctrl-y` binds and `FZF_CTRL_R_OPTS` — they're good.
-**Install mechanism:** `fd`/`bat` fit the mise story — `mise use -g fd bat` — or pin
-as `_lib/` submodules. Note Debian's packages expose `fdfind`/`batcat`; if using the
-distro-package route, alias them in `_shell/shellenv`. Decide during implementation.
+**Install mechanism (updated 2026-09-14):** add `fd` and `bat` to `mise/config.toml`
+(the portable list); on flox hosts optionally add them to
+`_sites/work/flox/manifest.toml` as well (`fd.pkg-path = "fd"`, `bat.pkg-path =
+"bat"`) and `check-tools` will skip the mise copy. Then `mise-refresh`. Note
+Debian's packages expose `fdfind`/`batcat`; if using the distro-package route,
+alias them in `_shell/shellenv`.
 
 ---
 
@@ -185,7 +204,9 @@ if command -v zoxide >/dev/null 2>&1; then
 fi
 ```
 
-Missing tool — `mise use -g zoxide` fits the existing mise setup.
+Missing tool — `zoxide = "latest"` in `mise/config.toml` (portable); optionally
+`zoxide.pkg-path = "zoxide"` in the flox manifest on flox hosts. `~/.warprc` has grown to ~37 bookmarks
+(2026-09-14), so `wd` is clearly the daily driver — keep this strictly additive.
 
 ## 12. shell — per-project env: prefer mise `[env]` over new direnv
 
@@ -239,7 +260,8 @@ happens in nvim — so delta's marginal value is mainly for CLI `git show`/`git 
 
 ⚠️ Alternative: `difftastic` (structural/AST diff) as an on-demand `git dft` alias
 rather than pager — better for refactors, slower, not a drop-in pager. Both missing →
-`mise use -g delta difftastic` or submodule.
+`mise/config.toml` (portable), optionally also the flox manifest on flox hosts
+(`delta.pkg-path = "delta"`, `difftastic.pkg-path = "difftastic"`).
 
 ## 6. git — workflow gaps to close
 
@@ -344,12 +366,16 @@ notes (adopt only if terminal-only stepping becomes frequent friction).
 
 ## 15. nvim — optional modern swaps (⚠️ fight stability preference)
 
-**Status:** ⬜ not started (not recommended now)
+**Status:** ❌ blink.cmp rejected (decision recorded in `nvim/TODO_REFACTORING.md`
+§3, 2026-09-13: "nvim-cmp over blink.cmp or native `vim.lsp.completion` … Revisit
+only when nvim-cmp breaks"). ⬜ trouble.nvim / fidget remain optional additions.
 
 Shown for completeness:
 - **blink.cmp** replacing nvim-cmp — faster, but there's a finely-tuned
-  quiet/manual/full completion-mode system (`nvim/lua/config/completion.lua`) to
-  re-port.
+  quiet/manual/full completion-mode system (`nvim/lua/config/completion.lua`) that
+  relies on cmp's `debounce` and re-`setup` semantics; blink has no user debounce.
+  Same file also rejects snacks.picker/fzf-lua in favor of Telescope, which keeps
+  #10 (telescope-fzf-native) as the only picker-performance item.
 - **trouble.nvim** — persistent diagnostics panel; Telescope covers this today.
   Low-risk *addition* if a pinned list is wanted.
 - **fidget.nvim** — LSP progress spinner; trivial, cosmetic.
@@ -372,9 +398,110 @@ security posture (`_bin/hibp-check-password`, OSC52 care, ForwardAgent off).
 
 ---
 
+## 16. shell — startup: three no-op Python calls cost ~220 ms (new 2026-09-14)
+
+**Status:** ⬜ not started
+
+**Why:** `zsh -i -c exit` measures ≈ 0.53 s on the host. A timestamped xtrace
+shows the single largest cost is **not** OMZ (≈ 30 ms) or compinit (≈ 9 ms) but
+`_sites/work/_shell/shellenv`, which calls `path-insert` three times (PATH,
+MANPATH, PKG_CONFIG_PATH) with **empty** `new_*` arrays. `path-insert` is a Python
+script (`_bin/path-insert`) reached through the pyenv shim, so each call is a full
+interpreter start: ≈ 73 ms × 3. Everything else is small change.
+
+**File:** `_sites/work/_shell/shellenv` (site repo). Guard each call:
+
+```sh
+if [ ${#new_path[@]} -gt 0 ]; then
+    export PATH="$(path-insert '.*/\.npm-packages/bin$' "$(join : ${new_path[@]})" "$PATH")"
+fi
+```
+
+(Same for `new_manpath` / `new_pkg_config_path`.) If the arrays are empty on every
+host, delete the block outright. Alternatively re-implement `path-insert` as a shell
+function in `_shell/shellenv` so it is free even when non-empty.
+
+**Second-order (optional, ~70 ms more):**
+- `kubectl completion zsh` (`_shell/shellinteractive:242-248`, ≈ 36 ms) → cache to
+  `${XDG_CACHE_HOME:-~/.cache}/kubectl-completion.$CURRENT_SHELL`, regenerate when
+  the file is older than the `kubectl` binary.
+- Six `cd … && wd -q add!` calls at every shell start (`_shell/shellenv:211-218`,
+  ≈ 33 ms) rewrite `~/.warprc` each time. `~/.warprc` is already a plain
+  `name:path` file — seed those six entries once from `_bin/dotfiles-install` and
+  drop the loop (wd tolerates entries whose directory doesn't exist).
+- `pyenv init` + `pyenv virtualenv-init` (≈ 53 ms) — already trimmed by
+  `--no-rehash` (`71a9ad6`, 2026-09-13); the rest is inherent to pyenv.
+
+**Out of scope but visible:** `/etc/profile.d/system-restart-check.sh`
+(`needs-restarting --reboothint`, ≈ 92 ms) is the host's root-owned profile script,
+not the dotfiles'. It is the single largest remaining line after #16. To re-measure
+after any change:
+
+```sh
+PS4='+%D{%s.%6.} %N:%i> ' zsh -i -x -c exit 2> /tmp/zsh-trace.txt
+awk 'match($0,/^\++([0-9]+\.[0-9]+) (.*)$/,m){t=m[1]; if(prev!=""){d=t-prev; if(d>0.008) printf "%.3f  %s\n", d, prevline}; prev=t; prevline=substr(m[2],1,140)}' /tmp/zsh-trace.txt | sort -rn | head -20
+```
+
+## 17. fzf — provider cleanup (new 2026-09-14)
+
+**Status:** ⬜ not started
+
+**Why:** fzf now resolves to the **mise shim (0.71.0)** because `_shell/shellenv:168`
+prepends `$MISE_DATA_DIR/shims`. The `fzf/install` run from Jan 2026 left an
+untracked **0.67.0 binary in `_lib/fzf/bin/`**, which `~/.fzf.zsh` appends to the
+*end* of PATH — dead weight that never runs, while the submodule source itself is at
+v0.74.4 (so its `fzf-tmux` script is newer than the binary it drives).
+`_bin/dotfiles-install:163` still says "remember to run fzf/install", which would
+re-download another binary PATH ignores.
+
+**Fix (tiny):**
+- `rm _lib/fzf/bin/fzf` (untracked; `bin/fzf-tmux` and `bin/fzf-preview.sh` are
+  tracked and stay).
+- Bump `fzf = "0.71.0"` in `mise/config.toml` to the submodule's tag (0.74.x) so
+  binary and `fzf-tmux` match; keep `policy[fzf]=newer`.
+- Change the `dotfiles-install` fzf step to write `~/.fzf.zsh`/`~/.fzf.bash` only
+  (or `fzf/install --no-bin --no-update-rc` style) — the shell hooks are just
+  `source <(fzf --zsh)` and need no binary download.
+
+## 18. shell — mise/flox hygiene (new 2026-09-14)
+
+**Status:** ⬜ not started
+
+Small, mechanical, all low-risk:
+
+- **mise orphans:** `mise-all ls` shows `terraform-docs 0.20.0`, `terraformer
+  0.8.30`, `terragrunt 0.87.5`, `tfupdate 0.9.2`, `tflint 0.59.1`, `pre-commit
+  4.3.0` installed but not in `mise/config.toml` (the tf* pins are commented out),
+  while `pre-commit 4.5.1` is pinned but *missing*. `mise install && mise prune`
+  reconciles. If the tf* tools are meant to be system-provided, the commented
+  `= "system"` lines belong in `check-tools`' `policy` table, not `config.toml`.
+- **Two flox lists drift:** `_reqs/flox-al2.txt` (shared repo, 2026-09-13) lacks
+  `chafa`, `gcc`, `glow`, `mc` and has an older `glab` than
+  `_sites/work/flox/flox.list` (site repo, 2026-08-25). Pick one as canonical, or
+  regenerate `_reqs/flox-al2.txt` from `flox list` in the same commit that touches
+  the manifest.
+- **Untracked `.local` variants (inventoried 2026-09-14):** only
+  `mise/check-tools.local` is a wired-in override (sourced by `check-tools`;
+  currently `skip+=(ollama)`). The other three are **hand-swapped alternates** for
+  tools whose config formats have no include mechanism, and nothing links them —
+  `~/.npmrc`, `~/.config/pypoetry/config.toml` and `~/.terraformrc` all point at the
+  tracked files: `nodejs/npmrc.local` and `poetry/config.toml.local` (2026-01-10)
+  are the tracked files plus the work Nexus mirror URL, and the current uncommitted
+  edits to the tracked files add that same mirror config, which makes the two
+  `.local` copies redundant once that WIP lands; `terraform/terraformrc.devlocal`
+  (2024-05) is a `dev_overrides` variant pointing `hashicorp/aws` at a local Go
+  build, for hacking on the provider. Since the mirror URLs are work-site-specific,
+  the repo's own convention says they belong in `_sites/work/` with a `relink`
+  fallback in `dotfiles-install`, not in the shared files — decide that, then delete
+  the redundant copies. Either way, add `*.local`, `*.devlocal`, `/.python-version`
+  to `.gitignore` so intentional per-host files stop showing as noise.
+
+---
+
 ## What to deliberately NOT change
 
-- **OMZ → zinit/antidote:** startup isn't the bottleneck; auto-update is off. Keep OMZ.
+- **OMZ → zinit/antidote:** OMZ is ≈ 30 ms of a ≈ 530 ms startup (profiled
+  2026-09-14); the real cost is external commands (#16). Auto-update is off. Keep OMZ.
 - **Custom `kyle` theme → starship:** intentional and fast; starship is a lateral move.
 - **Telescope → fzf-lua:** `nvim/PICKER_NOTES.md` already concluded Telescope suffices;
   fzf-native (item 10) gets the speed without the rewrite.
@@ -401,9 +528,17 @@ security posture (`_bin/hibp-check-password`, OSC52 care, ForwardAgent off).
 - **nvim telescope-fzf-native (#10):** `:checkhealth telescope` shows fzf loaded.
 - **nvim DAP (#11):** breakpoint → `SPC d` run → stop + locals pane on a sample pytest.
 - **tmux (#9):** `prefix T` opens session picker; clipboard toggle table still works after.
+- **startup (#16):** `time zsh -i -c exit` drops by ≥ 0.2 s; the xtrace in #16 shows no
+  `path-insert` line above 8 ms.
+- **fzf cleanup (#17):** `command -v fzf` → mise shim; `fzf --version` equals the
+  `_lib/fzf` tag; `fzf-tmux` still launches.
+- **hygiene (#18):** `mise-all ls` shows no `(missing)` and no unpinned rows;
+  `git status` shows no `*.local` files.
 
 ## Suggested implementation order
 
+0. Startup guard for empty `path-insert` (#16) — a three-line `if` in the site
+   shellenv, ~0.2 s back on every shell; do it first because it is the cheapest.
 1. SSH multiplexing + keepalive (#1, #5) — instant daily payoff, config-only.
 2. fzf backends + install fd/bat (#2, #8) — mise-install tools, wire env.
 3. git delta + config hygiene + worktree aliases (#3, #6) — install delta, edit gitconfig.
@@ -411,6 +546,7 @@ security posture (`_bin/hibp-check-password`, OSC52 care, ForwardAgent off).
 5. nvim telescope-fzf-native (#10) — one-line plugin spec.
 6. tmux session picker (#9).
 7. Spikes/decisions: mise `[env]` vs direnv (#12), nvim DAP (#11), atuin (#13).
+8. Hygiene sweep when convenient (#17, #18) — each is a single small commit.
 
 Each is independent and individually revertible (matches the modular, sourced-file
 design). No item requires touching another to land.
@@ -462,3 +598,67 @@ backends, git config hygiene, fzf-tab) are exactly as applicable as on 2026-06-0
 those areas simply weren't touched. The two months of work went almost entirely into
 nvim polish (plus the mise engine), which *strengthens* the case for the nvim-side
 items and confirms the DAP deferral is a real, standing decision.
+
+---
+
+## Appendix — Reassessment 2026-09-14
+
+Repo moved from `3915c7e` (2026-07-29, the commit that added this file) to
+`71a9ad6` (2026-09-13); 66 commits. Verified on the AL2 host itself (an earlier
+pass from a sandbox mirroring `$HOME` reported `tree` missing; the host has it as an
+rpm, so that item was withdrawn before this file was saved).
+
+### The gap is still lopsided — more so
+Of 66 commits, **54 are `nvim`** (a full refactoring pass driven by
+`nvim/TODO_REFACTORING.md`), plus 3 `claude`, 2 `tmux`, 1 each of `shell`, `mise`,
+`lib`, `flox`, `gitignore`, `docs`, `ai`. **`ssh/`, `git/`, `zsh/`, and the fzf block received zero
+commits.** `ssh/config` is still 12 lines; `git/gitconfig` still `diff3`, no
+`rerere`, no worktree aliases; `FZF_DEFAULT_COMMAND` still unset. Items #1–#8 and
+#14 are exactly as applicable as on 2026-06-01.
+
+### Still valid (re-verified 2026-09-14)
+| # | Item | Status now |
+|---|------|-----------|
+| 1, 5 | SSH ControlMaster, keepalive | `ssh/config` unchanged. OpenSSH 7.4p1 supports every recommended key. **Still #1.** |
+| 2, 8 | fzf backends; fd + bat | `FZF_DEFAULT_COMMAND` unset; fd/bat still missing. Valid; install route is now flox-first. |
+| 3, 6, 14 | git delta, rerere/worktree/sort, signing | `git/` unchanged (git 2.47.3 supports all keys). Valid. |
+| 4 | fzf-tab | `zsh/zshrc` unchanged; plugin list identical. Valid. |
+| 7 | zoxide alongside wd | Not adopted; `~/.warprc` now ~37 entries, wd is clearly primary. Valid, strictly additive. |
+| 9 | tmux session picker, extrakto | tmux.conf changed only in the reattach-resize hook (now `M-r` key, `99870a8`) and double/triple-click (`copy-mode -H`, `66aad12`). Plugins still tpm/resurrect/continuum/yank. Valid. |
+| 10 | telescope-fzf-native | Still absent. `TODO_REFACTORING.md` re-affirmed Telescope over snacks.picker/fzf-lua, so this stays the only picker-perf item. |
+| 11 | Python DAP | Still absent; `DEBUGGING_PYTHON.md` unchanged. Standing deferral. |
+| 12 | mise `[env]` vs direnv | Unchanged — and `flox activate` is *also* deliberately off, so there are now three env-hook mechanisms all disabled by design. Standalone direnv remains the lowest-risk route. |
+| 13 | atuin | Unchanged; conditional. |
+| 15 | blink / trouble / fidget | **blink.cmp now ❌** — explicitly rejected in `TODO_REFACTORING.md` §3. trouble/fidget still optional. |
+
+### What changed, and its effect on the backlog
+- **The binary hierarchy is now explicit and per-host:** system packages → flox
+  (on hosts that use it) → mise → homedir builds (`~/.local`, `~/.root`).
+  `check-tools` implements exactly this. On this host flox supplies rg, nvim, glab,
+  yq, mc, glow and more via plain PATH entries (not `flox activate`); on non-flox
+  hosts mise fills that role. → **Install instructions in #2/#3/#7/#8 were stale
+  ("`mise use -g`") and now say: `mise/config.toml` as the portable list, flox
+  manifest optionally on flox hosts.** The "Repo conventions" section describes the
+  hierarchy.
+- **fzf moved from the submodule download to the mise shim** (0.67.0 → 0.71.0)
+  because shims are prepended to PATH. The old binary is orphaned → new #17.
+- **`pyenv init --no-rehash`** (`71a9ad6`) shows startup time is on the owner's
+  mind. Profiling found the dominant cost is three no-op Python `path-insert` calls
+  in the site shellenv (~220 ms) → new #16, and the "keep OMZ" rationale was
+  corrected (OMZ is ~30 ms, not the bottleneck).
+- **mise orphans and two drifting flox lists** → new #18.
+- **nvim: 54 commits of refactoring** (lsp.lua split into four modules, tool
+  probes centralised in `config/tools.lua` and cached per PATH, dependency audit
+  moved to `:checkhealth`, mason-lspconfig dropped, git listings batched/backgrounded,
+  Oil git-status column, project-wide diff-base change lists). None touch the
+  backlog items, but two recorded decisions do: Telescope stays (reinforces #10 as
+  the right shape) and nvim-cmp stays (#15 blink → ❌).
+- **Uncommitted WIP** (`nodejs/npmrc`, `poetry/config.toml`, `terraform/terraformrc`,
+  `mc/ini`) is internal-mirror configuration — unrelated to this backlog, left alone.
+
+### Net verdict
+Nothing in the original ranking is invalidated; the top four items are untouched
+and still the highest value. Three small items were added (#16–#18), of which **#16
+is the only one with a measured payoff** (~0.2 s per shell start for a three-line
+guard) and should go first. The install mechanism text was the one genuinely stale
+part of the doc and has been corrected for the per-host provider hierarchy.
