@@ -76,7 +76,7 @@ shifts. Commit changes to this file alongside the config changes they track.
 | 15 | nvim: blink.cmp, trouble.nvim, fidget | nvim | ★★☆☆☆ | medium | ⚠️ swap | ❌ blink · ⬜ trouble/fidget |
 | 16 | shell startup: skip empty `path-insert`, cache kubectl completion | shell | ★★★☆☆ | tiny | augment | ⬜ |
 | 17 | fzf provider cleanup: stale `_lib/fzf/bin/fzf`, install step, pin | fzf | ★★☆☆☆ | tiny | augment | ⬜ |
-| 18 | mise/flox hygiene: `mise prune`, reconcile flox lists, ignore `*.local` | shell | ★☆☆☆☆ | tiny | augment | ⬜ |
+| 18 | mise/flox hygiene: `mise prune`, reconcile flox lists | shell | ★☆☆☆☆ | tiny | augment | ⬜ |
 
 Status legend: ⬜ not started · 🚧 in progress · ✅ done · ❌ rejected
 
@@ -480,21 +480,6 @@ Small, mechanical, all low-risk:
   `_sites/work/flox/flox.list` (site repo, 2026-08-25). Pick one as canonical, or
   regenerate `_reqs/flox-al2.txt` from `flox list` in the same commit that touches
   the manifest.
-- **Untracked `.local` variants (inventoried 2026-09-14):** only
-  `mise/check-tools.local` is a wired-in override (sourced by `check-tools`;
-  currently `skip+=(ollama)`). The other three are **hand-swapped alternates** for
-  tools whose config formats have no include mechanism, and nothing links them —
-  `~/.npmrc`, `~/.config/pypoetry/config.toml` and `~/.terraformrc` all point at the
-  tracked files: `nodejs/npmrc.local` and `poetry/config.toml.local` (2026-01-10)
-  are the tracked files plus the work Nexus mirror URL, and the current uncommitted
-  edits to the tracked files add that same mirror config, which makes the two
-  `.local` copies redundant once that WIP lands; `terraform/terraformrc.devlocal`
-  (2024-05) is a `dev_overrides` variant pointing `hashicorp/aws` at a local Go
-  build, for hacking on the provider. Since the mirror URLs are work-site-specific,
-  the repo's own convention says they belong in `_sites/work/` with a `relink`
-  fallback in `dotfiles-install`, not in the shared files — decide that, then delete
-  the redundant copies. Either way, add `*.local`, `*.devlocal`, `/.python-version`
-  to `.gitignore` so intentional per-host files stop showing as noise.
 
 ---
 
@@ -532,8 +517,7 @@ Small, mechanical, all low-risk:
   `path-insert` line above 8 ms.
 - **fzf cleanup (#17):** `command -v fzf` → mise shim; `fzf --version` equals the
   `_lib/fzf` tag; `fzf-tmux` still launches.
-- **hygiene (#18):** `mise-all ls` shows no `(missing)` and no unpinned rows;
-  `git status` shows no `*.local` files.
+- **hygiene (#18):** `mise-all ls` shows no `(missing)` and no unpinned rows.
 
 ## Suggested implementation order
 
