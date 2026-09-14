@@ -6,8 +6,8 @@ Tool installation via [mise](https://mise.jdx.dev/), run in shims mode (no
 * `check-tools` -- computes MISE_DISABLE_TOOLS, the tools mise should skip
   because a runnable copy exists outside mise (rpm/apt, flox, homedir build)
   that meets the version need.  Policies, minimums, and per-machine skips are
-  documented in its header; per-machine overrides go in the untracked
-  `check-tools.local` (see `check-tools.local.example`).
+  documented in its header; per-machine overrides go in the site repo at
+  `_sites/current/mise/check-tools.local` (see `check-tools.local.example`).
 * `config.toml` -- the global tool list.
 * `install` -- bootstraps mise itself, then installs the tools.
 

@@ -1,6 +1,7 @@
-# Per-machine overrides for check-tools. Copy to check-tools.local (untracked)
-# and edit for this host. Sourced after the defaults, so it can append to skip
-# or reassign any array (policy/minver/cmd).
+# Per-machine overrides for check-tools. Copy to the site repo as
+# _sites/current/mise/check-tools.local and edit for this host. Sourced after
+# the defaults, so it can append to skip or reassign any array
+# (policy/minver/cmd).
 
 # Skip installs on this host only, keeping the tool in the shared config:
 #skip+=(ollama)

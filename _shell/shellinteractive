@@ -182,10 +182,11 @@ mise-all() {
 }
 
 # Cheap per-prompt sync (~5ms): --cached serves the file when fresh and rebuilds
-# only on the first prompt after check-tools/config.toml/check-tools.local
-# change, so an edited minimum version or policy is picked up without a new
-# shell or manual mise-refresh. The mtime check short-circuits before any slow
-# --version probing, so a warm cache costs the same as a raw file read.
+# only on the first prompt after check-tools, config.toml, or the site's
+# check-tools.local change, so an edited minimum version or policy is picked up
+# without a new shell or manual mise-refresh. The mtime check short-circuits
+# before any slow --version probing, so a warm cache costs the same as a raw
+# file read.
 
 _mise_disable_sync() {
     local list

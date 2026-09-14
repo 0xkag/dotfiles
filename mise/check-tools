@@ -26,7 +26,7 @@ cached=
 
 self_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 config_toml="$self_dir/config.toml"
-local_override="$self_dir/check-tools.local"
+local_override="$self_dir/../_sites/current/mise/check-tools.local"
 cache_file="${XDG_CACHE_HOME:-$HOME/.cache}/mise/check-tools-disable"
 mise_data_dir="${MISE_DATA_DIR:-$HOME/.local/share/mise}"
 
@@ -99,13 +99,14 @@ declare -A cmd=(
 
 # Per-machine skips: tool names here are always disabled (mise never installs
 # them on this host) regardless of policy, keeping them in the shared config.
-# Populate this from check-tools.local, e.g. `skip+=(ollama)`.
+# Populate this from the site repo's mise/check-tools.local, e.g.
+# `skip+=(ollama)`.
 
 skip=()
 
-# Source the optional per-machine override (path set above). It runs after the
-# defaults, so it can append to skip or reassign any array (policy/minver/cmd)
-# for this host only.
+# Source the optional per-machine override from _sites/current (path set
+# above). It runs after the defaults, so it can append to skip or reassign any
+# array (policy/minver/cmd) for this host only.
 
 # shellcheck source=/dev/null
 [[ -f $local_override ]] && source "$local_override"
