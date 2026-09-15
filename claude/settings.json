@@ -19,8 +19,6 @@
     "ponytail@ponytail": true,
     "pyright-lsp@claude-plugins-official": true,
     "andrej-karpathy-skills@karpathy-skills": true,
-    "mr-tools@arcesium-devex-plugins": false,
-    "glab-mr@arcesium-devex-plugins": false,
     "terraform@claude-plugins-official": true,
     "context7@claude-plugins-official": false
   },
