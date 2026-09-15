@@ -137,6 +137,12 @@ opt.foldexpr = "v:lua.require'config.treesitter'.foldexpr()"
 opt.foldenable = true
 opt.foldlevel = 99
 opt.foldlevelstart = 99
+-- Treesitter parses synchronously. Neovim 0.12's async parse has a 3 ms
+-- budget; when a redraw's parse overruns it, the highlighter reuses the tree
+-- objects it cached before the edit (TSTree:edit returns a copy), and any
+-- edit that shortened the buffer then dies in a text predicate with
+-- "treesitter.lua: Index out of bounds" (neovim/neovim#38303).
+vim.g._ts_force_sync_parsing = true
 opt.sessionoptions = {
   "buffers",
   "curdir",
