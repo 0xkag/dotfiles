@@ -225,6 +225,19 @@ day-to-day work inside tmux, the behavior is already identical everywhere:
 - =y= in copy mode → copies to system clipboard via =clip-in=
 - =prefix p= → pastes from tmux buffer
 - =prefix P= → pastes from system clipboard
+- =prefix M-p= → pastes from tmux buffer without bracketed paste markers
+
+Both paste bindings use =paste-buffer -p=, which wraps the text in bracketed
+paste markers (=ESC[200~= / =ESC[201~=) for applications that asked for them.
+That is what makes a multi-line paste land intact in vim/nvim: the editor sees
+one paste instead of a stream of keystrokes, so there is no autoindent or
+=textwidth= reflow, no mapping fires, and the mode the editor happens to be in
+no longer matters -- in particular a paste into *normal* mode inserts text
+instead of running the buffer as commands.  =:set paste= is not a substitute
+(and is not needed): it only relaxes insert-mode behavior.  Shells and other
+apps that never request bracketed paste get the plain buffer, so =-p= is safe
+everywhere; =prefix M-p= is the escape hatch for anything that mishandles the
+markers.
 
 * Platform Detection (clip-in / clip-out)
 
