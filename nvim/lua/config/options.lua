@@ -81,6 +81,7 @@ opt.scrolloff = 6
 opt.sidescrolloff = 6
 opt.signcolumn = "yes"
 opt.cursorline = true
+opt.guicursor = "n-v-c-sm:block,i-ci-ve:ver40-blinkwait300-blinkon500-blinkoff300,r-cr-o:hor20,t:block"
 opt.wrap = false
 opt.linebreak = false
 opt.breakindent = true
