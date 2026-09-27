@@ -1,5 +1,13 @@
 # keep this in sync with $DOTFILES/readline/inputrc
 
+# Home/End sequences vary between terminals and tmux terminfo entries.
+bindkey '^[[H' beginning-of-line
+bindkey '^[[F' end-of-line
+bindkey '^[OH' beginning-of-line
+bindkey '^[OF' end-of-line
+bindkey '^[[1~' beginning-of-line
+bindkey '^[[4~' end-of-line
+
 bindkey "^[[5C" forward-word
 bindkey "^[[5D" backward-word
 bindkey "^[[1;5C" forward-word
@@ -16,4 +24,3 @@ bindkey "^[^[OC" forward-word
 bindkey "^[^[OD" backward-word
 bindkey "^[^[[OC" forward-word
 bindkey "^[^[[OD" backward-word
-
