@@ -81,7 +81,12 @@ opt.scrolloff = 6
 opt.sidescrolloff = 6
 opt.signcolumn = "yes"
 opt.cursorline = true
-opt.guicursor = "n-v-c-sm:block,i-ci-ve:ver40-blinkwait300-blinkon500-blinkoff300,r-cr-o:hor20,t:block"
+-- Every mode names the Cursor group so nvim sets the terminal's cursor color
+-- (OSC 12, through tmux's ccolour): gnome-terminal with no cursor color of its
+-- own paints the cursor in the color of the character under it, which on dim
+-- text made the bar near-invisible. A terminal ignores the 40 in ver40 and draws
+-- its own bar width; gnome-terminal's comes from gnome/gtk.css.
+opt.guicursor = "n-v-c-sm:block-Cursor,i-ci-ve:ver40-Cursor-blinkwait300-blinkon500-blinkoff300,r-cr-o:hor20-Cursor,t:block-Cursor"
 opt.wrap = false
 opt.linebreak = false
 opt.breakindent = true
