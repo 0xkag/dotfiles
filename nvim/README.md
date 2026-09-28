@@ -702,6 +702,7 @@ The per-filetype warnings and `:checkhealth config` come from `lua/config/deps.l
 | `vscode-css-language-server`     | `css-lsp`                      |
 | `bash-language-server`           | `bash-language-server`         |
 | `yaml-language-server`           | `yaml-language-server`         |
+| `ansible-language-server`        | `ansible-language-server`      |
 | `marksman`                       | `marksman`                     |
 | `lua-language-server`            | `lua-language-server`          |
 | `stylua`                         | `stylua`                       |
@@ -709,6 +710,13 @@ The per-filetype warnings and `:checkhealth config` come from `lua/config/deps.l
 | `terraform-ls` / `tflint`        | `terraform-ls` / `tflint`      |
 | `rust-analyzer` / `rustfmt`      | `rust-analyzer` (rustfmt via rustup) |
 | `gopls` / `goimports`            | `gopls` / `goimports`          |
+
+Ansible files get the `yaml.ansible` filetype from `lua/config/ansible.lua`,
+which is the only filetype `ansible-language-server` attaches to: a role's
+`tasks/`, `handlers/`, `defaults/`, `vars/` and `meta/`, anything under
+`playbooks/`, `group_vars/` or `host_vars/`, and YAML beside an `ansible.cfg`.
+Other YAML stays `yaml` for `yaml-language-server`. The server validates with
+`ansible-lint` when it is on PATH.
 
 Not everything in the warnings is a Mason package: `glow` (Markdown terminal
 view) comes from mise (`mise/config.toml`) or your system package manager.

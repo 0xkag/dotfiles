@@ -33,6 +33,7 @@ vim.opt.rtp:prepend(lazypath)
 -- autocmds before keymaps so its localleader which-key labels are in place;
 -- python/deps/projects wire side effects; then lazy loads the plugin specs.
 require("config.env")
+require("config.ansible").setup()
 require("config.options")
 require("config.autocmds")
 require("config.code_mode").setup()
