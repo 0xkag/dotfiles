@@ -115,6 +115,16 @@ local features = {
     mode = "all",
     bins = { "vscode-html-language-server" },
   },
+  hurl_format = {
+    label = "Hurl JSON response formatting",
+    mode = "all",
+    bins = { "jq" },
+  },
+  hurl_runner = {
+    label = "Hurl HTTP requests",
+    mode = "all",
+    bins = { "hurl" },
+  },
   java_lsp = {
     label = "Java LSP",
     mode = "all",
@@ -310,6 +320,7 @@ local filetype_features = {
   dockerfile = { "docker_lsp" },
   go = { "go_lsp", "go_runtime", "go_format" },
   html = { "html_lsp", "js_format" },
+  hurl = { "hurl_runner", "hurl_format" },
   java = { "java_lsp", "gnu_global" },
   javascript = { "js_lsp", "js_format" },
   javascriptreact = { "js_lsp", "js_format" },

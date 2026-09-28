@@ -353,7 +353,7 @@ colorscheme handler loads it on demand, and `colors/cyberpunk.lua` is what
 actually gets applied), flash and hydra (`keys`). snacks stays eager
 (`lazy = false`, 0.57 ms): bigfile's filetype pattern has to be registered
 before the first buffer is read. Ungrouped autocmds: deps, python,
-treesitter, kulala, terminal, lsp, git, neotree.
+treesitter, hurl, terminal, lsp, git, neotree.
 
 Payoff (measured 2026-09-02, dependencies included): loading telescope costs
 8.8 ms, hydra 8.4 ms, orgmode 3.5 ms, flash 0.7 ms; lualine (5.2 ms) is the
@@ -567,7 +567,7 @@ Keep, and do not migrate:
   terminal) call it; code_mode_spec covers the mapper and fails if a module
   writes the closure again. The rest of this item is open.
 - `code_mode`: actions live per language but keymaps come from four places
-  (code_mode/init.lua, plugins/python.lua `,t*`, kulala.lua, lsp.lua). Give
+  (code_mode/init.lua, plugins/python.lua `,t*`, hurl.lua, lsp.lua). Give
   each module one shape, `{ filetypes, actions, keymaps(buf) }`, and have
   init.lua iterate. The merge loop flattens namespaces; terraform exports
   unprefixed names. Leftovers: a fish branch with no fish pattern,

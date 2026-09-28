@@ -22,6 +22,27 @@ For FreeBSD-specific Neovim install notes, see
 For the reflow/restyle model behind `gq` / `gQ` / `,=`, see
 [FORMATTING_NOTES.md](./FORMATTING_NOTES.md:1).
 
+## HTTP requests (Hurl)
+
+`.hurl` files run through [hurl.nvim](https://github.com/jellydn/hurl.nvim) and
+the `hurl` CLI from mise, so the same file runs from the shell (`hurl --test
+api.hurl`) or CI. `[Captures]` carry values such as tokens into later requests,
+and `[Asserts]` check the response. Responses open in a split, JSON formatted by
+`jq`; variables come from a `vars.env` beside the file or up to the git root.
+
+- `,r` run the request under the cursor; in visual mode, the selected requests
+- `,a` run every request in the file
+- `,e` / `,E` run up to the current request / from it to the end
+- `,l` show the last response
+- `,v` / `,V` run verbose / very verbose
+- `,m` toggle the response between split and popup
+- `,s` select the env file
+
+This replaced kulala.nvim, whose upstream went private in September 2026. Hurl
+has no gRPC or WebSocket requests (use `grpcurl` and `websocat` directly) and no
+pre/post-request scripts: captures and asserts cover chaining and checks, and a
+computed value is passed in with `hurl --variable name=value`.
+
 ## Core keys
 
 - `SPC` is the main leader key
@@ -159,7 +180,7 @@ right; they never share a row, so it is left as is.
 - `SPC cm` re-checks the current buffer's workflow tools and its Treesitter parser, and says so when all are present
 - `:PyenvInfo` show the Python environment Neovim resolved for the current buffer
 - `:Org help` view orgmode help
-- `:TSInstall lua python markdown markdown_inline org kulala_http` install parsers you want; nvim-treesitter's main branch builds them with the `tree-sitter` CLI (mise), which `:checkhealth config` reports as "Treesitter parser builds"
+- `:TSInstall lua python markdown markdown_inline org` install parsers you want; nvim-treesitter's main branch builds them with the `tree-sitter` CLI (mise), which `:checkhealth config` reports as "Treesitter parser builds"
 - Treesitter parser auto-install is off by default; set `vim.g.nvim_treesitter_auto_install = true` before plugin setup if you want startup to ensure the configured parser list
 - `:checkhealth` inspect Neovim health
 
