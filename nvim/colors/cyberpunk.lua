@@ -12,7 +12,7 @@ local function hl(group, opts)
 end
 
 hl("Normal", { fg = "#d3d3d3", bg = "#000000" })
-hl("Cursor", { fg = "#000000", bg = "#dcdccc" })
+hl("Cursor", { fg = "#000000", bg = "#ffffff" })
 hl("CursorLine", { bg = "#333333" })
 hl("CursorColumn", { bg = "#333333" })
 hl("ColorColumn", { bg = "#383838" })
