@@ -10,4 +10,6 @@ diff -u \
      gnome-terminal.dconf &> /dev/null || \
     echo "gnome-terminal.dconf difference!"
 dconf load /org/gnome/terminal/ < gnome-terminal.dconf
+mkdir -p ~/.config/gtk-3.0
+ln -sfn "$PWD/gtk.css" ~/.config/gtk-3.0/gtk.css
 popd &> /dev/null
