@@ -2,6 +2,12 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = ","
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
+-- No remote plugins here need the language hosts; off, they stop probing for
+-- the neovim npm/cpan/pip/gem packages and :checkhealth stops warning.
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
 
 local uv = vim.uv or vim.loop
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
