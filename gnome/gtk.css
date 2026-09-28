@@ -1,0 +1,10 @@
+/* Linked to ~/.config/gtk-3.0/gtk.css by gnome/load.
+ *
+ * gnome-terminal's bar cursor (nvim insert mode) is cursor-aspect-ratio times
+ * the cell height, rounded: on a 16 px cell VTE's default of 0.04 draws a 1 px
+ * hairline and 0.1 draws 2 px; 0.2 (3 px) was tried and was more than wanted.
+ * Terminals ignore the width an app asks for (nvim's ver40), so it is set here.
+ * Read when gnome-terminal-server starts: close every window to apply. */
+vte-terminal {
+  -GtkWidget-cursor-aspect-ratio: 0.1;
+}
