@@ -50,6 +50,9 @@ local treesitter = require("config.treesitter")
 treesitter.missing_for_filetype = function()
   return {}
 end
+treesitter.missing_configured = function()
+  return {}
+end
 
 local deps = require("config.deps")
 
@@ -114,6 +117,29 @@ do
   check("a forced clean check reports success", #notifications == 1 and notifications[1].level == vim.log.levels.INFO, vim.inspect(notifications))
 end
 
+-- A missing parser points at :TSInstall, and at the tree-sitter CLI first when
+-- that is missing too, since :TSInstall cannot build a parser without it.
+do
+  treesitter.missing_for_filetype = function(ft)
+    return ft == "toml" and { "toml" } or {}
+  end
+  notifications = {}
+  deps.check_current_buffer(buffer_of("toml"), { force = true })
+  local msg = notifications[1] and notifications[1].msg or ""
+  check("a missing parser names :TSInstall", msg:find("Treesitter parser: missing toml (:TSInstall toml)", 1, true) ~= nil, msg)
+
+  unavailable["tree-sitter"] = true
+  notifications = {}
+  deps.check_current_buffer(buffer_of("toml"), { force = true })
+  msg = notifications[1] and notifications[1].msg or ""
+  check("without the CLI it says to install tree-sitter first", msg:find("toml (install tree-sitter, then :TSInstall toml)", 1, true) ~= nil, msg)
+
+  unavailable["tree-sitter"] = nil
+  treesitter.missing_for_filetype = function()
+    return {}
+  end
+end
+
 -- The startup sweep and :NvimDeps are gone; the audit is :checkhealth config.
 do
   check(":NvimDeps no longer exists", vim.fn.exists(":NvimDeps") == 0, vim.fn.exists(":NvimDeps"))
@@ -169,6 +195,7 @@ do
   check("the earlier missing server is still reported", find(report.warn, "yaml%-language%-server") ~= nil, vim.inspect(report.warn))
   check("the per-buffer parser check is not in the report", find(report.ok, "^Treesitter parser:") == nil and find(report.warn, "^Treesitter parser:") == nil)
   check("configured parsers are", find(report.ok, "^Treesitter parsers") ~= nil, vim.inspect(report.ok))
+  check("the tree-sitter CLI parsers build with is reported", find(report.ok, "^Treesitter parser builds: tree%-sitter") ~= nil, vim.inspect(report.ok))
 
   -- The servers lsp_servers.lua configures that no list checked, and the linters as
   -- config.linters actually runs them (mypy first; ruff is the LSP's job).

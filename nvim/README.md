@@ -159,7 +159,7 @@ right; they never share a row, so it is left as is.
 - `SPC cm` re-checks the current buffer's workflow tools and its Treesitter parser, and says so when all are present
 - `:PyenvInfo` show the Python environment Neovim resolved for the current buffer
 - `:Org help` view orgmode help
-- `:TSInstall lua python markdown markdown_inline org kulala_http` install parsers you want
+- `:TSInstall lua python markdown markdown_inline org kulala_http` install parsers you want; nvim-treesitter's main branch builds them with the `tree-sitter` CLI (mise), which `:checkhealth config` reports as "Treesitter parser builds"
 - Treesitter parser auto-install is off by default; set `vim.g.nvim_treesitter_auto_install = true` before plugin setup if you want startup to ensure the configured parser list
 - `:checkhealth` inspect Neovim health
 
