@@ -13,6 +13,9 @@
   (https://github.com/nvim-treesitter/nvim-treesitter-locals) as a future
   pure-treesitter alternative for in-buffer local rename; it's a stub as
   of late 2025
+- editor: Inline images in nvim (snacks.image: PNG/JPG, Markdown images,
+  Mermaid via mmdc, LaTeX math); needs a kitty-graphics terminal (kitty,
+  WezTerm, Ghostty) and tmux allow-passthrough, and snacks `image` enabled
 - fzf: Better integration of vim and fzf
 - fzf: Better use of fzf
 - keybindings: Re-rationalize keybindings across tools
