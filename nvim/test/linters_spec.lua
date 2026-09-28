@@ -102,7 +102,7 @@ end
 do
   check(
     "filetypes lists every configured filetype",
-    same(linters.filetypes(), { "bash", "python", "sh", "terraform", "yaml" }),
+    same(linters.filetypes(), { "bash", "python", "sh", "terraform", "yaml", "yaml.ansible" }),
     vim.inspect(linters.filetypes())
   )
 end

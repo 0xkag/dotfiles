@@ -14,6 +14,7 @@ local candidates_by_ft = {
   sh = { "shellcheck" },
   terraform = { "tflint" },
   yaml = { "yamllint" },
+  ["yaml.ansible"] = { "yamllint" },
 }
 
 -- Linters that run on write only. mypy takes 1-3 s a run and, on a file as it
