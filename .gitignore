@@ -3,3 +3,6 @@ _sites/personal
 _sites/work
 
 nvim.log
+
+# Help tags nvim generates for vendored plugins
+nvim/vendor/*/doc/tags
