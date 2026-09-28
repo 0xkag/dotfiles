@@ -93,6 +93,16 @@ do
   check("and is not probed again", probes == before, probes - before)
 end
 
+-- An Ansible buffer checks ansible-lint, which ansiblels validates with.
+do
+  unavailable["ansible-lint"] = true
+  notifications = {}
+  deps.check_current_buffer(buffer_of("yaml.ansible"), { force = true })
+  local msg = notifications[1] and notifications[1].msg or ""
+  check("a missing ansible-lint warns on an Ansible buffer", msg:find("Ansible validation (ansiblels): missing ansible-lint", 1, true) ~= nil, msg)
+  unavailable["ansible-lint"] = nil
+end
+
 -- zsh is not a shell the shell tools handle: shellcheck and shfmt parse
 -- bash and POSIX sh only, and bash-language-server attaches to bash and sh.
 -- So a zsh buffer has nothing to check, and conform runs no formatter on it.
@@ -202,6 +212,7 @@ do
   for _, bin in ipairs({ "ansible%-language%-server", "vscode%-css%-language%-server", "docker%-langserver", "taplo" }) do
     check("checkhealth covers " .. bin:gsub("%%", ""), find(report.ok, bin) ~= nil, bin)
   end
+  check("checkhealth covers ansible-lint", find(report.ok, "^Ansible validation %(ansiblels%): ansible%-lint") ~= nil, find(report.ok, "^Ansible validation"))
   check("python linting is reported as nvim-lint runs it", find(report.ok, "^Python linting: mypy") ~= nil, find(report.ok, "^Python linting"))
   check("ruff is not advertised as a linter", find(report.ok, "^Python linting.*ruff") == nil, find(report.ok, "^Python linting"))
 end
