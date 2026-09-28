@@ -14,6 +14,16 @@ local tools = require("config.tools")
 
 local notified = {}
 
+-- How to install the parsers `langs` names, which first needs the tree-sitter
+-- CLI that :TSInstall builds with.
+local function install_hint(langs)
+  local hint = ":TSInstall " .. langs
+  if not tools.available("tree-sitter") then
+    hint = "install tree-sitter, then " .. hint
+  end
+  return hint
+end
+
 -- A feature is either `bins` with a `mode` ("all" of them, or "any" one), or a
 -- `check(bufnr)` returning ok and a list of what is missing. `core` features
 -- are editor-wide rather than a language's; `per_buffer` marks a check that
@@ -235,6 +245,14 @@ local features = {
     mode = "all",
     bins = { "taplo" },
   },
+  -- nvim-treesitter's main branch builds every parser with the tree-sitter CLI,
+  -- so without it :TSInstall fails with an ENOENT for 'tree-sitter'.
+  treesitter_cli = {
+    label = "Treesitter parser builds",
+    core = true,
+    mode = "all",
+    bins = { "tree-sitter" },
+  },
   treesitter_parser = {
     label = "Treesitter parser",
     per_buffer = true,
@@ -246,7 +264,7 @@ local features = {
       end
 
       return false, vim.tbl_map(function(lang)
-        return lang .. " (:TSInstall " .. lang .. ")"
+        return lang .. " (" .. install_hint(lang) .. ")"
       end, missing)
     end,
   },
@@ -260,7 +278,7 @@ local features = {
       end
 
       return false, {
-        table.concat(missing, ", ") .. " (:TSInstall " .. table.concat(missing, " ") .. ")",
+        table.concat(missing, ", ") .. " (" .. install_hint(table.concat(missing, " ")) .. ")",
       }
     end,
   },
