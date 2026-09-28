@@ -11,6 +11,7 @@ M.parsers = {
   "gomod",
   "gosum",
   "html",
+  "hurl",
   "javascript",
   "json",
   "lua",

@@ -1,5 +1,5 @@
 -- Headless test for keymap hygiene: config.keymaps, and the buffer-local maps
--- kulala.lua adds.
+-- hurl.lua adds.
 -- Run: nvim/test/run.sh keymaps
 --
 -- Neovim 0.11 ships grn / grr / gri / gra / grt as default LSP mappings. This
@@ -93,13 +93,13 @@ do
   check("every map config.keymaps sets has a desc", #undescribed == 0, table.concat(undescribed, ", "))
 end
 
--- kulala's buffer-local `,r`, `,a` and `,i` share their key with the global
--- refactor, action and insert/import groups, so which-key would show the
--- group's name over the map's own; the http FileType registers labels the
--- way the git editors do.
+-- hurl's buffer-local `,r`, `,a` and `,e` share their key with the global
+-- refactor, action and errors/exec groups, so which-key would show the group's
+-- name over the map's own; the hurl FileType registers labels the way the git
+-- editors do.
 do
   local added = {}
-  package.preload["kulala"] = function()
+  package.preload["hurl"] = function()
     return { setup = function() end }
   end
   package.preload["which-key"] = function()
@@ -112,14 +112,16 @@ do
   package.preload["which-key.config"] = function()
     return { loaded = true }
   end
-  local spec = require("plugins.kulala")
+  local spec = require("plugins.hurl")
   spec.config(spec, spec.opts)
 
   vim.cmd("enew")
-  vim.bo.filetype = "http"
+  vim.bo.filetype = "hurl"
   local buf = vim.api.nvim_get_current_buf()
   local run = vim.fn.maparg("<localleader>r", "n", false, true)
-  check("an http buffer gets the kulala maps", run.buffer == 1, vim.inspect(run))
+  check("a hurl buffer gets the hurl maps", run.buffer == 1 and run.rhs == "<cmd>HurlRunnerAt<CR>", vim.inspect(run))
+  local selected = vim.fn.maparg("<localleader>r", "x", false, true)
+  check("a selection runs its requests", selected.buffer == 1 and selected.rhs == ":HurlRunner<CR>", vim.inspect(selected))
 
   local labels = {}
   for _, item in ipairs(added) do
@@ -127,7 +129,7 @@ do
       labels[item[1]] = item.desc
     end
   end
-  for _, lhs in ipairs({ "<localleader>a", "<localleader>i", "<localleader>r" }) do
+  for _, lhs in ipairs({ "<localleader>a", "<localleader>e", "<localleader>r" }) do
     check(lhs .. " labels itself over the global group", labels[lhs] ~= nil, vim.inspect(added))
   end
 end

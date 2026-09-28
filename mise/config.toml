@@ -12,6 +12,7 @@ cmake = "4.4.3"
 codex = "0.125.0"
 fzf = "0.74.4"
 glow = "2.1.2"
+hurl = "8.0.1"
 maven = "3.9.16"
 neovim = { version = "0.12.5", os = ["linux", "macos", "windows"] }
 ninja = "1.13.2"
