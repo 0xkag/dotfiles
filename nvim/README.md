@@ -716,7 +716,8 @@ which is the only filetype `ansible-language-server` attaches to: a role's
 `tasks/`, `handlers/`, `defaults/`, `vars/` and `meta/`, anything under
 `playbooks/`, `group_vars/` or `host_vars/`, and YAML beside an `ansible.cfg`.
 Other YAML stays `yaml` for `yaml-language-server`. The server validates with
-`ansible-lint` when it is on PATH.
+`ansible-lint` (`pipx install ansible-lint`; the apt package lags well behind),
+which the dependency checks report as "Ansible validation".
 
 Not everything in the warnings is a Mason package: `glow` (Markdown terminal
 view) comes from mise (`mise/config.toml`) or your system package manager.

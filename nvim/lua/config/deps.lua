@@ -36,6 +36,13 @@ local features = {
     mode = "all",
     bins = { "ansible-language-server" },
   },
+  -- ansiblels runs ansible-lint itself (nvim-lint does not), and without it
+  -- the server validates nothing and says so on every start.
+  ansible_validation = {
+    label = "Ansible validation (ansiblels)",
+    mode = "all",
+    bins = { "ansible-lint" },
+  },
   binary_edit = {
     label = "Binary editing",
     core = true,
@@ -320,7 +327,7 @@ local filetype_features = {
   typescript = { "js_lsp", "js_format" },
   typescriptreact = { "js_lsp", "js_format" },
   yaml = { "yaml_lsp", "yaml_lint" },
-  ["yaml.ansible"] = { "ansible_lsp", "yaml_lint" },
+  ["yaml.ansible"] = { "ansible_lsp", "ansible_validation", "yaml_lint" },
 }
 
 -- ok, the missing tools (or what stands in for them), and the tools found.
