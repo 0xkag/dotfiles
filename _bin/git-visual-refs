@@ -7,20 +7,46 @@ set -x
 
 if [[ $# = 0 || $1 == local ]]; then
     prefix=refs/heads/
-    bindcmd='enter:execute(git checkout {1})+abort'
+    remote=
 else
     prefix=refs/remotes/$1/
-    bindcmd='enter:execute(git checkout -b $(echo {1} | cut -d '/' -f 2-) {1})+abort'
+    remote=$1
 fi
 
-git \
-  for-each-ref \
-  --count=1000 \
-  --sort=-committerdate \
-  --format='%(refname:short)' \
-  $prefix | \
-fzf \
-  --preview="git log --color --pretty=fuller --decorate {1}" \
-  --preview-window='up:75%:wrap' \
-  --bind="$bindcmd"
+ref=$(
+    git \
+      for-each-ref \
+      --count=1000 \
+      --sort=-committerdate \
+      --format='%(refname:short)' \
+      "$prefix" | \
+    fzf \
+      --preview="git log --color --pretty=fuller --decorate {1}" \
+      --preview-window='up:75%:wrap'
+)
 
+if [[ -z $remote ]]; then
+    git checkout "$ref"
+    exit
+fi
+
+# reuse an existing local branch only if it already tracks the selected remote
+# branch, otherwise create a new local branch that tracks it
+#
+branch=${ref#"$remote"/}
+tracking=refs/remotes/$ref
+
+if git show-ref --verify --quiet "refs/heads/$branch"; then
+    upstream=$(
+        git rev-parse --symbolic-full-name "$branch@{upstream}" 2>/dev/null \
+          || true
+    )
+    if [[ $upstream != "$tracking" ]]; then
+        echo "error: local branch '$branch' tracks" \
+          "'${upstream:-nothing}', not '$tracking'" >&2
+        exit 1
+    fi
+    git checkout "$branch"
+else
+    git checkout --track -b "$branch" "$ref"
+fi
