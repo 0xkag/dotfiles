@@ -5,6 +5,13 @@
   3.12.11 is installed before that runs; this is a bootstrapping problem
 - binaries: poetry and ruff are installed via pipx and need to be automated
 - binaries: Rationalize use of mise vs. system package manager
+- binaries: One package list for every platform, replacing the per-platform
+  lists in `_reqs/` (ubuntu, macos-brew, freebsd, openbsd, rockylinux8,
+  flox-al2, python): each tool once, with its name and install method per
+  platform (apt/brew/pkg/pkg_add/yum/flox/mise/pipx/snap/built from source),
+  or none; needs a file format (and probably an installer reading it);
+  recent additions to seed it: chafa (apt), ghostty (snap), yazi/hurl/
+  tree-sitter (mise), ansible-lint (pipx)
 - binaries: Support for NFS homedir mounted on multiple architectures (amd64
   and arm64); this is a problem for things like ~/.local, pyenv, pipx, and
   mise
