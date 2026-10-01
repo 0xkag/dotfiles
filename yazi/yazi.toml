@@ -1,0 +1,27 @@
+#:schema https://yazi-rs.github.io/schemas/yazi.json
+
+# yazi (mise), linked to ~/.config/yazi by _bin/dotfiles-install. Only what
+# differs from the defaults (yazi-config/preset/yazi-default.toml for the
+# installed version); everything unset keeps them. Keys: keymap.toml. Run it
+# through `y` (_shell/shellinteractive) to land in its directory on quit.
+
+[mgr]
+# Parent / current / preview; wider preview than the default 1:4:3, for
+# screenshots and code.
+ratio          = [ 1, 3, 4 ]
+# file2 before file10, directories first.
+sort_by        = "natural"
+sort_dir_first = true
+# Size beside each name; m+s/p/m/o switch it, , + key sorts by it.
+linemode       = "size"
+# A dotfiles user wants dotfiles; `.` toggles.
+show_hidden    = true
+
+[preview]
+# Larger image previews than the default 600x900 for a HiDPI screen; images
+# draw with the terminal's protocol (kitty, sixel, iTerm2) or chafa symbols
+# (see _docs/terminal-images.org).
+max_width     = 1200
+max_height    = 1200
+image_quality = 90
+tab_size      = 4

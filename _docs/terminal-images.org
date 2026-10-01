@@ -76,7 +76,13 @@ differ: check with =tmux display -p '#{client_termfeatures}'= from inside one.
   PDFs through whichever protocol the terminal supports (Kitty, Sixel, iTerm2,
   or chafa as a fallback), plus syntax-highlighted text.  It is the
   general-purpose way to browse a directory of screenshots in a terminal.
-  Installable with mise (=yazi= is in the registry).
+  Installed with mise; config in =yazi/= (linked to =~/.config/yazi=): hidden
+  files shown, natural sort with sizes, a wider preview, and keys added to the
+  vim-style defaults (=g .= / =g n= / =g w= / =g /= / =g r= go to dotfiles,
+  nvim config, =~/wc=, =/=, the git root; =e= edit in =$EDITOR=; =!= a shell
+  here).  Start it with =y= (=_shell/shellinteractive=) to land in its
+  directory on quit.  Its name search (=s=) needs =fd=; content search (=S=)
+  uses =rg=.
 - *Neovim*: snacks.image (bundled with snacks.nvim; =image= is disabled in
   =nvim/lua/plugins/ui.lua=) and image.nvim draw images in buffers (PNG/JPG,
   Markdown images, Mermaid via =mmdc=, LaTeX math).  Both need the Kitty

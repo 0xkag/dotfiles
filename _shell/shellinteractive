@@ -102,6 +102,16 @@ alias la='ls -lA'
 
 alias up='cd ..'
 
+# y -- yazi, then cd to the directory it was in on quit (q; Q quits without).
+y() {
+    local tmp cwd
+    tmp="$(mktemp -t yazi-cwd.XXXXXX)"
+    command yazi "$@" --cwd-file="$tmp"
+    IFS= read -r -d '' cwd < "$tmp"
+    [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+    rm -f -- "$tmp"
+}
+
 # ... bsd / linux compat
 
 command -v gnugetopt &> /dev/null && \
