@@ -1,0 +1,132 @@
+#+TITLE: Images in the Terminal
+#+AUTHOR: Kyle George (w/ Claude Code assistance)
+#+STARTUP: showall
+
+* Overview
+
+Showing an image *in* a terminal means the program draws pixels through an
+in-band graphics protocol: escape sequences on the same byte stream as text.
+That is why it works over ssh and through tmux, unlike pasting an image *into*
+a program, which reads the local clipboard (see clipboard.org, "Images:
+pasting screenshots into Claude Code").  Claude Code itself shows a pasted
+image as an =[Image #N]= chip and draws no pixels, so terminal graphics are for
+looking at screenshots and diagrams yourself.
+
+Three pixel protocols matter; everything else is character art:
+
+| Protocol             | Terminals                                     | Notes                                       |
+|----------------------+-----------------------------------------------+---------------------------------------------|
+| Kitty graphics       | kitty, Ghostty, WezTerm                       | Best supported by nvim plugins (snacks.image, image.nvim) |
+| Sixel                | Windows Terminal 1.22+, WezTerm, foot, mlterm, xterm (=-ti vt340=), iTerm2 | Oldest; tmux can carry it natively          |
+| iTerm2 inline images | iTerm2, WezTerm                               | =imgcat=                                    |
+| (Unicode blocks)     | anything with truecolor                       | Fallback: chafa's =symbols= mode            |
+
+* Support by setup
+
+Checked 2026-10-01; each row depends on the versions named, and on build
+options where noted.
+
+| Setup                                  | Pixels?      | Why                                                       |
+|----------------------------------------+--------------+-----------------------------------------------------------|
+| gnome-terminal + tmux (Linux)          | No           | See [[*gnome-terminal][gnome-terminal]]; character art only |
+| Windows Terminal + ssh + tmux (WSL)    | Yes, Sixel   | Windows Terminal 1.22+ reports sixel; tmux picks it up    |
+| PuTTY + tmux                           | No           | PuTTY has no graphics protocol (as of 0.83)               |
+| Ghostty (+ ssh) + tmux (Linux, macOS)  | Yes, Kitty   | Through tmux via passthrough                              |
+| iTerm2 (+ ssh) + tmux (macOS)          | Yes          | iTerm2 protocol and Sixel; iTerm2 protocol via passthrough |
+
+** gnome-terminal
+
+gnome-terminal 3.52 on VTE 0.76 (Ubuntu 24.04) draws no images.  VTE has Sixel
+support behind a build option (=-Dsixel=) and a runtime switch
+(=vte_terminal_set_enable_sixel=, both present in this VTE), but gnome-terminal
+never turns it on, and VTE does not report sixel in its device attributes, so
+tmux lists no =sixel= feature for it.  No Kitty protocol.  Later VTE /
+gnome-terminal releases, or VTE-based terminals that enable it (Ptyxis), may
+differ: check with =tmux display -p '#{client_termfeatures}'= from inside one.
+
+** tmux
+
+- *Sixel*: tmux carries it itself (decodes and redraws it per client), but only
+  when built with =./configure --enable-sixel=.  Ubuntu's tmux 3.4 package is;
+  a tmux built by =tmux/install= (plain =./configure=) is *not*.  tmux 3.4
+  turns the =sixel= feature on for a client whose terminal reports attribute 4
+  in its primary device attributes (Windows Terminal 1.22+ does), so no config
+  line is needed.  =tmux/tmux.conf= has a commented =terminal-features= line
+  for a terminal that supports sixel without reporting it; forcing it by
+  =TERM= would also claim it for gnome-terminal (same =xterm-256color=), where
+  images would come out blank instead of falling back to character art.
+- *Kitty and iTerm2 protocols*: tmux does not understand them; programs wrap
+  them in a passthrough sequence, which needs =set -g allow-passthrough on=
+  (set in =tmux/tmux.conf=, tmux 3.3+).  Images do not survive tmux redraws
+  (switching windows, resizing), so redraw or rerun.
+- Verify: =term-features= (=_bin/=) prints the terminal's identity and, inside
+  tmux, =#{client_termfeatures}= with a sixel verdict; =term-features --image=
+  then draws a test gradient with chafa, showing which protocol gets through.
+
+* Tools
+
+- *chafa*: renders an image with the best protocol the terminal offers (Kitty,
+  Sixel, iTerm2) and falls back to surprisingly good Unicode block art, so it
+  is useful even in gnome-terminal and PuTTY.  =chafa shot.png=; force a mode
+  with =-f kitty|sixels|iterm|symbols=; through tmux it adds the passthrough
+  wrapping itself.  Install: [[*Installing chafa][below]].
+- *timg*, *viu*: similar viewers.  =imgcat= (iTerm2), =kitten icat= (kitty).
+- *yazi*: a fast terminal file manager (Rust; three-pane Miller-columns layout
+  like ranger, async I/O).  Its preview pane shows images, video thumbnails and
+  PDFs through whichever protocol the terminal supports (Kitty, Sixel, iTerm2,
+  or chafa as a fallback), plus syntax-highlighted text.  It is the
+  general-purpose way to browse a directory of screenshots in a terminal.
+  Installable with mise (=yazi= is in the registry).
+- *Neovim*: snacks.image (bundled with snacks.nvim; =image= is disabled in
+  =nvim/lua/plugins/ui.lua=) and image.nvim draw images in buffers (PNG/JPG,
+  Markdown images, Mermaid via =mmdc=, LaTeX math).  Both need the Kitty
+  protocol, so they work in Ghostty, kitty and WezTerm and not in
+  gnome-terminal or PuTTY.  Tracked as a TODO in =TODO.md=.
+
+** Installing chafa
+
+chafa is not in mise's registry (mise 2026.4.5).  Its GitHub releases are
+source tarballs, and its static Linux builds
+(https://hpjansson.org/chafa/releases/static/) cover x86_64 and armv7l but not
+aarch64 (checked at 1.18.3).  conda-forge builds it for aarch64 (=mise
+ls-remote conda:chafa= lists 1.18.3), but mise's conda backend is experimental
+and needs =experimental = true= in =mise/config.toml=, which turns on all of
+mise's experimental features.  So it comes from the system package manager:
+
+- Ubuntu/Debian: =sudo apt install chafa= (1.14 on 24.04)
+- macOS: =brew install chafa=
+- FreeBSD: =pkg install chafa=; OpenBSD: =pkg_add chafa=
+
+* Ghostty
+
+Ghostty is the Kitty-protocol terminal for Linux (and macOS) here: real images
+over ssh and through tmux, snacks.image in nvim, and OSC 52 clipboard.
+
+- *Config*: =ghostty/config=, linked to =~/.config/ghostty/config= by
+  =_bin/dotfiles-install= (same path on Linux and macOS).  Ported from the
+  live gnome-terminal profile: font, colors and palette, blinking
+  block cursor, the doubled bar cursor from =gnome/gtk.css=, scrollback, and
+  the window manager's title bar on i3.  =ghostty +validate-config= checks it.
+- *Install*: not in mise's registry, and its GitHub releases ship macOS builds
+  only.  macOS: =Ghostty.dmg= or =brew install --cask ghostty=.  Ubuntu 24.04
+  (arm64 included): =sudo snap install ghostty --classic= (1.3.1 on stable,
+  2026-10-01; built with Ghostty's own scripts, maintained externally).
+  Ubuntu 26.04+ has it in apt.  Community =.deb= and AppImage builds exist;
+  building from source is the upstream-recommended alternative to those.
+- *TERM*: Ghostty sets =TERM=xterm-ghostty=.  Remote hosts without that
+  terminfo entry break tmux, nvim and less ("unknown terminal type"); the
+  config enables =ssh-terminfo= (Ghostty 1.2+), which installs the entry with
+  =tic= on first connect.  tmux's =terminal-overrides= (=xterm*:Tc=) already
+  match it for truecolor.
+- *Clipboard*: Ghostty asks before a program reads the clipboard by OSC 52
+  (=clipboard-read = ask= default) and allows writes; see clipboard.org.
+
+* References
+
+- Kitty graphics protocol: https://sw.kovidgoyal.net/kitty/graphics-protocol/
+- Sixel support matrix: https://www.arewesixelyet.com/
+- tmux sixel detection: =tty-keys.c= (primary DA attribute 4) in tmux 3.4
+- chafa: https://hpjansson.org/chafa/
+- yazi: https://yazi-rs.github.io/
+- Ghostty config reference: https://ghostty.org/docs/config/reference
+- Ghostty install: https://ghostty.org/docs/install/binary

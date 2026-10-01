@@ -808,6 +808,81 @@ to PASS because tmux's interception buffer captures the data before the
 outer terminal even gets a chance to drop it.  Always confirm end-to-end by
 pasting in a real GUI app after the run.
 
+* Images: pasting screenshots into Claude Code
+
+Claude Code's image paste (=Ctrl+V=, or =Alt+V= on Windows and WSL) never
+goes through the terminal: terminal paste only carries text.  On the keypress,
+Claude Code reads the *system clipboard of the machine it runs on* with its own
+helper and inserts an =[Image #N]= chip.  Verified on Claude Code 2.1.284
+(strings in the binary); the helpers may change between versions:
+
+| Claude Code runs on | Reads the clipboard with                                          |
+|---------------------+-------------------------------------------------------------------|
+| Linux               | =xclip -selection clipboard -t image/png -o=, falling back to =wl-paste --type image/png= (also =image/bmp=) |
+| macOS               | =osascript= (AppleScript clipboard access)                        |
+| Windows / WSL       | PowerShell; bound to =Alt+V= (WSL also binds =Ctrl+V=)            |
+
+So paste works only when Claude Code runs where the screenshot was copied.
+Anything with =ssh= in between needs the image moved to the remote host as a
+file (see [[*Transfer options for SSH sessions][Transfer options]]); OSC 52
+does not help, since it carries text and is write-mostly.
+
+Other ways in, per the Claude Code docs: drag a file onto the window (the
+terminal pastes its *local* path as text), or give a path in the prompt
+("look at ~/shots/x.png").  Both need the path to exist where Claude Code runs.
+
+** Linux local (gnome-terminal + tmux)
+
+Works with =xclip= installed and =DISPLAY= set (X11; =wl-paste= on Wayland).
+=xsel= does not serve images, so =clip-in= / =clip-out= working is not proof.
+
+- Copy the screenshot *to the clipboard*, not to a file: =maim -s | xclip
+  -selection clipboard -t image/png=, or =flameshot gui= then =Ctrl+C=.
+- Press =Ctrl+V= in Claude Code.  =Ctrl+Shift+V= is gnome-terminal's text
+  paste and sends nothing useful.
+- Check what the clipboard holds: =xclip -selection clipboard -t TARGETS -o=
+  (an image lists =image/png=).
+- tmux copies =DISPLAY= only into panes created after an attach
+  (=update-environment=).  A pane started while attached over ssh keeps an
+  empty or stale value and paste silently does nothing: check =echo
+  $DISPLAY= and =export DISPLAY=:1= (whatever the local session uses).
+
+** macOS local (iTerm2 or Ghostty, with or without tmux)
+
+Works.  =Cmd+Ctrl+Shift+4= captures a region to the clipboard (the Ctrl is
+what sends it to the clipboard instead of a file); paste with =Ctrl+V=, or
+=Cmd+V= in iTerm2 per the Claude Code shortcut table.
+
+** WSL (Windows Terminal), Claude Code inside WSL
+
+Works.  =Win+Shift+S= to the clipboard, then =Alt+V= (Windows Terminal keeps
+=Ctrl+V= for its own paste).
+
+** Remote: Windows Terminal + ssh, PuTTY, iTerm2/Ghostty + ssh
+
+Claude Code on the remote host cannot see the local clipboard.  X11
+forwarding is no fix in practice: Xming's and VcXsrv's clipboard bridges are
+documented for text, not images (unverified here; check a newer release before
+relying on it either way).  iTerm2 alone has a built-in way across: with its shell integration
+installed on the remote host, Option-drag a file into the window and iTerm2
+uploads it to the remote's current directory over scp.
+
+** Transfer options for SSH sessions
+
+1. *Upload-the-clipboard hotkey* (works for every remote case).  A local script
+   saves the clipboard image (=pngpaste= on macOS, PowerShell =Get-Clipboard
+   -Format Image= on Windows), copies it with =scp= (=pscp= for PuTTY) to e.g.
+   =~/shots/2026-10-01-1412.png= on the remote, and puts that *path* on the
+   clipboard.  Paste the path as text into Claude Code; text paste crosses ssh.
+   Bind it with AutoHotkey (=autohotkey/=), Shortcuts, Hammerspoon or Raycast.
+2. *Synced screenshot folder*: point the screenshot tool at a folder that
+   Syncthing or an sshfs / SSHFS-Win mount mirrors to the remote, then name the
+   newest file in the prompt.
+3. *By hand*: save, =scp=, type the path.
+
+Dragging a file into Windows Terminal or PuTTY pastes the local =C:\...= path,
+which means nothing on the remote; the options above move the file first.
+
 * Dependencies
 
 | Platform     | Required packages             |
@@ -820,6 +895,10 @@ pasting in a real GUI app after the run.
 
 For OSC 52 over SSH, the *local* terminal must support it.  No packages needed
 on the remote side.
+
+Pasting *images* into Claude Code on Linux needs =xclip= (or =wl-clipboard= on
+Wayland) specifically; =xsel= has no image support.  See
+[[*Images: pasting screenshots into Claude Code][Images]].
 
 * Troubleshooting
 
