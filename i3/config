@@ -32,6 +32,11 @@ floating_modifier $mod
 bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod+t exec i3-sensible-terminal
 
+# GTK4 apps such as Ghostty draw their own decorations and ask for none, which
+# i3 honors with no title bar or border. Ghostty asks for i3's instead
+# (window-decoration = server in ghostty/config); this forces it from here.
+#for_window [class="com.mitchellh.ghostty"] border normal 2
+
 # kill focused window
 bindsym $mod+Shift+q kill
 bindsym $alt+F4 kill

@@ -54,6 +54,9 @@ shell-integration-features = no-cursor,ssh-terminfo
 # lines; 100 MB holds well over that at normal widths and is allocated lazily.
 scrollback-limit = 100000000
 
-# Use the window manager's title bar (i3's) instead of the GTK header bar.
-# Ghostty ignores gtk-* options on macOS, which keeps its native title bar.
-gtk-titlebar = false
+# Ask the window manager for its decorations. GTK4 Ghostty otherwise draws its
+# own and tells the window manager to draw none (_MOTIF_WM_HINTS), so i3 shows
+# no title bar or border at all. `server` only matters on Linux with GTK; macOS
+# ignores it. Ghostty's menu then lives on right-click (Shift+right-click
+# inside tmux, which takes the mouse) and in the Ctrl+Shift+P command palette.
+window-decoration = server
