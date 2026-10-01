@@ -1,0 +1,58 @@
+# Ghostty config, ported from the gnome-terminal profile "kag" (live dconf,
+# 2026-10-01; repo copy in gnome/gnome-terminal.dconf) and gnome/gtk.css.
+# Linked to ~/.config/ghostty/config by _bin/dotfiles-install; Ghostty reads
+# that path on Linux and macOS. Check it with `ghostty +validate-config`. Why
+# Ghostty, and how to install it: _docs/terminal-images.org.
+
+# Font: SauceCodePro Nerd Font Mono 12, as in the gnome-terminal profile
+# (installed by nerdfonts/install). The Mono variant keeps icons one cell wide.
+font-family = SauceCodePro Nerd Font Mono
+font-size = 12
+
+# Colors: gnome-terminal's custom background/foreground and its 16-color
+# palette (Solarized-based; green and blue brightened for contrast on the dark
+# background: bold-blue directory names from _shell/shellcolors come out at
+# 5.9:1 against 4.9:1 with Solarized's #268bd2).
+background = #171421
+foreground = #d0cfcc
+palette = 0=#073642
+palette = 1=#dc322f
+palette = 2=#5feb3c
+palette = 3=#b58900
+palette = 4=#3799de
+palette = 5=#d33682
+palette = 6=#2aa198
+palette = 7=#eee8d5
+palette = 8=#002b36
+palette = 9=#cb4b16
+palette = 10=#586e75
+palette = 11=#657b83
+palette = 12=#839496
+palette = 13=#6c71c4
+palette = 14=#93a1a1
+palette = 15=#fdf6e3
+
+# A solid background, no transparency.
+background-opacity = 1
+
+# Cursor: a blinking block, like the gnome-terminal profile (blink follows the
+# GNOME setting, which is on). nvim switches it to a bar in insert mode and sets
+# its color itself (guicursor with the Cursor group). gnome/gtk.css doubles
+# VTE's hairline bar; 100% doubles Ghostty's default bar the same way.
+cursor-style = block
+cursor-style-blink = true
+adjust-cursor-thickness = 100%
+
+# Shell integration would turn the prompt cursor into a bar; keep the block.
+# ssh-terminfo (Ghostty 1.2+) installs Ghostty's terminfo with tic on hosts
+# reached with ssh, so remote tmux, nvim and less know xterm-ghostty instead of
+# failing with "unknown terminal type"; it needs infocmp here and tic there.
+shell-integration-features = no-cursor,ssh-terminfo
+
+# gnome-terminal keeps 65536 lines. Ghostty limits scrollback by bytes, not
+# lines; 100 MB holds well over that at normal widths and is allocated lazily.
+scrollback-limit = 100000000
+
+# Use the window manager's title bar (i3's) instead of the GTK header bar.
+# Ghostty ignores gtk-* options on macOS, which keeps its native title bar.
+gtk-titlebar = false
