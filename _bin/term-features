@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+# What the terminal (and tmux, if inside it) can do: identity, truecolor,
+# the features tmux detected for this client (sixel, RGB, clipboard, ...),
+# and with --image, a test picture through chafa to show which graphics
+# protocol actually gets through.  See _docs/terminal-images.org.
+#
+#   term-features            report
+#   term-features --image    report, then draw a test gradient with chafa
+#   term-features FILE       report, then draw FILE with chafa
+
+set -u
+
+row () {
+    printf "%-22s %s\n" "$1" "${2:-(unset)}"
+}
+
+row TERM "${TERM:-}"
+row TERM_PROGRAM "${TERM_PROGRAM:-}"
+row COLORTERM "${COLORTERM:-}"
+[ -n "${WT_SESSION:-}" ] && row WT_SESSION "$WT_SESSION (Windows Terminal)"
+
+if [ -n "${TMUX:-}" ]; then
+    # tmux detects features per client from the outer terminal's replies
+    # (sixel from primary device attributes, others from XTVERSION and
+    # terminal-features); a feature missing here never reaches programs.
+    row "tmux version" "$(tmux display -p '#{version}')"
+    row "tmux client TERM" "$(tmux display -p '#{client_termname}')"
+    features=$(tmux display -p '#{client_termfeatures}')
+    row "tmux client features" "$features"
+    case ",$features," in
+        *,sixel,*) row "tmux sixel" "yes: sixel images reach this client" ;;
+        *) row "tmux sixel" "no: terminal did not report sixel (or tmux built without it)" ;;
+    esac
+    row "tmux passthrough" "$(tmux show -gv allow-passthrough 2>/dev/null) (kitty/iTerm2 images need on)"
+else
+    row tmux "(not inside tmux)"
+fi
+
+image="${1:-}"
+[ -z "$image" ] && exit 0
+
+if ! command -v chafa > /dev/null; then
+    echo "chafa not installed; see _docs/terminal-images.org" >&2
+    exit 1
+fi
+
+tmp=""
+if [ "$image" = "--image" ]; then
+    if ! command -v convert > /dev/null; then
+        echo "--image needs ImageMagick's convert; pass an image file instead" >&2
+        exit 1
+    fi
+    tmp=$(mktemp --suffix=.png)
+    trap 'rm -f "$tmp"' EXIT
+    convert -size 320x120 gradient:'#dc322f'-'#3799de' "$tmp"
+    image=$tmp
+fi
+
+echo
+# chafa picks the best protocol the terminal offers (kitty, sixels, iterm)
+# and falls back to Unicode symbols; force one with: chafa -f sixels FILE
+chafa --size 40x8 "$image"
