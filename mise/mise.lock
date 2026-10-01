@@ -84,6 +84,10 @@ url = "https://github.com/Kitware/CMake/releases/download/v4.4.3/cmake-4.4.3-win
 version = "0.125.0"
 backend = "aqua:openai/codex"
 
+[[tools.fd]]
+version = "10.5.0"
+backend = "aqua:sharkdp/fd"
+
 [[tools.fzf]]
 version = "0.74.4"
 backend = "aqua:junegunn/fzf"
