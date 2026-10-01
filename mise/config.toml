@@ -10,6 +10,7 @@ ag = "2.2.0"
 awscli = { version = "2.37.4", symlink_bins = "true" }
 cmake = "4.4.3"
 codex = "0.125.0"
+fd = "10.5.0"
 fzf = "0.74.4"
 glow = "2.1.2"
 hurl = "8.0.1"
