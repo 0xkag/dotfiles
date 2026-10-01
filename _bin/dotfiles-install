@@ -173,6 +173,13 @@ def main():
     relink('.dotfiles/git/gitconfig', '~/.gitconfig')
     step('(optional) remember to run git/install (for git-appraise)')
 
+    # ghostty
+
+    heading('ghostty')
+    mkdir('~/.config/ghostty')
+    relink('~/.dotfiles/ghostty/config', '~/.config/ghostty/config')
+    step('(optional) install Ghostty itself; see _docs/terminal-images.org')
+
     # global
 
     heading('global')
