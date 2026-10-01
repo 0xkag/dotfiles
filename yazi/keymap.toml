@@ -1,0 +1,27 @@
+#:schema https://yazi-rs.github.io/schemas/keymap.json
+
+# Additions to yazi's vim-style defaults (prepend_keymap: these win over a
+# default on the same key, every other default stays). `~` or F1 lists all
+# keys. Defaults worth knowing: hjkl move (l enters a dir), o/Enter open,
+# Space select, y/x/p yank/cut/paste, d trash, D delete, a create (end with /
+# for a dir), r rename, . hidden, / find, f filter, s/S search name
+# (fd)/content (rg), z fzf jump, ; shell command, g+h/c/d go
+# home/.config/Downloads, c+c/d/f copy path/dir/name, , sort, m linemode,
+# t+t new tab, 1-9 tabs, w tasks.
+
+[mgr]
+prepend_keymap = [
+	# Go-to shortcuts for this machine's usual places (g+h, g+c, g+d stay).
+	{ on = [ "g", "." ], run = "cd ~/.dotfiles",    desc = "Go to ~/.dotfiles" },
+	{ on = [ "g", "n" ], run = "cd ~/.config/nvim", desc = "Go to the nvim config" },
+	{ on = [ "g", "w" ], run = "cd ~/wc",           desc = "Go to ~/wc (working copies)" },
+	{ on = [ "g", "/" ], run = "cd /",              desc = "Go to /" },
+	{ on = [ "g", "r" ], run = 'shell -- ya emit cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"', desc = "Go to the git root" },
+
+	# Edit in $EDITOR (nvim) whatever the file type; o/Enter follow the open
+	# rules instead (images to the viewer, archives to extract, ...).
+	{ on = "e", run = 'shell --block -- "${EDITOR:-vi}" %s', desc = "Edit selected files in $EDITOR" },
+
+	# A shell in the current directory; exit returns to yazi.
+	{ on = "!", run = 'shell "$SHELL" --block', desc = "Open $SHELL here" },
+]

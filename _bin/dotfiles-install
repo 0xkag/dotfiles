@@ -341,6 +341,12 @@ def main():
     heading('xdotool')
     step('(optional) remember to run xdotool/install or install from binary')
 
+    # yazi
+
+    heading('yazi')
+    relink_relative('~/.dotfiles/yazi', '~/.config/yazi')
+    step('remember to install yazi (mise/config.toml)')
+
     # zsh
 
     heading('zsh')
