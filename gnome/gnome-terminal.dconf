@@ -2,7 +2,7 @@
 mnemonics-enabled=true
 
 [legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
-background-color='rgb(23,20,33)'
+background-color='rgb(0,0,0)'
 background-transparency-percent=100
 bold-color-same-as-fg=true
 bold-is-bright=false
@@ -15,5 +15,5 @@ scrollback-lines=65536
 use-system-font=false
 use-theme-colors=false
 use-theme-transparency=false
-use-transparent-background=true
+use-transparent-background=false
 visible-name='kag'

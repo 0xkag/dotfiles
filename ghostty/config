@@ -9,11 +9,12 @@
 font-family = SauceCodePro Nerd Font Mono
 font-size = 12
 
-# Colors: gnome-terminal's custom background/foreground and its 16-color
-# palette (Solarized-based; green and blue brightened for contrast on the dark
-# background: bold-blue directory names from _shell/shellcolors come out at
-# 5.9:1 against 4.9:1 with Solarized's #268bd2).
-background = #171421
+# Colors: black background (as in gnome-terminal and nvim's cyberpunk scheme),
+# gnome-terminal's foreground and its 16-color palette (Solarized-based; green
+# and blue brightened for contrast: bold-blue directory names from
+# _shell/shellcolors come out at 6.8:1 on black against 5.7:1 with Solarized's
+# #268bd2).
+background = #000000
 foreground = #d0cfcc
 palette = 0=#073642
 palette = 1=#dc322f
