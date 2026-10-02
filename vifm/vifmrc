@@ -2,6 +2,7 @@
 "
 " Local changes to vifm 0.14.4's sample vifmrc:
 "
+"   -- Files open in nvim, ahead of vim, like $EDITOR in the shell.
 "   -- Images open on the terminal and preview in the preview pane (w) with
 "      image-view from ~/.dotfiles/_bin, as sixel graphics where they reach
 "      the screen and as colored text elsewhere.
@@ -38,10 +39,10 @@
 " Command used to edit files in various contexts.  The default is vim.
 " If you would like to use another vi clone such as Elvis or Vile
 " you will need to change this setting.
-if executable('vim')
-    set vicmd=vim
-elseif executable('nvim')
+if executable('nvim')
     set vicmd=nvim
+elseif executable('vim')
+    set vicmd=vim
 elseif executable('elvis')
     set vicmd=elvis\ -G\ termcap
 elseif executable('vile')
