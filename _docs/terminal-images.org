@@ -210,9 +210,12 @@ More detail:
   redefine.  vifm downsamples truecolor to 256 anyway unless =$TERM= names a
   =*-direct= terminfo entry, so chafa is better off quantizing itself.
 - =-s= and =-p= never probe the terminal and emit nothing but the image, since
-  vifm reads them through a pipe.  For =-p=, chafa reads the pane's size in
-  pixels from the controlling terminal, which vifm leaves it only with =%N=
-  (see ttys.org, *Pixel sizes*).
+  vifm reads them through a pipe.  chafa 1.16 added terminal probing and
+  =--probe off= to stop it; older chafa (1.14 on Ubuntu 24.04) never probes
+  and rejects the option, so =image-view= passes it only to a chafa that
+  accepts it.  For =-p=, chafa reads the pane's size in pixels from the
+  controlling terminal, which vifm leaves it only with =%N= (see ttys.org,
+  *Pixel sizes*).
 
 * mc, nvim, and vifm
 
