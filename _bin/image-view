@@ -105,20 +105,21 @@ image_format() {
 
 # Render the image with chafa, passing it the given options, and converting
 # the image to PNG with ImageMagick first when chafa can't decode it:
-# ImageMagick 7's magick, or 6's convert (e.g., Ubuntu's package).
+# ImageMagick 7's magick, or 6's convert (e.g., Ubuntu's package).  The image
+# goes to stdout; chafa's first error is kept for the message, since it may
+# be about an option rather than the file.
 image_render() {
-    local magick
+    local error magick
 
-    if chafa "$@" "$path" 2>/dev/null; then
-        return
-    fi
+    { error=$(chafa "$@" "$path" 2>&1 1>&3 3>&-); } 3>&1 && return
+    error=${error%%$'\n'*}
     if ! magick=$(command -v magick || command -v convert); then
-        echo "chafa can't decode ${path##*/}; ImageMagick would add formats"
+        echo "${path##*/}: ${error:-chafa failed} (ImageMagick would add formats)"
         return 1
     fi
     if ! "$magick" "${path}[0]" png:- 2>/dev/null \
       | chafa "$@" - 2>/dev/null; then
-        echo "neither chafa nor ImageMagick can decode ${path##*/}"
+        echo "${path##*/}: ${error:-chafa failed}; ImageMagick couldn't convert it either"
         return 1
     fi
 }
@@ -153,7 +154,14 @@ path=$1
 # leave alone.  As sixel, vifm writes the output straight to the terminal,
 # and tmux draws sixel itself rather than passing it through; chafa reads the
 # pane's size in pixels from the terminal, which vifm leaves it with %N.
+# chafa 1.16 added both terminal probing and --probe to turn it off; older
+# chafa (e.g., 1.14 on Ubuntu 24.04) never probes, and rejects the option.
 #
+probe_off=()
+if [[ $mode == symbols || $mode == sixel ]] \
+  && chafa --probe off --version > /dev/null 2>&1; then
+    probe_off=(--probe off)
+fi
 case $mode in
 symbols)
     image_render \
@@ -161,7 +169,7 @@ symbols)
       --colors 240 \
       --format symbols \
       --polite on \
-      --probe off \
+      ${probe_off[@]+"${probe_off[@]}"} \
       --size "$size"
     exit
     ;;
@@ -171,7 +179,7 @@ sixel)
       --format sixels \
       --passthrough none \
       --polite on \
-      --probe off \
+      ${probe_off[@]+"${probe_off[@]}"} \
       --size "$size"
     exit
     ;;
