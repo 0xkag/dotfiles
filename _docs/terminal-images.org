@@ -102,10 +102,18 @@ Sixel: chafa does not wrap iTerm2's protocol for tmux (see below), though
 
 ** Which tmux
 
-Have to have the right tmux in PATH with the right sixel support.
+Sixel depends on the tmux /server/ that is running, which is whichever binary
+started it, not necessarily the one first on =PATH= now.  With more than one
+installed (a distro package, flox's, one built by =tmux/install= without
+sixel), a server started by one without sixel shows every image as text until
+it is restarted.  =tmux -V= reports the binary on =PATH=; =tmux display -p
+'#{version}'= and =term-features= report the server.  Which binary the server
+is:
 
-Which binary the running server is:
-=ls -l /proc/$(tmux display -p '#{pid}')/exe=.
+- Linux: =ls -l /proc/$(tmux display -p '#{pid}')/exe=
+- macOS (and anywhere with lsof): =lsof -a -d txt -p $(tmux display -p
+  '#{pid}')=, whose first =txt= line is the binary
+- FreeBSD: =procstat -b $(tmux display -p '#{pid}')=
 
 * Tools
 
@@ -131,7 +139,7 @@ Which binary the running server is:
   directory on quit.  Its name search (=s=) needs =fd=; content search (=S=)
   uses =rg=.
 - *mc* and *vifm*: image viewing and previews through =image-view=; see
-  [[*mc, vifm and nvim][mc, vifm and nvim]].  vifm is the two-pane
+  [[*mc, nvim, and vifm][mc, nvim, and vifm]].  vifm is the two-pane
   alternative to yazi, and the one that runs inside nvim.
 - *Neovim*: snacks.image (bundled with snacks.nvim; =image= is disabled in
   =nvim/lua/plugins/ui.lua=) and image.nvim draw images in buffers (PNG/JPG,
