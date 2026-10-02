@@ -88,12 +88,13 @@ computed value is passed in with `hurl --variable name=value`.
 
 ## File and picker views
 
-Three components split the work, and it is worth knowing which one you are in:
+Four components split the work, and it is worth knowing which one you are in:
 
 | Component | What it is | Main keys |
 |---|---|---|
 | **neo-tree** | Persistent sidebar tree. For *looking*: navigating and seeing structure. | `SPC pe` / `SPC pt`, `SPC oe`, `SPC ft` |
 | **Oil** | An editable directory buffer, dired-style. For *changing*: rename a line to rename the file, delete a line to delete it, add a line to create one, then `:w` to apply. One directory at a time, in a normal buffer. | `SPC od`, `SPC oD`, `:Oil`, `<C-l>` to refresh |
+| **vifm** | A two-pane file manager in a terminal buffer (vifm.vim). For *seeing*, images included: its preview pane (`w`) draws them as colored text, through `~/.dotfiles/vifm/vifmrc` and `image-view`, which nothing native here can do without the kitty graphics protocol. A file picked in it opens here. | `SPC ov`, `SPC oV`, `:Vifm` |
 | **Telescope** | The picker: a popup of prompt + results + preview. For *finding*. | `SPC pf`, `SPC ff`, `SPC /`, `SPC gc`, `SPC SPC` |
 
 - "Picker" means a Telescope popup. Each is built from a finder (where candidates
@@ -128,6 +129,7 @@ Three components split the work, and it is worth knowing which one you are in:
 - `SPC pg` or `SPC p/` greps in the current project
 - `SPC pt` opens the project tree -- the same action as `SPC pe`, kept as a synonym
 - `SPC od` opens the current directory in Oil, `SPC oD` the project root; both carry a git status column marked against the active diff base, the same marks the pickers and the tree use
+- `SPC ov` opens vifm in the current file's directory, `SPC oV` at the project root; `:checkhealth config` reports whether `vifm` is installed, and separately `chafa` and `image-view` for its image previews
 - Oil's column does *not* redraw itself when `SPC gm` changes the base: an Oil buffer can be holding unsaved filesystem edits and a refresh discards them, so `<C-l>` (Oil's refresh, which also drops the cached listing) is left to you
 - Project switching saves the current session, changes directory, and restores the target project session when one exists
 - In the project picker, `<C-d>` in insert mode or `dd` in normal mode removes the selected project from history
@@ -174,6 +176,7 @@ right; they never share a row, so it is left as is.
 - `:ConformInfo` inspect formatter setup
 - `:Neogit` open the git UI
 - `:Oil` open a dired-style editable directory buffer
+- `:Vifm` open vifm in a terminal buffer; `:SplitVifm`, `:VsplitVifm` and `:TabVifm` open it elsewhere
 - `:Telescope commands` search commands
 - `:Telescope keymaps` search mappings
 - `:checkhealth config` audits every external tool this config leans on, probed afresh, in two sections (editor-wide, languages); `SPC cM` opens it

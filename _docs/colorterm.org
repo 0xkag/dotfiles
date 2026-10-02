@@ -10,12 +10,15 @@ environment variable, which signals truecolor capability to applications.
 
 The color stack has three layers:
 
-1. *Outer terminal* (gnome-terminal, xfce4-terminal, PuTTY, Windows Terminal)
-   -- determines actual color capability
+1. *Outer terminal* (gnome-terminal, xfce4-terminal, iTerm2, PuTTY, Windows
+   Terminal) -- determines actual color capability
 2. *tmux* -- mediates between outer terminal and inner programs via =TERM=,
    =terminal-overrides=, and =set-clipboard=
 3. *Inner programs* (vim, emacs, shell) -- check =COLORTERM= and =TERM= to
    decide whether to emit truecolor escape sequences
+
+Images cross the same three layers, as pixels (sixel, kitty) or as colored
+text; see terminal-images.org.
 
 * Key Environment Variables
 

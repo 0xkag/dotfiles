@@ -76,6 +76,20 @@ local features = {
     mode = "all",
     bins = { "docker-langserver" },
   },
+  file_manager = {
+    label = "File manager (vifm)",
+    core = true,
+    mode = "all",
+    bins = { "vifm" },
+  },
+  -- vifm's preview pane draws images with image-view (~/.dotfiles/_bin), which
+  -- renders them with chafa; vifm itself works without either.
+  file_manager_images = {
+    label = "File manager image previews",
+    core = true,
+    mode = "all",
+    bins = { "chafa", "image-view" },
+  },
   file_watch = {
     label = "LSP file watching",
     core = true,
