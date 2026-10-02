@@ -2,12 +2,13 @@
 
 # What the terminal (and tmux, if inside it) can do: identity, truecolor,
 # the features tmux detected for this client (sixel, RGB, clipboard, ...),
-# and with --image, a test picture through chafa to show which graphics
-# protocol actually gets through.  See _docs/terminal-images.org.
+# the image format mc and vifm draw with (image-view -q), and with --image, a
+# test picture in that format to show what actually gets through.  See
+# _docs/terminal-images.org.
 #
 #   term-features            report
-#   term-features --image    report, then draw a test gradient with chafa
-#   term-features FILE       report, then draw FILE with chafa
+#   term-features --image    report, then draw a test gradient
+#   term-features FILE       report, then draw FILE
 
 set -u
 
@@ -26,16 +27,23 @@ if [ -n "${TMUX:-}" ]; then
     # terminal-features); a feature missing here never reaches programs.
     row "tmux version" "$(tmux display -p '#{version}')"
     row "tmux client TERM" "$(tmux display -p '#{client_termname}')"
+    row "tmux client type" "$(tmux display -p '#{client_termtype}')"
     features=$(tmux display -p '#{client_termfeatures}')
     row "tmux client features" "$features"
+    # tmux lists sixel for a client whose terminal reported it however tmux
+    # was built, so whether tmux can draw it is a separate question:
+    # #{sixel_support} answers it from tmux 3.6, and image-view below asks
+    # older tmux directly
     case ",$features," in
-        *,sixel,*) row "tmux sixel" "yes: sixel images reach this client" ;;
-        *) row "tmux sixel" "no: terminal did not report sixel (or tmux built without it)" ;;
+        *,sixel,*) row "tmux client sixel" "yes: the terminal reported sixel" ;;
+        *) row "tmux client sixel" "no: the terminal did not report sixel" ;;
     esac
+    row "tmux sixel_support" "$(tmux display -p '#{sixel_support}') (1: tmux draws sixel; empty before tmux 3.6)"
     row "tmux passthrough" "$(tmux show -gv allow-passthrough 2>/dev/null) (kitty/iTerm2 images need on)"
 else
     row tmux "(not inside tmux)"
 fi
+row "image-view format" "$(image-view -q) (mc's and vifm's full-screen view)"
 
 image="${1:-}"
 [ -z "$image" ] && exit 0
@@ -47,17 +55,18 @@ fi
 
 tmp=""
 if [ "$image" = "--image" ]; then
-    if ! command -v convert > /dev/null; then
-        echo "--image needs ImageMagick's convert; pass an image file instead" >&2
+    # ImageMagick 7's magick, or 6's convert (e.g., Ubuntu's package)
+    if ! magick=$(command -v magick || command -v convert); then
+        echo "--image needs ImageMagick; pass an image file instead" >&2
         exit 1
     fi
     tmp=$(mktemp --suffix=.png)
     trap 'rm -f "$tmp"' EXIT
-    convert -size 320x120 gradient:'#dc322f'-'#3799de' "$tmp"
+    "$magick" -size 320x120 gradient:'#dc322f'-'#3799de' "$tmp"
     image=$tmp
 fi
 
 echo
-# chafa picks the best protocol the terminal offers (kitty, sixels, iterm)
-# and falls back to Unicode symbols; force one with: chafa -f sixels FILE
-chafa --size 40x8 "$image"
+# Draw in the format image-view -q reported rather than chafa's own choice,
+# which inside tmux only sees tmux; force one with: chafa -f sixels FILE
+image-view -i 40x8 "$image"

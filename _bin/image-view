@@ -1,0 +1,208 @@
+#!/usr/bin/env bash
+# vim: et sw=4 ts=4:
+#
+# Show an image in the terminal with chafa(1), for mc(1), vifm(1) and
+# term-features
+#
+#   image-view FILE
+#     Clear the screen, draw the image centered on it, and wait for a key
+#     (mc's F3 and Enter, vifm's Enter), in the format -q prints.
+#
+#   image-view -i WxH FILE
+#     Draw the image at the cursor, at most W columns by H rows, in the
+#     format -q prints (term-features).
+#
+#   image-view -s WxH FILE
+#     Print the image as colored Unicode blocks of at most W columns by H
+#     rows (vifm's preview pane as text).
+#
+#   image-view -p WxH FILE
+#     Print the image as sixel graphics of at most W columns by H rows (vifm's
+#     preview pane as graphics).
+#
+#   image-view -q
+#     Print the format FILE and -i draw with: sixel or kitty (pixels), symbols
+#     (colored Unicode blocks), or auto (outside tmux, where chafa asks the
+#     terminal itself).  See _docs/terminal-images.org.
+#
+# When installed, ImageMagick converts formats that chafa can't decode (e.g.,
+# BMP, ICO, WebP).
+#
+
+set -u
+
+usage() {
+    echo "usage: ${0##*/} [-i WxH | -s WxH | -p WxH] FILE" >&2
+    echo "       ${0##*/} -q" >&2
+    exit 2
+}
+
+# Whether the terminal replies to a primary device attributes query (DA1)
+# with attribute 4, sixel.  Inside tmux the reply is tmux's own, which says
+# whether tmux was built with sixel, whatever its client can do.
+da1_sixel() {
+    local reply
+
+    { exec 3<>/dev/tty; } 2>/dev/null || return 1
+    printf '\e[c' >&3
+    IFS= read -rs -d c -t 0.5 reply <&3
+    exec 3>&-
+    [[ ";${reply#*\?};" == *';4;'* ]]
+}
+
+# The format to draw with (see -q).  Inside nvim's or vim's terminal (e.g.,
+# vifm.vim's), which draws no pixels whatever sits outside it, symbols.
+# Outside tmux, sixel when the terminal says so, else whatever chafa finds.
+# Inside tmux, chafa's own probing would only see tmux, which claims sixel
+# whenever it's built with it and shows a client without sixel a "SIXEL
+# IMAGE" placeholder instead, so ask tmux:
+#
+#   -- sixel when the client's terminal reported it (#{client_termfeatures},
+#      which lists it however tmux was built) and tmux can draw it, which
+#      tmux 3.6 and later say (#{sixel_support}) and older ones only in their
+#      own DA1 reply
+#   -- kitty when the client's terminal speaks the kitty protocol, by its
+#      XTVERSION reply (#{client_termtype}), and programs may pass it through
+#      tmux (allow-passthrough); chafa wraps only kitty images for tmux, not
+#      iTerm2's, which tmux would drop, so iTerm2 gets sixel or symbols
+#   -- symbols otherwise
+image_format() {
+    local features passthrough support termtype
+
+    if [[ -n ${NVIM-} || -n ${VIM_TERMINAL-} ]]; then
+        echo symbols
+        return
+    fi
+    if [[ -z ${TMUX-} ]]; then
+        if da1_sixel; then
+            echo sixel
+        else
+            echo auto
+        fi
+        return
+    fi
+
+    IFS=: read -r support passthrough termtype features < <(
+        tmux display -p '#{sixel_support}:#{allow-passthrough}:#{client_termtype}:#{client_termfeatures}' \
+          2>/dev/null
+    )
+    if [[ ,$features, == *,sixel,* ]]; then
+        if [[ $support == 1 ]] || { [[ -z $support ]] && da1_sixel; }; then
+            echo sixel
+            return
+        fi
+    fi
+    if [[ $passthrough == on || $passthrough == all ]]; then
+        case $termtype in
+        'ghostty '* | 'kitty('* | 'WezTerm '*)
+            echo kitty
+            return
+            ;;
+        esac
+    fi
+    echo symbols
+}
+
+# Render the image with chafa, passing it the given options, and converting
+# the image to PNG with ImageMagick first when chafa can't decode it:
+# ImageMagick 7's magick, or 6's convert (e.g., Ubuntu's package).
+image_render() {
+    local magick
+
+    if chafa "$@" "$path" 2>/dev/null; then
+        return
+    fi
+    if ! magick=$(command -v magick || command -v convert); then
+        echo "chafa can't decode ${path##*/}; ImageMagick would add formats"
+        return 1
+    fi
+    if ! "$magick" "${path}[0]" png:- 2>/dev/null \
+      | chafa "$@" - 2>/dev/null; then
+        echo "neither chafa nor ImageMagick can decode ${path##*/}"
+        return 1
+    fi
+}
+
+mode=full
+size=
+while getopts i:p:qs: opt; do
+    case $opt in
+    i) mode=inline size=$OPTARG ;;
+    p) mode=sixel size=$OPTARG ;;
+    q) mode=query ;;
+    s) mode=symbols size=$OPTARG ;;
+    *) usage ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+if [[ $mode == query ]]; then
+    [[ $# = 0 ]] || usage
+    image_format
+    exit
+fi
+[[ $# = 1 ]] || usage
+
+path=$1
+
+# keep a file name that starts with a dash from looking like an option
+[[ $path == /* ]] || path=./$path
+
+# vifm reads a preview through a pipe, so never probe the terminal or emit
+# anything but the image.  As text, use the 240 colors that terminal themes
+# leave alone.  As sixel, vifm writes the output straight to the terminal,
+# and tmux draws sixel itself rather than passing it through; chafa reads the
+# pane's size in pixels from the terminal, which vifm leaves it with %N.
+#
+case $mode in
+symbols)
+    image_render \
+      --animate off \
+      --colors 240 \
+      --format symbols \
+      --polite on \
+      --probe off \
+      --size "$size"
+    exit
+    ;;
+sixel)
+    image_render \
+      --animate off \
+      --format sixels \
+      --passthrough none \
+      --polite on \
+      --probe off \
+      --size "$size"
+    exit
+    ;;
+esac
+
+# chafa's options for the format: sixel is tmux's own to draw, while kitty
+# images reach the terminal only through tmux's passthrough
+#
+case $(image_format) in
+auto) options=() ;;
+kitty) options=(--format kitty --passthrough tmux) ;;
+sixel) options=(--format sixels --passthrough none) ;;
+symbols) options=(--format symbols) ;;
+esac
+
+if [[ $mode == inline ]]; then
+    image_render --animate off --size "$size" ${options[@]+"${options[@]}"}
+    exit
+fi
+
+# center the image, and prompt on the bottom row below it (cursor positions
+# past the last row clamp to it)
+#
+printf '\e[H\e[2J'
+image_render --align mid,mid --animate off ${options[@]+"${options[@]}"}
+printf '\e[999;1H'
+read -rsn1 -p "${path##*/}: press any key to return"
+
+# swallow the rest of a multi-byte key (e.g., an arrow) so that it doesn't
+# leak into the caller's input, then leave a clean screen behind (e.g., for
+# mc's Ctrl-O)
+#
+while read -rsn1 -t 0.01; do :; done
+printf '\e[H\e[2J'

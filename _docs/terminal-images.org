@@ -21,6 +21,12 @@ Three pixel protocols matter; everything else is character art:
 | iTerm2 inline images | iTerm2, WezTerm                               | =imgcat=                                    |
 | (Unicode blocks)     | anything with truecolor                       | Fallback: chafa's =symbols= mode            |
 
+Character art has a hard ceiling: each cell carries two colors, so it stays
+coarse however it is tuned.  Pixels need all three layers of colorterm.org's
+color stack: the outer terminal must speak a protocol, tmux must carry it,
+and the program must choose it.  Pixel sizes and the controlling terminal,
+which pixel graphics also depend on, are in ttys.org.
+
 * Support by setup
 
 Checked 2026-10-01; each row depends on the versions named, and on build
@@ -32,7 +38,11 @@ options where noted.
 | Windows Terminal + ssh + tmux (WSL)    | Yes, Sixel   | Windows Terminal 1.22+ reports sixel; tmux picks it up    |
 | PuTTY + tmux                           | No           | PuTTY has no graphics protocol (as of 0.83)               |
 | Ghostty (+ ssh) + tmux (Linux, macOS)  | Yes, Kitty   | Through tmux via passthrough                              |
-| iTerm2 (+ ssh) + tmux (macOS)          | Yes          | iTerm2 protocol and Sixel; iTerm2 protocol via passthrough |
+| iTerm2 (+ ssh) + tmux (macOS)          | Yes, Sixel   | iTerm2 reports sixel; chafa's iTerm2 images do not get through tmux |
+
+Sixel through tmux also needs a tmux built with sixel; see [[*tmux][tmux]].
+Without one, the Sixel rows show character art; Ghostty's Kitty images do
+not depend on it.
 
 ** gnome-terminal
 
@@ -42,34 +52,71 @@ support behind a build option (=-Dsixel=) and a runtime switch
 never turns it on, and VTE does not report sixel in its device attributes, so
 tmux lists no =sixel= feature for it.  No Kitty protocol.  Later VTE /
 gnome-terminal releases, or VTE-based terminals that enable it (Ptyxis), may
-differ: check with =tmux display -p '#{client_termfeatures}'= from inside one.
+differ: check with =term-features= from inside one.
+
+** iTerm2
+
+iTerm2 supports Sixel and its own inline-image protocol.  Its reply to a
+primary device attributes query (DA1) is =^[[?64;1;2;4;6;17;18;21;22;52=; the
+=4= is sixel, so tmux turns sixel on for it with no config.  Through tmux, use
+Sixel: chafa does not wrap iTerm2's protocol for tmux (see below), though
+=imgcat= wraps its own.
 
 ** tmux
 
 - *Sixel*: tmux carries it itself (decodes and redraws it per client), but only
-  when built with =./configure --enable-sixel=.  Ubuntu's tmux 3.4 package is;
-  a tmux built by =tmux/install= (plain =./configure=) is *not*.  tmux 3.4
-  turns the =sixel= feature on for a client whose terminal reports attribute 4
-  in its primary device attributes (Windows Terminal 1.22+ does), so no config
-  line is needed.  =tmux/tmux.conf= has a commented =terminal-features= line
-  for a terminal that supports sixel without reporting it; forcing it by
+  when built with =./configure --enable-sixel=.  Ubuntu's tmux 3.4 package is,
+  and so is flox's (nixpkgs builds tmux with sixel; 3.7c on 2026-09-30); a tmux
+  built by =tmux/install= (plain =./configure=) is *not*.  tmux 3.4 turns the
+  =sixel= feature on for a client whose terminal reports attribute 4 in its
+  primary device attributes (Windows Terminal 1.22+ and iTerm2 do), so no
+  config line is needed.  =tmux/tmux.conf= has a commented =terminal-features=
+  line for a terminal that supports sixel without reporting it; forcing it by
   =TERM= would also claim it for gnome-terminal (same =xterm-256color=), where
   images would come out blank instead of falling back to character art.
+- *What tmux reports is not what it can draw.*  tmux lists =sixel= in
+  =#{client_termfeatures}= for any client whose terminal reports it, however
+  tmux was built, and a tmux built without sixel then discards the images.
+  =#{sixel_support}= says whether this tmux can draw them (=1= or =0=), but
+  only from tmux 3.6; older tmux expand it to nothing and tell only through
+  their own DA1 reply.
+- *Programs inside tmux cannot probe for sixel.*  tmux answers a program's
+  DA1 query with attribute 4 whenever tmux is built with sixel, whatever the
+  client can do, and shows a client without sixel a =SIXEL IMAGE (WxH)= text
+  placeholder instead of the image (=image.c=).  chafa probes, so inside a
+  sixel tmux attached from gnome-terminal it can choose sixel and draw
+  placeholders.  That is why mc and vifm go through =image-view=, which asks
+  tmux instead (see [[*image-view][image-view]]).
 - *Kitty and iTerm2 protocols*: tmux does not understand them; programs wrap
   them in a passthrough sequence, which needs =set -g allow-passthrough on=
   (set in =tmux/tmux.conf=, tmux 3.3+).  Images do not survive tmux redraws
-  (switching windows, resizing), so redraw or rerun.
+  (switching windows, resizing), so redraw or rerun.  chafa 1.18 wraps Kitty
+  images for tmux with =--passthrough tmux= (which =image-view= passes rather
+  than rely on chafa's own detection) but sends iTerm2's unwrapped even then,
+  and tmux drops them.
 - Verify: =term-features= (=_bin/=) prints the terminal's identity and, inside
-  tmux, =#{client_termfeatures}= with a sixel verdict; =term-features --image=
-  then draws a test gradient with chafa, showing which protocol gets through.
+  tmux, the client's type and features, whether its terminal reported sixel,
+  =#{sixel_support}=, and the format =image-view= would draw with;
+  =term-features --image= (or a file) then draws a test picture in that
+  format, showing what gets through.
+
+** Which tmux
+
+Have to have the right tmux in PATH with the right sixel support.
+
+Which binary the running server is:
+=ls -l /proc/$(tmux display -p '#{pid}')/exe=.
 
 * Tools
 
 - *chafa*: renders an image with the best protocol the terminal offers (Kitty,
   Sixel, iTerm2) and falls back to surprisingly good Unicode block art, so it
   is useful even in gnome-terminal and PuTTY.  =chafa shot.png=; force a mode
-  with =-f kitty|sixels|iterm|symbols=; through tmux it adds the passthrough
-  wrapping itself.  Install: [[*Installing chafa][below]].
+  with =-f kitty|sixels|iterm|symbols=.  Inside tmux its own choice is not
+  reliable (see [[*tmux][tmux]]); =image-view= makes it there.  Install:
+  [[*Installing chafa][below]].
+- *image-view* (=_bin/=): chafa with the format chosen for the terminal and
+  tmux, as mc and vifm use it; see [[*image-view][image-view]].
 - *timg*, *viu*: similar viewers.  =imgcat= (iTerm2), =kitten icat= (kitty).
 - *yazi*: a fast terminal file manager (Rust; three-pane Miller-columns layout
   like ranger, async I/O).  Its preview pane shows images, video thumbnails and
@@ -83,11 +130,15 @@ differ: check with =tmux display -p '#{client_termfeatures}'= from inside one.
   here).  Start it with =y= (=_shell/shellinteractive=) to land in its
   directory on quit.  Its name search (=s=) needs =fd=; content search (=S=)
   uses =rg=.
+- *mc* and *vifm*: image viewing and previews through =image-view=; see
+  [[*mc, vifm and nvim][mc, vifm and nvim]].  vifm is the two-pane
+  alternative to yazi, and the one that runs inside nvim.
 - *Neovim*: snacks.image (bundled with snacks.nvim; =image= is disabled in
   =nvim/lua/plugins/ui.lua=) and image.nvim draw images in buffers (PNG/JPG,
   Markdown images, Mermaid via =mmdc=, LaTeX math).  Both need the Kitty
   protocol, so they work in Ghostty, kitty and WezTerm and not in
-  gnome-terminal or PuTTY.  Tracked as a TODO in =TODO.md=.
+  gnome-terminal or PuTTY.  Tracked as a TODO in =TODO.md=.  vifm runs inside
+  nvim through vifm.vim, with character-art previews only.
 
 ** Installing chafa
 
@@ -99,14 +150,134 @@ ls-remote conda:chafa= lists 1.18.3), but mise's conda backend is experimental
 and needs =experimental = true= in =mise/config.toml=, which turns on all of
 mise's experimental features.  So it comes from the system package manager:
 
-- Ubuntu/Debian: =sudo apt install chafa= (1.14 on 24.04)
+- Ubuntu/Debian: =sudo apt install chafa= (1.14 on 24.04; listed in
+  =_reqs/requirements-ubuntu.txt=)
+- Amazon Linux 2: flox (=flox install chafa=; 1.18.2 at the time of writing)
 - macOS: =brew install chafa=
 - FreeBSD: =pkg install chafa=; OpenBSD: =pkg_add chafa=
+
+=chafa --version= lists the formats it decodes (flox's: AVIF, GIF, JPEG, JXL,
+PNG, QOI, SVG, TIFF, XWD).  With ImageMagick installed, =image-view= converts
+anything else (BMP, ICO, WebP, HEIC, TGA, PNM, XPM) to PNG first, through
+ImageMagick 7's =magick= or 6's =convert= (Ubuntu's package); without it,
+those show a one-line message instead.
+
+* image-view
+
+=_bin/image-view= is chafa with the protocol chosen for the terminal and tmux,
+for mc, vifm and =term-features=:
+
+| Invocation               | Output                                   | Used by                      |
+|--------------------------+------------------------------------------+------------------------------|
+| =image-view FILE=        | Full screen, centered, waits for a key   | mc F3 and Enter, vifm Enter  |
+| =image-view -i WxH FILE= | At the cursor, in the same format        | =term-features=              |
+| =image-view -s WxH FILE= | Colored text, 240 colors, SGR codes only | vifm preview pane, as text   |
+| =image-view -p WxH FILE= | One line of sixel                        | vifm preview pane, as sixel  |
+| =image-view -q=          | The format =FILE= and =-i= use           | =vifmrc=, =term-features=    |
+
+=image-view -q= prints =sixel=, =kitty=, =symbols= or =auto=:
+
+- *Inside nvim's or vim's terminal* (=$NVIM=, =$VIM_TERMINAL=): =symbols=,
+  since those terminals sit in between and draw no pixels.
+- *Outside tmux*: =sixel= when the terminal lists attribute 4 in its reply to
+  DA1 (sent to =/dev/tty=), else =auto=, which leaves chafa to probe the
+  terminal itself (finding Kitty or iTerm2 graphics, or falling back to
+  character art).
+- *Inside tmux* it asks tmux rather than the terminal (see [[*tmux][tmux]]):
+  - =sixel= when =#{client_termfeatures}= lists =sixel= and tmux can draw it:
+    =#{sixel_support}= is =1=, or, before tmux 3.6, tmux's own DA1 reply
+    lists attribute 4;
+  - =kitty= when the client's terminal is Ghostty, kitty or WezTerm by its
+    XTVERSION reply (=#{client_termtype}=) and =allow-passthrough= is on or
+    =all=;
+  - =symbols= otherwise.  iTerm2 without a sixel tmux lands here, since
+    chafa's iTerm2 images do not get through tmux.
+
+More detail:
+
+- Formats map to chafa's options: =sixel= is =--format sixels --passthrough
+  none= (tmux draws it itself), =kitty= is =--format kitty --passthrough tmux=,
+  =symbols= is =--format symbols=, and =auto= passes none.
+- =-s= uses 240 colors, the 256-color palette less the 16 that terminal themes
+  redefine.  vifm downsamples truecolor to 256 anyway unless =$TERM= names a
+  =*-direct= terminfo entry, so chafa is better off quantizing itself.
+- =-s= and =-p= never probe the terminal and emit nothing but the image, since
+  vifm reads them through a pipe.  For =-p=, chafa reads the pane's size in
+  pixels from the controlling terminal, which vifm leaves it only with =%N=
+  (see ttys.org, *Pixel sizes*).
+
+* mc, nvim, and vifm
+
+** mc
+
+- F3 and Enter on an image both run =image-view= full screen.  mc's own
+  viewer cannot do better: it is a text widget with no ANSI color support, so
+  a filter piped into it (=%view=) could only show colorless text.  Shift-F3
+  still shows the raw bytes.
+- The quick-view pane (=C-x q=) cannot show images at all.  mc loads the raw
+  file there and never runs =mc.ext.ini='s filters (true of 4.8.33 and of
+  mc's master branch).
+- =mc/mc.ext.ini= is mc 4.8.33's default with the local changes listed at its
+  top.  mc reads the user file /instead of/ the system one, so it must be
+  complete.  The 2023 starter copy it replaced used single backslashes
+  (~Regex=\.tar~), which GLib 2.79 and later reject as an invalid escape: 69
+  keys were silently ignored.  Backslashes must be doubled (=\\.=).
+- Images are matched by extension (=[image-by-shell]=) as well as by content
+  type (~Type=^PNG~ and friends, which need =file(1)=).
+- mc's stock handler scripts (archives, documents, ...) live wherever mc was
+  installed, so =mc.ext.ini= runs them through =~/.local/share/mc/ext.d=.
+  =dotfiles-install= makes that link from the "File extension handlers" path
+  =mc -F= reports, mapped through the prefix of the mc on =PATH= so that
+  flox's =~/.flox/run/...= path survives upgrades.  Homebrew has no such
+  stable path; rerun =dotfiles-install= after upgrading mc there.  mc before
+  4.8.29 uses the older =mc.ext= format and ignores =mc.ext.ini= entirely.
+- mc reads =mc.ext.ini= once; restart mc after editing it.
+
+** nvim
+
+- vifm.vim comes from its own repository through lazy
+  (=nvim/lua/plugins/vifm.lua=), not the copy vifm installs, whose location
+  depends on how vifm was installed.  =SPC ov= opens vifm in the current
+  file's directory, =SPC oV= at the project root; =:Vifm=, =:SplitVifm=,
+  =:VsplitVifm= and =:TabVifm= open it elsewhere.
+- Previews inside nvim are always character art: nvim's terminal draws no
+  pixels, and =image-view -q= sees =$NVIM=.
+- The keys are plain mappings rather than lazy =keys=.  lazy's key stubs are
+  expr mappings, and vifm.vim probes for =:drop= as it loads by running a
+  bare =drop=, which an expr mapping's textlock turns into E565.
+- =:checkhealth config= reports vifm, and separately chafa and =image-view=
+  for the previews.
+
+** vifm
+
+- =vifm/vifmrc= is vifm 0.14.4's sample with the local changes listed at its
+  top.  =dotfiles-install= links it, first moving aside the copy vifm writes
+  on its first run (to =vifmrc.orig=).
+- =w= toggles the preview pane (=:view=); the =tui= item in =vifminfo=
+  remembers it across restarts.
+- The image previewer is chosen once, at startup: sixel as a pass-through
+  previewer (=%pd=) when =image-view -q= says =sixel=, and colored text
+  otherwise (Ghostty's Kitty images included: passthrough images in a pane
+  that vifm redraws would not last).  After reattaching tmux from a
+  different terminal, restart vifm to switch.
+- A pass-through previewer's output goes through a pipe that vifm then writes
+  at the pane's corner, so chafa never sees the terminal on stdout.  It reads
+  the pane's size in pixels from the controlling terminal instead, which vifm
+  only leaves a previewer that carries =%N=; see ttys.org, *Pixel sizes*.
+- If sixel images linger after moving off them,
+  ~set previewoptions+=hardgraphicsclear~ clears them, at the cost of
+  flicker.
+- Enter opens =image-view= full screen; the graphical viewers (sxiv and the
+  rest) stay available through =:file=.  vifm's globs are always
+  case-insensitive.
 
 * Ghostty
 
 Ghostty is the Kitty-protocol terminal for Linux (and macOS) here: real images
-over ssh and through tmux, snacks.image in nvim, and OSC 52 clipboard.
+over ssh and through tmux, snacks.image in nvim, and OSC 52 clipboard.  mc's
+and vifm's full-screen views draw Kitty images in it, through tmux too
+(=image-view= knows it by its XTVERSION reply); vifm's preview pane shows
+character art, since its pixel previewer is sixel only.
 
 - *Config*: =ghostty/config=, linked to =~/.config/ghostty/config= by
   =_bin/dotfiles-install= (same path on Linux and macOS).  Ported from the
@@ -127,11 +298,42 @@ over ssh and through tmux, snacks.image in nvim, and OSC 52 clipboard.
 - *Clipboard*: Ghostty asks before a program reads the clipboard by OSC 52
   (=clipboard-read = ask= default) and allows writes; see clipboard.org.
 
+* Troubleshooting
+
+** Images show as character art instead of pixels
+
+1. Run =term-features=; its =image-view format= row is what mc and vifm draw
+   with, and the tmux rows above it say why.
+2. In tmux, =tmux client sixel: no= means the terminal did not report sixel;
+   check the terminal itself, in a local tab without ssh or tmux (this form
+   works in both zsh and bash):
+
+   #+begin_src sh
+   printf '\e[c'; read -rs -d c r; echo "$r" | cat -v
+   #+end_src
+
+   A =4= among the numbers after =?= means sixel.
+3. =tmux client sixel: yes= with =tmux sixel_support= =0= means this tmux was
+   built without sixel; empty means a tmux before 3.6, which =image-view=
+   asks directly.  =ls -l /proc/$(tmux display -p '#{pid}')/exe= shows which
+   binary the server is (see [[*Which tmux][Which tmux]]); after replacing
+   it, =tmux kill-server=.
+4. Inside nvim's terminal, character art is expected.
+5. vifm decides at startup, so restart it after fixing any of the above.
+
+** mc's archive or document handlers do nothing
+
+They run through =~/.local/share/mc/ext.d=.  Check that
+=ls -l ~/.local/share/mc/ext.d= points at an existing directory, and rerun
+=dotfiles-install= after installing, moving or (on Homebrew) upgrading mc.
+
 * References
 
 - Kitty graphics protocol: https://sw.kovidgoyal.net/kitty/graphics-protocol/
 - Sixel support matrix: https://www.arewesixelyet.com/
-- tmux sixel detection: =tty-keys.c= (primary DA attribute 4) in tmux 3.4
+- tmux sixel detection: =tty-keys.c= (primary DA attribute 4) in tmux 3.4;
+  tmux's own DA1 reply: =input.c=; the placeholder for clients without sixel:
+  =image.c=; =sixel_support=: =format.c= (tmux 3.6)
 - chafa: https://hpjansson.org/chafa/
 - yazi: https://yazi-rs.github.io/
 - Ghostty config reference: https://ghostty.org/docs/config/reference

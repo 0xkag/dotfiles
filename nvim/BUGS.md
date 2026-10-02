@@ -33,6 +33,13 @@ upstream on both projects.
   with an out-of-range `deltaStart`. Filled to the hashicorp/terraform-ls "Bug
   report" form (a "Performance" form also exists, but this is a correctness bug
   in the encoded value, so "Bug report" fits better).
+- [BUG_REPORT_3.md](./BUG_REPORT_3.md:1) — Neovim: treesitter highlighter
+  reuses pre-edit tree objects while an async parse is pending, so an edit
+  that shortens the buffer (`J`) dies with `treesitter.lua:212: Index out of
+  bounds` in a text predicate. Filled to the neovim/neovim "Bug report" form.
+  Includes a self-contained `nvim --clean -c 'luafile repro.lua'` repro that
+  stalls the timed parse step to force the race. Local workaround shipped in
+  `lua/config/options.lua` (`vim.g._ts_force_sync_parsing = true`).
 
 ## Things to flag before filing
 
@@ -44,6 +51,11 @@ upstream on both projects.
 - **Neither tracker has been searched for duplicates.** Check before filing:
   Neovim for `semantic_tokens hang` / `str_utfindex`; terraform-ls for
   `semantic tokens deltaStart` / `4294967253`.
+- **Report 3 has a likely duplicate.** neovim/neovim#38303 ("Treesitter
+  highlighter, out of bounds checks", 0.11.6, same `get_node_text` path, open
+  and tagged needs-reproduction) is probably the same race seen from the
+  `on_line` side. Comment there with the repro rather than opening a new
+  issue unless a maintainer asks for one.
 - The Neovim repro is solid and standalone; the terraform-ls one currently
   leans on the wire capture (the `data`-array dump) rather than a from-scratch
   reproduction. Both are honest about their state.

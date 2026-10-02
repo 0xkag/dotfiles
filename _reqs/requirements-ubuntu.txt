@@ -30,6 +30,7 @@ bvi
 bzip2
 ca-certificates
 cgdb
+chafa
 chromium-browser
 connect-proxy
 coreutils
@@ -173,6 +174,7 @@ ttf-mscorefonts-installer
 ufw
 unrar
 unzip
+vifm
 vim
 vim-doc
 vim-gnome

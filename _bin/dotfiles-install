@@ -2,7 +2,9 @@
 # vim: et sw=4 ts=4:
 
 import os
+import re
 import shlex
+import shutil
 import subprocess
 import sys
 
@@ -32,6 +34,13 @@ def relink_relative(target, linkname):
             raise Exception('%s is not a symlink' % linkname)
     os.symlink(os.path.relpath(target, os.path.dirname(linkname)), linkname)
 
+def backup(p):
+    p = os.path.expanduser(p)
+    if os.path.lexists(p) and not os.path.islink(p):
+        if os.path.lexists(p + '.orig'):
+            raise Exception('%s.orig already exists' % p)
+        os.rename(p, p + '.orig')
+
 def unlink(p):
     try:
         os.unlink(os.path.expanduser(p))
@@ -53,6 +62,29 @@ def run(p):
         subprocess.check_call(' '.join(parts), shell=True, env=env)
     except:
         raise
+
+# The directory of mc's stock extension handlers, as `mc -F` reports it, but
+# reached through the prefix of the mc on PATH when that holds it too, so that
+# a profile's path (e.g., ~/.flox/run/...) survives upgrades that move the
+# real one; None without mc.
+def mc_ext_d():
+    mc = shutil.which('mc')
+    if mc is None:
+        return None
+    info = subprocess.run([mc, '-F'], capture_output=True, text=True).stdout
+    match = re.search(r'^\s*File extension handlers:\s*(.+?)/?\s*$', info,
+                      re.MULTILINE)
+    if match is None:
+        return None
+
+    ext_d = match.group(1)
+    real_prefix = os.path.dirname(os.path.dirname(os.path.realpath(mc)))
+    if ext_d.startswith(real_prefix + '/'):
+        prefix = os.path.dirname(os.path.dirname(mc))
+        profile_ext_d = prefix + ext_d[len(real_prefix):]
+        if os.path.isdir(profile_ext_d):
+            return profile_ext_d
+    return ext_d
 
 def main():
     # <top level mkdirs>
@@ -215,6 +247,14 @@ def main():
 
     heading('mc')
     relink_relative('~/.dotfiles/mc', '~/.config/mc')
+    # mc.ext.ini runs mc's stock handlers through this link, since where they
+    # live depends on how mc was installed
+    ext_d = mc_ext_d()
+    if ext_d is None:
+        step('remember to install mc, then rerun this to link its ext.d')
+    else:
+        mkdir('~/.local/share/mc')
+        relink(ext_d, '~/.local/share/mc/ext.d')
 
     # mosh
 
@@ -308,6 +348,14 @@ def main():
     step('remember to run tmux/install or install from binary')
     mkdir('~/.tmux/plugins')
     relink('~/.dotfiles/_lib/tmux-tpm', '~/.tmux/plugins/tpm')
+
+    # vifm
+
+    heading('vifm')
+    mkdir('~/.config/vifm')
+    # vifm writes a copy of its sample vifmrc on first run
+    backup('~/.config/vifm/vifmrc')
+    relink('~/.dotfiles/vifm/vifmrc', '~/.config/vifm/vifmrc')
 
     # vim
 

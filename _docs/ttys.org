@@ -301,6 +301,31 @@ upstream bug: a forced SIGWINCH is a forced full redraw, which is precisely
 what these bugs need to recover.  It does nothing for case 2, where the signal
 never arrives at all.
 
+* Pixel sizes (sixel images)
+
+=winsize= also carries the terminal's size in pixels (=ws_xpixel=,
+=ws_ypixel=), and pixel graphics depend on it: a sixel image is drawn in
+pixels, so chafa turns a size in cells into pixels with the cell size those
+fields imply.
+
+- tmux learns each client's cell size from the client's own winsize (ssh
+  forwards the pixel size along with rows and cols) and writes each pane pty
+  as =xpixel * cols= by =ypixel * rows=, so a pane reports real pixels.
+- chafa looks for a winsize on stdout, stderr and stdin, then opens the
+  controlling terminal (=ctermid()=).  With none of those it assumes
+  10x20-pixel cells, so an image meant for W x H cells can come out larger
+  than W x H on a terminal with smaller cells, spilling past where it was
+  put.
+- vifm's previewers are where this bites.  vifm reads a previewer's output
+  through a pipe and starts it with =setsid()=, in a session of its own with
+  no controlling terminal -- the same ctty loss as the sandbox's (above) --
+  unless the viewer command carries =%N=.  The sixel previewer in
+  =vifm/vifmrc= carries =%N= for exactly this.  vifm's =system()=, which
+  =vifmrc= calls at startup to choose the previewer, keeps the ctty, so
+  =image-view -q= can query the terminal from there.
+
+See =terminal-images.org= for the rest of the image setup.
+
 * Related tmux settings
 
 - =setw -g aggressive-resize= -- *removed.*  It sizes a window to the smallest
