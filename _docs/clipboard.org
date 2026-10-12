@@ -363,9 +363,17 @@ integration over PuTTY is limited to:
 - *PuTTY's own mouse selection*: select text in the PuTTY window to copy to
   the Windows clipboard, right-click to paste.  This works but doesn't
   integrate with tmux copy-mode or vim.
+- *Shift + click-drag* (tmux mouse mode on): bypasses tmux so PuTTY does the
+  selection and copies to the Windows clipboard on release.  Not pane-aware,
+  so it can select across split panes.
+- *=prefix t X=* (raw bypass): turns off tmux mouse mode and clipboard sync
+  at once, so a plain click-drag is PuTTY's.  Press again to restore.  Use
+  it when you don't want to hold Shift.
 - *tmux buffer*: =clip-in= / =clip-out= fall back to =tmux load-buffer= /
   =tmux save-buffer=.  Data round-trips through the tmux buffer but does not
-  reach the Windows clipboard.
+  reach the Windows clipboard.  This is what a tmux mouse-drag release, =y=
+  in copy mode, and =prefix C= all end up doing under PuTTY: the text is
+  pasteable inside tmux (=prefix p=) but never leaves it.
 - *X11 forwarding*: If you enable X forwarding in PuTTY (Connection > SSH >
   X11 > "Enable X11 forwarding") and have an X server running on Windows
   (e.g. VcXsrv, Xming), then =$DISPLAY= will be set and =clip-in= will use
