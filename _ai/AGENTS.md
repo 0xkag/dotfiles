@@ -92,6 +92,8 @@ These conventions are mostly for programming, but can apply generally too.
 
 - [GitLab MR dependencies](~/.dotfiles/_ai/memories/gitlab-mr-dependencies.md) — set cross-project
   "blocked-by" via glab GraphQL (REST 400s); inline-array gotcha
+- [GitLab MR patch comments](~/.dotfiles/_ai/memories/gitlab-mr-patch-comments.md) — on others'
+  MRs, ask me whether to push or comment with a .patch; patch steps + Slack @ mention request
 - [glab MR review comments](~/.dotfiles/_ai/memories/glab-mr-review-comments.md) — find an MR,
   read/reply to inline + summary review comments, retrigger review bots
 - [glab token source](~/.dotfiles/_ai/memories/glab-token-source.md) — on glab REST 401, source
