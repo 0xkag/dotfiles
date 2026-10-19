@@ -89,6 +89,8 @@ See also [site-specific instructions](~/.dotfiles/_sites/current/_ai/memories/co
   --amend` + force-push on a branch already under review (amend/force-push
   disrupts the reviewer's diff view). Use the follow-up to also fix a flagged
   commit-subject if needed.
+- On someone else's MR, ask Kyle whether to push or attach a `.patch` to a
+  comment: see [[gitlab-mr-patch-comments]].
 - glab is authed via `GITLAB_TOKEN` as Kyle George's user.
 - For setting merge-order dependencies between MRs, see
   [[gitlab-mr-dependencies]]. 
