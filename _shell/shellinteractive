@@ -112,6 +112,19 @@ y() {
     rm -f -- "$tmp"
 }
 
+# warptree (wt) -- git visual-refs, then cd to the worktree it jumped to or
+# created.  runs git-visual-refs directly, since git would turn --help into
+# git help.
+warptree() {
+    local tmp dir
+    tmp="$(mktemp -t visual-refs-cwd.XXXXXX)"
+    GIT_VISUAL_REFS_CWD_FILE="$tmp" git-visual-refs "$@"
+    IFS= read -r -d '' dir < "$tmp"
+    [ -n "$dir" ] && [ "$dir" != "$PWD" ] && builtin cd -- "$dir"
+    rm -f -- "$tmp"
+}
+alias wt=warptree
+
 # ... bsd / linux compat
 
 command -v gnugetopt &> /dev/null && \

@@ -3,50 +3,345 @@
 
 set -e
 set -u
-set -x
 
-if [[ $# = 0 || $1 == local ]]; then
-    prefix=refs/heads/
-    remote=
-else
-    prefix=refs/remotes/$1/
-    remote=$1
-fi
+usage() {
+    cat <<'EOF'
+usage: wt [-w] [--debug] [local|<remote>]
+       git visual-refs [-w] [--debug] [local|<remote>]
 
-ref=$(
-    git \
-      for-each-ref \
-      --count=1000 \
-      --sort=-committerdate \
-      --format='%(refname:short)' \
-      "$prefix" | \
-    fzf \
-      --preview="git log --color --pretty=fuller --decorate {1}" \
-      --preview-window='up:75%:wrap'
-)
+Pick a branch with fzf.  Enter jumps to its worktree if it has one,
+otherwise checks it out in place; a remote-only branch gets a new local
+branch tracking it.  Lists branches with a worktree first, then local
+branches, then remote branches with no local branch of the same name;
+detached worktrees count as having a worktree.
 
-if [[ -z $remote ]]; then
-    git checkout "$ref"
+  -w          enter creates a worktree instead of checking out in place
+  local       list only local branches and worktrees
+  <remote>    list only that remote's branches
+  --debug     trace commands (set -x)
+  -h, --help  show this help
+
+keys (also shown above the list):
+  enter       jump to the branch's worktree, else check it out
+  ctrl-w      create a worktree under .worktrees/ in the main checkout,
+              then jump to it (jumps to an existing one instead)
+  ctrl-t      toggle listing only branches with a worktree
+  ctrl-x      after a y/N prompt, remove the row's worktree (its branch
+              stays), or delete its branch (git branch -d) when it has
+              none; removing the worktree you are in jumps to the main
+              checkout.  nothing is forced, and remote branches and the
+              main checkout are refused
+
+Jumps keep the current subdirectory when it exists in the target.  Only
+wt (warptree) can cd the shell: git visual-refs prints a cd hint, and
+git turns its --help into git help, so use -h there.
+EOF
+}
+
+# ctrl-x runs this under fzf's execute, which hands it the terminal:
+#
+#   git visual-refs --delete <all> <trees> <kind> <name> <path>
+#
+# then fixes up the lists fzf reloads.  nothing is forced, so git refuses a
+# worktree with changes and an unmerged branch.  removing the worktree the
+# shell is in runs git from the main checkout and leaves the main checkout in
+# <all>.jump, which tells the picker to quit and jump there
+#
+rows_edit() {
+    awk -F'\t' -v OFS='\t' -v kind="$kind" -v name="$name" "$2" "$1" \
+      > "$1.new"
+    mv "$1.new" "$1"
+}
+
+if [[ ${1:-} == --delete ]]; then
+    all=$2 trees=$3 kind=$4 name=$5 path=$6
+    main=$(git worktree list --porcelain | awk 'NR == 1 { print substr($0, 10) }')
+    here=$(git rev-parse --show-toplevel)
+
+    if [[ $kind == remote ]]; then
+        echo "not deleting remote branch $name"
+    elif [[ $path == "$main" ]]; then
+        echo "not removing the main checkout: $main"
+    else
+        if [[ -z $path ]]; then
+            question="delete branch $name?"
+            remove=(git branch -d "$name")
+        else
+            if [[ $path == "$here" ]]; then
+                question="remove the worktree you are in, $path, and jump to $main?"
+            else
+                question="remove worktree $path?"
+            fi
+            if [[ $kind == local ]]; then
+                question+=" (branch $name stays)"
+            fi
+            remove=(git -C "$main" worktree remove "$path")
+        fi
+        printf '%s [y/N] ' "$question"
+        read -r answer
+        [[ $answer == [yY]* ]] || exit 0
+
+        if "${remove[@]}"; then
+            if [[ $path == "$here" ]]; then
+                printf '%s' "$main" > "$all.jump"
+                exit
+            fi
+            rows_edit "$trees" '!($1 == kind && $3 == name)'
+            if [[ $kind == local && -n $path ]]; then
+                rows_edit "$all" '$1 == kind && $3 == name { $4 = ""; $5 = $2 } 1'
+            else
+                rows_edit "$all" '!($1 == kind && $3 == name)'
+            fi
+            exit
+        fi
+    fi
+    printf 'press a key to go back'
+    read -r -s -n 1
     exit
 fi
 
-# reuse an existing local branch only if it already tracks the selected remote
-# branch, otherwise create a new local branch that tracks it
-#
-branch=${ref#"$remote"/}
-tracking=refs/remotes/$ref
+create=false
+debug=false
+while [[ ${1:-} == -* ]]; do
+    case $1 in
+        --debug)
+            debug=true
+            ;;
+        -h | --help)
+            usage
+            exit
+            ;;
+        -w)
+            create=true
+            ;;
+        *)
+            echo "unknown option: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
 
-if git show-ref --verify --quiet "refs/heads/$branch"; then
+if $debug; then
+    set -x
+fi
+
+git rev-parse --git-dir > /dev/null
+
+if [[ $# = 0 ]]; then
+    locals=true
+    remotes=refs/remotes/
+elif [[ $1 == local ]]; then
+    locals=true
+    remotes=
+else
+    locals=false
+    remotes=refs/remotes/$1/
+fi
+
+# new worktrees and the jump after removing the current worktree go to the
+# main checkout, the first worktree listed, even from a linked worktree; the
+# prefix is taken now since that removal leaves the cwd gone
+#
+main=$(git worktree list --porcelain | awk 'NR == 1 { print substr($0, 10) }')
+prefix=$(git rev-parse --show-prefix)
+
+# hand the shell its jump target through $GIT_VISUAL_REFS_CWD_FILE, which the
+# warptree shell function reads; land in the same subdirectory of the target
+# when it exists there
+#
+jump() {
+    local dir=$1/$prefix
+    [[ -d $dir ]] || dir=$1
+    dir=${dir%/}
+
+    if [[ -n ${GIT_VISUAL_REFS_CWD_FILE:-} ]]; then
+        printf '%s' "$dir" > "$GIT_VISUAL_REFS_CWD_FILE"
+    else
+        printf 'cd %q\n' "$dir" >&2
+    fi
+}
+
+# one tab-separated row per pick: kind, ref, branch, worktree path
+#
+rows_list() {
+    if $locals; then
+        git \
+          for-each-ref \
+          --count=1000 \
+          --sort=-committerdate \
+          --format='local%09%(refname:short)%09%(refname:lstrip=2)%09%(worktreepath)' \
+          refs/heads/
+    fi
+
+    # ponytail: lstrip=3 assumes remote names have no '/'
+    if [[ -n $remotes ]]; then
+        git \
+          for-each-ref \
+          --count=1000 \
+          --sort=-committerdate \
+          --format='%(if)%(symref)%(then)%(else)remote%09%(refname:short)%09%(refname:lstrip=3)%09%(end)' \
+          "$remotes"
+    fi
+
+    if $locals; then
+        git worktree list --porcelain | awk '
+            /^worktree / { path = substr($0, 10) }
+            /^HEAD / { head = substr($2, 1, 12) }
+            /^detached/ { print "detached\t" head "\t" path "\t" path }
+        '
+    fi
+}
+
+# locals are listed first, so a remote branch is hidden when a local branch of
+# the same name exists.  rows with a worktree are then moved to the top, which
+# with --tiebreak=index ranks them first among equally good matches.  each row
+# gains a display field: the ref padded to a column (names over 32 chars just
+# overflow it), then its worktree path in bold cyan (the zsh prompt's cwd
+# color: its cyan inherits bold from the user@host before it), relative to the
+# physical cwd since git records physical paths.  no tracing from here through
+# fzf: the awk programs are noise, and anything traced while fzf is up lands
+# on top of it
+#
+all=$(mktemp)
+trees=$(mktemp)
+trap 'rm -f "$all" "$trees" "$all.jump"' EXIT
+
+set +x
+rows_list | \
+    awk -F'\t' -v OFS='\t' -v cwd="$(pwd -P)" '
+        function rel(to, from,    tn, fn, ta, fa, i, j, r) {
+            sub(/\/$/, "", from)
+            tn = split(to, ta, "/")
+            fn = split(from, fa, "/")
+            for (i = 2; i <= tn && i <= fn && ta[i] == fa[i]; i++)
+                ;
+            for (j = i; j <= fn; j++)
+                r = r "../"
+            for (j = i; j <= tn; j++)
+                r = r ta[j] "/"
+            return r == "" ? "." : substr(r, 1, length(r) - 1)
+        }
+        NF && !seen[$3]++ {
+            rows[++n] = $0
+            refs[n] = $2
+            paths[n] = $4
+            if (length($2) > w && length($2) <= 32)
+                w = length($2)
+        }
+        END {
+            for (i = 1; i <= n; i++)
+                if (paths[i] != "")
+                    print rows[i], sprintf("%-" w "s  \033[1;36m%s\033[0m", \
+                      refs[i], rel(paths[i], cwd))
+            for (i = 1; i <= n; i++)
+                if (paths[i] == "")
+                    print rows[i], refs[i]
+        }
+    ' > "$all"
+awk -F'\t' '$4 != ""' "$all" > "$trees"
+
+# the header lists the keys and the footer shows the highlighted row's
+# absolute path.  ctrl-t toggles the list between all rows and only those
+# with a worktree, the prompt showing which one is up; ctrl-x deletes (see
+# --delete above), then reloads whichever list is up, or quits when it
+# removed the current worktree
+#
+if $create; then
+    enter='jump/new worktree'
+else
+    enter='jump/checkout'
+fi
+keys="enter: $enter  ctrl-w: new worktree  ctrl-t: worktrees only  ctrl-x: delete"
+reload_all="reload(cat \"$all\")"
+reload_trees="reload(cat \"$trees\")"
+status=0
+pick=$(
+    fzf \
+      --ansi \
+      --delimiter='\t' \
+      --with-nth=5 \
+      --tiebreak=index \
+      --prompt='> ' \
+      --header="$keys" \
+      --footer=' ' \
+      --bind="focus:transform-footer:[ -n {4} ] \
+&& printf 'worktree: \033[1;36m%s\033[0m' {4} || echo '(no worktree)'" \
+      --bind="ctrl-t:transform:[ \"\$FZF_PROMPT\" = '> ' ] \
+&& echo 'change-prompt(worktrees> )+$reload_trees' \
+|| echo 'change-prompt(> )+$reload_all'" \
+      --bind="ctrl-x:execute(\"$0\" --delete \"$all\" \"$trees\" {1} {3} {4})\
++transform:if [ -s \"$all.jump\" ]; then echo abort; \
+elif [ \"\$FZF_PROMPT\" = '> ' ]; then echo '$reload_all'; \
+else echo '$reload_trees'; fi" \
+      --expect=ctrl-w \
+      --preview="git log --color --pretty=fuller --decorate {2}" \
+      --preview-window='up:50%:wrap' \
+      < "$all"
+) || status=$?
+if $debug; then
+    set -x
+fi
+
+if [[ -s $all.jump ]]; then
+    jump "$(< "$all.jump")"
+    exit
+fi
+if [[ $status != 0 ]]; then
+    exit "$status"
+fi
+
+key=${pick%%$'\n'*}
+row=${pick#*$'\n'}
+if [[ $key == ctrl-w ]]; then
+    create=true
+fi
+# read splits on \x1f, not tab: tab is whitespace to read, so the tabs around
+# an empty path would collapse into one and shift the fields after it
+#
+IFS=$'\x1f' read -r kind ref branch path _ <<< "${row//$'\t'/$'\x1f'}"
+
+# reuse an existing local branch only if it already tracks the selected remote
+# branch
+#
+if [[ $kind == remote ]] && git show-ref --verify --quiet "refs/heads/$branch"
+then
     upstream=$(
         git rev-parse --symbolic-full-name "$branch@{upstream}" 2>/dev/null \
           || true
     )
-    if [[ $upstream != "$tracking" ]]; then
+    if [[ $upstream != "refs/remotes/$ref" ]]; then
         echo "error: local branch '$branch' tracks" \
-          "'${upstream:-nothing}', not '$tracking'" >&2
+          "'${upstream:-nothing}', not 'refs/remotes/$ref'" >&2
         exit 1
     fi
-    git checkout "$branch"
-else
-    git checkout --track -b "$branch" "$ref"
+    kind=local
+    path=$(git for-each-ref --format='%(worktreepath)' "refs/heads/$branch")
 fi
+
+if [[ -z $path ]] && ! $create; then
+    if [[ $kind == local ]]; then
+        git checkout "$branch"
+    else
+        git checkout --track -b "$branch" "$ref"
+    fi
+    exit
+fi
+
+if [[ -z $path ]]; then
+    path=$main/.worktrees/${branch//\//-}
+
+    exclude=$(git rev-parse --path-format=absolute --git-common-dir)/info/exclude
+    mkdir -p "${exclude%/*}"
+    grep -qxF /.worktrees/ "$exclude" 2>/dev/null \
+      || echo /.worktrees/ >> "$exclude"
+
+    if [[ $kind == local ]]; then
+        git worktree add "$path" "$branch"
+    else
+        git worktree add --track -b "$branch" "$path" "$ref"
+    fi
+fi
+
+jump "$path"
