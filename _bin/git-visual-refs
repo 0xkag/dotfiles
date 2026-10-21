@@ -24,7 +24,12 @@ detached worktrees count as having a worktree.
 keys (also shown above the list):
   enter       jump to the branch's worktree, else check it out
   ctrl-w      create a worktree under .worktrees/ in the main checkout,
-              then jump to it (jumps to an existing one instead)
+              named after the branch, then jump to it.  master and main
+              prompt for the name, as does a branch that already has a
+              worktree, such as master in the main checkout; git allows a
+              branch in only one worktree, so that one is detached
+  alt-b       prompt for a name, then create a branch of that name from
+              the row in a new worktree and jump to it
   ctrl-t      toggle listing only branches with a worktree
   ctrl-x      after a y/N prompt, remove the row's worktree (its branch
               stays), or delete its branch (git branch -d) when it has
@@ -163,6 +168,19 @@ jump() {
     fi
 }
 
+# new worktrees go in $tree, under .worktrees/ in the main checkout, named
+# with slashes as dashes; .worktrees/ is kept out of git status
+#
+worktree_path() {
+    local exclude
+    tree=$main/.worktrees/${1//\//-}
+
+    exclude=$(git rev-parse --path-format=absolute --git-common-dir)/info/exclude
+    mkdir -p "${exclude%/*}"
+    grep -qxF /.worktrees/ "$exclude" 2>/dev/null \
+      || echo /.worktrees/ >> "$exclude"
+}
+
 # one tab-separated row per pick: kind, ref, branch, worktree path
 #
 rows_list() {
@@ -253,7 +271,7 @@ if $create; then
 else
     enter='jump/checkout'
 fi
-keys="enter: $enter  ctrl-w: new worktree  ctrl-t: worktrees only  ctrl-x: delete"
+keys="enter: $enter  ctrl-w: new worktree  alt-b: new branch  ctrl-t: worktrees only  ctrl-x: delete"
 reload_all="reload(cat \"$all\")"
 reload_trees="reload(cat \"$trees\")"
 status=0
@@ -275,7 +293,7 @@ pick=$(
 +transform:if [ -s \"$all.jump\" ]; then echo abort; \
 elif [ \"\$FZF_PROMPT\" = '> ' ]; then echo '$reload_all'; \
 else echo '$reload_trees'; fi" \
-      --expect=ctrl-w \
+      --expect=ctrl-w,alt-b \
       --preview="git log --color --pretty=fuller --decorate {2}" \
       --preview-window='up:50%:wrap' \
       < "$all"
@@ -301,6 +319,19 @@ fi
 # an empty path would collapse into one and shift the fields after it
 #
 IFS=$'\x1f' read -r kind ref branch path _ <<< "${row//$'\t'/$'\x1f'}"
+
+# alt-b starts a new branch at the row in a new worktree.  it does not track
+# the row's ref: under push.default=simple, a branch tracking a remote branch
+# of another name refuses to push
+#
+if [[ $key == alt-b ]]; then
+    read -r -e -p "new branch from $ref: " name
+    [[ -n $name ]] || exit
+    worktree_path "$name"
+    git worktree add --no-track -b "$name" "$tree" "$ref"
+    jump "$tree"
+    exit
+fi
 
 # reuse an existing local branch only if it already tracks the selected remote
 # branch
@@ -329,19 +360,30 @@ if [[ -z $path ]] && ! $create; then
     exit
 fi
 
-if [[ -z $path ]]; then
-    path=$main/.worktrees/${branch//\//-}
-
-    exclude=$(git rev-parse --path-format=absolute --git-common-dir)/info/exclude
-    mkdir -p "${exclude%/*}"
-    grep -qxF /.worktrees/ "$exclude" 2>/dev/null \
-      || echo /.worktrees/ >> "$exclude"
-
-    if [[ $kind == local ]]; then
-        git worktree add "$path" "$branch"
-    else
-        git worktree add --track -b "$branch" "$path" "$ref"
-    fi
+if [[ -n $path && $key != ctrl-w ]]; then
+    jump "$path"
+    exit
 fi
 
-jump "$path"
+# a new worktree is named after its branch, except one of master or main,
+# which asks for a name, as does ctrl-w on a row that has a worktree: git
+# checks a branch out in only one worktree, so the new one is detached at it
+#
+# ponytail: master and main stand in for the default branch; read origin/HEAD
+# if a repo names it otherwise
+#
+name=$branch
+if [[ -n $path || $branch == master || $branch == main ]]; then
+    read -r -e -p "worktree name for $ref${path:+ (detached)}: " name
+    [[ -n $name ]] || exit
+fi
+
+worktree_path "$name"
+if [[ -n $path ]]; then
+    git worktree add --detach "$tree" "$ref"
+elif [[ $kind == local ]]; then
+    git worktree add "$tree" "$branch"
+else
+    git worktree add --track -b "$branch" "$tree" "$ref"
+fi
+jump "$tree"
