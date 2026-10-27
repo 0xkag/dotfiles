@@ -54,14 +54,14 @@
     "command": "claude-statusline"
   },
   "enabledPlugins": {
-    "superpowers@claude-plugins-official": true,
-    "gitlab@claude-plugins-official": true,
+    "andrej-karpathy-skills@karpathy-skills": true,
     "caveman@caveman": false,
+    "context7@claude-plugins-official": false,
+    "gitlab@claude-plugins-official": true,
     "ponytail@ponytail": true,
     "pyright-lsp@claude-plugins-official": true,
-    "andrej-karpathy-skills@karpathy-skills": true,
-    "terraform@claude-plugins-official": true,
-    "context7@claude-plugins-official": false
+    "superpowers@claude-plugins-official": true,
+    "terraform@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "caveman": {
