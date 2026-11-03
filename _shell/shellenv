@@ -162,10 +162,22 @@ if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then
     source $HOME/.nix-profile/etc/profile.d/nix.sh
 fi
 
-# ... mise
+# ... mise (before pyenv on purpose, so pyenv's shims end up first: a pyenv
+# virtualenv's own copy of a tool, e.g. ruff or pre-commit, then wins, since
+# pyenv-virtualenv activation routes through pyenv's shims instead of adding
+# the venv's bin to PATH; pyenv falls back to mise's shim when the selected
+# version lacks the tool, so mise doctor's "shadowed" warning is expected)
 
 export MISE_DATA_DIR=${MISE_DATA_DIR:-$HOME/.local/share/mise}
 export PATH="$MISE_DATA_DIR/shims:$PATH"
+
+# the global config symlinks to ~/.dotfiles/mise/config.toml, so inside
+# ~/.dotfiles mise also finds that file as the project config mise/config.toml
+# (and, under paranoid, warns about its lockfile entries on every command);
+# the ignored_config_paths setting cannot do this from config.toml itself,
+# since mise discovers project configs before it reads that file's settings
+
+export MISE_IGNORED_CONFIG_PATHS="$HOME/.dotfiles/mise/config.toml"
 
 # tools to skip installing via mise (system copy preferred, per-machine skips)
 # - cached, since probing system versions is slow; refreshed by mise/install.
