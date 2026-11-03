@@ -25,7 +25,7 @@ case $(uname -s) in
 esac
 
 ARCH=$(uname -m | sed s/aarch64/arm64/g | sed s/x86_64/x64/g)
-VERSION="2026.4.5"
+VERSION="2026.10.19"
 
 CURRENT=$(
     [[ -x ~/.local/bin/mise ]] && {

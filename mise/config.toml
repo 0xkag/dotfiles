@@ -1,16 +1,19 @@
 [settings]
 auto_install = false
 experimental = false
-locked = false
+locked = true
 lockfile = true
+minimum_release_age = "7d"
 paranoid = true
 
 [tools]
+# libc = "musl": on glibc hosts mise prefers glibc builds, and some need a
+# newer glibc than Amazon Linux 2's 2.26 (yazi's needs 2.39).
 ag = "2.2.0"
 awscli = { version = "2.37.4", symlink_bins = "true" }
 cmake = "4.4.3"
-codex = "0.125.0"
-fd = "10.5.0"
+codex = { version = "0.125.0", libc = "musl" }
+fd = { version = "10.5.0", libc = "musl" }
 fzf = "0.74.4"
 glow = "2.1.2"
 hurl = "8.0.1"
@@ -35,4 +38,4 @@ tree-sitter = "0.27.0"
 #tfupdate = "system"
 vim = "9.2.1135"
 yamllint = "1.38.0"
-yazi = "26.9.1"
+yazi = { version = "26.9.1", libc = "musl" }

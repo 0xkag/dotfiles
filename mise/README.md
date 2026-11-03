@@ -10,6 +10,48 @@ Tool installation via [mise](https://mise.jdx.dev/), run in shims mode (no
   `_sites/current/mise/check-tools.local` (see `check-tools.local.example`).
 * `config.toml` -- the global tool list.
 * `install` -- bootstraps mise itself, then installs the tools.
+* `mise.lock` -- the lockfile, symlinked as `~/.config/mise/mise.lock`.
+
+## Lockfile
+
+`config.toml` sets `locked = true`, so installs use only what `mise.lock`
+records and never rewrite it.  After changing `config.toml` (adding a tool,
+or changing a version or a tool option), refresh the lockfile with locked
+mode off and the per-machine skips lifted, so skipped tools stay locked,
+then commit it:
+
+    MISE_LOCKED=false mise-all lock -g
+
+`mise-all` (from `_shell/shellinteractive`) clears MISE_DISABLE_TOOLS.  Under
+locked mode a plain `mise lock` fails with "... is not in the lockfile" for
+any changed tool.  Add `--bump` to move `rust = "latest"` forward.
+
+`mise.lock` is still lockfile format 0, which mise warns about after
+2027-02-23.  Older mise cannot read newer formats, so only once every machine
+sharing these dotfiles runs mise 2026.10.19 or newer, upgrade it to the
+current format, from a host with direct PyPI access (see below), and commit
+it:
+
+    MISE_LOCKED=false mise-all lock -g --upgrade
+
+### Private package indexes
+
+`mise.lock` is shared, so it must never record a site's private package
+index (such as a Nexus PyPI proxy).  mise ignores pip.conf: it passes
+`pypi.registry_url` (default PyPI) to pipx and uv as PIP_INDEX_URL and
+UV_INDEX, which take precedence over config files.  Where PyPI is blocked,
+point a one-off install at the proxy, and never set MISE_PYPI_REGISTRY_URL
+in config or the shell environment, so that no lock run sees it:
+
+    MISE_PYPI_REGISTRY_URL='https://<proxy>/simple/{}/' MISE_PIPX_UVX=false \
+        mise-all install yamllint
+
+On format 0 a lock run records only a version for Python tools, and works
+even where PyPI downloads are blocked.  Newer formats also store dependency
+graphs for Python tools, so locking yamllint will likely need PyPI there:
+on such hosts lock only the tools that changed (`MISE_LOCKED=false mise-all
+lock -g TOOL...`) and run full locks from a host with direct PyPI access.
+Before committing, check `git diff mise.lock` for the private host.
 
 ## Troubleshooting
 
