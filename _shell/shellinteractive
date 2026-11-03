@@ -215,6 +215,32 @@ mise-lock() {
         MISE_DISABLE_TOOLS= mise lock -g "$@")
 }
 
+# mise-bump -- move tools past their pins to the newest release older than
+# minimum_release_age, install them, and lock them on every platform:
+# `mise-bump awscli fd`, `mise-bump --dry-run awscli`. Locked mode is off for
+# the upgrade, which rejects versions not yet in the lockfile. Tools this host
+# skips are invisible to mise, so a bump of one would silently do nothing;
+# refuse those and point at mise-all (see mise/README.md).
+
+mise-bump() {
+    local tool
+    if [ $# -eq 0 ]; then
+        echo 'usage: mise-bump [--dry-run] TOOL...' >&2
+        return 2
+    fi
+    for tool in "$@"; do
+        case ",$MISE_DISABLE_TOOLS," in
+            *",${tool%%@*},"*)
+                echo "mise-bump: ${tool%%@*} is skipped on this host;" \
+                    'bump it with mise-all (see mise/README.md)' >&2
+                return 1
+                ;;
+        esac
+    done
+    (cd ~ && env -u MISE_PYPI_REGISTRY_URL MISE_LOCKED=false \
+        mise upgrade --global --bump "$@") && mise-lock "$@"
+}
+
 # Cheap per-prompt sync (~5ms): --cached serves the file when fresh and rebuilds
 # only on the first prompt after check-tools, config.toml, or the site's
 # check-tools.local change, so an edited minimum version or policy is picked up

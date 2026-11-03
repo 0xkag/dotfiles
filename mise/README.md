@@ -12,6 +12,20 @@ Tool installation via [mise](https://mise.jdx.dev/), run in shims mode (no
 * `install` -- bootstraps mise itself, then installs the tools.
 * `mise.lock` -- the lockfile, symlinked as `~/.config/mise/mise.lock`.
 
+## Shell helpers
+
+From `_shell/shellinteractive`:
+
+* `mise-all` -- runs mise with MISE_DISABLE_TOOLS cleared, to see or manage
+  the tools this host skips (`mise-all ls`, `mise-all uninstall neovim`).
+  Plain mise does not see skipped tools at all: it lists, upgrades, and
+  installs them as if they were not configured.
+* `mise-bump` -- bumps tools to their newest eligible release (see "Bumping
+  versions").
+* `mise-lock` -- refreshes the lockfile (see "Lockfile").
+* `mise-refresh` -- recomputes MISE_DISABLE_TOOLS after a system or flox
+  tool is added or removed.
+
 ## Lockfile
 
 `config.toml` sets `locked = true`, so installs use only what `mise.lock`
@@ -27,6 +41,32 @@ or changing a version or a tool option), refresh the lockfile with
 `mise lock` fails with "... is not in the lockfile" for any changed tool),
 with MISE_DISABLE_TOOLS cleared so skipped tools stay locked, and with
 MISE_PYPI_REGISTRY_URL removed (see "Private package indexes").
+
+### Bumping versions
+
+`mise-bump` moves tools past their pins to the newest release older than
+`minimum_release_age`, installs them, and locks them on every platform,
+then `config.toml` and `mise.lock` get committed together:
+
+    mise-bump awscli fd
+    mise-bump --dry-run awscli     # show what would change
+
+It runs `mise upgrade --global --bump` from `~` with locked mode off, then
+`mise-lock` for the same tools.  A plain `mise upgrade --bump` fails under
+locked mode after already rewriting the pin, leaving `config.toml` bumped
+but `mise.lock` not, and every later mise command warns until `mise-lock
+TOOL` catches the lockfile up.
+
+Tools this host skips are invisible to plain mise, so `mise-bump` refuses
+them.  Bump a skipped tool with `mise-all`, which also installs it here
+(where the exclusion hides it again), or edit its pin by hand and lock it:
+
+    cd ~ && MISE_LOCKED=false mise-all upgrade --global --bump ripgrep && \
+        mise-lock ripgrep
+    mise-lock ripgrep              # after editing the pin by hand
+
+Never run `mise-all upgrade --bump` without tool names: it bumps every tool
+at once and installs every skipped one on this host.
 
 `mise.lock` is still lockfile format 0, which mise warns about after
 2027-02-23.  Older mise cannot read newer formats, so only once every machine
