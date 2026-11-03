@@ -204,6 +204,17 @@ mise-all() {
     MISE_DISABLE_TOOLS= command mise "$@"
 }
 
+# mise-lock -- refresh the global mise.lock (see mise/README.md): locked mode
+# off, the exclusion lifted so skipped tools stay locked, and any private
+# package index dropped so it cannot leak into the shared lockfile. Runs from
+# ~ so a project config is not pulled in: `mise-lock`, `mise-lock yazi`,
+# `mise-lock --bump rust`, `mise-lock --upgrade`.
+
+mise-lock() {
+    (cd ~ && env -u MISE_PYPI_REGISTRY_URL MISE_LOCKED=false \
+        MISE_DISABLE_TOOLS= mise lock -g "$@")
+}
+
 # Cheap per-prompt sync (~5ms): --cached serves the file when fresh and rebuilds
 # only on the first prompt after check-tools, config.toml, or the site's
 # check-tools.local change, so an edited minimum version or policy is picked up
