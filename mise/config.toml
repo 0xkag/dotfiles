@@ -1,6 +1,7 @@
 [settings]
 auto_install = false
 experimental = false
+gitlab.use_git_credentials = true
 locked = true
 lockfile = true
 minimum_release_age = "7d"
