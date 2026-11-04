@@ -204,41 +204,55 @@ mise-all() {
     MISE_DISABLE_TOOLS= command mise "$@"
 }
 
-# mise-lock -- refresh the global mise.lock (see mise/README.md): locked mode
-# off, the exclusion lifted so skipped tools stay locked, and any private
-# package index dropped so it cannot leak into the shared lockfile. Runs from
-# ~ so a project config is not pulled in: `mise-lock`, `mise-lock yazi`,
-# `mise-lock --bump rust`, `mise-lock --upgrade`.
+# mise-lock -- mise lock (see mise/README.md) with locked mode off, the
+# exclusion lifted so skipped tools stay locked, and any private package index
+# dropped so it cannot leak into a shared lockfile. Like mise lock, it locks
+# the current project by default and the global mise.lock with -g:
+# `mise-lock -g`, `mise-lock -g yazi`, `mise-lock -g --bump rust`, `mise-lock`.
 
 mise-lock() {
-    (cd ~ && env -u MISE_PYPI_REGISTRY_URL MISE_LOCKED=false \
-        MISE_DISABLE_TOOLS= mise lock -g "$@")
+    env -u MISE_PYPI_REGISTRY_URL MISE_LOCKED=false MISE_DISABLE_TOOLS= \
+        mise lock "$@"
 }
 
 # mise-bump -- move tools past their pins to the newest release older than
-# minimum_release_age, install them, and lock them on every platform:
-# `mise-bump awscli fd`, `mise-bump --dry-run awscli`. Locked mode is off for
-# the upgrade, which rejects versions not yet in the lockfile. Tools this host
-# skips are invisible to mise, so a bump of one would silently do nothing;
-# refuse those and point at mise-all (see mise/README.md).
+# minimum_release_age, install them, and lock them on every platform. Like
+# mise-lock, it works on the current project by default and on the global
+# config with -g: `mise-bump -g awscli fd`, `mise-bump -g --dry-run awscli`,
+# `mise-bump ruff`. The project mode is mise upgrade --local, so the bump and
+# the lock touch the same config root; mise upgrade has no -g, so -g becomes
+# --global. Locked mode is off for the upgrade, which rejects versions not yet
+# in the lockfile. Tools this host skips are invisible to mise, so a bump of
+# one would silently do nothing; refuse those and point at mise-all (see
+# mise/README.md).
 
 mise-bump() {
-    local tool
-    if [ $# -eq 0 ]; then
-        echo 'usage: mise-bump [--dry-run] TOOL...' >&2
-        return 2
-    fi
-    for tool in "$@"; do
-        case ",$MISE_DISABLE_TOOLS," in
-            *",${tool%%@*},"*)
-                echo "mise-bump: ${tool%%@*} is skipped on this host;" \
-                    'bump it with mise-all (see mise/README.md)' >&2
-                return 1
+    local arg global='' tools=0
+    local -a args=()
+    for arg in "$@"; do
+        case $arg in
+            -g|--global) global=--global; continue ;;
+            -*) ;;
+            *)
+                tools=$((tools + 1))
+                case ",$MISE_DISABLE_TOOLS," in
+                    *",${arg%%@*},"*)
+                        echo "mise-bump: ${arg%%@*} is skipped on this host;" \
+                            'bump it with mise-all (see mise/README.md)' >&2
+                        return 1
+                        ;;
+                esac
                 ;;
         esac
+        args+=("$arg")
     done
-    (cd ~ && env -u MISE_PYPI_REGISTRY_URL MISE_LOCKED=false \
-        mise upgrade --global --bump "$@") && mise-lock "$@"
+    if [ "$tools" -eq 0 ]; then
+        echo 'usage: mise-bump [-g] [--dry-run] TOOL...' >&2
+        return 2
+    fi
+    env -u MISE_PYPI_REGISTRY_URL MISE_LOCKED=false \
+        mise upgrade "${global:---local}" --bump "${args[@]}" &&
+        mise-lock ${global:+"$global"} "${args[@]}"
 }
 
 # Cheap per-prompt sync (~5ms): --cached serves the file when fresh and rebuilds
