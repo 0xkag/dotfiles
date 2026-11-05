@@ -11,31 +11,30 @@ paranoid = true
 # libc = "musl": on glibc hosts mise prefers glibc builds, and some need a
 # newer glibc than Amazon Linux 2's 2.26 (yazi's needs 2.39).
 ag = "2.2.0"
-awscli = { version = "2.37.4", symlink_bins = "true" }
-cmake = "4.4.3"
-codex = { version = "0.125.0", libc = "musl" }
+awscli = { version = "2.38.6", symlink_bins = "true" }
+cmake = "4.4.4"
+codex = { version = "0.163.0", libc = "musl" }
 fd = { version = "10.5.0", libc = "musl" }
-fzf = "0.74.4"
-glow = "2.1.2"
+fzf = "0.74.5"
+glow = "3.0.0"
 hurl = "8.0.1"
-maven = "3.9.16"
-neovim = { version = "0.12.5", os = ["linux", "macos", "windows"] }
+maven = "3.10.0"
+neovim = { version = "0.12.6", os = ["linux", "macos", "windows"] }
 ninja = "1.13.2"
 ollama = "0.34.4"
-pandoc = "3.11"
+pandoc = "3.13"
 perl = "5.44.0"
-pre-commit = "4.6.2"
-ripgrep = "15.1.0"
-ruff = "0.16.9"
+pre-commit = "4.7.0"
+ripgrep = "15.2.0"
+ruff = "0.17.3"
 rust = "latest"
 shellcheck = "0.11.0"
 terraform = "1.13.2"
-tflint = "0.64.0"
-tree-sitter = "0.27.0"
+tflint = "0.65.0"
+tree-sitter = "0.27.1"
 #terraform-docs = "system"
 #terraformer = "system"
 #terragrunt = "system"
-#tflint = "system"
 #tfupdate = "system"
 vim = "9.2.1135"
 yamllint = "1.38.0"
