@@ -60,8 +60,8 @@ These conventions are mostly for programming, but can apply generally too.
   that copy, list, and get widgets, name them as `widget_get()`,
   `widget_copy()`, and `widgets_list()`, NOT as `get_widgets()`,
   `copy_widgets()`, and `list_widgets()`.
-* DO maintain the plurality of variable names.  If something is signular, name
-  it singularly.  If something is pulural, name it plurally.
+* DO maintain the plurality of variable names.  If something is singular, name
+  it singularly.  If something is plural, name it plurally.
 
 ## Imports
 
@@ -80,6 +80,19 @@ These conventions are mostly for programming, but can apply generally too.
 - [Commit message format](~/.dotfiles/_ai/memories/commit-message-format.md) — my required style:
   `topic: Phrase` subject, `--` body bullets, 75-col wrap, ASCII-only, refs +
   Co-Authored-By last
+
+## Writing prose
+
+* DO NOT use ambiguous pronouns.  Example of what is ambiguous:
+
+  ```
+  The turbo encabulator and the widget are broken.  <more sentences> It needs
+  to be fixed.
+  ```
+
+  Tell me what `it` is, or any other similar pronoun, unless it is blaringly
+  obvious.  Even better than restating is just writing in a way that it is
+  completely unambiguous.
 
 ## Git workflow
 
