@@ -81,6 +81,19 @@ These conventions are mostly for programming, but can apply generally too.
   `topic: Phrase` subject, `--` body bullets, 75-col wrap, ASCII-only, refs +
   Co-Authored-By last
 
+## Writing prose
+
+* DO NOT use ambiguous pronouns.  Example of what is ambiguous:
+
+  ```
+  The turbo encabulator and the widget are broken.  <more sentences> It needs
+  to be fixed.
+  ```
+
+  Tell me what `it` is, or any other similar pronoun, unless it is blaringly
+  obvious.  Even better than restating is just writing in a way that it is
+  completely unambiguous.
+
 ## Git workflow
 
 - [Branch & worktree creation](~/.dotfiles/_ai/memories/git-branch-creation.md) — never create a
