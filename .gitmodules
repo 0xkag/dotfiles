@@ -180,7 +180,7 @@
 	branch = master
 [submodule "testssl.sh"]
 	path = _lib/_todo/testssl.sh
-	url = https://github.com/drwetter/testssl.sh.git
+	url = https://github.com/testssl/testssl.sh
 	branch = 3.2
 [submodule "tmux"]
 	path = _lib/_opt/tmux
