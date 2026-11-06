@@ -1,0 +1,71 @@
+[tool.poetry]
+name = "{{ cookiecutter.dist_name }}"
+
+description = "{{ cookiecutter.description }}"
+keywords = ["{{ cookiecutter.package_path }}"]
+packages = [{include = "{{ cookiecutter.__package_root }}"}]
+version = "0.1.0"
+
+authors = ["{{ cookiecutter.author_name }} <{{ cookiecutter.author_email }}>"]
+license = "{{ cookiecutter.license }}"
+readme = "README.md"
+{%- if cookiecutter.repository_url %}
+repository = "{{ cookiecutter.repository_url }}"
+{%- endif %}
+
+[tool.poetry.scripts]
+{{ cookiecutter.cli_name }} = "{{ cookiecutter.package_path }}.cli:main"
+
+[tool.poetry.dependencies]
+python = ">=3.12,<4"
+boto3 = "^1.33"
+botocore = "^1.33"
+click = ">=7.1.2,<9"
+structlog = "^25.4.0"
+
+[tool.poetry.group.dev.dependencies]
+bandit = "^1.8.6"
+bumpversion = "^0.6.0"
+coverage = "^7.10.7"
+distlib = "^0.4.0"
+flake8 = "^7.3.0"
+icecream = "^2.1.8"
+isort = "^7.0.0"
+mdurl = "^0.1.2"
+mypy = "<1.16"
+mypy-extensions = "^1.1.0"
+pre-commit = "^4.3.0"
+pylint = "^4.0.0"
+pytest = "^8.4.2"
+pytest-env = "^1.2.0"
+snoop = "^0.6.0"
+tox = "^4.31.0"
+twine = "^6.2.0"
+{%- if cookiecutter.poetry_source_url %}
+
+[[tool.poetry.source]]
+name = "{{ cookiecutter.poetry_source_name }}"
+url = "{{ cookiecutter.poetry_source_url }}"
+priority = "primary"
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
+{%- endif %}
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+src_paths = ["{{ cookiecutter.__package_root }}", "tests"]
+line_length = 80
+
+[tool.bandit]
+[tool.bandit.assert_used]
+skips = ["*/*_test.py", "*/test_*.py"]
+
+[tool.coverage.run]
+omit = ["tests/*", ".*"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
