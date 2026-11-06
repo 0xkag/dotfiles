@@ -1,5 +1,5 @@
 {
-  "autoUpdatesChannel": "latest",
+  "cleanupPeriodDays": 3650,
   "awsAuthRefresh": "rm -rf ~/.aws/cli/cache/* 2>/dev/null; aws sts get-caller-identity",
   "permissions": {
     "allow": [
@@ -56,6 +56,7 @@
   "enabledPlugins": {
     "andrej-karpathy-skills@karpathy-skills": true,
     "caveman@caveman": false,
+    "cc-plugin-you-should-know@builtin": true,
     "context7@claude-plugins-official": false,
     "gitlab@claude-plugins-official": true,
     "ponytail@ponytail": true,
@@ -93,8 +94,10 @@
       "effortLevel": "xhigh"
     }
   },
+  "autoUpdatesChannel": "latest",
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
   "editorMode": "normal",
+  "switchModelsOnFlag": false,
   "mcpServers": {}
 }
