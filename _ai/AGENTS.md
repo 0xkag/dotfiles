@@ -60,8 +60,8 @@ These conventions are mostly for programming, but can apply generally too.
   that copy, list, and get widgets, name them as `widget_get()`,
   `widget_copy()`, and `widgets_list()`, NOT as `get_widgets()`,
   `copy_widgets()`, and `list_widgets()`.
-* DO maintain the plurality of variable names.  If something is signular, name
-  it singularly.  If something is pulural, name it plurally.
+* DO maintain the plurality of variable names.  If something is singular, name
+  it singularly.  If something is plural, name it plurally.
 
 ## Imports
 
