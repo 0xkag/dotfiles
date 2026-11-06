@@ -1,0 +1,19 @@
+{
+    "repo_slug": "my-project",
+    "package_path": "example.my_project",
+    "dist_name": "{{ cookiecutter.package_path | replace('.', '-') | replace('_', '-') }}",
+    "cli_name": "{{ cookiecutter.repo_slug }}",
+    "description": "My project",
+
+    "author_name": "Your Name",
+    "author_email": "you@example.com",
+    "author_username": "{{ cookiecutter.author_email.split('@')[0] }}",
+    "license": "Proprietary",
+    "repository_url": "",
+
+    "poetry_source_name": "private",
+    "poetry_source_url": "",
+
+    "__package_dir": "{{ cookiecutter.package_path | replace('.', '/') }}",
+    "__package_root": "{{ cookiecutter.package_path.split('.')[0] }}"
+}

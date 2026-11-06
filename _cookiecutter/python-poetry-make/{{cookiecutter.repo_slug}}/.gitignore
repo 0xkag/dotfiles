@@ -1,0 +1,38 @@
+# Python bytecode
+*.py[cod]
+__pycache__/
+
+# Packaging
+*.egg-info/
+/build/
+/dist/
+
+# Virtualenvs and interpreter pins
+/.python-version
+/.venv
+
+# Test, coverage, lint, and type-check output
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+/.coverage
+/.coverage.*
+/.dmypy.json
+/.tox/
+/coverage.xml
+/dmypy.json
+/htmlcov/
+
+# Local files and secrets
+*.log
+.env
+.envrc
+.pypirc
+
+# Editors and tools
+.aider*
+.ropeproject/
+/.worktrees/
+GPATH
+GRTAGS
+GTAGS
