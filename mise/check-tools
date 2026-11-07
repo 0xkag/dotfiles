@@ -128,12 +128,13 @@ pinned_version() {
 }
 
 # system_version TOOL -> the major.minor of the best non-mise copy on PATH, or
-# empty if none works. Walks PATH so a provider hierarchy is honored (rpm/apt,
-# then flox, then a homedir build - whatever comes first wins); the source does
-# not matter, only "installed outside mise and runnable". Reads --version stdout
-# only, and keeps walking past a binary that prints no version (e.g. a
-# GLIBC-broken build whose error goes to stderr), so a broken copy never masks a
-# working one further down PATH.
+# empty if none works. Walks PATH in order and the first runnable copy wins,
+# which with the PATH from _shell/shellenv means a homedir build (~/.local,
+# ~/.root), then flox, then the system package (see _docs/binary-hierarchy.org);
+# the source does not matter, only "installed outside mise and runnable". Reads
+# --version stdout only, and keeps walking past a binary that prints no version
+# (e.g. a GLIBC-broken build whose error goes to stderr), so a broken copy never
+# masks a working one further down PATH.
 #
 # Any */shims directory is skipped: shims are version-manager redirectors (mise,
 # but also pyenv/rbenv/asdf), not real installs, and they chain into each other

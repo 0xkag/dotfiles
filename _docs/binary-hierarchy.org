@@ -1,0 +1,361 @@
+#+TITLE: Binary Installation Hierarchy
+#+AUTHOR: Kyle George (w/ Claude Code assistance)
+#+STARTUP: showall
+
+* Overview
+
+Executables on a host come from about a dozen providers: the OS package
+manager, flox, hand builds in the home directory, pipx, mise, pyenv, and a few
+language-specific install dirs.  Two separate orderings decide which copy of a
+tool gets used:
+
+1. *PATH lookup order*, which decides which copy runs.  =_shell/shellenv=
+   builds PATH from a fixed list, then mise and pyenv each prepend their
+   shims directory.  User-level directories come before system ones, so the
+   most personal copy wins.
+2. *Install preference*, which decides which provider should supply a tool in
+   the first place.  mise is the fill-in tier: =mise/check-tools= disables the
+   mise copy of a tool whenever a runnable copy from any other provider meets
+   the version need.  A disabled tool gets no mise shim, so PATH lookup falls
+   through to the other provider.
+
+In short, every host gets the portable tool list in =mise/config.toml=, and on
+each host anything already provided by the OS, flox, or a homedir build
+replaces the mise copy.
+
+* PATH lookup order
+
+The order on a flox host (the AL2 work host), first match wins:
+
+| #  | Directory                                   | Provider                   |
+|----+---------------------------------------------+----------------------------|
+|  1 | =_lib/pyenv/plugins/pyenv-virtualenv/shims= | pyenv-virtualenv           |
+|  2 | =_lib/pyenv/shims=                          | pyenv                      |
+|  3 | =~/.local/share/mise/shims=                 | mise                       |
+|  4 | =~/bin=                                     | personal (unmanaged)       |
+|  5 | =~/.dotfiles/_sites/current/_bin=           | site repo scripts          |
+|  6 | =~/.dotfiles/_bin=                          | dotfiles scripts           |
+|  7 | =~/.local/bin=, =~/.local/usr/bin=          | homedir builds, pipx, etc. |
+|  8 | =~/.root/bin=, =~/.root/usr/bin=            | homedir builds (older)     |
+|  9 | =_lib/pyenv/bin=                            | the pyenv command itself   |
+| 10 | =~/.go/bin=                                 | =go install=               |
+| 11 | =~/.npm-packages/bin=                       | =npm install -g=           |
+| 12 | =~/.flox/run/x86_64-linux.default.dev/bin=  | flox (and =sbin=)          |
+| 13 | =/opt/homebrew/bin=, =/opt/homebrew/sbin=   | Homebrew (macOS)           |
+| 14 | =/usr/local/bin=, =/usr/local/sbin=         | system (local)             |
+| 15 | =/usr/bin=, =/usr/sbin=, =/bin=, =/sbin=    | system package manager     |
+
+Entries 4 through 15 come from the =path= array in =_shell/shellenv=, which
+replaces PATH outright rather than appending to it.  After that array,
+=_shell/shellenv= runs the PATH manipulators in this order:
+
+1. nix (only if =~/.nix-profile/etc/profile.d/nix.sh= exists), which prepends
+   =~/.nix-profile/bin=.
+2. mise, which prepends its shims directory.
+3. pyenv (=pyenv init= and =pyenv virtualenv-init=), which prepends both
+   shims directories.
+
+The last one to prepend ends up first, so pyenv's shims beat mise's.  The
+comment above the mise block explains why: a pyenv virtualenv's own copy of
+a tool (ruff, pre-commit) must win inside that project, and
+pyenv-virtualenv activation routes through pyenv's shims instead of putting
+the venv's =bin= on PATH.
+
+The site repo's =_sites/current/_shell/shellenv= runs last and can insert
+entries with =_bin/path-insert=.  Its lists are all commented out today, so
+it changes nothing.  =flox activate= and =mise activate= are both
+deliberately off in =_shell/shellinteractive=: flox is reached through plain
+PATH, MANPATH, PKG_CONFIG_PATH, and XDG_DATA_DIRS entries, and mise through
+its shims.
+
+* The providers
+
+** System package manager
+
+=/usr/bin= and friends, plus =/opt/homebrew= on macOS.  This tier holds
+anything that needs system integration (libraries, daemons, GUI apps, the
+compiler toolchain) and anything where the distribution's version is good
+enough.  The per-platform package lists live in =_reqs/=:
+
+- =requirements-ubuntu.txt= (checked by =_bin/debian-reqs-check=)
+- =requirements-macos-brew.txt=
+- =requirements-freebsd.txt=, =requirements-openbsd.txt=
+- =rockylinux8.txt=
+
+None of these lists is applied automatically.  =TODO.md= has an item to
+replace them with one cross-platform list.
+
+** flox
+
+Only the AL2 work host uses flox, where the OS packages are too old.  The
+default environment lives in =~/.flox=, and PATH points at its =.dev= run
+directory, =~/.flox/run/<system>.default.dev/=.  =_shell/shellenv= derives
+=<system>= from =uname -sm= the way flox names systems (=x86_64-linux=,
+=aarch64-linux=, =aarch64-darwin=, =x86_64-darwin=).  On hosts without
+flox the directory does not exist and the PATH entries are inert.
+
+On the work host flox supplies (among others) rg, nvim, glab, yq, mc, glow,
+pandoc, shellcheck, node, and go.  Nothing in the package list is specific
+to the work site, only to old OS packages, so the environment itself lives
+in the shared repo: =~/.flox= is a symlink to =~/.dotfiles/flox/.flox=.
+=flox install= and friends therefore edit the committed
+=flox/.flox/env/manifest.toml= and =manifest.lock= directly, and the lock
+pins exact package versions the way =mise.lock= does.  =run/=, =cache/=,
+and =log/= are gitignored.
+
+The link has to be at =~/.flox=.  Every flox edit builds the new
+environment in a temporary directory, renames =~/.flox/env= aside, and
+copies the temporary one back as a new =env= directory, and it writes the
+manifest atomically (temporary file, then rename).  A link at =env= or at
+=manifest.toml= would therefore be replaced by a real directory or file on
+the first edit, while everything flox does stays inside the =~/.flox= link.
+
+On hosts with flox whose system the manifest lists in =[options] systems=
+(only =x86_64-linux= today), =_bin/dotfiles-install= creates the link and
+runs =flox activate -d ~ -- true= once to build the =run/= links, just
+before the mise step.  Hosts without flox, or with an unlisted system, skip
+the step with a note.  If =~/.flox= is already a real directory, the
+install stops with "is not a symlink"; move it aside by hand and re-run.
+
+After installing or removing a flox package, run =mise-refresh= so mise
+stops (or starts) providing its own copy, then commit =flox/.flox/env/=.
+
+The committed lock is the package list.  =flox list= shows it for the
+current host, and this prints it for any listed system, even where flox is
+not installed:
+
+#+begin_src sh
+jq -r '.packages[] | select(.system=="x86_64-linux")
+       | "\(.install_id): \(.attr_path) (\(.version))"' \
+    ~/.dotfiles/flox/.flox/env/manifest.lock | sort -u
+#+end_src
+
+*** Other systems and platforms
+
+One environment can serve several systems:
+
+- List each system in =[options] systems= and re-lock (=flox edit -d ~=
+  locks on save).  The lock then holds every package for every listed
+  system, and a =flox install= on any host keeps them all locked.
+- Limit a package that only makes sense on some systems with its own
+  =systems= key, e.g. =glibc.systems = ["aarch64-linux", "x86_64-linux"]=.
+- Run links are named per system (=x86_64-linux.default.dev=,
+  =aarch64-linux.default.dev=), so hosts of different systems can share
+  one home directory, even over NFS.
+
+flox cannot tell two distributions on the same system apart: the AL2 host
+and an Ubuntu host are both =x86_64-linux= and would get the same packages.
+When a second flox host needs a different set, give each set its own
+environment (e.g. =flox/al2/.flox=, with packages they share in another
+environment pulled in through the manifest's =[include]= table), and have
+the site repo choose which one =~/.flox= links to.  Until then, one
+environment is enough.
+
+** Dotfiles and personal bin directories
+
+=~/bin=, =~/.dotfiles/_sites/current/_bin=, and =~/.dotfiles/_bin= hold
+scripts, not installed packages.  =_bin= is shared across hosts and the site
+=_bin= is per-site.  =~/bin= is not created by anything in the dotfiles (it
+does not exist on the work host) but stays on PATH for ad hoc use.  These
+directories come before every real install, so a script here can wrap or
+replace any tool.
+
+** Homedir builds: =~/.local= and =~/.root=
+
+=~/.local= is the standard =--prefix= for tools built from source by the
+per-tool =<tool>/install= scripts in the dotfiles (tmux, bup, mosh, global,
+xclip, wmctrl, tarsnap, alpine, bitwise, picom).  Prebuilt binaries copied
+by hand also land in =~/.local/bin= (cmake, ninja, and meson on the work
+host).
+
+=~/.local/bin= is also a shared drop point for several other installers:
+
+- mise puts its own binary there (=mise/install=).
+- pipx symlinks its apps there (see below).
+- =pip install --user= puts pipx itself there, along with pipx's
+  dependencies' scripts (argcomplete, userpath).
+- =uv tool install= links apps there (aider), with the venvs under
+  =~/.local/share/uv/tools/=.
+- Claude Code's own installer links =claude= there, with the versions
+  under =~/.local/share/claude/=.
+
+=~/.root= is the older homedir prefix.  =_bin/dotfiles-install= still
+creates it, and =emacs/install-*= still build into it.  =_docs/stack.org=
+also points stack's =local-bin-path= at it.  The =usr/bin= variants of both
+prefixes catch packages unpacked with their =usr/= layout intact.
+
+Both prefixes also feed LD_LIBRARY_PATH, MANPATH, PKG_CONFIG_PATH, and
+XDG_DATA_DIRS, ahead of flox and the system, so a library built here
+shadows the system copy as well.
+
+** Go and npm global installs
+
+=go install= writes to =$GOPATH/bin= (=GOPATH=~/.go=).  =npm install -g=
+writes to =~/.npm-packages= because both =nodejs/npmrc= and the site
+=nodejs/npmrc= set =prefix=.  On the work host the =go= and =npm= commands
+come from flox, and these two directories hold what those commands
+installed (actionlint and other Go tools, codex and gemini from npm).  Nothing
+tracks their contents.
+
+** pipx
+
+pipx is for Python command-line apps: each app gets its own venv, isolated
+from every project.  =pipx/install= installs pyenv's Python 3.12.16 if it
+is missing, pins pip and pipx, and installs pipx with =pip install --user=
+under it, reinstalling pipx only when its launcher points at another
+Python.  It then installs the apps recorded in =pipx/apps.json= on that
+interpreter.  The
+venvs live in =~/.local/share/pipx/venvs/= and the entry points are
+symlinked into =~/.local/bin=.
+
+Installed on the work host: black, cookiecutter, poetry, python-lsp-server,
+uv, and yapf.  nvim's Python setup (=nvim/lua/config/python.lua=) looks
+for pylsp in the pipx venv of python-lsp-server first, before searching
+PATH, and its health check suggests =pipx inject python-lsp-server
+pylsp-rope= when the rope plugin is missing.
+
+=pipx/apps.json= is the output of =pipx list --json=.  It records each app's
+version and injected packages, and =pipx install-all= installs exactly those
+versions.  Regenerate it after any change to the installed apps.
+=_bin/dotfiles-install= does not run =pipx/install=: it only prints a
+reminder, since a missing Python takes minutes to build.  =pipx/README.md=
+covers recording apps, changing the Python version, and upgrading an app's
+dependencies.
+
+** mise
+
+mise is the portable tier: =mise/config.toml= is the one tool list every
+host shares, pinned by =mise/mise.lock=.  It runs in shims mode only, so
+=~/.local/share/mise/shims= is its single PATH entry.  =mise/install=
+bootstraps the pinned mise release into =~/.local/bin= and then runs =mise
+install=, with =MISE_DISABLE_TOOLS= computed fresh by =mise/check-tools=.
+
+mise pulls tools through several backends: mostly aqua (prebuilt GitHub
+release binaries), plus vfox (ag, neovim), asdf (vim), github (pandoc),
+pipx (yamllint), and core (rust).  The core rust backend installs rustup
+into =~/.cargo=.  =~/.cargo/bin= is not on PATH, so cargo, rustc, and
+anything added with =cargo install= are reachable only through mise's
+shims, and a new =cargo install= binary needs a =mise reshim=.
+
+=mise/README.md= covers the lockfile, bumping versions, private package
+indexes, and the =mise-all=, =mise-bump=, =mise-lock=, and =mise-refresh=
+helpers.
+
+** pyenv and pyenv virtualenvs
+
+pyenv and pyenv-virtualenv are git submodules under =_lib/=, with
+=PYENV_ROOT= set to =~/.dotfiles/_lib/pyenv=, so the Python builds and
+virtualenvs also live inside the dotfiles checkout.  pyenv provides three
+things:
+
+- *Python interpreters* (3.9.7, 3.11.6, 3.12.3, 3.12.13, and so on).
+  check-tools sets python to the =system= policy, so mise never installs
+  Python itself.
+- *Per-project virtualenvs* (=3.9.7-arc-kerberos=, =3.12.3-aider=, and so
+  on), selected by a =.python-version= file in the project.  Project
+  libraries and project-pinned tools belong here, never in a global
+  install.
+- *The interpreter for pipx* (3.12.16, set as PYTHON_VERSION in
+  =pipx/install=).
+
+The global pyenv version is =system=.  When the selected version does not
+have a command, =pyenv which= falls back to =system=, meaning PATH with
+pyenv's shims removed, and that falls through to mise's shims next.  A
+command found nowhere at all produces pyenv's "command exists in these
+Python versions" message instead of a plain "command not found".
+
+* How =check-tools= picks between mise and everything else
+
+=mise/check-tools= prints the comma-separated list of mise tools to skip.
+=_shell/shellenv= exports that list as =MISE_DISABLE_TOOLS= at shell start,
+and a precmd / PROMPT_COMMAND hook in =_shell/shellinteractive= keeps it
+current.  Each tool has a policy:
+
+- =system=: always skip the mise copy.  Here "system" means any copy outside
+  mise, not specifically an OS package.  For example, poetry is set to
+  =system= and is satisfied by the pipx install.
+- =newer= (the default): skip the mise copy only if an outside copy's
+  version meets the minimum, which is the =minver= table entry, otherwise
+  the version pinned in =config.toml=, otherwise any version.
+- =mise=: never skip; mise always provides the tool.
+
+To find an outside copy, check-tools walks PATH in order.  It skips every
+=*/shims= directory (mise's, and also pyenv's, whose =system= fallback
+would otherwise land on the mise copy) as well as mise's install directory.
+The first binary that prints a version on =--version= counts.  A binary that
+prints nothing (such as a build broken against the host's glibc) is passed
+over, so it cannot hide a working copy further down PATH.
+
+A host can override any of this in =_sites/current/mise/check-tools.local=.
+The work host uses it to skip ollama.  On the work host the current list is
+ag, neovim, node, ollama, poetry, python, ripgrep, shellcheck, vim, and
+yamllint.
+
+The result is cached in =~/.cache/mise/check-tools-disable= and rebuilt
+when =check-tools=, =config.toml=, or the =.local= override is edited.  The
+cache does not notice tools appearing or disappearing outside mise, so run
+=mise-refresh= after installing or removing a tool through any other
+provider.
+
+* Where a new tool should go
+
+| The tool is...                                              | Install it with                           |
+|-------------------------------------------------------------+-------------------------------------------|
+| A personal script                                           | =_bin/=, or =_sites/current/_bin/=        |
+| Wanted on every host, with a prebuilt release               | =mise/config.toml=, then =mise-lock -g=   |
+| A library, daemon, GUI app, or fine at the distro's version | the OS package manager + a =_reqs/= list  |
+| Too old in the OS packages on the AL2 work host             | the flox manifest, then =mise-refresh=    |
+| A Python CLI app used across projects                       | pipx (or mise's =pipx:= backend to pin)   |
+| A Python library or tool for one project                    | a pyenv virtualenv for that project       |
+| Only available by building from source, or needs patching   | a =<tool>/install= script into =~/.local= |
+
+A tool can sit in more than one tier on purpose.  Listing it in
+=config.toml= as well as the flox manifest means non-flox hosts get it from
+mise while the flox host skips the mise copy.  Add a =policy= row to
+=check-tools= only when the default =newer= rule is wrong for the tool.
+
+* Gotchas and inconsistencies
+
+- *Homedir builds shadow flox and the system.*  PATH puts =~/.local= and
+  =~/.root= ahead of flox, and flox ahead of the system.  Both at run time
+  and in check-tools' probe, a stale build in =~/.local= or =~/.root=
+  therefore hides a newer flox or OS copy.  Remove the stale build rather
+  than reordering PATH.
+- *flox's compiler shadows the system's.*  flox ahead of the system on PATH
+  also means flox's gcc and ld win.  That gcc is a nix wrapper that never
+  searches =/usr/include=, and flox's pkg-config files point at nix
+  libraries, so source builds (=pyenv install=, the =<tool>/install=
+  scripts) fail on missing system headers or link against nix libraries.
+  Build with flox stripped out, using =no_flox= from =_shell/shellenv=, as
+  =pipx/install= does:
+  =PATH=$(no_flox "$PATH") PKG_CONFIG_PATH=$(no_flox "$PKG_CONFIG_PATH") ...=
+- *pipx depends on one pyenv version.*  Every pipx venv is built on the
+  pyenv Python named in =pipx/install=, so uninstalling that Python breaks
+  every pipx app.  Changing PYTHON_VERSION does not move apps that are
+  already installed; see "Changing the Python version" in
+  =pipx/README.md=.
+- *pyenv's shims come first for every command name in every pyenv
+  version.*  A command that exists in any pyenv Python or virtualenv (black,
+  ruff, pre-commit) always goes through a pyenv shim first, even when the
+  copy that finally runs comes from mise or the system.
+- *=~/.local= is architecture-specific.*  So are pyenv's builds, the pipx
+  venvs, and mise's installs.  An NFS home directory mounted on both amd64
+  and arm64 hosts would mix them up (a =TODO.md= item).  =~/.flox= is the
+  exception: its run links are named per system.
+- *Several tiers are untracked.*  The uv tools, the Go and npm global
+  installs, and the hand-copied binaries in =~/.local/bin= are not recorded
+  anywhere in the dotfiles.
+
+* Related files
+
+- =_shell/shellenv=: the PATH, MANPATH, PKG_CONFIG_PATH, LD_LIBRARY_PATH,
+  and XDG_DATA_DIRS lists, plus the mise and pyenv setup
+- =_shell/shellinteractive=: the disabled =flox activate= and =mise
+  activate= blocks, and the mise helpers
+- =mise/check-tools=, =mise/config.toml=, =mise/install=, =mise/README.md=
+- =pipx/apps.json=, =pipx/install=, =pipx/README.md=
+- =_bin/dotfiles-install=: install order (pip config, site install, flox,
+  mise, then reminders for pipx and the per-tool =install= scripts)
+- =flox/.flox/=: the flox environment, linked from =~/.flox=
+- =_reqs/=: per-platform system package lists
+- =TODO.md=: the "binaries:" items

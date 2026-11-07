@@ -41,14 +41,14 @@ shifts. Commit changes to this file alongside the config changes they track.
   #1/#5 (`%C` ≥6.7, `ControlPersist` ≥5.6, `AddKeysToAgent` ≥7.2, `Include` ≥7.3).
 - **SSH:** no ControlMaster multiplexing (`ssh/config` is 12 lines: EscapeChar + ForwardAgent/X11 off) despite a socks-`ProxyCommand` work setup — highest-latency win.
 - **fzf:** `FZF_DEFAULT_COMMAND` unset → fzf uses its slow built-in walker and ignores `.gitignore`, even though `rg` is installed. Shell integration is `source <(fzf --zsh)` / `eval "$(fzf --bash)"` (`~/.fzf.zsh`, `~/.fzf.bash`), so the key-binding scripts always match whichever binary wins PATH.
-- **mise:** deliberately **shim-based, not `eval`-activated** — `mise activate` is commented out (`_shell/shellinteractive:148-158`) in favor of a custom `MISE_DISABLE_TOOLS` exclusion system with per-prompt cached sync (`_mise_disable_sync`, `mise-refresh`, `mise-all`, `_shell/shellinteractive:160-202`; `_shell/shellenv:165-174`). This is intentional and sophisticated — see item #12. Reworked into a data-driven skip engine on 2026-07-01 (commit `b1e77d8`).
-- **Binary hierarchy (per host):** system packages → flox (only on hosts that use it; this one does) → mise → homedir builds (`~/.local`, `~/.root`). On non-flox hosts the middle tier is simply absent. `mise/check-tools` implements this: it probes PATH with every `*/shims` dir skipped ("system rpm, then flox, then a homedir build — whatever comes first wins", `check-tools:131-148`) and disables the mise copy per-tool policy. On this host flox supplies rg, nvim, glab, yq, mc, glow, pandoc, shellcheck, node, go. `flox activate` is deliberately off (`_shell/shellinteractive:143-147`); the env is injected by direct PATH/MANPATH/PKG_CONFIG_PATH entries in `_shell/shellenv`. Manifest lives in the site repo (`_sites/work/flox/manifest.toml`); an AL2 package list was committed to `_reqs/flox-al2.txt` on 2026-09-13 (`aad2f29`).
+- **mise:** deliberately **shim-based, not `eval`-activated** — `mise activate` is commented out (`_shell/shellinteractive:173-181`) in favor of a custom `MISE_DISABLE_TOOLS` exclusion system with per-prompt cached sync (`_mise_disable_sync`, `mise-refresh`, `mise-all`, `_shell/shellinteractive:183-279`; `_shell/shellenv:191-212`). This is intentional and sophisticated — see item #12. Reworked into a data-driven skip engine on 2026-07-01 (commit `b1e77d8`).
+- **Binary hierarchy (per host):** full write-up in `_docs/binary-hierarchy.org`. After the pyenv and mise shims, PATH runs homedir builds (`~/.local`, `~/.root`) → flox (only on hosts that use it; this one does) → system packages; on non-flox hosts the flox tier is simply absent. mise is the fill-in tier: `mise/check-tools` walks that PATH with every `*/shims` dir skipped, takes the first runnable copy (`check-tools:130-160`), and disables the mise copy per-tool policy when that copy is good enough — so a stale homedir build shadows a newer flox or system copy. On this host flox supplies rg, nvim, glab, yq, mc, glow, pandoc, shellcheck, node, go. `flox activate` is deliberately off (`_shell/shellinteractive:166-171`); the env is injected by direct PATH/MANPATH/PKG_CONFIG_PATH entries in `_shell/shellenv`. The environment itself lives in the repo: `~/.flox` is a symlink to `flox/.flox`, so `flox install` edits the committed `flox/.flox/env/manifest.toml` and `manifest.lock` (moved from the site repo on 2026-11-07; nothing in it is site-specific). The committed lock is the package list; `_reqs/flox-al2.txt` (first committed 2026-09-13, `aad2f29`) was dropped on 2026-11-07.
 - **nvim:** nvim-cmp + Telescope with **no** telescope-fzf-native (absent) and **no** nvim-dap (absent) — both match the documented `PICKER_NOTES.md` / `DEBUGGING_PYTHON.md` deferrals. `snacks.nvim` is now installed but only for the big-file guard. `nvim/TODO_REFACTORING.md` (2026-09-13) records explicit decisions: Telescope over snacks.picker/fzf-lua, nvim-cmp over blink.cmp ("revisit only when nvim-cmp breaks") — see #15.
 - **EDITOR is now `nvim`** (`_shell/shellinteractive:65`; switched 2026-06-30, commit `11f1e0b`) — raises the payoff of the nvim-side items.
 - **Shell startup (new, measured 2026-09-14 on the host):** `zsh -i -c exit` ≈ 0.53 s, bash ≈ 0.37 s. Of the zsh total, ~220 ms is three **no-op** `path-insert` calls (a Python script, run via the pyenv shim) from `_sites/work/_shell/shellenv` with empty lists; ~36 ms `kubectl completion zsh`; ~53 ms pyenv init + virtualenv-init; ~33 ms six `wd add!` calls; OMZ itself ≈ 30 ms and compinit ≈ 9 ms. See #16.
 
 ### Repo conventions a fresh agent needs
-- **Install model:** symlink-based via `_bin/dotfiles-install` (Python); external tools pinned as **git submodules under `_lib/`**. Binaries follow a **per-host hierarchy arbitrated by `mise/check-tools`**: system packages → flox (hosts that use it) → mise → homedir builds (`~/.local`, `~/.root`). `mise/config.toml` is the **portable** tool list every host shares; the flox manifest (`_sites/work/flox/manifest.toml`) is per-site. For a *new* CLI tool (fd, bat, delta, zoxide…): add it to `mise/config.toml` so every host gets it, and on flox hosts optionally to the flox manifest too — `check-tools` then skips the mise copy wherever a higher tier already provides it. Run `mise-refresh` after installing. Add a `policy[...]` row in `check-tools` only if the default `newer` is wrong.
+- **Install model:** symlink-based via `_bin/dotfiles-install` (Python); external tools pinned as **git submodules under `_lib/`**. Binaries follow a **per-host hierarchy arbitrated by `mise/check-tools`** (see `_docs/binary-hierarchy.org`): any copy outside mise — homedir builds (`~/.local`, `~/.root`), then flox (hosts that use it), then system packages, in PATH order — beats mise, which fills in whatever is missing. `mise/config.toml` is the **portable** tool list every host shares; the flox manifest (`flox/.flox/env/manifest.toml`, live via the `~/.flox` symlink) applies only to flox hosts. For a *new* CLI tool (fd, bat, delta, zoxide…): add it to `mise/config.toml` so every host gets it, and on flox hosts optionally to the flox manifest too — `check-tools` then skips the mise copy wherever another provider already supplies it. Run `mise-refresh` after installing. Add a `policy[...]` row in `check-tools` only if the default `newer` is wrong.
 - **Site overrides:** identity/host-specific config lives in `_sites/current/` (a symlink, currently → `work`). Machine-specific and identity-specific settings belong there, not in the shared files.
 - **Shell init chain:** `~/.zshrc`/`~/.bashrc` → `_shell/shellrc` → `_shell/shellenv` (env/PATH) + `_shell/shellinteractive` (aliases, fzf, editors). zsh specifics in `zsh/zshrc` (OMZ). Keep bash+zsh compatibility in `_shell/*`.
 - **Commit style:** `topic: Phrase` subject, `--` body bullets, 75-col wrap, ASCII-only, `Co-Authored-By` last (see `_ai/memories/commit-message-format.md`).
@@ -155,9 +155,9 @@ fi
 
 Keep the existing `ctrl-o`/`ctrl-y` binds and `FZF_CTRL_R_OPTS` — they're good.
 **Install mechanism (updated 2026-09-14):** add `fd` and `bat` to `mise/config.toml`
-(the portable list); on flox hosts optionally add them to
-`_sites/work/flox/manifest.toml` as well (`fd.pkg-path = "fd"`, `bat.pkg-path =
-"bat"`) and `check-tools` will skip the mise copy. Then `mise-refresh`. Note
+(the portable list); on flox hosts optionally `flox install fd bat` as well (it
+edits the committed `flox/.flox/env/manifest.toml` through the `~/.flox` symlink)
+and `check-tools` will skip the mise copy. Then `mise-refresh`. Note
 Debian's packages expose `fdfind`/`batcat`; if using the distro-package route,
 alias them in `_shell/shellenv`.
 
@@ -191,7 +191,7 @@ first; verify arrow-key history still works after.
 
 **Status:** ⬜ not started
 
-**Why:** `wd` is manual bookmarks (`home`, `dot`, `ssh`… set in `_shell/shellenv:205-214`).
+**Why:** `wd` is manual bookmarks (`home`, `dot`, `ssh`… set in `_shell/shellenv:247-258`).
 `zoxide` learns frequency/recency automatically — `z dotf<Tab>` jumps without
 pre-registering. They coexist: keep `wd` for named stable jumps; add `z` for the long
 tail.
@@ -216,7 +216,7 @@ Missing tool — `zoxide = "latest"` in `mise/config.toml` (portable); optionall
 shim setup. `mise` natively provides direnv-style per-directory env loading via
 `mise.toml` `[env]` blocks — so a new tool may be unnecessary. The tradeoff: mise env
 loading requires `mise activate` (currently commented out at
-`_shell/shellinteractive:150-158`), which would interact with the `MISE_DISABLE_TOOLS`
+`_shell/shellinteractive:173-181`), which would interact with the `MISE_DISABLE_TOOLS`
 / `_mise_disable_sync` exclusion machinery. Two clean options:
 
 - **Enable `mise activate`** and lean on `[env]` for per-project vars — one tool, but
@@ -422,10 +422,10 @@ host, delete the block outright. Alternatively re-implement `path-insert` as a s
 function in `_shell/shellenv` so it is free even when non-empty.
 
 **Second-order (optional, ~70 ms more):**
-- `kubectl completion zsh` (`_shell/shellinteractive:242-248`, ≈ 36 ms) → cache to
+- `kubectl completion zsh` (`_shell/shellinteractive:315-323`, ≈ 36 ms) → cache to
   `${XDG_CACHE_HOME:-~/.cache}/kubectl-completion.$CURRENT_SHELL`, regenerate when
   the file is older than the `kubectl` binary.
-- Six `cd … && wd -q add!` calls at every shell start (`_shell/shellenv:211-218`,
+- Six `cd … && wd -q add!` calls at every shell start (`_shell/shellenv:251-256`,
   ≈ 33 ms) rewrite `~/.warprc` each time. `~/.warprc` is already a plain
   `name:path` file — seed those six entries once from `_bin/dotfiles-install` and
   drop the loop (wd tolerates entries whose directory doesn't exist).
@@ -446,12 +446,12 @@ awk 'match($0,/^\++([0-9]+\.[0-9]+) (.*)$/,m){t=m[1]; if(prev!=""){d=t-prev; if(
 
 **Status:** ⬜ not started
 
-**Why:** fzf now resolves to the **mise shim (0.71.0)** because `_shell/shellenv:168`
+**Why:** fzf now resolves to the **mise shim (0.71.0)** because `_shell/shellenv:198`
 prepends `$MISE_DATA_DIR/shims`. The `fzf/install` run from Jan 2026 left an
 untracked **0.67.0 binary in `_lib/fzf/bin/`**, which `~/.fzf.zsh` appends to the
 *end* of PATH — dead weight that never runs, while the submodule source itself is at
 v0.74.4 (so its `fzf-tmux` script is newer than the binary it drives).
-`_bin/dotfiles-install:163` still says "remember to run fzf/install", which would
+`_bin/dotfiles-install:225` still says "remember to run fzf/install", which would
 re-download another binary PATH ignores.
 
 **Fix (tiny):**
@@ -465,7 +465,7 @@ re-download another binary PATH ignores.
 
 ## 18. shell — mise/flox hygiene (new 2026-09-14)
 
-**Status:** ⬜ not started
+**Status:** 🚧 in progress (flox lists ✅ 2026-11-06; mise orphans ⬜)
 
 Small, mechanical, all low-risk:
 
@@ -479,7 +479,17 @@ Small, mechanical, all low-risk:
   `chafa`, `gcc`, `glow`, `mc` and has an older `glab` than
   `_sites/work/flox/flox.list` (site repo, 2026-08-25). Pick one as canonical, or
   regenerate `_reqs/flox-al2.txt` from `flox list` in the same commit that touches
-  the manifest.
+  the manifest. **Done 2026-11-06:** the site repo's `manifest.toml` was synced
+  from the live `~/.flox/env/manifest.toml` (adding imagemagick, tmux, yazi), and
+  `flox.list` was regenerated from `~/.flox/env/manifest.lock`, so it now matches
+  `_reqs/flox-al2.txt` byte for byte. **2026-11-07:** the manifest moved to the
+  shared repo as `flox/manifest.toml` and the duplicate `flox.list` was dropped,
+  leaving `_reqs/flox-al2.txt` as the one list; the live manifest, the committed
+  copy, and the list are still synced by hand. Later the same day `~/.flox` itself
+  became a symlink to `flox/.flox`, so `flox install` edits the committed manifest
+  and lock directly and only `_reqs/flox-al2.txt` is still synced by hand. That
+  list was then dropped as well: the committed lock lists every package for every
+  system, so nothing flox-related is synced by hand any more.
 
 ---
 
@@ -616,9 +626,11 @@ commits.** `ssh/config` is still 12 lines; `git/gitconfig` still `diff3`, no
 | 15 | blink / trouble / fidget | **blink.cmp now ❌** — explicitly rejected in `TODO_REFACTORING.md` §3. trouble/fidget still optional. |
 
 ### What changed, and its effect on the backlog
-- **The binary hierarchy is now explicit and per-host:** system packages → flox
-  (on hosts that use it) → mise → homedir builds (`~/.local`, `~/.root`).
-  `check-tools` implements exactly this. On this host flox supplies rg, nvim, glab,
+- **The binary hierarchy is now explicit and per-host:** any copy outside mise
+  beats mise, in PATH order: homedir builds (`~/.local`, `~/.root`), then flox
+  (on hosts that use it), then system packages; mise fills in the rest.
+  `check-tools` implements exactly this (order corrected 2026-11-06, see
+  `_docs/binary-hierarchy.org`). On this host flox supplies rg, nvim, glab,
   yq, mc, glow and more via plain PATH entries (not `flox activate`); on non-flox
   hosts mise fills that role. → **Install instructions in #2/#3/#7/#8 were stale
   ("`mise use -g`") and now say: `mise/config.toml` as the portable list, flox
