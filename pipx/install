@@ -34,7 +34,7 @@ reinstall=
 
 PYENV_VERSION=$PYTHON_VERSION pyenv exec pip install --upgrade pip==26.3
 PYENV_VERSION=$PYTHON_VERSION pyenv exec pip install --user $reinstall \
-    pipx
+    pipx==1.18.16
 PYENV_VERSION=$PYTHON_VERSION pyenv exec python -m pipx ensurepath
 
 # install the apps in apps.json at their recorded versions, with their

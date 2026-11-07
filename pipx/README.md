@@ -3,7 +3,7 @@
 * `apps.json` -- the apps to install, as written by `pipx list --json`:
   each app's version and its injected packages.
 * `install` -- installs the pinned pyenv Python (PYTHON_VERSION) if missing,
-  pins pip, installs pipx into that Python's user site
+  pins pip and pipx, installs pipx into that Python's user site
   (reinstalling it only when its launcher points at another Python), runs
   `pipx ensurepath`, then runs `pipx install-all` on `apps.json` with that
   Python.  Apps already installed are left alone, so it is safe to re-run.
