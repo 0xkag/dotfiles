@@ -35,13 +35,6 @@ def relink_relative(target, linkname):
             raise Exception('%s is not a symlink' % linkname)
     os.symlink(os.path.relpath(target, os.path.dirname(linkname)), linkname)
 
-def backup(p):
-    p = os.path.expanduser(p)
-    if os.path.lexists(p) and not os.path.islink(p):
-        if os.path.lexists(p + '.orig'):
-            raise Exception('%s.orig already exists' % p)
-        os.rename(p, p + '.orig')
-
 def unlink(p):
     try:
         os.unlink(os.path.expanduser(p))
@@ -390,8 +383,6 @@ def main():
 
     heading('vifm')
     mkdir('~/.config/vifm')
-    # vifm writes a copy of its sample vifmrc on first run
-    backup('~/.config/vifm/vifmrc')
     relink('~/.dotfiles/vifm/vifmrc', '~/.config/vifm/vifmrc')
 
     # vim
