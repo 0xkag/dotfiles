@@ -5,7 +5,40 @@ set -u
 set -x
 set -o pipefail
 
-PYENV_VERSION=3.12.11 pyenv exec pip install --upgrade pip==25.3
-PYENV_VERSION=3.12.11 pyenv exec pip install --user pipx
-PYENV_VERSION=3.12.11 pyenv exec python -m pipx ensurepath
+# for no_flox; shellenv is written for interactive shells, not for -e or -u
+# (bash 4.2 treats an empty array as unbound), and is sourced untraced so
+# set -x shows only this script's commands
 
+set +eux
+source ~/.dotfiles/_shell/shellenv
+set -eux
+
+PYTHON_VERSION=3.12.16
+
+# build Python with the system toolchain, not flox's (see no_flox)
+
+PATH=$(no_flox "$PATH") PKG_CONFIG_PATH=$(no_flox "${PKG_CONFIG_PATH:-}") \
+    pyenv install --skip-existing $PYTHON_VERSION
+
+python=$(PYENV_VERSION=$PYTHON_VERSION pyenv which python)
+
+# pipx lives in the user site, which every 3.12.x shares, so after a
+# PYTHON_VERSION change a plain install would find it already present and
+# leave its launcher (and its dependencies' scripts) on the old Python; force
+# a reinstall only when the launcher points at another Python
+
+launcher=$("$python" -m site --user-base)/bin/pipx
+reinstall=
+[[ $(head -1 "$launcher" 2> /dev/null) == "#!${python%/*}/"* ]] ||
+    reinstall=--force-reinstall
+
+PYENV_VERSION=$PYTHON_VERSION pyenv exec pip install --upgrade pip==25.3
+PYENV_VERSION=$PYTHON_VERSION pyenv exec pip install --user $reinstall \
+    pipx
+PYENV_VERSION=$PYTHON_VERSION pyenv exec python -m pipx ensurepath
+
+# install the apps in apps.json at their recorded versions, with their
+# injected packages; apps already installed are left alone
+
+PYENV_VERSION=$PYTHON_VERSION pyenv exec python -m pipx install-all \
+    --python "$python" ~/.dotfiles/pipx/apps.json

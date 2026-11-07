@@ -6,6 +6,18 @@
 
 function join { local IFS="$1"; shift; echo "$*"; }
 
+# no_flox LIST -> the colon-separated LIST (e.g. "$PATH") without its flox
+# entries, for building software with the system toolchain: flox's gcc is a
+# nix wrapper that never searches /usr/include, and flox's pkg-config files
+# point at nix libraries, e.g.
+#
+#     PATH=$(no_flox "$PATH") PKG_CONFIG_PATH=$(no_flox "$PKG_CONFIG_PATH") \
+#         pyenv install 3.12.16
+
+function no_flox {
+    printf '%s\n' "$1" | tr : '\n' | grep -v '/\.flox/' | paste -sd : -
+}
+
 # basic environment, part one
 
 # ... home & user & logname

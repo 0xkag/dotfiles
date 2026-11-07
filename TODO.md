@@ -1,9 +1,5 @@
 - binaries: Remove more `_lib` submodules in favor of just installing with
   mise (started this already)
-- binaries: Capture standard set of pipx / mise installed things
-- binaries: Pyenv 3.12.11 is used in pipx/install but nothing makes sure
-  3.12.11 is installed before that runs; this is a bootstrapping problem
-- binaries: poetry and ruff are installed via pipx and need to be automated
 - binaries: Rationalize use of mise vs. system package manager
 - binaries: One package list for every platform, replacing the per-platform
   lists in `_reqs/` (ubuntu, macos-brew, freebsd, openbsd, rockylinux8,

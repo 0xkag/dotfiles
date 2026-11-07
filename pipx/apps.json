@@ -1,0 +1,654 @@
+{
+    "pipx_spec_version": "0.1",
+    "venvs": {
+        "black": {
+            "metadata": {
+                "backend": "pip",
+                "environment": "black",
+                "exposure_enabled": true,
+                "injected_packages": {},
+                "main_package": {
+                    "app_paths": [
+                        {
+                            "__Path__": "/home/george/.local/share/pipx/venvs/black/bin/black",
+                            "__type__": "Path"
+                        },
+                        {
+                            "__Path__": "/home/george/.local/share/pipx/venvs/black/bin/blackd",
+                            "__type__": "Path"
+                        }
+                    ],
+                    "app_paths_of_dependencies": {},
+                    "apps": [
+                        "black",
+                        "blackd"
+                    ],
+                    "apps_of_dependencies": [],
+                    "completion_paths": [],
+                    "completion_paths_of_dependencies": {},
+                    "completions": [],
+                    "completions_of_dependencies": [],
+                    "cooldown_days": null,
+                    "expected_apps": [],
+                    "include_apps": true,
+                    "include_dependencies": false,
+                    "include_resources_from": [],
+                    "lock_file": null,
+                    "man_pages": [],
+                    "man_pages_of_dependencies": [],
+                    "man_paths": [],
+                    "man_paths_of_dependencies": {},
+                    "package": "black",
+                    "package_or_url": "black==25.12.0",
+                    "package_version": "25.12.0",
+                    "pinned": false,
+                    "pip_args": [],
+                    "suffix": ""
+                },
+                "pipx_metadata_version": "0.12",
+                "python_version": "Python 3.12.16",
+                "source_interpreter": {
+                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
+                    "__type__": "Path"
+                },
+                "venv_args": []
+            }
+        },
+        "cookiecutter": {
+            "metadata": {
+                "backend": "pip",
+                "environment": "cookiecutter",
+                "exposure_enabled": true,
+                "injected_packages": {},
+                "main_package": {
+                    "app_paths": [
+                        {
+                            "__Path__": "/home/george/.local/share/pipx/venvs/cookiecutter/bin/cookiecutter",
+                            "__type__": "Path"
+                        }
+                    ],
+                    "app_paths_of_dependencies": {
+                        "binaryornot": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/cookiecutter/bin/binaryornot",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "charset-normalizer": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/cookiecutter/bin/normalizer",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "idna": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/cookiecutter/bin/idna",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "markdown-it-py": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/cookiecutter/bin/markdown-it",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "pygments": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/cookiecutter/bin/pygmentize",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "python-slugify": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/cookiecutter/bin/slugify",
+                                "__type__": "Path"
+                            }
+                        ]
+                    },
+                    "apps": [
+                        "cookiecutter"
+                    ],
+                    "apps_of_dependencies": [
+                        "binaryornot",
+                        "slugify",
+                        "normalizer",
+                        "idna",
+                        "markdown-it",
+                        "pygmentize"
+                    ],
+                    "completion_paths": [],
+                    "completion_paths_of_dependencies": {},
+                    "completions": [],
+                    "completions_of_dependencies": [],
+                    "cooldown_days": null,
+                    "expected_apps": [],
+                    "include_apps": true,
+                    "include_dependencies": false,
+                    "include_resources_from": [],
+                    "lock_file": null,
+                    "man_pages": [],
+                    "man_pages_of_dependencies": [],
+                    "man_paths": [],
+                    "man_paths_of_dependencies": {},
+                    "package": "cookiecutter",
+                    "package_or_url": "cookiecutter==2.7.1",
+                    "package_version": "2.7.1",
+                    "pinned": false,
+                    "pip_args": [],
+                    "suffix": ""
+                },
+                "pipx_metadata_version": "0.12",
+                "python_version": "Python 3.12.16",
+                "source_interpreter": {
+                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
+                    "__type__": "Path"
+                },
+                "venv_args": []
+            }
+        },
+        "poetry": {
+            "metadata": {
+                "backend": "pip",
+                "environment": "poetry",
+                "exposure_enabled": true,
+                "injected_packages": {
+                    "poetry-plugin-pypi-mirror": {
+                        "app_paths": [],
+                        "app_paths_of_dependencies": {
+                            "build": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/pyproject-build",
+                                    "__type__": "Path"
+                                }
+                            ],
+                            "cachecontrol": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/doesitcache",
+                                    "__type__": "Path"
+                                }
+                            ],
+                            "cffi": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/cffi-gen-src",
+                                    "__type__": "Path"
+                                }
+                            ],
+                            "charset-normalizer": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/normalizer",
+                                    "__type__": "Path"
+                                }
+                            ],
+                            "dulwich": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/dul-receive-pack",
+                                    "__type__": "Path"
+                                },
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/dul-upload-pack",
+                                    "__type__": "Path"
+                                },
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/dulwich",
+                                    "__type__": "Path"
+                                }
+                            ],
+                            "findpython": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/findpython",
+                                    "__type__": "Path"
+                                }
+                            ],
+                            "httpx": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/httpx",
+                                    "__type__": "Path"
+                                }
+                            ],
+                            "idna": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/idna",
+                                    "__type__": "Path"
+                                }
+                            ],
+                            "keyring": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/keyring",
+                                    "__type__": "Path"
+                                }
+                            ],
+                            "pbs-installer": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/pbs-install",
+                                    "__type__": "Path"
+                                }
+                            ],
+                            "pkginfo": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/pkginfo",
+                                    "__type__": "Path"
+                                }
+                            ],
+                            "poetry": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/poetry",
+                                    "__type__": "Path"
+                                }
+                            ],
+                            "trove-classifiers": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/trove-classifiers",
+                                    "__type__": "Path"
+                                }
+                            ],
+                            "virtualenv": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/virtualenv",
+                                    "__type__": "Path"
+                                }
+                            ]
+                        },
+                        "apps": [],
+                        "apps_of_dependencies": [
+                            "poetry",
+                            "pyproject-build",
+                            "doesitcache",
+                            "normalizer",
+                            "idna",
+                            "dul-receive-pack",
+                            "dul-upload-pack",
+                            "dulwich",
+                            "findpython",
+                            "keyring",
+                            "cffi-gen-src",
+                            "pbs-install",
+                            "httpx",
+                            "pkginfo",
+                            "trove-classifiers",
+                            "virtualenv"
+                        ],
+                        "completion_paths": [],
+                        "completion_paths_of_dependencies": {},
+                        "completions": [],
+                        "completions_of_dependencies": [],
+                        "cooldown_days": null,
+                        "expected_apps": [],
+                        "include_apps": false,
+                        "include_dependencies": false,
+                        "include_resources_from": [],
+                        "lock_file": null,
+                        "man_pages": [],
+                        "man_pages_of_dependencies": [],
+                        "man_paths": [],
+                        "man_paths_of_dependencies": {},
+                        "package": "poetry-plugin-pypi-mirror",
+                        "package_or_url": "poetry-plugin-pypi-mirror==0.6.2",
+                        "package_version": "0.6.2",
+                        "pinned": false,
+                        "pip_args": [],
+                        "suffix": ""
+                    }
+                },
+                "main_package": {
+                    "app_paths": [
+                        {
+                            "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/poetry",
+                            "__type__": "Path"
+                        }
+                    ],
+                    "app_paths_of_dependencies": {
+                        "build": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/pyproject-build",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "cachecontrol": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/doesitcache",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "cffi": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/cffi-gen-src",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "charset-normalizer": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/normalizer",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "dulwich": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/dul-receive-pack",
+                                "__type__": "Path"
+                            },
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/dul-upload-pack",
+                                "__type__": "Path"
+                            },
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/dulwich",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "findpython": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/findpython",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "httpx": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/httpx",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "idna": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/idna",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "keyring": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/keyring",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "pbs-installer": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/pbs-install",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "pkginfo": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/pkginfo",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "trove-classifiers": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/trove-classifiers",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "virtualenv": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/virtualenv",
+                                "__type__": "Path"
+                            }
+                        ]
+                    },
+                    "apps": [
+                        "poetry"
+                    ],
+                    "apps_of_dependencies": [
+                        "pyproject-build",
+                        "doesitcache",
+                        "normalizer",
+                        "idna",
+                        "dul-receive-pack",
+                        "dul-upload-pack",
+                        "dulwich",
+                        "findpython",
+                        "keyring",
+                        "cffi-gen-src",
+                        "pbs-install",
+                        "httpx",
+                        "pkginfo",
+                        "trove-classifiers",
+                        "virtualenv"
+                    ],
+                    "completion_paths": [],
+                    "completion_paths_of_dependencies": {},
+                    "completions": [],
+                    "completions_of_dependencies": [],
+                    "cooldown_days": null,
+                    "expected_apps": [],
+                    "include_apps": true,
+                    "include_dependencies": false,
+                    "include_resources_from": [],
+                    "lock_file": null,
+                    "man_pages": [],
+                    "man_pages_of_dependencies": [],
+                    "man_paths": [],
+                    "man_paths_of_dependencies": {},
+                    "package": "poetry",
+                    "package_or_url": "poetry==2.2.1",
+                    "package_version": "2.2.1",
+                    "pinned": false,
+                    "pip_args": [],
+                    "suffix": ""
+                },
+                "pipx_metadata_version": "0.12",
+                "python_version": "Python 3.12.16",
+                "source_interpreter": {
+                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
+                    "__type__": "Path"
+                },
+                "venv_args": []
+            }
+        },
+        "python-lsp-server": {
+            "metadata": {
+                "backend": "pip",
+                "environment": "python-lsp-server",
+                "exposure_enabled": true,
+                "injected_packages": {
+                    "pylsp-rope": {
+                        "app_paths": [],
+                        "app_paths_of_dependencies": {
+                            "black": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/python-lsp-server/bin/black",
+                                    "__type__": "Path"
+                                },
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/python-lsp-server/bin/blackd",
+                                    "__type__": "Path"
+                                }
+                            ],
+                            "python-lsp-server": [
+                                {
+                                    "__Path__": "/home/george/.local/share/pipx/venvs/python-lsp-server/bin/pylsp",
+                                    "__type__": "Path"
+                                }
+                            ]
+                        },
+                        "apps": [],
+                        "apps_of_dependencies": [
+                            "pylsp",
+                            "black",
+                            "blackd"
+                        ],
+                        "completion_paths": [],
+                        "completion_paths_of_dependencies": {},
+                        "completions": [],
+                        "completions_of_dependencies": [],
+                        "cooldown_days": null,
+                        "expected_apps": [],
+                        "include_apps": false,
+                        "include_dependencies": false,
+                        "include_resources_from": [],
+                        "lock_file": null,
+                        "man_pages": [],
+                        "man_pages_of_dependencies": [],
+                        "man_paths": [],
+                        "man_paths_of_dependencies": {},
+                        "package": "pylsp-rope",
+                        "package_or_url": "pylsp-rope==0.1.17",
+                        "package_version": "0.1.17",
+                        "pinned": false,
+                        "pip_args": [],
+                        "suffix": ""
+                    }
+                },
+                "main_package": {
+                    "app_paths": [
+                        {
+                            "__Path__": "/home/george/.local/share/pipx/venvs/python-lsp-server/bin/pylsp",
+                            "__type__": "Path"
+                        }
+                    ],
+                    "app_paths_of_dependencies": {
+                        "black": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/python-lsp-server/bin/black",
+                                "__type__": "Path"
+                            },
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/python-lsp-server/bin/blackd",
+                                "__type__": "Path"
+                            }
+                        ]
+                    },
+                    "apps": [
+                        "pylsp"
+                    ],
+                    "apps_of_dependencies": [
+                        "black",
+                        "blackd"
+                    ],
+                    "completion_paths": [],
+                    "completion_paths_of_dependencies": {},
+                    "completions": [],
+                    "completions_of_dependencies": [],
+                    "cooldown_days": null,
+                    "expected_apps": [],
+                    "include_apps": true,
+                    "include_dependencies": false,
+                    "include_resources_from": [],
+                    "lock_file": null,
+                    "man_pages": [],
+                    "man_pages_of_dependencies": [],
+                    "man_paths": [],
+                    "man_paths_of_dependencies": {},
+                    "package": "python-lsp-server",
+                    "package_or_url": "python-lsp-server==1.14.0",
+                    "package_version": "1.14.0",
+                    "pinned": false,
+                    "pip_args": [],
+                    "suffix": ""
+                },
+                "pipx_metadata_version": "0.12",
+                "python_version": "Python 3.12.16",
+                "source_interpreter": {
+                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
+                    "__type__": "Path"
+                },
+                "venv_args": []
+            }
+        },
+        "uv": {
+            "metadata": {
+                "backend": "pip",
+                "environment": "uv",
+                "exposure_enabled": true,
+                "injected_packages": {},
+                "main_package": {
+                    "app_paths": [
+                        {
+                            "__Path__": "/home/george/.local/share/pipx/venvs/uv/bin/uv",
+                            "__type__": "Path"
+                        },
+                        {
+                            "__Path__": "/home/george/.local/share/pipx/venvs/uv/bin/uvx",
+                            "__type__": "Path"
+                        }
+                    ],
+                    "app_paths_of_dependencies": {},
+                    "apps": [
+                        "uv",
+                        "uvx"
+                    ],
+                    "apps_of_dependencies": [],
+                    "completion_paths": [],
+                    "completion_paths_of_dependencies": {},
+                    "completions": [],
+                    "completions_of_dependencies": [],
+                    "cooldown_days": null,
+                    "expected_apps": [],
+                    "include_apps": true,
+                    "include_dependencies": false,
+                    "include_resources_from": [],
+                    "lock_file": null,
+                    "man_pages": [],
+                    "man_pages_of_dependencies": [],
+                    "man_paths": [],
+                    "man_paths_of_dependencies": {},
+                    "package": "uv",
+                    "package_or_url": "uv==0.9.26",
+                    "package_version": "0.9.26",
+                    "pinned": false,
+                    "pip_args": [],
+                    "suffix": ""
+                },
+                "pipx_metadata_version": "0.12",
+                "python_version": "Python 3.12.16",
+                "source_interpreter": {
+                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
+                    "__type__": "Path"
+                },
+                "venv_args": []
+            }
+        },
+        "yapf": {
+            "metadata": {
+                "backend": "pip",
+                "environment": "yapf",
+                "exposure_enabled": true,
+                "injected_packages": {},
+                "main_package": {
+                    "app_paths": [
+                        {
+                            "__Path__": "/home/george/.local/share/pipx/venvs/yapf/bin/yapf",
+                            "__type__": "Path"
+                        },
+                        {
+                            "__Path__": "/home/george/.local/share/pipx/venvs/yapf/bin/yapf-diff",
+                            "__type__": "Path"
+                        }
+                    ],
+                    "app_paths_of_dependencies": {},
+                    "apps": [
+                        "yapf",
+                        "yapf-diff"
+                    ],
+                    "apps_of_dependencies": [],
+                    "completion_paths": [],
+                    "completion_paths_of_dependencies": {},
+                    "completions": [],
+                    "completions_of_dependencies": [],
+                    "cooldown_days": null,
+                    "expected_apps": [],
+                    "include_apps": true,
+                    "include_dependencies": false,
+                    "include_resources_from": [],
+                    "lock_file": null,
+                    "man_pages": [],
+                    "man_pages_of_dependencies": [],
+                    "man_paths": [],
+                    "man_paths_of_dependencies": {},
+                    "package": "yapf",
+                    "package_or_url": "yapf==0.43.0",
+                    "package_version": "0.43.0",
+                    "pinned": false,
+                    "pip_args": [],
+                    "suffix": ""
+                },
+                "pipx_metadata_version": "0.12",
+                "python_version": "Python 3.12.16",
+                "source_interpreter": {
+                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
+                    "__type__": "Path"
+                },
+                "venv_args": []
+            }
+        }
+    }
+}
