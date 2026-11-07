@@ -32,7 +32,7 @@ reinstall=
 [[ $(head -1 "$launcher" 2> /dev/null) == "#!${python%/*}/"* ]] ||
     reinstall=--force-reinstall
 
-PYENV_VERSION=$PYTHON_VERSION pyenv exec pip install --upgrade pip==25.3
+PYENV_VERSION=$PYTHON_VERSION pyenv exec pip install --upgrade pip==26.3
 PYENV_VERSION=$PYTHON_VERSION pyenv exec pip install --user $reinstall \
     pipx
 PYENV_VERSION=$PYTHON_VERSION pyenv exec python -m pipx ensurepath
