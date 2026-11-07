@@ -1,0 +1,1238 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "awscli2": {
+        "pkg-path": "awscli2"
+      },
+      "bash-language-server": {
+        "pkg-path": "bash-language-server"
+      },
+      "binutils": {
+        "pkg-path": "binutils"
+      },
+      "boto3": {
+        "pkg-path": "python313Packages.boto3"
+      },
+      "chafa": {
+        "pkg-path": "chafa"
+      },
+      "cmake": {
+        "pkg-path": "cmake"
+      },
+      "duckdb": {
+        "pkg-path": "duckdb"
+      },
+      "emacs30": {
+        "pkg-path": "emacs30",
+        "version": "30.2"
+      },
+      "gcc": {
+        "pkg-path": "gcc"
+      },
+      "glab": {
+        "pkg-path": "glab"
+      },
+      "glibc": {
+        "pkg-path": "glibc"
+      },
+      "glow": {
+        "pkg-path": "glow"
+      },
+      "go": {
+        "pkg-path": "go"
+      },
+      "gopls": {
+        "pkg-path": "gopls"
+      },
+      "htmlq": {
+        "pkg-path": "htmlq"
+      },
+      "imagemagick": {
+        "pkg-path": "imagemagick"
+      },
+      "inotify-tools": {
+        "pkg-path": "inotify-tools"
+      },
+      "mc": {
+        "pkg-path": "mc"
+      },
+      "mercurial": {
+        "pkg-path": "mercurial"
+      },
+      "neovim": {
+        "pkg-path": "neovim",
+        "version": "0.12.2"
+      },
+      "nodejs": {
+        "pkg-path": "nodejs"
+      },
+      "opendkim": {
+        "pkg-path": "opendkim"
+      },
+      "pandoc": {
+        "pkg-path": "pandoc",
+        "version": "3.7.0.2"
+      },
+      "par2cmdline": {
+        "pkg-path": "par2cmdline"
+      },
+      "pass": {
+        "pkg-path": "pass"
+      },
+      "ripgrep": {
+        "pkg-path": "ripgrep"
+      },
+      "rustup": {
+        "pkg-path": "rustup"
+      },
+      "shellcheck": {
+        "pkg-path": "shellcheck"
+      },
+      "tmux": {
+        "pkg-path": "tmux"
+      },
+      "tree-sitter": {
+        "pkg-path": "tree-sitter",
+        "pkg-group": "tree-sitter",
+        "version": "0.26.8"
+      },
+      "vifm": {
+        "pkg-path": "vifm"
+      },
+      "vim": {
+        "pkg-path": "vim",
+        "pkg-group": "vim",
+        "version": "9.2.0340"
+      },
+      "yamllint": {
+        "pkg-path": "yamllint"
+      },
+      "yazi": {
+        "pkg-path": "yazi"
+      },
+      "yq": {
+        "pkg-path": "yq"
+      }
+    },
+    "hook": {},
+    "profile": {},
+    "options": {
+      "systems": [
+        "x86_64-linux"
+      ]
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "awscli2",
+      "broken": false,
+      "derivation": "/nix/store/dbl9vmw4sbrfxby3gn2n61k50wwgqhqv-awscli2-2.34.24.drv",
+      "description": "Unified tool to manage your AWS services",
+      "install_id": "awscli2",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "awscli2-2.34.24",
+      "pname": "awscli2",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:35.234084Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.34.24",
+      "outputs_to_install": [
+        "out",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/d61f9km3qfzb3xwa1nzd662ii8607zdh-awscli2-2.34.24-dist",
+        "out": "/nix/store/1kxvaj17xxfl0dznykiqn2ikscajpwag-awscli2-2.34.24"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "bash-language-server",
+      "broken": false,
+      "derivation": "/nix/store/grzm58xj5lizhhc67ln85q54kvfbiaf9-bash-language-server-5.6.0.drv",
+      "description": "Language server for Bash",
+      "install_id": "bash-language-server",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "bash-language-server-5.6.0",
+      "pname": "bash-language-server",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:35.354723Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.6.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/9x4rck6jbf9gpi9pgygi04i2blmwbrh2-bash-language-server-5.6.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "binutils",
+      "broken": false,
+      "derivation": "/nix/store/fr4s6crprj60n9wwcyf7icplz8dxp1ls-binutils-wrapper-2.46.drv",
+      "description": "Tools for manipulating binaries (linker, assembler, etc.) (wrapper script)",
+      "install_id": "binutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "binutils-wrapper-2.46",
+      "pname": "binutils",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:35.411097Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.46",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/mlfnw3b798bj39i25nn145kdyrxsirwp-binutils-wrapper-2.46-info",
+        "man": "/nix/store/8zd61mzpnwpq1x9p45w9ifii7rpxgrq7-binutils-wrapper-2.46-man",
+        "out": "/nix/store/mbyy19mdwnfvfwmdi0gqgggx0njvpl1w-binutils-wrapper-2.46"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python313Packages.boto3",
+      "broken": false,
+      "derivation": "/nix/store/fpjfjbw5r7814nhrjyvlh13ggy3xlq7h-python3.13-boto3-1.42.31.drv",
+      "description": "AWS SDK for Python",
+      "install_id": "boto3",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "python3.13-boto3-1.42.31",
+      "pname": "boto3",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:48:43.305921Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.13-boto3-1.42.31",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/bckial7n6gl50vicy7f6h44f80n1fl78-python3.13-boto3-1.42.31-dist",
+        "out": "/nix/store/yay6gi2pwzhqhpzb8j78czz9qahjdlzx-python3.13-boto3-1.42.31"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "chafa",
+      "broken": false,
+      "derivation": "/nix/store/rriyxlibslwmqz2afj6cass1jh5gllyl-chafa-1.18.2.drv",
+      "description": "Terminal graphics for the 21st century",
+      "install_id": "chafa",
+      "license": "LGPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "chafa-1.18.2",
+      "pname": "chafa",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:35.597311Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.18.2",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/4m25ri4i5z1nj0bcq2aw0pzkf9kbn417-chafa-1.18.2-bin",
+        "dev": "/nix/store/7za7pdy2bjbm4awdj7s9x7134p0ggc33-chafa-1.18.2-dev",
+        "man": "/nix/store/12mz6p407fx2by6p0lw86c9z8p1snapi-chafa-1.18.2-man",
+        "out": "/nix/store/48h719rwzxl971w9w8jcg3594dm5mnw9-chafa-1.18.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "cmake",
+      "broken": false,
+      "derivation": "/nix/store/chjihb93qzh3xi3x8if7259bz2lzj8b1-cmake-4.1.2.drv",
+      "description": "Cross-platform, open-source build system generator",
+      "install_id": "cmake",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "cmake-4.1.2",
+      "pname": "cmake",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:35.807831Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "4.1.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/rd1qfyjkzr3zswd8v5jblv9j2nydcxgx-cmake-4.1.2-debug",
+        "out": "/nix/store/r9941n32g4wyvggz2703dlplbdq8a6rd-cmake-4.1.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "duckdb",
+      "broken": false,
+      "derivation": "/nix/store/n2l6r77pisn0r2m4bxwbn93y9lsy506m-duckdb-1.5.2.drv",
+      "description": "Embeddable SQL OLAP Database Management System",
+      "install_id": "duckdb",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "duckdb-1.5.2",
+      "pname": "duckdb",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:36.438160Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.5.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/6jcnq8spw5rn7zdp3lyqfix274znrq27-duckdb-1.5.2-dev",
+        "lib": "/nix/store/jh4nw6lc668jxy2hdj98skprgavgvq6c-duckdb-1.5.2-lib",
+        "out": "/nix/store/y4ya9vsbq4wr784l4g4cvi27v0cy40k9-duckdb-1.5.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "emacs30",
+      "broken": false,
+      "derivation": "/nix/store/l2npfb8khh3dx9f93sm1n7h3rpdhmbq3-emacs-30.2.drv",
+      "description": "Extensible, customizable GNU text editor",
+      "install_id": "emacs30",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "emacs-30.2",
+      "pname": "emacs30",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:36.586714Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "30.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/q8mb81r7fr21bpkp98faws4q7s62yw50-emacs-30.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc",
+      "broken": false,
+      "derivation": "/nix/store/y7wnv3kycy9gpxzwmny1sppi7il9i31a-gcc-wrapper-15.2.0.drv",
+      "description": "GNU Compiler Collection, version 15.2.0 (wrapper script)",
+      "install_id": "gcc",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "gcc-wrapper-15.2.0",
+      "pname": "gcc",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:37.217059Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "15.2.0",
+      "outputs_to_install": [
+        "man",
+        "man",
+        "man",
+        "out",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/5b0hplrl0n9g159mcis4jca1fjd4822a-gcc-wrapper-15.2.0-info",
+        "man": "/nix/store/r35yg8h1w630r3lmnyglwhv5nvk284mx-gcc-wrapper-15.2.0-man",
+        "out": "/nix/store/788mx070y81zjlg5ipcl0cra3afviw9k-gcc-wrapper-15.2.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "glab",
+      "broken": false,
+      "derivation": "/nix/store/sx0lkgyfrlj833vh3hqwd6431iwi4d5k-glab-1.101.0.drv",
+      "description": "GitLab CLI tool bringing GitLab to your command line",
+      "install_id": "glab",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "glab-1.101.0",
+      "pname": "glab",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:37.476856Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.101.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/4y2bas8mzfwylzb4jwllhzxp8id0lx2n-glab-1.101.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "glibc",
+      "broken": false,
+      "derivation": "/nix/store/3rx2w7lxnr0ndimg0mavnb4klbm04amd-glibc-2.42-61.drv",
+      "description": "GNU C Library",
+      "install_id": "glibc",
+      "license": "LGPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "glibc-2.42-61",
+      "pname": "glibc",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:37.489221Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.42-61",
+      "outputs_to_install": [
+        "bin",
+        "bin",
+        "bin",
+        "bin",
+        "bin",
+        "bin",
+        "bin"
+      ],
+      "outputs": {
+        "bin": "/nix/store/bsh7n2nx8ndmm1mmww6v2h4851nalj13-glibc-2.42-61-bin",
+        "debug": "/nix/store/064aav9qq5cszj4vw0q9z35pf9mjrj5w-glibc-2.42-61-debug",
+        "dev": "/nix/store/15h9askp4k1lx44d9871wid23j2a8ijp-glibc-2.42-61-dev",
+        "getent": "/nix/store/nacdc243fq2l9csjcbb1d2pzb14pfq8b-glibc-2.42-61-getent",
+        "out": "/nix/store/57iz36553175g3178pvxjij8z5rcsd4n-glibc-2.42-61",
+        "static": "/nix/store/b5qr6vlws4ifz9y5b98rn08iif41imv8-glibc-2.42-61-static"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "glow",
+      "broken": false,
+      "derivation": "/nix/store/sfgzsscw1kd3i7xy872sl4z2dvv07f6l-glow-2.1.2.drv",
+      "description": "Render markdown on the CLI, with pizzazz",
+      "install_id": "glow",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "glow-2.1.2",
+      "pname": "glow",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:37.503190Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.1.2",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/hmdr0gqd2r219idqk96sal5qwy6i867s-glow-2.1.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "go",
+      "broken": false,
+      "derivation": "/nix/store/zalhv7i71i9c3v7vm61psf2arglbzjfg-go-1.26.3.drv",
+      "description": "Go Programming language",
+      "install_id": "go",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "go-1.26.3",
+      "pname": "go",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:38.187124Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.26.3",
+      "outputs_to_install": [
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/33fw5m31lfcnk4ff2f0df7j2bxnh8lgk-go-1.26.3"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gopls",
+      "broken": false,
+      "derivation": "/nix/store/y6m5yysfxd6gkf8azhj3csws9zd846bz-gopls-0.22.0.drv",
+      "description": "Official language server for the Go language",
+      "install_id": "gopls",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "gopls-0.22.0",
+      "pname": "gopls",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:38.342956Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.22.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2j2ic8l0xgarlckkmc6k7dh9v4j6ip3b-gopls-0.22.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "htmlq",
+      "broken": false,
+      "derivation": "/nix/store/ljd5zmix2qrcbdj009gj06y9vfv1pz6i-htmlq-0.4.0.drv",
+      "description": "Like jq, but for HTML",
+      "install_id": "htmlq",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "htmlq-0.4.0",
+      "pname": "htmlq",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:57.551702Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/vmwa9r93acfy4c8jyzi9jjpzni5qbikn-htmlq-0.4.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "imagemagick",
+      "broken": false,
+      "derivation": "/nix/store/cqq7r0qbpgh9j6y7z39bs7n6brn0xg3m-imagemagick-7.1.2-23.drv",
+      "description": "Software suite to create, edit, compose, or convert bitmap images",
+      "install_id": "imagemagick",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "imagemagick-7.1.2-23",
+      "pname": "imagemagick",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:58.504450Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "7.1.2-23",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/mqn50k3viz5wb0gwbdfwb23v7l32kfxf-imagemagick-7.1.2-23-dev",
+        "doc": "/nix/store/fqly9ymadz5cj8kq18wv2flq45m00rs1-imagemagick-7.1.2-23-doc",
+        "out": "/nix/store/vwalk1kcnb5mr5c5c8100a96r9kgq4g2-imagemagick-7.1.2-23"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "inotify-tools",
+      "broken": false,
+      "derivation": "/nix/store/9pz2scg26pgp5z0ll67w0ivgx7qgf4hp-inotify-tools-4.25.9.0.drv",
+      "install_id": "inotify-tools",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "inotify-tools-4.25.9.0",
+      "pname": "inotify-tools",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:58.766429Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "4.25.9.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3r5q28qrng58xfqla94z0ix3jr8wim30-inotify-tools-4.25.9.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mc",
+      "broken": false,
+      "derivation": "/nix/store/4g1884f56a0v85l7nmyw9f1x83cbgbay-mc-4.8.33.drv",
+      "description": "File Manager and User Shell for the GNU Project, known as Midnight Commander",
+      "install_id": "mc",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "mc-4.8.33",
+      "pname": "mc",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:48:13.866260Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "4.8.33",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "man": "/nix/store/rqa24n8la2nw899gdn4i86djs3ahvlsk-mc-4.8.33-man",
+        "out": "/nix/store/lhilqvdpr85dpfal6912s23mkqcvj98q-mc-4.8.33"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mercurial",
+      "broken": false,
+      "derivation": "/nix/store/wcka0dhznwqd6wq4mszbf7dah4cqv3gc-mercurial-7.1.2.drv",
+      "description": "Fast, lightweight SCM system for very large distributed projects",
+      "install_id": "mercurial",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "mercurial-7.1.2",
+      "pname": "mercurial",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:48:14.214876Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "7.1.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/x1aw3v33a3lax6sdd3wgkfqv5bph4zd2-mercurial-7.1.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "neovim",
+      "broken": false,
+      "derivation": "/nix/store/ccpk13f9s7wwsppavpmwyvspk2m3wrj2-neovim-0.12.2.drv",
+      "description": "Vim text editor fork focused on extensibility and agility",
+      "install_id": "neovim",
+      "license": "[ Apache-2.0, Vim ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "neovim-0.12.2",
+      "pname": "neovim",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:48:16.609834Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.12.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/jk2rz33v6vprn2pnksfypby4z0swm1f9-neovim-0.12.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nodejs",
+      "broken": false,
+      "derivation": "/nix/store/f8i8jydaqs0ngxm97c091zna2mnjb43f-nodejs-24.15.0.drv",
+      "description": "Event-driven I/O framework for the V8 JavaScript engine",
+      "install_id": "nodejs",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "nodejs-24.15.0",
+      "pname": "nodejs",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:48:17.971319Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "24.15.0",
+      "outputs_to_install": [
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/5a8ysg1jnj8jmzzyfcfw7rvpvnp5rfpa-nodejs-24.15.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "opendkim",
+      "broken": false,
+      "derivation": "/nix/store/yaf7yn5v9jmawkvvirmmzgx69yv2q5w3-opendkim-2.11.0-Beta2.drv",
+      "description": "C library for producing DKIM-aware applications and an open source milter for providing DKIM service",
+      "install_id": "opendkim",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "opendkim-2.11.0-Beta2",
+      "pname": "opendkim",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:48:25.128866Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.11.0-Beta2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/q3j4a0rpryj8sfgw2jb6rmgylycp6zk2-opendkim-2.11.0-Beta2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "pandoc",
+      "broken": false,
+      "derivation": "/nix/store/bnf0b028lhpskp6g1hi351qagjcf764j-pandoc-cli-3.7.0.2.drv",
+      "description": "Conversion between documentation formats",
+      "install_id": "pandoc",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "pandoc-cli-3.7.0.2",
+      "pname": "pandoc",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:48:26.367274Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.7.0.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cgnsdqszjy9sb22nxfqhja3slw73ja8k-pandoc-cli-3.7.0.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "par2cmdline",
+      "broken": false,
+      "derivation": "/nix/store/1sr678rfzvin5rhrp1k6ckwlphkz7p89-par2cmdline-0.8.1.drv",
+      "description": "PAR 2.0 compatible file verification and repair tool",
+      "install_id": "par2cmdline",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "par2cmdline-0.8.1",
+      "pname": "par2cmdline",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:48:26.714832Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.8.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2mkp08xhdbli81qklf3iwnxh3fj487f7-par2cmdline-0.8.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "pass",
+      "broken": false,
+      "derivation": "/nix/store/xv1qrb7bfjn2vr5f9bq4gfid2ygkyhqn-password-store-1.7.4.drv",
+      "description": "Stores, retrieves, generates, and synchronizes passwords securely",
+      "install_id": "pass",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "password-store-1.7.4",
+      "pname": "pass",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:48:26.820403Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.7.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/pbsdywmwgs1q3si5b5lir55b9y173v1q-password-store-1.7.4"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "ripgrep",
+      "broken": false,
+      "derivation": "/nix/store/iqqcq02llqxrgbid7g8q56vqkdvs20ww-ripgrep-15.1.0.drv",
+      "description": "Utility that combines the usability of The Silver Searcher with the raw speed of grep",
+      "install_id": "ripgrep",
+      "license": "[ Unlicense, MIT ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "ripgrep-15.1.0",
+      "pname": "ripgrep",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:49:43.220486Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "15.1.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ixsp81bia5w1fqd2d59vwbcfqk3n5231-ripgrep-15.1.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "rustup",
+      "broken": false,
+      "derivation": "/nix/store/skkqqjs9x3hcghbbzap831vrna8jhil5-rustup-1.29.0.drv",
+      "description": "Rust toolchain installer",
+      "install_id": "rustup",
+      "license": "[ Apache-2.0, MIT ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "rustup-1.29.0",
+      "pname": "rustup",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:49:50.602454Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.29.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/dpqx1vygrisrvnnwgym1226x317vqp4a-rustup-1.29.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "shellcheck",
+      "broken": false,
+      "derivation": "/nix/store/asfa0kv0rbb0b999qhn3yvg3019awb4x-shellcheck-0.11.0.drv",
+      "description": "Shell script analysis tool",
+      "install_id": "shellcheck",
+      "license": "GPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "shellcheck-0.11.0",
+      "pname": "shellcheck",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:50:10.194478Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.11.0",
+      "outputs_to_install": [
+        "bin",
+        "doc",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/2lfacwyvxpllrq9jpbyz7z4v4lc3wnr9-shellcheck-0.11.0-bin",
+        "doc": "/nix/store/qbmc0kv3ddridry1w7rdc124an8fk895-shellcheck-0.11.0-doc",
+        "man": "/nix/store/0504zfbbnxm2dgnkj0pal11nv09i1g2p-shellcheck-0.11.0-man",
+        "out": "/nix/store/pmk1wsbpsxkaa33mrigc72iln3pvy9r2-shellcheck-0.11.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tmux",
+      "broken": false,
+      "derivation": "/nix/store/m0dw7b0iqh8c75x33mi129zwn1fhjyji-tmux-3.6a.drv",
+      "description": "Terminal multiplexer",
+      "install_id": "tmux",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "tmux-3.6a",
+      "pname": "tmux",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:50:48.211091Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.6a",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "man": "/nix/store/2wj5f8mjg8x2md3hr5zlrv1jc6vc1134-tmux-3.6a-man",
+        "out": "/nix/store/ajvll7kw423j98gc0hry86bgic4lanl5-tmux-3.6a"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "vifm",
+      "broken": false,
+      "derivation": "/nix/store/4x28sip4bwbpyk4d8idfhsayang01y8w-vifm-0.14.4.drv",
+      "description": "Vi-like file manager",
+      "install_id": "vifm",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "vifm-0.14.4",
+      "pname": "vifm",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:51:16.636499Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/k4ffqkdasdl20g11nnxdilzc52ww3478-vifm-0.14.4"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "yamllint",
+      "broken": false,
+      "derivation": "/nix/store/r171qxnlx3fnbvggrh51ipl5012cnj0x-python3.13-yamllint-1.37.1.drv",
+      "description": "Linter for YAML files",
+      "install_id": "yamllint",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "python3.13-yamllint-1.37.1",
+      "pname": "yamllint",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:51:36.837734Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.37.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/fl5c4n9mfmpw63j56s37irh0bvmklpfw-python3.13-yamllint-1.37.1-dist",
+        "out": "/nix/store/5w1q20g6qp27s73jq1lsc7dflj95rrm8-python3.13-yamllint-1.37.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "yazi",
+      "broken": false,
+      "derivation": "/nix/store/hchx3ziyh90zdkamqvlkabsvczyf1d88-yazi-26.5.6.drv",
+      "description": "Blazing fast terminal file manager written in Rust, based on async I/O",
+      "install_id": "yazi",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "yazi-26.5.6",
+      "pname": "yazi",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:51:37.052576Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "26.5.6",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/549k33kzv5w0dvyrkiqqhn0gawxkvra1-yazi-26.5.6"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "yq",
+      "broken": false,
+      "derivation": "/nix/store/fbyvxpzq2m57p3j17yrx2j01dcjvpsa7-python3.13-yq-3.4.3.drv",
+      "description": "Command-line YAML/XML/TOML processor - jq wrapper for YAML, XML, TOML documents",
+      "install_id": "yq",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "python3.13-yq-3.4.3",
+      "pname": "yq",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:51:37.598858Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.4.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/a4n67838ybdk1xs21dsnl4afzcc8p729-python3.13-yq-3.4.3-dist",
+        "out": "/nix/store/7jh563kddcyj954pyffmcb79vcwrn6h5-python3.13-yq-3.4.3"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tree-sitter",
+      "broken": false,
+      "derivation": "/nix/store/2liczb0xlvm0za6mbpx1v7lz2pdgfxhy-tree-sitter-0.26.8.drv",
+      "description": "Parser generator tool and an incremental parsing library",
+      "install_id": "tree-sitter",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e73de5be04e0eff4190a1432b946d469c794e7b4",
+      "name": "tree-sitter-0.26.8",
+      "pname": "tree-sitter",
+      "rev": "e73de5be04e0eff4190a1432b946d469c794e7b4",
+      "rev_count": 1022855,
+      "rev_date": "2026-06-26T09:58:34Z",
+      "scrape_date": "2026-06-27T04:58:52.221804Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.26.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/q225wxvqcxx8r66kpazcdvv3q6hdxc33-tree-sitter-0.26.8"
+      },
+      "system": "x86_64-linux",
+      "group": "tree-sitter",
+      "priority": 5
+    },
+    {
+      "attr_path": "vim",
+      "broken": false,
+      "derivation": "/nix/store/zvx0lzr62xi37a49dd1pwb9hcw4jy5sl-vim-9.2.0340.drv",
+      "description": "Most popular clone of the VI editor",
+      "install_id": "vim",
+      "license": "Vim",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=d233902339c02a9c334e7e593de68855ad26c4cb",
+      "name": "vim-9.2.0340",
+      "pname": "vim",
+      "rev": "d233902339c02a9c334e7e593de68855ad26c4cb",
+      "rev_count": 998534,
+      "rev_date": "2026-05-15T18:21:44Z",
+      "scrape_date": "2026-05-17T08:35:48.406526Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.2.0340",
+      "outputs_to_install": [
+        "out",
+        "xxd"
+      ],
+      "outputs": {
+        "out": "/nix/store/yl6gvmafjjpaqidkaj5npdpl2fr5kimq-vim-9.2.0340",
+        "xxd": "/nix/store/9pxv7h40jwsffkwkx23zxwlgk9whjfn0-vim-9.2.0340-xxd"
+      },
+      "system": "x86_64-linux",
+      "group": "vim",
+      "priority": 5
+    }
+  ]
+}

@@ -2,6 +2,7 @@
 # vim: et sw=4 ts=4:
 
 import os
+import platform
 import re
 import shlex
 import shutil
@@ -63,6 +64,26 @@ def run(p):
     except:
         raise
 
+# This host's system as flox names it: x86_64-linux, aarch64-linux,
+# aarch64-darwin, x86_64-darwin (anything else is a system flox lacks).
+def flox_system():
+    machine = platform.machine().replace('arm64', 'aarch64')
+    return '%s-%s' % (machine, platform.system().lower())
+
+# The systems flox/.flox's manifest lists in [options] systems; without that
+# list flox resolves for its default systems plus the current one, so this
+# host's system always qualifies.
+# ponytail: regex, not a TOML parser; the python3 running this may predate
+# tomllib (3.11)
+def flox_systems():
+    p = os.path.expanduser('~/.dotfiles/flox/.flox/env/manifest.toml')
+    with open(p) as f:
+        match = re.search(r'^systems\s*=\s*\[(.*?)\]', f.read(),
+                          re.MULTILINE | re.DOTALL)
+    if match is None:
+        return [flox_system()]
+    return re.findall(r'"([^"]+)"', match.group(1))
+
 # The directory of mc's stock extension handlers, as `mc -F` reports it, but
 # reached through the prefix of the mc on PATH when that holds it too, so that
 # a profile's path (e.g., ~/.flox/run/...) survives upgrades that move the
@@ -118,6 +139,22 @@ def main():
         run(p)
     else:
         step('no site-specific dotfiles-install-site')
+
+    # flox (only where flox is installed and the manifest lists this host's
+    # system; before mise, so that check-tools sees the tools flox provides
+    # and mise skips them). The link is at ~/.flox itself because every flox
+    # edit replaces ~/.flox/env wholesale (and writes the manifest
+    # atomically), which would break a link at env or at the manifest;
+    # activating once builds the gitignored run/ links
+
+    heading('flox')
+    if shutil.which('flox') is None:
+        step('no flox')
+    elif flox_system() not in flox_systems():
+        step('flox/.flox does not list %s in its systems' % flox_system())
+    else:
+        relink('~/.dotfiles/flox/.flox', '~/.flox')
+        run('flox activate -d ~ -- true')
 
     # mise
 

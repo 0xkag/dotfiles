@@ -3,7 +3,7 @@
 - binaries: Rationalize use of mise vs. system package manager
 - binaries: One package list for every platform, replacing the per-platform
   lists in `_reqs/` (ubuntu, macos-brew, freebsd, openbsd, rockylinux8,
-  flox-al2, python): each tool once, with its name and install method per
+  python): each tool once, with its name and install method per
   platform (apt/brew/pkg/pkg_add/yum/flox/mise/pipx/snap/built from source),
   or none; needs a file format (and probably an installer reading it);
   recent additions to seed it: chafa and vifm (apt; flox on AL2), ghostty
