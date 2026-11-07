@@ -53,6 +53,20 @@ fi
 # language and runtime paths / bootstrapping; any PATH changes will be
 # overridden
 
+# ... flox (the default environment's run directory, named for this host's
+# system; flox activate is off, see _shell/shellinteractive, so the paths
+# below point into it directly, and are inert on hosts without flox)
+
+case $(uname -sm) in
+    'Darwin arm64')  flox_system=aarch64-darwin ;;
+    'Darwin x86_64') flox_system=x86_64-darwin ;;
+    'Linux aarch64') flox_system=aarch64-linux ;;
+    'Linux x86_64')  flox_system=x86_64-linux ;;
+    *)               flox_system=unknown ;;
+esac
+
+flox_run=$HOME/.flox/run/$flox_system.default.dev
+
 # ... go
 
 export GOPATH=$HOME/.go
@@ -92,7 +106,7 @@ manpath=(
     $HOME/.root/man
     $HOME/.root/share/man
     $NPM_PACKAGES/share/man
-    $HOME/.flox/run/x86_64-linux.default.dev/share/man
+    $flox_run/share/man
     /usr/local/man
     /usr/local/share/man
     /usr/share/man
@@ -113,8 +127,8 @@ path=(
     $PYENV_ROOT/bin
     $GOPATH/bin
     $NPM_PACKAGES/bin
-    $HOME/.flox/run/x86_64-linux.default.dev/bin
-    $HOME/.flox/run/x86_64-linux.default.dev/sbin
+    $flox_run/bin
+    $flox_run/sbin
     /opt/homebrew/bin
     /opt/homebrew/sbin
     /usr/local/bin
@@ -134,8 +148,8 @@ pkg_config_path=(
     $HOME/.local/lib/pkgconfig
     $HOME/.root/lib64/pkgconfig
     $HOME/.root/lib/pkgconfig
-    $HOME/.flox/run/x86_64-linux.default.dev/lib/pkgconfig
-    $HOME/.flox/run/x86_64-linux.default.dev/share/pkgconfig
+    $flox_run/lib/pkgconfig
+    $flox_run/share/pkgconfig
     /usr/lib64/pkgconfig
     /usr/lib/pkgconfig
     /usr/share/pkgconfig
@@ -156,7 +170,7 @@ fi
 xdg_data_dirs=(
     $HOME/.local/share
     $HOME/.root/share
-    $HOME/.flox/run/x86_64-linux.default.dev/share
+    $flox_run/share
     ${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}
 )
 
