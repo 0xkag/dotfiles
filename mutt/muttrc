@@ -1,133 +1,160 @@
-# http://www.stat.rice.edu/~helpdesk/dotfiles/.muttrc.pine.html
+# Mutt set up to behave like Alpine 2.26 (plus the fancy, compose, and tome
+# patches from 0xkag/alpine custom-2.26.x) as configured in alpine/pinerc.
 #
-# Date: Mon, 7 Dec 1998 21:49:17 +0100
-# From: Daniel Gonzalez Gasull <gasull[at]usa.net>
-# Subject: .muttrc for Pine users
+# Alpine commands are case-insensitive; mutt's are not.  Only the lowercase
+# Alpine keys are bound here, so uppercase keys keep their mutt meanings
+# (e.g., D is delete-pattern, L is list-reply), except R, which is
+# group-reply since Alpine's reply prompts for reply-to-all.
 #
-# muttrc.Pine 1.0 by Daniel Gonzalez Gasull
-# Feedback is welcome.  Email: gasull[at]usa.net
-#                       http://gasull.home.ml.org
+# Accounts (spoolfile, folder, record, alternates, gmail) are site-specific
+# and live next to the site pinerc, in _sites/current/mutt/muttrc.local,
+# which is sourced last.  See README.md for what differs from Alpine.
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
-# This file contains commands to change the keybindings in Mutt to be
-# similar to those of PINE 3.96.
+# Settings
 #
+
+# Equivalents of pinerc features and variables: compose and reply go
+# straight to the editor with headers above the body (like Alpine's
+# composer), beep on new mail, save without "Append to?", include-text-in-
+# reply, index-format (STATUS MSGNO SMARTTIME FROMORTO SIZE SUBJECT), the
+# speller for spell-check-before-sending, mail-check-interval, forward-as-
+# attachment, viewer-overlap, Space stops at the end of a message, "Really
+# quit Alpine?", no pauses on status messages, sort-key Arrival, title bar
+# on top, and the tome patch's "+" (sole recipient) and "." (one of several)
+# markers.
+set autoedit
+set beep_new
+unset confirmappend
+set edit_headers
+set editor=nvim
+set fast_reply
+set include=yes
+set index_format='%Z %4C %[%b %d %R] %-25.25F (%4c) %s'
+set ispell='aspell --mode=email -c'
+set mail_check=30
+set mime_forward=yes
+set pager_context=2
+set pager_stop
+set quit=ask-yes
+set sleep_time=0
+set sort=mailbox-order
+set status_on_top
+set timeout=30
+set to_chars=' +. F'
+
+# expunge-only-manually: closing or quitting never purges deleted messages
+# (IMAP keeps the \Deleted flag); only x does, after confirming.  x leaves
+# delete=ask-yes until the next folder open.  incoming-startup-rule=last.
+folder-hook . 'set delete=no; push <last-entry>'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
 # Key bindings
 #
-#       maps:
-#               alias           alias menu
-#               attach          attachment menu
-#               browser         directory browser
-#               compose         compose menu
-#               index           message index
-#               pgp             pgp menu
-#               postpone        postponed message recall menu
-#               generic         generic keymap for all of the above
-#               editor          line editor
-#               pager           text viewer
-#               
 
-bind alias ' ' next-page
-bind alias - previous-page
-bind alias . enter-command
-bind alias : tag-entry
-bind alias n next-entry
-bind alias p previous-entry
-bind alias w search
-bind alias x tag-entry
+# Movement, paging, WhereIs, and SelectCur in every list screen.  Since :
+# selects, enter-command moves to Esc-:.
+bind alias,attach,browser,generic,index ' ' next-page
+bind alias,attach,browser,generic,index + next-page
+bind alias,attach,browser,generic,index - previous-page
+bind alias,attach,browser,generic,index : tag-entry
+bind alias,attach,browser,generic,index \Cv next-page
+bind alias,attach,browser,generic,index \Cw search
+bind alias,attach,browser,generic,index \Cy previous-page
+bind alias,attach,browser,generic,index n next-entry
+bind alias,attach,browser,generic,index p previous-entry
+bind alias,attach,browser,generic,index w search
+bind generic,index,pager \e: enter-command
 
-bind browser ' ' next-page
-bind browser - previous-page
-macro browser c "qc"    # Compose a message
-bind browser g select-new
-bind browser i exit
-bind browser n next-entry
-bind browser p previous-entry
+# Commands shared by the MESSAGE INDEX and MESSAGE TEXT screens.
+bind index,pager % print-message
+bind index,pager ( previous-thread
+bind index,pager ) next-thread
+bind index,pager * flag-message
+bind index,pager R group-reply
+bind index,pager \Cr delete-thread
+bind index,pager c mail
+bind index,pager e decode-copy
+bind index,pager g change-folder
+bind index,pager j jump
+bind index,pager t create-alias
+macro index,pager l '<change-folder>?' 'ListFldrs'
 
-bind index $ sort-mailbox
-bind index ' ' next-page
-bind index * set-flag
-bind index + clear-flag
-bind index , tag-subthread
-bind index - previous-page
-bind index . enter-command
-bind index : tag-entry
+# Prev URL (^B) and Next URL (^F) both open urlscan on the message, with no
+# "Press any key" afterward.
+macro index,pager \Cb '<enter-command>unset wait_key<enter><pipe-message>urlscan<enter><enter-command>set wait_key<enter>' 'urlscan'
+macro index,pager \Cf '<enter-command>unset wait_key<enter><pipe-message>urlscan<enter><enter-command>set wait_key<enter>' 'urlscan'
+
+# MESSAGE INDEX.  Select (;), Apply (a), Zoom (z), unXclude (&), and the
+# fancy patch's thread keys.  Zoom doesn't toggle; & unzooms.
+bind index . display-message
+bind index / collapse-thread
 bind index <down> next-entry
 bind index <up> previous-entry
-bind index L limit    # Not possible to simulate zoom-out...
-bind index N next-unread
-bind index R group-reply
-macro index W "w\Cu~B "  # Search in the whole content of any message
+bind index > display-message
+bind index [ collapse-thread
+bind index \$ sort-mailbox
 bind index \; tag-pattern
-bind index \Cr list-reply# Because 'l' is for GotoFldr
+bind index \Ct tag-thread
+bind index ] collapse-thread
 bind index a tag-prefix
-bind index c mail
-bind index d delete-message
-bind index g change-folder
-macro index j "1<backspace>"# like Jump in Pine
-macro index l "g?"# like GotoFldr in Pine
-bind index n next-entry
-bind index p previous-entry
-bind index t create-alias
-bind index u undelete-message
 bind index v display-message
-bind index w search
-bind index x sync-mailbox
-bind index y print-message
+bind index { collapse-all
+bind index } collapse-all
+macro index & '<limit>all<enter>' 'unXclude'
+macro index , '<change-folder>?' 'FldrList'
+macro index < '<change-folder>?' 'FldrList'
+macro index x '<enter-command>set delete=ask-yes<enter><sync-mailbox>' 'eXpunge'
+macro index z '<limit>~T<enter>' 'ZoomMode'
 
-bind attach . enter-command
-bind attach : tag-entry
-bind attach R group-reply
-bind attach \Cr list-reply# Because 'l' is for GotoFldr
-bind attach a tag-prefix
-macro attach c "qic"
-macro attach g "qg"
-
-bind pager ' ' next-page
-macro pager * "i*"
-macro pager + "i+"
-macro pager , "i,v"
-bind pager . enter-command
+# MESSAGE TEXT.  q quits mutt, like Alpine; i, <, and , return to the index.
+bind pager + next-page
+bind pager , exit
+bind pager . view-attachments
 bind pager : tag-message
+bind pager < exit
 bind pager <down> next-line
 bind pager <up> previous-line
-bind pager N next-unread
-bind pager Q exit
-bind pager R group-reply
-macro pager W "iW"# Search in the whole content of any message
-macro pager \; "i;"
-bind pager \Cr list-reply# Because 'l' is for GotoFldr
-macro pager a "ia"
-macro pager b "Qb"
-macro pager c "Qc"# like Pine
-bind pager d delete-message
-bind pager g change-folder
-macro pager j "1<backspace>"# like Jump in Pine
-macro pager l "g?"      # like GotoFdlr in Pine
+bind pager > view-attachments
+bind pager \Cv next-page
+bind pager \Cw search
+bind pager \Cy previous-page
 bind pager n next-entry
 bind pager p previous-entry
 bind pager q quit
-bind pager t create-alias
-bind pager u undelete-message
 bind pager w search
-bind pager y print-message
 
-bind compose . enter-command
-bind compose : tag-entry
-bind compose D edit-description
+# ATTACHMENT INDEX.
+bind attach % print-entry
+bind attach , exit
+bind attach . view-attach
+bind attach < exit
+bind attach > view-attach
+bind attach e save-entry
+bind attach i exit
+bind attach v view-attach
+bind attach x view-mailcap
+
+# FOLDER LIST.
+bind browser , exit
+bind browser . select-entry
+bind browser < exit
+bind browser > select-entry
+bind browser a create-mailbox
+bind browser i exit
+bind browser v select-entry
+
+# COMPOSE, on mutt's post-editor screen.  ^X spell checks, then sends
+# (spell-check-before-sending); y still sends without checking.
 bind compose \Cj attach-file
 bind compose \Co postpone-message
-bind compose \Cr edit-headers
-bind compose \Cx send-message
-bind compose a tag-prefix
-bind compose d detach-file
-bind compose e edit-file
+macro compose \Cx '<ispell><send-message>' 'spell check and send'
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#
+# Site
+#
 
-# PINE has different defaults for this variables
-set nosave_name
-set hdr_format=3D"%Z %3C %{%b %d} %-19.19L (%5c) %s"
-set editor="pico"
-
+source `f=~/.dotfiles/_sites/current/mutt/muttrc.local; [ -f $f ] && echo $f || echo /dev/null`
