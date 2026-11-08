@@ -11,6 +11,8 @@ from that branch's `alpine/keymenu.c`.
 - `muttrc`: keys and behavior, the same everywhere.
 - `~/.dotfiles/_sites/current/mutt/muttrc.local`: accounts and identity for
   this site, next to the site pinerc.  Sourced last if it exists.
+- `~/.dotfiles/_sites/current/mutt/aliases`: the address book, which `t`
+  adds to.  Alpine's `~/.addressbook` isn't shared.
 - `~/.dotfiles/_sites/current/mutt/mutt_oauth2.py`: mutt's OAuth2 helper for
   gmail, with the token file encrypted to my GPG key.
 
