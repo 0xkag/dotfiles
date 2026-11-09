@@ -291,6 +291,11 @@ def main():
     heading('mosh')
     step('(optional) remember to run mosh/install or install from binary')
 
+    # mutt
+
+    heading('mutt')
+    relink('.dotfiles/mutt/muttrc', '~/.muttrc')
+
     # nodejs
 
     heading('nodejs')

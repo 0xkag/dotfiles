@@ -18,8 +18,7 @@ from that branch's `alpine/keymenu.c`.
 
 ## Setup
 
-1. `ln -s ~/.dotfiles/mutt/muttrc ~/.muttrc` (`dotfiles-install` doesn't do
-   this).
+1. `dotfiles-install` links `~/.muttrc` to `muttrc`.
 2. Install `aspell`, `aspell-en`, and `urlscan` (in
    `_reqs/requirements-ubuntu.txt`).
 3. localhost IMAP: on first connect, answer `(a)ccept always` for its
