@@ -34,6 +34,13 @@ glab api "projects/PROJECT_ID/merge_requests/IID" | python3 -c "import sys,json;
   "projects/PROJECT_ID/merge_requests/IID/notes?sort=asc&per_page=100"`
 - Discussions (needed for the **thread/discussion id** to reply to): `glab api
   "projects/PROJECT_ID/merge_requests/IID/discussions?per_page=100"`
+- **From a note link** (`.../merge_requests/IID#note_NOTE_ID`), find the
+  thread holding that note; `--paginate` emits one array per page, so slurp
+  and merge them:
+  ```
+  glab api --paginate "projects/PROJECT_ID/merge_requests/IID/discussions?per_page=100" \
+    | jq -s --argjson n NOTE_ID 'add | map(select(any(.notes[]; .id == $n)))'
+  ```
 - **Inline vs summary:** a note's first note has a `position` object (with
   `new_path`/`new_line`) ⇒ it's an **inline** comment on a code line. No
   `position` and `system:false` ⇒ a **summary / top-level** comment.
@@ -50,6 +57,15 @@ glab api "projects/PROJECT_ID/merge_requests/IID" | python3 -c "import sys,json;
   full id by matching note body text.
 
 ## 3. Reply IN-THREAD (not a new top-level comment)
+
+**Check `resolved` first.** A reply in a resolved discussion is collapsed
+with it in the MR view, so Kyle cannot see it: a bot re-review request
+posted in a long-resolved summary thread went missing this way
+(2026-10-30). If the target discussion's notes have `resolved: true`, say
+so, then either unresolve it with Kyle's OK (`glab api -X PUT
+"projects/PROJECT_ID/merge_requests/IID/discussions/DISCUSSION_ID" -f
+resolved=false`) or post where it is visible. Report a direct link to the
+note you posted and to any bot reply.
 
 Reply to the specific discussion so it threads under the finding. **Every
 agent-written GitLab comment MUST end with a `Co-Authored-By` line** (blank
@@ -70,27 +86,80 @@ If you disagree with a finding, push back with reasoning (e.g. I corrected a
 code review bot suggestion that referenced `result.stdout`/`.stderr` when the
 real attrs were `.output`/`.error`).
 
+### Wording a reply to review findings
+
+Draft the reply to a file, show Kyle the full text, and post only on an
+explicit go-ahead ([[act-only-when-asked]]). In the draft:
+
+- One bullet per finding, in the review's order, named by its title.
+- Each bullet gives the decision (fixed in <sha>, dismissing, keeping it,
+  leaving it), the reason, and whose position it follows: a human by
+  `@username`, or "the review bot". A bare "agreed" or "dismissing" leaves
+  the reader guessing who agreed with what.
+- @-mention the human reviewer whose proposals the reply acts on, so they
+  are notified. Do not @-mention the bot unless asking it for a re-review;
+  a mention starts a pass.
+- Write the bot's severity markers as words ("Red", "Yellow"), not its
+  emoji: replies are ASCII-only ([[agent-attribution]]).
+
+**Why:** on 2026-11-13 Kyle rejected "agreed, dismissing" as unclear about
+who was agreed with and why, and asked for the human reviewer to be
+@-mentioned; that reply also copied the bot's emoji markers.
+
+### Posting a long reply
+
+Post from the approved draft file, not a `-f body=...` shell string, so
+backticks, quotes and newlines arrive exactly as approved. Like the PUT in
+section 4, the POST needs the content-type header:
+```
+jq -n --rawfile b reply.md '{body: $b}' > reply.json
+glab api -X POST -H 'Content-Type: application/json' --input reply.json \
+  "projects/PROJECT_ID/merge_requests/IID/discussions/DISCUSSION_ID/notes" > posted.json
+jq -r .id posted.json   # link: .../merge_requests/IID#note_<id>
+```
+Diff `jq -r .body posted.json` against `reply.md` to confirm.
+
 ## 4. Update MR title/description (e.g. when scope changed)
+
+Titles follow the subject rules in [[commit-message-format]] (no ticket key
+in front). Short edits:
 ```
-glab mr update IID --title "..." --description "$(cat /tmp/body.md)"   # run from inside the repo, or pass -R group/sub/project
+glab mr update IID --title "..." --description "$(cat body.md)"   # run from inside the repo, or pass -R group/sub/project
 ```
+For a long description, round-trip it through a file to avoid shell
+quoting. `glab api --input` sets no content type by itself, so without the
+header the PUT fails with a bare `glab: HTTP 415`:
+```
+glab api "projects/PROJECT_ID/merge_requests/IID" | jq -r .description > desc.md   # then edit desc.md
+jq -n --rawfile d desc.md '{description: $d}' > body.json
+glab api -X PUT -H 'Content-Type: application/json' --input body.json "projects/PROJECT_ID/merge_requests/IID"
+```
+Re-fetch afterwards and diff against `desc.md`.
 
 ## 5. Retrigger any code revierw bots for a re-review
 
 If the code review appears to be automated, try @ mentioning the bot and
 asking nicely for a re-review.
 
+When replying to the bot's findings, post the re-review request as its own
+reply in the same thread, after the response, so the bot reads the
+response first. Name the commits that address the findings. Then wait for
+the verdict in the background and report it to Kyle.
+
 See also [site-specific instructions](~/.dotfiles/_sites/current/_ai/memories/code-review-bot.md).
 
 ## Notes
 - bash `cd` does NOT persist across separate Bash tool calls — `cd repo && git
   push` in ONE call, or pass `-R group/sub/project` to glab.
-- After pushing review fixes, prefer a **follow-up commit** over `git commit
-  --amend` + force-push on a branch already under review (amend/force-push
-  disrupts the reviewer's diff view). Use the follow-up to also fix a flagged
-  commit-subject if needed.
+- Review fixes: propose folding each into the commit it belongs to, or a
+  follow-up commit, and confirm before force-pushing a branch under review;
+  see [[git-history-rewrites]].
 - On someone else's MR, ask Kyle whether to push or attach a `.patch` to a
-  comment: see [[gitlab-mr-patch-comments]].
-- glab is authed via `GITLAB_TOKEN` as Kyle George's user.
+  comment, and never rewrite the author's commits: see
+  [[gitlab-mr-patch-comments]].
+- glab is authed via `GITLAB_TOKEN` as Kyle George's user; where the token
+  comes from is site-specific (see the site memories,
+  ~/.dotfiles/_sites/current/_ai/AGENTS.md).
+- Every comment ends with the Co-Authored-By line: [[agent-attribution]].
 - For setting merge-order dependencies between MRs, see
   [[gitlab-mr-dependencies]]. 

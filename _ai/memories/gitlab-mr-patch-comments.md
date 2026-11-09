@@ -21,6 +21,16 @@ author's branch on a guess. Local commits are fine either way.
   apply it with `--reset-author` or keep Kyle as the author, unless Kyle
   already said.
 
+## Leave the author's commits alone
+
+Either way, fixes go in new commits on top of the MR head. Do not amend,
+reword or squash the MR author's existing commits unless Kyle asks, even
+when a message breaks [[commit-message-format]]; mention it in the comment
+instead, or leave it for the squash at merge. When Kyle does ask for a
+reword, never change the commit's author. Kyle has said "Do not rewrite
+existing commit messages" and "Fixup the message ... but do not change the
+author" on review branches.
+
 ## Patch comment workflow
 
 1. Commit the fixes locally on top of the MR head; note that base sha.
@@ -34,8 +44,9 @@ author's branch on a guess. Local commits are fine either way.
      [ "$(git write-tree)" = "$(git rev-parse 'HEAD^{tree}')" ] && echo patch-ok
    unset GIT_INDEX_FILE
    ```
-4. Upload it to the project and use the returned markdown link; see
-   [[glab-token-source]] for `GITLAB_TOKEN`:
+4. Upload it to the project and use the returned markdown link; where
+   `GITLAB_TOKEN` comes from is in the site memories
+   (~/.dotfiles/_sites/current/_ai/AGENTS.md):
    ```
    curl -sS --fail --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
      --form "file=@mr-<iid>-review.patch" \

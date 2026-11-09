@@ -41,6 +41,12 @@ def unlink(p):
     except:
         pass
 
+def unlink_if_link_to(target, linkname):
+    target = os.path.realpath(os.path.expanduser(target))
+    linkname = os.path.expanduser(linkname)
+    if os.path.islink(linkname) and os.path.realpath(linkname) == target:
+        os.unlink(linkname)
+
 def mkdir(p):
     try:
         os.makedirs(os.path.expanduser(p))
@@ -191,10 +197,15 @@ def main():
 
     heading('claude')
     mkdir('~/.claude/skills')
+    relink('../.dotfiles/_ai/AGENTS.md', '~/.claude/CLAUDE.md')
     relink('../.dotfiles/claude/settings.json', '~/.claude/settings.json')
     relink('../../.dotfiles/_ai/skills/transcript', '~/.claude/skills/transcript')
-    relink('.dotfiles/_ai/AGENTS.md', '~/AGENTS.md')
-    relink('.dotfiles/_ai/AGENTS.md', '~/CLAUDE.md')
+
+    # ~/AGENTS.md and ~/CLAUDE.md only applied to sessions started under ~,
+    # while ~/.claude/CLAUDE.md loads everywhere; drop the old links so
+    # AGENTS.md is not loaded twice, but leave a real file alone
+    unlink_if_link_to('~/.dotfiles/_ai/AGENTS.md', '~/AGENTS.md')
+    unlink_if_link_to('~/.dotfiles/_ai/AGENTS.md', '~/CLAUDE.md')
 
     # compton / picom
 
