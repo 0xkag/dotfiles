@@ -94,6 +94,13 @@ These conventions are mostly for programming, but can apply generally too.
   obvious.  Even better than restating is just writing in a way that it is
   completely unambiguous.
 
+## Agent hygiene
+
+- [Avoid scratchpad prefer
+  cwd](~/.dotfiles/_ai/memories/avoid-scratchpad-prefer-cwd.md) - avoid using
+  /tmp scratchpd and instead prefer the cwd; the scratch pad gets cleared if
+  your sandbox (when running in a sandbox) restarts
+
 ## Git workflow
 
 - [Branch & worktree creation](~/.dotfiles/_ai/memories/git-branch-creation.md) — never create a
@@ -111,4 +118,3 @@ These conventions are mostly for programming, but can apply generally too.
   read/reply to inline + summary review comments, retrigger review bots
 - [glab token source](~/.dotfiles/_ai/memories/glab-token-source.md) — on glab REST 401, source
   `~/.gitlab-token` into the environment first
-
