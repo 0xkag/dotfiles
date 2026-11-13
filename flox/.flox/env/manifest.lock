@@ -3,6 +3,10 @@
   "manifest": {
     "version": 1,
     "install": {
+      "agentsview": {
+        "pkg-path": "agent-stacks/agentsview",
+        "pkg-group": "agentsview"
+      },
       "awscli2": {
         "pkg-path": "awscli2"
       },
@@ -30,6 +34,9 @@
       },
       "gcc": {
         "pkg-path": "gcc"
+      },
+      "gh": {
+        "pkg-path": "gh"
       },
       "glab": {
         "pkg-path": "glab"
@@ -125,6 +132,96 @@
     }
   },
   "packages": [
+    {
+      "attr_path": "agentsview",
+      "broken": false,
+      "derivation": "/nix/store/pvgxaqwmpmz5xrz47311fcavckwz17ig-agentsview-0.47.0.drv",
+      "description": "Local-first viewer and analytics for AI coding agent sessions",
+      "install_id": "agentsview",
+      "license": "MIT",
+      "locked_url": "file:///tmp/tmp.O5jFcfn7JW?rev=d42235e4032a905cfbab79542b16bcf9753ba79a",
+      "name": "agentsview-0.47.0",
+      "pname": "agentsview",
+      "rev": "d42235e4032a905cfbab79542b16bcf9753ba79a",
+      "rev_count": 1,
+      "rev_date": "2026-11-11T13:01:04Z",
+      "scrape_date": "2026-11-12T05:34:29.571537708Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.47.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/b5zm2kjv0i3wq7h0xcxyk6n2asfvxh4p-agentsview-0.47.0"
+      },
+      "system": "x86_64-linux",
+      "group": "agentsview",
+      "priority": 5
+    },
+    {
+      "attr_path": "tree-sitter",
+      "broken": false,
+      "derivation": "/nix/store/2liczb0xlvm0za6mbpx1v7lz2pdgfxhy-tree-sitter-0.26.8.drv",
+      "description": "Parser generator tool and an incremental parsing library",
+      "install_id": "tree-sitter",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e73de5be04e0eff4190a1432b946d469c794e7b4",
+      "name": "tree-sitter-0.26.8",
+      "pname": "tree-sitter",
+      "rev": "e73de5be04e0eff4190a1432b946d469c794e7b4",
+      "rev_count": 1022855,
+      "rev_date": "2026-06-26T09:58:34Z",
+      "scrape_date": "2026-06-27T04:58:52.221804Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.26.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/q225wxvqcxx8r66kpazcdvv3q6hdxc33-tree-sitter-0.26.8"
+      },
+      "system": "x86_64-linux",
+      "group": "tree-sitter",
+      "priority": 5
+    },
+    {
+      "attr_path": "vim",
+      "broken": false,
+      "derivation": "/nix/store/zvx0lzr62xi37a49dd1pwb9hcw4jy5sl-vim-9.2.0340.drv",
+      "description": "Most popular clone of the VI editor",
+      "install_id": "vim",
+      "license": "Vim",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=d233902339c02a9c334e7e593de68855ad26c4cb",
+      "name": "vim-9.2.0340",
+      "pname": "vim",
+      "rev": "d233902339c02a9c334e7e593de68855ad26c4cb",
+      "rev_count": 998534,
+      "rev_date": "2026-05-15T18:21:44Z",
+      "scrape_date": "2026-05-17T08:35:48.406526Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.2.0340",
+      "outputs_to_install": [
+        "out",
+        "xxd"
+      ],
+      "outputs": {
+        "out": "/nix/store/yl6gvmafjjpaqidkaj5npdpl2fr5kimq-vim-9.2.0340",
+        "xxd": "/nix/store/9pxv7h40jwsffkwkx23zxwlgk9whjfn0-vim-9.2.0340-xxd"
+      },
+      "system": "x86_64-linux",
+      "group": "vim",
+      "priority": 5
+    },
     {
       "attr_path": "awscli2",
       "broken": false,
@@ -417,6 +514,36 @@
         "info": "/nix/store/5b0hplrl0n9g159mcis4jca1fjd4822a-gcc-wrapper-15.2.0-info",
         "man": "/nix/store/r35yg8h1w630r3lmnyglwhv5nvk284mx-gcc-wrapper-15.2.0-man",
         "out": "/nix/store/788mx070y81zjlg5ipcl0cra3afviw9k-gcc-wrapper-15.2.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gh",
+      "broken": false,
+      "derivation": "/nix/store/g2ny647j4ipcy7qfmdvizw36avkzrwbh-gh-2.93.0.drv",
+      "description": "GitHub CLI tool",
+      "install_id": "gh",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "name": "gh-2.93.0",
+      "pname": "gh",
+      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "rev_count": 1014179,
+      "rev_date": "2026-06-10T06:56:03Z",
+      "scrape_date": "2026-06-12T04:47:37.316175Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.93.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/fxvyz1dx5wp87qgbd6dfkmqqb4fypm3b-gh-2.93.0"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -1171,67 +1298,6 @@
       },
       "system": "x86_64-linux",
       "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "tree-sitter",
-      "broken": false,
-      "derivation": "/nix/store/2liczb0xlvm0za6mbpx1v7lz2pdgfxhy-tree-sitter-0.26.8.drv",
-      "description": "Parser generator tool and an incremental parsing library",
-      "install_id": "tree-sitter",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=e73de5be04e0eff4190a1432b946d469c794e7b4",
-      "name": "tree-sitter-0.26.8",
-      "pname": "tree-sitter",
-      "rev": "e73de5be04e0eff4190a1432b946d469c794e7b4",
-      "rev_count": 1022855,
-      "rev_date": "2026-06-26T09:58:34Z",
-      "scrape_date": "2026-06-27T04:58:52.221804Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.26.8",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/q225wxvqcxx8r66kpazcdvv3q6hdxc33-tree-sitter-0.26.8"
-      },
-      "system": "x86_64-linux",
-      "group": "tree-sitter",
-      "priority": 5
-    },
-    {
-      "attr_path": "vim",
-      "broken": false,
-      "derivation": "/nix/store/zvx0lzr62xi37a49dd1pwb9hcw4jy5sl-vim-9.2.0340.drv",
-      "description": "Most popular clone of the VI editor",
-      "install_id": "vim",
-      "license": "Vim",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d233902339c02a9c334e7e593de68855ad26c4cb",
-      "name": "vim-9.2.0340",
-      "pname": "vim",
-      "rev": "d233902339c02a9c334e7e593de68855ad26c4cb",
-      "rev_count": 998534,
-      "rev_date": "2026-05-15T18:21:44Z",
-      "scrape_date": "2026-05-17T08:35:48.406526Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "9.2.0340",
-      "outputs_to_install": [
-        "out",
-        "xxd"
-      ],
-      "outputs": {
-        "out": "/nix/store/yl6gvmafjjpaqidkaj5npdpl2fr5kimq-vim-9.2.0340",
-        "xxd": "/nix/store/9pxv7h40jwsffkwkx23zxwlgk9whjfn0-vim-9.2.0340-xxd"
-      },
-      "system": "x86_64-linux",
-      "group": "vim",
       "priority": 5
     }
   ]
