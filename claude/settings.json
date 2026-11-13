@@ -1,6 +1,9 @@
 {
   "awsAuthRefresh": "rm -rf ~/.aws/cli/cache/* 2>/dev/null; aws sts get-caller-identity",
   "cleanupPeriodDays": 3650,
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-opus-5-5"
+  },
   "permissions": {
     "allow": [
       "Bash(ldapsearch:*)"
@@ -54,15 +57,15 @@
     "command": "claude-statusline"
   },
   "enabledPlugins": {
-    "andrej-karpathy-skills@karpathy-skills": true,
+    "andrej-karpathy-skills@karpathy-skills": false,
     "caveman@caveman": false,
     "cc-plugin-you-should-know@builtin": true,
     "context7@claude-plugins-official": false,
-    "gitlab@claude-plugins-official": true,
+    "gitlab@claude-plugins-official": false,
     "ponytail@ponytail": true,
     "pyright-lsp@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
-    "terraform@claude-plugins-official": true
+    "terraform@claude-plugins-official": false
   },
   "extraKnownMarketplaces": {
     "caveman": {
@@ -92,6 +95,9 @@
     },
     "claude-sonnet-5-5": {
       "effortLevel": "xhigh"
+    },
+    "claude-fable-5-2": {
+      "effortLevel": "high"
     }
   },
   "autoUpdatesChannel": "latest",
