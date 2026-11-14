@@ -160,6 +160,10 @@ def main():
     # alpine
 
     heading('alpine')
+    if os.path.exists(os.path.expanduser('~/.dotfiles/alpine/pinerc')):
+        relink('.dotfiles/alpine/pinerc', '~/.pinerc')
+    else:
+        step('no site pinerc')
     step('(optional) remember to run alpine/install')
 
     # ansifilter
@@ -186,17 +190,11 @@ def main():
     # claude
 
     heading('claude')
-    mkdir('~/.claude')
-    step('(optional) remember to run claude/install')
+    mkdir('~/.claude/skills')
     relink('../.dotfiles/claude/settings.json', '~/.claude/settings.json')
     relink('../../.dotfiles/_ai/skills/transcript', '~/.claude/skills/transcript')
     relink('.dotfiles/_ai/AGENTS.md', '~/AGENTS.md')
     relink('.dotfiles/_ai/AGENTS.md', '~/CLAUDE.md')
-
-    # cmake
-
-    heading('cmake')
-    step('(optional) remember to run cmake/install')
 
     # compton / picom
 
@@ -229,18 +227,18 @@ def main():
     heading('gdb')
     relink('.dotfiles/gdb/gdbinit', '~/.gdbinit')
 
-    # git
-
-    heading('git')
-    relink('.dotfiles/git/gitconfig', '~/.gitconfig')
-    step('(optional) remember to run git/install (for git-appraise)')
-
     # ghostty
 
     heading('ghostty')
     mkdir('~/.config/ghostty')
     relink('~/.dotfiles/ghostty/config', '~/.config/ghostty/config')
     step('(optional) install Ghostty itself; see _docs/terminal-images.org')
+
+    # git
+
+    heading('git')
+    relink('.dotfiles/git/gitconfig', '~/.gitconfig')
+    step('(optional) remember to run git/install (for git-appraise)')
 
     # global
 
@@ -257,7 +255,7 @@ def main():
     heading('i3')
     relink('.dotfiles/i3', '~/.i3')
     relink('.dotfiles/i3/i3blocks.conf', '~/.i3blocks.conf')
-    # TODO i3lock systemd
+    step('(optional) remember to lock on sleep: sudo cp ~/.dotfiles/systemd/i3lock.service /etc/systemd/system/ && sudo systemctl enable i3lock')
 
     # iftop
 
@@ -266,7 +264,9 @@ def main():
 
     # irssi
 
-    # TODO
+    heading('irssi')
+    mkdir('~/.irssi')
+    relink('~/.dotfiles/irssi/config', '~/.irssi/config')
 
     # less
 
@@ -309,11 +309,6 @@ def main():
     if os.uname().sysname == 'FreeBSD':
         step('install neovim with: sudo pkg install neovim')
 
-    # pandoc
-
-    heading('pandoc')
-    step('(optional) remember to run pandoc/install or install from binary')
-
     # pipx
 
     heading('pipx')
@@ -330,9 +325,18 @@ def main():
     heading('poppler')
     step('(optional) remember to run poppler/install or install from binary')
 
+    # postgres
+
+    heading('postgres')
+    relink('.dotfiles/postgres/psqlrc', '~/.psqlrc')
+
     # procmail
 
-    # TODO
+    heading('procmail')
+    if os.path.exists(os.path.expanduser('~/.dotfiles/procmail/procmailrc')):
+        relink('.dotfiles/procmail/procmailrc', '~/.procmailrc')
+    else:
+        step('no site procmailrc')
 
     # pyenv
 
@@ -342,7 +346,8 @@ def main():
 
     # pylint
 
-    # TODO
+    heading('pylint')
+    relink('.dotfiles/pylint/pylintrc', '~/.pylintrc')
 
     # readline
 
@@ -359,6 +364,12 @@ def main():
 
     heading('ssh')
     relink('~/.dotfiles/ssh/config', '~/.ssh/config')
+
+    # subversion
+
+    heading('subversion')
+    mkdir('~/.subversion')
+    relink('~/.dotfiles/subversion/config', '~/.subversion/config')
 
     # tarsnap
 
@@ -395,8 +406,8 @@ def main():
     heading('vim')
     mkdir('~/.vim/colors')
     relink('.dotfiles/vim/vimrc', '~/.vimrc')
+    relink('~/.dotfiles/vim/cyberpunk.vim', '~/.vim/colors/cyberpunk.vim')
     relink('~/.dotfiles/vim/ron.vim', '~/.vim/colors/ron.vim')
-    step('remember to run vim/install or install from binary')
     step('remember to install pathogen: mkdir -p ~/.vim/autoload ~/.vim/bundle && curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim')
 
     # wmctrl
