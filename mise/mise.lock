@@ -32,6 +32,38 @@ url = "https://github.com/ggreer/the_silver_searcher/archive/refs/tags/2.2.0.tar
 checksum = "sha256:6a0a19ca5e73b2bef9481c29a508d2413ca1a0a9a5a6b1bd9bbd695a7626cbf9"
 url = "https://github.com/ggreer/the_silver_searcher/archive/refs/tags/2.2.0.tar.gz"
 
+[[tools."aqua:hashicorp/terraform"]]
+version = "1.16.7"
+backend = "aqua:hashicorp/terraform"
+
+[tools."aqua:hashicorp/terraform"."platforms.linux-arm64"]
+checksum = "sha256:2d6a3f1098de94f1672aaa4e6873ef91ade9eac38851d3a403e2009193208de4"
+url = "https://releases.hashicorp.com/terraform/1.16.7/terraform_1.16.7_linux_arm64.zip"
+
+[tools."aqua:hashicorp/terraform"."platforms.linux-arm64-musl"]
+checksum = "sha256:2d6a3f1098de94f1672aaa4e6873ef91ade9eac38851d3a403e2009193208de4"
+url = "https://releases.hashicorp.com/terraform/1.16.7/terraform_1.16.7_linux_arm64.zip"
+
+[tools."aqua:hashicorp/terraform"."platforms.linux-x64"]
+checksum = "sha256:5454efcf7fc87f0c2113111b9a5c7182f0ca1c6f0f23a1e110a50770a8fe473b"
+url = "https://releases.hashicorp.com/terraform/1.16.7/terraform_1.16.7_linux_amd64.zip"
+
+[tools."aqua:hashicorp/terraform"."platforms.linux-x64-musl"]
+checksum = "sha256:5454efcf7fc87f0c2113111b9a5c7182f0ca1c6f0f23a1e110a50770a8fe473b"
+url = "https://releases.hashicorp.com/terraform/1.16.7/terraform_1.16.7_linux_amd64.zip"
+
+[tools."aqua:hashicorp/terraform"."platforms.macos-arm64"]
+checksum = "sha256:81e98d9186e0cd1bc88caeb2403453fdd4bdeedd574ca4dbe8fb6a2880c9c51a"
+url = "https://releases.hashicorp.com/terraform/1.16.7/terraform_1.16.7_darwin_arm64.zip"
+
+[tools."aqua:hashicorp/terraform"."platforms.macos-x64"]
+checksum = "sha256:d17d1053bcbde650a8a919b7218ef2886eac76c474306e9ecd8bd64427408741"
+url = "https://releases.hashicorp.com/terraform/1.16.7/terraform_1.16.7_darwin_amd64.zip"
+
+[tools."aqua:hashicorp/terraform"."platforms.windows-x64"]
+checksum = "sha256:b22dfa64a9530c9b7774f840d98e9bfadc1ae33b1bd2083ffa976828c46e542c"
+url = "https://releases.hashicorp.com/terraform/1.16.7/terraform_1.16.7_windows_amd64.zip"
+
 [[tools.awscli]]
 version = "2.38.6"
 backend = "aqua:aws/aws-cli"
@@ -164,45 +196,45 @@ libc = "musl"
 
 [tools.fd."platforms.linux-arm64"]
 checksum = "sha256:d76c4317f7d5dba69f8a2a15856c90c777e7f0dd4e85f0de8c76de6992c374d4"
-checksum_source = "mise-versions"
 url = "https://github.com/sharkdp/fd/releases/download/v10.5.0/fd-v10.5.0-aarch64-unknown-linux-musl.tar.gz"
 url_api = "https://api.github.com/repos/sharkdp/fd/releases/assets/530481810"
+provenance = "github-attestations"
 
 [tools.fd."platforms.linux-arm64-musl"]
 checksum = "sha256:d76c4317f7d5dba69f8a2a15856c90c777e7f0dd4e85f0de8c76de6992c374d4"
-checksum_source = "mise-versions"
 url = "https://github.com/sharkdp/fd/releases/download/v10.5.0/fd-v10.5.0-aarch64-unknown-linux-musl.tar.gz"
 url_api = "https://api.github.com/repos/sharkdp/fd/releases/assets/530481810"
+provenance = "github-attestations"
 
 [tools.fd."platforms.linux-x64"]
 checksum = "sha256:761c72dc8e120d85b22292063be8a796e2eeb20eb3e4f38b8fa2343ccf3514a7"
-checksum_source = "mise-versions"
 url = "https://github.com/sharkdp/fd/releases/download/v10.5.0/fd-v10.5.0-x86_64-unknown-linux-musl.tar.gz"
 url_api = "https://api.github.com/repos/sharkdp/fd/releases/assets/530481315"
+provenance = "github-attestations"
 
 [tools.fd."platforms.linux-x64-musl"]
 checksum = "sha256:761c72dc8e120d85b22292063be8a796e2eeb20eb3e4f38b8fa2343ccf3514a7"
-checksum_source = "mise-versions"
 url = "https://github.com/sharkdp/fd/releases/download/v10.5.0/fd-v10.5.0-x86_64-unknown-linux-musl.tar.gz"
 url_api = "https://api.github.com/repos/sharkdp/fd/releases/assets/530481315"
+provenance = "github-attestations"
 
 [tools.fd."platforms.macos-arm64"]
 checksum = "sha256:b67e1836c468e42e411984b56e52fa7abec08c2bd22c867398e7cc134aac5e12"
-checksum_source = "mise-versions"
 url = "https://github.com/sharkdp/fd/releases/download/v10.5.0/fd-v10.5.0-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/sharkdp/fd/releases/assets/530481346"
+provenance = "github-attestations"
 
 [tools.fd."platforms.macos-x64"]
 checksum = "sha256:7e31028c62c6955877735d0406807aa484c2a5e6f86235a59e26c29c301da590"
-checksum_source = "mise-versions"
 url = "https://github.com/sharkdp/fd/releases/download/v10.5.0/fd-v10.5.0-x86_64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/sharkdp/fd/releases/assets/530484719"
+provenance = "github-attestations"
 
 [tools.fd."platforms.windows-x64"]
 checksum = "sha256:a227701b8551c35a9931d9f6da75503cf86d88e182d71fb849a70864c5d57cd7"
-checksum_source = "mise-versions"
 url = "https://github.com/sharkdp/fd/releases/download/v10.5.0/fd-v10.5.0-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/sharkdp/fd/releases/assets/530482901"
+provenance = "github-attestations"
 
 [[tools.fzf]]
 version = "0.74.5"
@@ -670,6 +702,52 @@ checksum_source = "mise-versions"
 url = "https://github.com/BurntSushi/ripgrep/releases/download/15.2.0/ripgrep-15.2.0-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/BurntSushi/ripgrep/releases/assets/478119643"
 
+[[tools.rtk]]
+version = "1.2.0"
+backend = "aqua:rtk-ai/rtk"
+
+[tools.rtk."platforms.linux-arm64"]
+checksum = "sha256:93c1dcd37fd5fcae8fa772a5b5c34a30af142ace4f4081c8f98319146b7a10a4"
+checksum_source = "mise-versions"
+url = "https://github.com/rtk-ai/rtk/releases/download/v1.2.0/rtk-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/rtk-ai/rtk/releases/assets/723664873"
+
+[tools.rtk."platforms.linux-arm64-musl"]
+checksum = "sha256:93c1dcd37fd5fcae8fa772a5b5c34a30af142ace4f4081c8f98319146b7a10a4"
+checksum_source = "mise-versions"
+url = "https://github.com/rtk-ai/rtk/releases/download/v1.2.0/rtk-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/rtk-ai/rtk/releases/assets/723664873"
+
+[tools.rtk."platforms.linux-x64"]
+checksum = "sha256:70fee7b4a548c43dde94c77e2335550981b0bc2fb013691d8c8109b5bd0eda37"
+checksum_source = "mise-versions"
+url = "https://github.com/rtk-ai/rtk/releases/download/v1.2.0/rtk-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/rtk-ai/rtk/releases/assets/723664846"
+
+[tools.rtk."platforms.linux-x64-musl"]
+checksum = "sha256:70fee7b4a548c43dde94c77e2335550981b0bc2fb013691d8c8109b5bd0eda37"
+checksum_source = "mise-versions"
+url = "https://github.com/rtk-ai/rtk/releases/download/v1.2.0/rtk-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/rtk-ai/rtk/releases/assets/723664846"
+
+[tools.rtk."platforms.macos-arm64"]
+checksum = "sha256:a2c411ffa49a8595b408c151ea47c9a812268924a76eaeecbc3a5065b02207ff"
+checksum_source = "mise-versions"
+url = "https://github.com/rtk-ai/rtk/releases/download/v1.2.0/rtk-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/rtk-ai/rtk/releases/assets/723664868"
+
+[tools.rtk."platforms.macos-x64"]
+checksum = "sha256:1484ae6fffd0da180d65434eeca32e014a86a6e21dcfc7a0004fe82b7bb0a9b9"
+checksum_source = "mise-versions"
+url = "https://github.com/rtk-ai/rtk/releases/download/v1.2.0/rtk-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/rtk-ai/rtk/releases/assets/723664848"
+
+[tools.rtk."platforms.windows-x64"]
+checksum = "sha256:b291b4e53d37f84b7f1696bc20559207396fb0190f20ed3c949db1b7e1c0c378"
+checksum_source = "mise-versions"
+url = "https://github.com/rtk-ai/rtk/releases/download/v1.2.0/rtk-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/rtk-ai/rtk/releases/assets/723664882"
+
 [[tools.ruff]]
 version = "0.17.3"
 backend = "aqua:astral-sh/ruff"
@@ -765,38 +843,6 @@ checksum = "sha256:8a4e35ab0b331c85d73567b12f2a444df187f483e5079ceffa6bda1faa2e7
 checksum_source = "mise-versions"
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.zip"
 url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056944"
-
-[[tools.terraform]]
-version = "1.13.2"
-backend = "aqua:hashicorp/terraform"
-
-[tools.terraform."platforms.linux-arm64"]
-checksum = "sha256:9b3814d36b5b22d9bc7a2856a676770c7b2597b8df025004054354226865ced6"
-url = "https://releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_linux_arm64.zip"
-
-[tools.terraform."platforms.linux-arm64-musl"]
-checksum = "sha256:9b3814d36b5b22d9bc7a2856a676770c7b2597b8df025004054354226865ced6"
-url = "https://releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_linux_arm64.zip"
-
-[tools.terraform."platforms.linux-x64"]
-checksum = "sha256:b7554c87f36dbb2231d54c4277cbbddf58ae8ba916fa97461564836a2c4954c0"
-url = "https://releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_linux_amd64.zip"
-
-[tools.terraform."platforms.linux-x64-musl"]
-checksum = "sha256:b7554c87f36dbb2231d54c4277cbbddf58ae8ba916fa97461564836a2c4954c0"
-url = "https://releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_linux_amd64.zip"
-
-[tools.terraform."platforms.macos-arm64"]
-checksum = "sha256:150c55bd7459ee1216d994307b3b84b3e44ad57354f62357d792e4cbb8b2f64b"
-url = "https://releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_darwin_arm64.zip"
-
-[tools.terraform."platforms.macos-x64"]
-checksum = "sha256:6eab5472d9afd510b6f4fb43ebe74e098821dfaab50cf5fcfb696082f73f5328"
-url = "https://releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_darwin_amd64.zip"
-
-[tools.terraform."platforms.windows-x64"]
-checksum = "sha256:d4b15db71c7f597291fbc7c7e61ed213dd6fe34ab8971d12a93bf9bb66b340e9"
-url = "https://releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_windows_amd64.zip"
 
 [[tools.tflint]]
 version = "0.65.0"
