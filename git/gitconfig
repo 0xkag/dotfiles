@@ -23,6 +23,7 @@
 
 [rebase]
 	autoStash = true
+	rebaseMerges = true
 
 [user]
 	name = Kyle George
