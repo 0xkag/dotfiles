@@ -51,3 +51,20 @@ Each dependency still goes only as high as the app's own requirements
 allow.  For example, poetry requires `pkginfo<2.0`, so this caps pkginfo at
 the latest 1.x.  Add `--include-injected` to `pipx upgrade` to also upgrade
 packages added with `pipx inject`.
+
+## graphify
+
+`graphify install` copies graphify's Claude Code skill to
+`~/.claude/skills/graphify/`, which this repo does not track.  Run it after
+`install` on a new host, and after upgrading graphify to refresh the skill:
+
+    graphify install
+
+It also appends a `# graphify` block to `~/.claude/CLAUDE.md`, which links
+to `_ai/AGENTS.md`, and has no option to skip that.  Claude Code finds the
+skill without the block, so drop it.  Check that `git diff` shows only that
+block before discarding it, since the checkout drops every uncommitted
+change to the file:
+
+    git -C ~/.dotfiles diff _ai/AGENTS.md
+    git -C ~/.dotfiles checkout -- _ai/AGENTS.md

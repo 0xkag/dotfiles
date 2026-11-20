@@ -146,6 +146,73 @@
                 "venv_args": []
             }
         },
+        "graphifyy": {
+            "metadata": {
+                "backend": "pip",
+                "environment": "graphifyy",
+                "exposure_enabled": true,
+                "injected_packages": {},
+                "main_package": {
+                    "app_paths": [
+                        {
+                            "__Path__": "/home/george/.local/share/pipx/venvs/graphifyy/bin/graphify",
+                            "__type__": "Path"
+                        },
+                        {
+                            "__Path__": "/home/george/.local/share/pipx/venvs/graphifyy/bin/graphify-mcp",
+                            "__type__": "Path"
+                        }
+                    ],
+                    "app_paths_of_dependencies": {
+                        "numpy": [
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/graphifyy/bin/f2py",
+                                "__type__": "Path"
+                            },
+                            {
+                                "__Path__": "/home/george/.local/share/pipx/venvs/graphifyy/bin/numpy-config",
+                                "__type__": "Path"
+                            }
+                        ]
+                    },
+                    "apps": [
+                        "graphify",
+                        "graphify-mcp"
+                    ],
+                    "apps_of_dependencies": [
+                        "f2py",
+                        "numpy-config"
+                    ],
+                    "completion_paths": [],
+                    "completion_paths_of_dependencies": {},
+                    "completions": [],
+                    "completions_of_dependencies": [],
+                    "cooldown_days": null,
+                    "expected_apps": [],
+                    "include_apps": true,
+                    "include_dependencies": false,
+                    "include_resources_from": [],
+                    "lock_file": null,
+                    "man_pages": [],
+                    "man_pages_of_dependencies": [],
+                    "man_paths": [],
+                    "man_paths_of_dependencies": {},
+                    "package": "graphifyy",
+                    "package_or_url": "graphifyy",
+                    "package_version": "0.9.113",
+                    "pinned": false,
+                    "pip_args": [],
+                    "suffix": ""
+                },
+                "pipx_metadata_version": "0.12",
+                "python_version": "Python 3.12.16",
+                "source_interpreter": {
+                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python3.12",
+                    "__type__": "Path"
+                },
+                "venv_args": []
+            }
+        },
         "poetry": {
             "metadata": {
                 "backend": "pip",
