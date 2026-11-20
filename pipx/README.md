@@ -14,7 +14,13 @@
 records, so regenerate it after any `pipx install`, `uninstall`, `inject`,
 or upgrade, and commit it:
 
-    pipx list --json > ~/.dotfiles/pipx/apps.json
+    pipx list --json | sed "s|\"$HOME/|\"~/|g" \
+        > ~/.dotfiles/pipx/apps.json
+
+The sed keeps the home directory, which varies between hosts, out of the
+file.  pipx does not expand the `~`, and does not need to: `install` passes
+`--python`, so the recorded interpreter is ignored, and `install-all` uses
+only the file names of the recorded app, man page and completion paths.
 
 Before committing, check `git diff apps.json` for a private package index:
 the file records any `--pip-args` an app was installed with.
@@ -27,7 +33,8 @@ reinstall-all --python ...` would, but it reinstalls each app at its latest
 release instead of its recorded version.  To move the apps and keep their
 versions, record them, remove them, and reinstall from the record:
 
-    pipx list --json > ~/.dotfiles/pipx/apps.json
+    pipx list --json | sed "s|\"$HOME/|\"~/|g" \
+        > ~/.dotfiles/pipx/apps.json
     pipx uninstall-all
     ~/.dotfiles/pipx/install
 

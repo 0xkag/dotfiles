@@ -10,11 +10,11 @@
                 "main_package": {
                     "app_paths": [
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/black/bin/black",
+                            "__Path__": "~/.local/share/pipx/venvs/black/bin/black",
                             "__type__": "Path"
                         },
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/black/bin/blackd",
+                            "__Path__": "~/.local/share/pipx/venvs/black/bin/blackd",
                             "__type__": "Path"
                         }
                     ],
@@ -48,7 +48,7 @@
                 "pipx_metadata_version": "0.12",
                 "python_version": "Python 3.12.16",
                 "source_interpreter": {
-                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
+                    "__Path__": "~/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
                     "__type__": "Path"
                 },
                 "venv_args": []
@@ -63,44 +63,44 @@
                 "main_package": {
                     "app_paths": [
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/cookiecutter/bin/cookiecutter",
+                            "__Path__": "~/.local/share/pipx/venvs/cookiecutter/bin/cookiecutter",
                             "__type__": "Path"
                         }
                     ],
                     "app_paths_of_dependencies": {
                         "binaryornot": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/cookiecutter/bin/binaryornot",
+                                "__Path__": "~/.local/share/pipx/venvs/cookiecutter/bin/binaryornot",
                                 "__type__": "Path"
                             }
                         ],
                         "charset-normalizer": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/cookiecutter/bin/normalizer",
+                                "__Path__": "~/.local/share/pipx/venvs/cookiecutter/bin/normalizer",
                                 "__type__": "Path"
                             }
                         ],
                         "idna": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/cookiecutter/bin/idna",
+                                "__Path__": "~/.local/share/pipx/venvs/cookiecutter/bin/idna",
                                 "__type__": "Path"
                             }
                         ],
                         "markdown-it-py": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/cookiecutter/bin/markdown-it",
+                                "__Path__": "~/.local/share/pipx/venvs/cookiecutter/bin/markdown-it",
                                 "__type__": "Path"
                             }
                         ],
                         "pygments": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/cookiecutter/bin/pygmentize",
+                                "__Path__": "~/.local/share/pipx/venvs/cookiecutter/bin/pygmentize",
                                 "__type__": "Path"
                             }
                         ],
                         "python-slugify": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/cookiecutter/bin/slugify",
+                                "__Path__": "~/.local/share/pipx/venvs/cookiecutter/bin/slugify",
                                 "__type__": "Path"
                             }
                         ]
@@ -140,7 +140,7 @@
                 "pipx_metadata_version": "0.12",
                 "python_version": "Python 3.12.16",
                 "source_interpreter": {
-                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
+                    "__Path__": "~/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
                     "__type__": "Path"
                 },
                 "venv_args": []
@@ -155,22 +155,22 @@
                 "main_package": {
                     "app_paths": [
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/graphifyy/bin/graphify",
+                            "__Path__": "~/.local/share/pipx/venvs/graphifyy/bin/graphify",
                             "__type__": "Path"
                         },
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/graphifyy/bin/graphify-mcp",
+                            "__Path__": "~/.local/share/pipx/venvs/graphifyy/bin/graphify-mcp",
                             "__type__": "Path"
                         }
                     ],
                     "app_paths_of_dependencies": {
                         "numpy": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/graphifyy/bin/f2py",
+                                "__Path__": "~/.local/share/pipx/venvs/graphifyy/bin/f2py",
                                 "__type__": "Path"
                             },
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/graphifyy/bin/numpy-config",
+                                "__Path__": "~/.local/share/pipx/venvs/graphifyy/bin/numpy-config",
                                 "__type__": "Path"
                             }
                         ]
@@ -207,7 +207,7 @@
                 "pipx_metadata_version": "0.12",
                 "python_version": "Python 3.12.16",
                 "source_interpreter": {
-                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python3.12",
+                    "__Path__": "~/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python3.12",
                     "__type__": "Path"
                 },
                 "venv_args": []
@@ -224,93 +224,93 @@
                         "app_paths_of_dependencies": {
                             "build": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/pyproject-build",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/pyproject-build",
                                     "__type__": "Path"
                                 }
                             ],
                             "cachecontrol": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/doesitcache",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/doesitcache",
                                     "__type__": "Path"
                                 }
                             ],
                             "cffi": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/cffi-gen-src",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/cffi-gen-src",
                                     "__type__": "Path"
                                 }
                             ],
                             "charset-normalizer": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/normalizer",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/normalizer",
                                     "__type__": "Path"
                                 }
                             ],
                             "dulwich": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/dul-receive-pack",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/dul-receive-pack",
                                     "__type__": "Path"
                                 },
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/dul-upload-pack",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/dul-upload-pack",
                                     "__type__": "Path"
                                 },
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/dulwich",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/dulwich",
                                     "__type__": "Path"
                                 }
                             ],
                             "findpython": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/findpython",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/findpython",
                                     "__type__": "Path"
                                 }
                             ],
                             "httpx": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/httpx",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/httpx",
                                     "__type__": "Path"
                                 }
                             ],
                             "idna": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/idna",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/idna",
                                     "__type__": "Path"
                                 }
                             ],
                             "keyring": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/keyring",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/keyring",
                                     "__type__": "Path"
                                 }
                             ],
                             "pbs-installer": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/pbs-install",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/pbs-install",
                                     "__type__": "Path"
                                 }
                             ],
                             "pkginfo": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/pkginfo",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/pkginfo",
                                     "__type__": "Path"
                                 }
                             ],
                             "poetry": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/poetry",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/poetry",
                                     "__type__": "Path"
                                 }
                             ],
                             "trove-classifiers": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/trove-classifiers",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/trove-classifiers",
                                     "__type__": "Path"
                                 }
                             ],
                             "virtualenv": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/virtualenv",
+                                    "__Path__": "~/.local/share/pipx/venvs/poetry/bin/virtualenv",
                                     "__type__": "Path"
                                 }
                             ]
@@ -359,94 +359,94 @@
                 "main_package": {
                     "app_paths": [
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/poetry",
+                            "__Path__": "~/.local/share/pipx/venvs/poetry/bin/poetry",
                             "__type__": "Path"
                         }
                     ],
                     "app_paths_of_dependencies": {
                         "build": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/pyproject-build",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/pyproject-build",
                                 "__type__": "Path"
                             }
                         ],
                         "cachecontrol": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/doesitcache",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/doesitcache",
                                 "__type__": "Path"
                             }
                         ],
                         "cffi": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/cffi-gen-src",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/cffi-gen-src",
                                 "__type__": "Path"
                             }
                         ],
                         "charset-normalizer": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/normalizer",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/normalizer",
                                 "__type__": "Path"
                             }
                         ],
                         "dulwich": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/dul-receive-pack",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/dul-receive-pack",
                                 "__type__": "Path"
                             },
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/dul-upload-pack",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/dul-upload-pack",
                                 "__type__": "Path"
                             },
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/dulwich",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/dulwich",
                                 "__type__": "Path"
                             }
                         ],
                         "findpython": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/findpython",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/findpython",
                                 "__type__": "Path"
                             }
                         ],
                         "httpx": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/httpx",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/httpx",
                                 "__type__": "Path"
                             }
                         ],
                         "idna": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/idna",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/idna",
                                 "__type__": "Path"
                             }
                         ],
                         "keyring": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/keyring",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/keyring",
                                 "__type__": "Path"
                             }
                         ],
                         "pbs-installer": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/pbs-install",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/pbs-install",
                                 "__type__": "Path"
                             }
                         ],
                         "pkginfo": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/pkginfo",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/pkginfo",
                                 "__type__": "Path"
                             }
                         ],
                         "trove-classifiers": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/trove-classifiers",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/trove-classifiers",
                                 "__type__": "Path"
                             }
                         ],
                         "virtualenv": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/poetry/bin/virtualenv",
+                                "__Path__": "~/.local/share/pipx/venvs/poetry/bin/virtualenv",
                                 "__type__": "Path"
                             }
                         ]
@@ -495,7 +495,7 @@
                 "pipx_metadata_version": "0.12",
                 "python_version": "Python 3.12.16",
                 "source_interpreter": {
-                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
+                    "__Path__": "~/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
                     "__type__": "Path"
                 },
                 "venv_args": []
@@ -510,26 +510,26 @@
                 "main_package": {
                     "app_paths": [
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/pyright/bin/pyright",
+                            "__Path__": "~/.local/share/pipx/venvs/pyright/bin/pyright",
                             "__type__": "Path"
                         },
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/pyright/bin/pyright-langserver",
+                            "__Path__": "~/.local/share/pipx/venvs/pyright/bin/pyright-langserver",
                             "__type__": "Path"
                         },
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/pyright/bin/pyright-python",
+                            "__Path__": "~/.local/share/pipx/venvs/pyright/bin/pyright-python",
                             "__type__": "Path"
                         },
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/pyright/bin/pyright-python-langserver",
+                            "__Path__": "~/.local/share/pipx/venvs/pyright/bin/pyright-python-langserver",
                             "__type__": "Path"
                         }
                     ],
                     "app_paths_of_dependencies": {
                         "nodeenv": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/pyright/bin/nodeenv",
+                                "__Path__": "~/.local/share/pipx/venvs/pyright/bin/nodeenv",
                                 "__type__": "Path"
                             }
                         ]
@@ -567,7 +567,7 @@
                 "pipx_metadata_version": "0.12",
                 "python_version": "Python 3.12.16",
                 "source_interpreter": {
-                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python3.12",
+                    "__Path__": "~/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python3.12",
                     "__type__": "Path"
                 },
                 "venv_args": []
@@ -584,17 +584,17 @@
                         "app_paths_of_dependencies": {
                             "black": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/python-lsp-server/bin/black",
+                                    "__Path__": "~/.local/share/pipx/venvs/python-lsp-server/bin/black",
                                     "__type__": "Path"
                                 },
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/python-lsp-server/bin/blackd",
+                                    "__Path__": "~/.local/share/pipx/venvs/python-lsp-server/bin/blackd",
                                     "__type__": "Path"
                                 }
                             ],
                             "python-lsp-server": [
                                 {
-                                    "__Path__": "/home/george/.local/share/pipx/venvs/python-lsp-server/bin/pylsp",
+                                    "__Path__": "~/.local/share/pipx/venvs/python-lsp-server/bin/pylsp",
                                     "__type__": "Path"
                                 }
                             ]
@@ -630,18 +630,18 @@
                 "main_package": {
                     "app_paths": [
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/python-lsp-server/bin/pylsp",
+                            "__Path__": "~/.local/share/pipx/venvs/python-lsp-server/bin/pylsp",
                             "__type__": "Path"
                         }
                     ],
                     "app_paths_of_dependencies": {
                         "black": [
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/python-lsp-server/bin/black",
+                                "__Path__": "~/.local/share/pipx/venvs/python-lsp-server/bin/black",
                                 "__type__": "Path"
                             },
                             {
-                                "__Path__": "/home/george/.local/share/pipx/venvs/python-lsp-server/bin/blackd",
+                                "__Path__": "~/.local/share/pipx/venvs/python-lsp-server/bin/blackd",
                                 "__type__": "Path"
                             }
                         ]
@@ -677,7 +677,7 @@
                 "pipx_metadata_version": "0.12",
                 "python_version": "Python 3.12.16",
                 "source_interpreter": {
-                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
+                    "__Path__": "~/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
                     "__type__": "Path"
                 },
                 "venv_args": []
@@ -692,11 +692,11 @@
                 "main_package": {
                     "app_paths": [
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/uv/bin/uv",
+                            "__Path__": "~/.local/share/pipx/venvs/uv/bin/uv",
                             "__type__": "Path"
                         },
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/uv/bin/uvx",
+                            "__Path__": "~/.local/share/pipx/venvs/uv/bin/uvx",
                             "__type__": "Path"
                         }
                     ],
@@ -730,7 +730,7 @@
                 "pipx_metadata_version": "0.12",
                 "python_version": "Python 3.12.16",
                 "source_interpreter": {
-                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
+                    "__Path__": "~/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
                     "__type__": "Path"
                 },
                 "venv_args": []
@@ -745,11 +745,11 @@
                 "main_package": {
                     "app_paths": [
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/yapf/bin/yapf",
+                            "__Path__": "~/.local/share/pipx/venvs/yapf/bin/yapf",
                             "__type__": "Path"
                         },
                         {
-                            "__Path__": "/home/george/.local/share/pipx/venvs/yapf/bin/yapf-diff",
+                            "__Path__": "~/.local/share/pipx/venvs/yapf/bin/yapf-diff",
                             "__type__": "Path"
                         }
                     ],
@@ -783,7 +783,7 @@
                 "pipx_metadata_version": "0.12",
                 "python_version": "Python 3.12.16",
                 "source_interpreter": {
-                    "__Path__": "/home/george/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
+                    "__Path__": "~/.dotfiles/_lib/pyenv/versions/3.12.16/bin/python",
                     "__type__": "Path"
                 },
                 "venv_args": []
