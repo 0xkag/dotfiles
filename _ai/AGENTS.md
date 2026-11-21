@@ -141,8 +141,9 @@ These conventions are mostly for programming, but can apply generally too.
   state as given unless I tell you to verify (or you ask me and I say ok)
 - [Never guess names](~/.dotfiles/_ai/memories/never-guess-names.md) — address people only by a
   name seen verbatim; call me Kyle
-- [Review write-ups](~/.dotfiles/_ai/memories/review-write-ups.md) - tag what needs my
-  answer `[Kyle?]`; restatements read fresh, with no old finding numbers
+- [Review write-ups](~/.dotfiles/_ai/memories/review-write-ups.md) - bracket tags
+  for sources (`[run]`, `[src]`) and for what needs my answer (`[Kyle?]`);
+  restatements read fresh, with no old finding numbers
 
 ## Agent hygiene
 
