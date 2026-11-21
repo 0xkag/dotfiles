@@ -125,6 +125,10 @@ Co-Authored-By, and come in two kinds:
 - **Links** (Slack messages and threads, GitLab MRs, anything else): a
   `Ref: <link>` line after a blank line, one per link. Write a GitLab MR in
   short form without the host: `Ref: group/sub/project!54`.
+- **The MR being merged** (in a merge commit): shorten GitLab's `See merge
+  request group/sub/project!54` line to `See MR group/sub/project!54`. Never
+  make it a `Ref:` line; `Ref:` is only for other references. It is the last
+  reference line, directly after any `Ref:` lines (2026-11-20).
 - If AI assisted with the commit, the message **ends with** a `Co-Authored-By`
   line naming the model actually used, in the form:
   `Co-Authored-By: <Provider> <Model> [Model Info Extra] <email>`.
@@ -141,7 +145,8 @@ Co-Authored-By, and come in two kinds:
 - One blank line before a `topic:` heading and after it (before its bullets).
 - One blank line between the last `-- ` bullet (the ticket bullet, if any)
   and the `Ref:` lines, and one between the `Ref:` lines and
-  `Co-Authored-By`; no blank lines between consecutive `Ref:` lines.
+  `Co-Authored-By`; no blank lines between consecutive `Ref:` lines. A
+  `See MR` line counts as the last `Ref:` line here.
 
 ## Example (single topic)
 Note the body lines are filled near column 75 (greedy `gq`), and the `Ref:`
