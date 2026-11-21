@@ -17,7 +17,8 @@ Kyle knows the environments deeply and expects claims backed by evidence.
   against the current source before repeating it; rebases and later commits
   leave line references and constants stale.
 - In reviews, separate findings into verified against the code, verified
-  against external docs, and needs Kyle (data out of reach).
+  against external docs, and needs Kyle (data out of reach), tagged
+  `[Kyle?]` per [[review-write-ups]].
 
 **But take facts Kyle states about the environment as given.** "These roles
 are available" means build on it: no mock harnesses, credential probes or
