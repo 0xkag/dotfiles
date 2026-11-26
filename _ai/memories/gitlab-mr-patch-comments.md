@@ -1,7 +1,7 @@
 ---
 name: gitlab-mr-patch-comments
 description: "On someone else's GitLab MR, ask Kyle whether to push fixes or
-post them as a .patch in an MR comment; how to do the patch comment"
+  post them as a .patch in an MR comment; how to do the patch comment"
 metadata:
   node_type: memory
   type: feedback
@@ -80,7 +80,7 @@ author" on review branches.
    the MR is ready again. Don't spell out Kyle's username; they know it:
    `@<author> once you've applied it, please @ mention me in Slack.`
 7. Every comment ends with the Co-Authored-By line; see
-   [[glab-mr-review-comments]].
+   [[agent-attribution]].
 
 **Why:** pushing changes a branch someone else owns, so it is Kyle's call; a
 patch lets the author apply the changes themselves and keep their branch and

@@ -1,12 +1,11 @@
 ---
 name: gitlab-mr-dependencies
 description: How to set cross-project GitLab MR merge dependencies
-(blocked-by) via glab, GraphQL mutation or REST blocks sub-resource, and
-how to verify them
-metadata: 
+  (blocked-by) via glab, GraphQL mutation or REST blocks sub-resource, and
+  how to verify them
+metadata:
   node_type: memory
   type: reference
-  originSessionId: 2c560b8d-566c-4256-a99d-647c33544fb7
 ---
 
 GitLab **MR dependencies** ("blocked by", the cross-reference that gates merge
@@ -41,7 +40,7 @@ global IDs). For cross-project, use the full reference form
 The mutation is a **full set** (replaces the blocker list), and the MR being
 updated is the one *blocked by* the listed references.
 
-**Gotcha (cost me a silent failure):** passing repeated `-f refs=...` flags to
+**Gotcha (a silent failure):** passing repeated `-f refs=...` flags to
 `glab api graphql` does NOT build an array — `glab` keeps only the LAST value,
 so earlier references are silently dropped and the mutation still returns
 `errors: []`. Use an **inline array literal** in the query string for multiple

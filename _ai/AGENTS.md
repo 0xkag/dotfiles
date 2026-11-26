@@ -149,16 +149,15 @@ These conventions are mostly for programming, but can apply generally too.
 
 - [Avoid scratchpad prefer
   cwd](~/.dotfiles/_ai/memories/avoid-scratchpad-prefer-cwd.md) - avoid using
-  /tmp scratchpd and instead prefer the cwd; the scratch pad gets cleared if
+  /tmp scratchpad and instead prefer the cwd; the scratch pad gets cleared if
   your sandbox (when running in a sandbox) restarts
 - [No rm workarounds](~/.dotfiles/_ai/memories/no-rm-workarounds.md) — `rm` is denied; never
   delete another way, avoid intermediates, ask me to remove files
 
 ## Git workflow
 
-- [Branch & worktree creation](~/.dotfiles/_ai/memories/git-branch-creation.md) — never create a
-  branch or worktree unless I ask; suggest one freely, then wait for a yes
-- [Branch naming](~/.dotfiles/_ai/memories/git-branch-naming.md) — plain descriptive kebab-case
+- [Branching](~/.dotfiles/_ai/memories/git-branching.md) — never create a branch or worktree
+  unless I ask; suggest one freely, then wait for a yes; name a branch with a plain kebab-case
   slug, no `feature/` / `bugfix/` / `chore/` prefix
 - [History rewrites](~/.dotfiles/_ai/memories/git-history-rewrites.md) — one complete change per
   commit, fold fix-ups in, bump last; old sha, byte-for-byte check, `--force-with-lease`

@@ -1,11 +1,10 @@
 ---
 name: commit-message-format
 description: "Kyle George's required git commit message format — subject
-prefix/casing, -- body bullets, wrapping, issue refs, Co-Authored-By"
-metadata: 
+  prefix/casing, -- body bullets, wrapping, issue refs, Co-Authored-By"
+metadata:
   node_type: memory
   type: feedback
-  originSessionId: 2c560b8d-566c-4256-a99d-647c33544fb7
 ---
 
 Kyle George's commit message convention. Follow it for EVERY commit in his repos.
@@ -105,7 +104,8 @@ def bullet_wrap(text, width=75):
 
 def bullet_check(lines, width=75):
     assert all(len(l) <= width and l.isascii() for l in lines), lines
-    assert not any(l.startswith('-') or l.endswith('-') for l in lines[1:]), lines
+    assert not any(l.startswith('-') for l in lines[1:]), lines
+    assert not any(l.endswith('-') for l in lines), lines
 ```
 A hyphen split in a pushed commit (2026-09-21) cost an amend and a
 force-push on a branch under review.
@@ -114,6 +114,13 @@ force-push on a branch under review.
 - Group bullets by topic. Lead each block with a `topic:` heading followed by
   a blank line, then the block's `-- ` lines.
 - A related block of `-- ` lines has **NO blank lines between the bullets**.
+- When the blocks are different subject topics (subsystems), name them all
+  in the subject. Join two with ` & `, e.g.
+  `shell & mise: Add mise-lock for lock refresh`; Kyle reworded
+  `shell: Add mise-lock ...` to that (2026-11-02). Separate three or more
+  with commas, e.g. `mc, vifm, nvim: Show images in file managers`; never
+  use a comma for two (2026-11-25). Blocks that are aspects of one topic
+  keep the single-topic subject, as in the multi-topic example below.
 
 ## Trailers / references (order matters, at the very end of the body)
 References in context go at the **end of the body, BEFORE**
@@ -196,8 +203,9 @@ inconsistent and harder to read in plain terminals.
 
 **How to apply:** Draft the message, then check each line length (<=75 body,
 <=56 subject), casing, ASCII-only, that no continuation line starts with `-`,
-blank-line placement, and that refs + Co-Authored-By are last. My earlier
-commits in these repos did NOT follow this — do not copy their style. See
+blank-line placement, and that refs + Co-Authored-By are last. Earlier
+agent-written commits in these repos did NOT follow this — do not copy their
+style. See
 [[agent-attribution]] for the Co-Authored-By rule on everything else written
 on Kyle's behalf (MR descriptions and comments, tickets), and
 [[git-history-rewrites]] for folding fix-ups into commits.

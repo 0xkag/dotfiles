@@ -37,5 +37,5 @@ quietly taken back.
 
 **How to apply:** before an edit, check that the latest message asks for
 one; before any command that leaves the machine, check that Kyle approved
-that action in this conversation. Related: [[git-branch-creation]],
+that action in this conversation. Related: [[git-branching]],
 [[agent-attribution]].

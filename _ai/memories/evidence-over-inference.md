@@ -12,7 +12,9 @@ Kyle knows the environments deeply and expects claims backed by evidence.
 - Say where each claim comes from: a file and line, command output, a doc
   URL. Mark anything else as an inference.
 - When something cannot be determined from what is in reach, ask in a short
-  numbered list instead of filling the gap. Kyle prefers being asked.
+  numbered list instead of filling the gap. Kyle prefers being asked. The
+  numbered list is for open factual questions; a decision between options
+  follows the DECISION line plus `AskUserQuestion` rule in AGENTS.md.
 - Re-verify earlier analysis (another agent's doc, a remembered fact)
   against the current source before repeating it; rebases and later commits
   leave line references and constants stale.
@@ -22,9 +24,10 @@ Kyle knows the environments deeply and expects claims backed by evidence.
 
 **But take facts Kyle states about the environment as given.** "These roles
 are available" means build on it: no mock harnesses, credential probes or
-multi-repo archaeology to prove it. A syntax check or the code's own
-self-test is fine. If a stated fact seems to conflict with evidence, say so
-in one line and carry on with Kyle's version.
+multi-repo archaeology to prove it, unless Kyle says to verify or agrees
+when asked. A syntax check or the code's own self-test is fine. If a stated
+fact seems to conflict with evidence, say so in one line and carry on with
+Kyle's version.
 
 **Why:** "Do not hesitate to ask me for clarification / confirmation. Do
 not guess." (2026-10-21, after an earlier agent's analysis had gone stale

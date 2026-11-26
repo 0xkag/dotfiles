@@ -1,7 +1,8 @@
 ---
-name: git-branch-creation
-description: Never create a git branch or worktree on Kyle's behalf — suggesting
-one is welcome, but wait for him to ask before creating it
+name: git-branching
+description: Never create a git branch or worktree on Kyle's behalf;
+  suggesting one is welcome, but wait for Kyle to ask. Name a requested
+  branch with a plain kebab-case slug and no feature/ (or other) prefix
 metadata:
   node_type: memory
   type: feedback
@@ -24,5 +25,15 @@ do not, and never did.
 
 **How to apply:** default to the current branch. If a branch or worktree seems
 warranted, propose it in one line and continue on the current branch unless he
-agrees. When he does ask for one, name it per [[git-branch-naming]] and note
-that nvim work has its own constraint in [[dotfiles-nvim-no-worktree]].
+agrees. When he does ask for one, name it as below. Repo memories can add
+limits, e.g. a repo where tests run in a worktree load the main checkout.
+
+## Naming
+
+Name a branch with a plain, descriptive, kebab-case slug and NO prefix.
+
+- Do: `git checkout -b s3-perishable-and-replicated-pair`
+- Don't: `git checkout -b feature/s3-perishable-and-replicated-pair`
+
+Kyle does not want a `feature/` prefix (or similar `bugfix/` / `chore/`
+prefixes) — he renamed a `feature/`-prefixed branch an agent created.

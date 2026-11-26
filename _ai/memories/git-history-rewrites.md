@@ -22,7 +22,7 @@ out.
 - Someone else's MR: do not rewrite their commits; see
   [[gitlab-mr-patch-comments]].
 - Record the old HEAD sha. Create a backup branch only when Kyle asks for
-  one ([[git-branch-creation]]).
+  one ([[git-branching]]).
 
 ## Doing it
 
